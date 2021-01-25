@@ -1,0 +1,47 @@
+: Author: Alfio Lazzaro (alfio.lazzaro@@chem.uzh.ch), UZH, 2018
+# Note: add optimization flags specific for your system (e.g. -xHost).
+
+LIBXSMM  = LIBXSMMPATH
+LIBXC    = LIBXCPATH
+LIBINT   = LIBINTPATH
+
+CC       = mpicc
+FC       = mpif90
+LD       = mpif90
+AR       = ar -r
+DFLAGS   = -D__MKL -D__FFTW3 -D__LIBXSMM \
+	   -D__parallel -D__SCALAPACK \
+	   -D__LIBXC \
+           -D__LIBINT \
+           -D__MAX_CONTR=4 CUDADEFS
+CFLAGS   = -O2 -g -mtune=native -fopenmp
+CXXFLAGS = -I$(CUDAHOME)/include -fopenmp
+NVCC_CFLAGS   = -O2
+FCFLAGS  = $(CFLAGS) $(DFLAGS)
+FCFLAGS += -ffree-form -ffree-line-length-none
+FCFLAGS += -ftree-vectorize -funroll-loops -std=f2008 -fopenmp
+FCFLAGS += -IMKL_ROOT/include -IMKL_ROOT/include/fftw
+FCFLAGS += -I$(LIBXSMM)/include
+FCFLAGS += -I$(LIBXC)/include
+FCFLAGS += -I$(LIBINT)/include
+LDFLAGS  = $(FCFLAGS)
+LDFLAGS_C = $(FCFLAGS)
+MKL_LIB  = MKL_ROOT/lib/intel64
+LIBS     = $(LIBXSMM)/lib/libxsmmf.a
+LIBS    += $(LIBXSMM)/lib/libxsmm.a
+LIBS    += $(LIBXC)/lib/libxcf03.a
+LIBS    += $(LIBXC)/lib/libxc.a
+LIBS    += $(LIBINT)/lib/libint2.a -lstdc++
+LIBS    += $(MKL_LIB)/libmkl_scalapack_lp64.a -Wl,--start-group \
+	   $(MKL_LIB)/libmkl_gf_lp64.a ${MKL_LIB}/libmkl_sequential.a \
+	   $(MKL_LIB)/libmkl_core.a \
+           ${MKL_LIB}/libmkl_blacs_INTELMPITYPE_lp64.a -Wl,--end-group \
+           -lpthread -lm
+LIBS    += CUDALIBS -ldl -lpthread -lstdc++
+
+# Required due to memory leak that occurs if high optimisations are used
+mp2_optimize_ri_basis.o: mp2_optimize_ri_basis.F
+			 $(FC) -c $(subst O2,O0,$(FCFLAGS)) $<
+
+NVCC = NVCCPATH
+NVFLAGS = -ccbin `which g++` -Xcompiler='-fopenmp' $(DFLAGS) $(NVCC_CFLAGS) -gencode arch=compute_30,code=sm_30 -gencode arch=compute_37,code=sm_37 -gencode arch=compute_50,code=sm_50 -gencode arch=compute_60,code=sm_60 -gencode arch=compute_61,code=sm_61 -gencode arch=compute_70,code=sm_70

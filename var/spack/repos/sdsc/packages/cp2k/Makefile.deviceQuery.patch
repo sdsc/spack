@@ -1,0 +1,21 @@
+--- deviceQuery.dir/Makefile	2018-09-27 12:53:33.241009800 -0700
++++ patch-files/Makefile.deviceQuery	2018-09-27 12:53:17.484005264 -0700
+@@ -242,7 +242,7 @@
+ ALL_LDFLAGS += $(addprefix -Xlinker ,$(EXTRA_LDFLAGS))
+ 
+ # Common includes and paths for CUDA
+-INCLUDES  := -I../../common/inc
++INCLUDES  := -I$(CUDAHOME)/samples/common/inc
+ LIBRARIES :=
+ 
+ ################################################################################
+@@ -289,8 +289,7 @@
+ 
+ deviceQuery: deviceQuery.o
+ 	$(EXEC) $(NVCC) $(ALL_LDFLAGS) $(GENCODE_FLAGS) -o $@ $+ $(LIBRARIES)
+-	$(EXEC) mkdir -p ../../bin/$(TARGET_ARCH)/$(TARGET_OS)/$(BUILD_TYPE)
+-	$(EXEC) cp $@ ../../bin/$(TARGET_ARCH)/$(TARGET_OS)/$(BUILD_TYPE)
++	$(EXEC) cp $@ ..
+ 
+ run: build
+ 	$(EXEC) ./deviceQuery

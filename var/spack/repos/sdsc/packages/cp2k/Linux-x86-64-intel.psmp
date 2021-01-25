@@ -1,0 +1,39 @@
+# Author: Alfio Lazzaro (alfio.lazzaro@chem.uzh.ch), UZH, 2018
+# Note: add optimization flags specific for your system (e.g. -xHost).
+
+LIBXSMM  = LIBXSMMPATH
+LIBXC    = LIBXCPATH
+LIBINT   = LIBINTPATH
+
+CC       = mpicc
+FC       = mpif90
+LD       = mpif90
+AR       = ar -r
+DFLAGS   = -D__INTEL -D__MKL -D__FFTW3 -D__LIBXSMM \
+	   -D__parallel -D__SCALAPACK \
+	   -D__LIBXC \
+	   -D__LIBINT \
+           -D__MAX_CONTR=4 CUDADEFS
+CFLAGS   = -O2 -xHost -qopenmp
+CXXFLAGS = -I$(CUDAHOME)/include -qopenmp
+FCFLAGS  = $(CFLAGS) $(DFLAGS) -qopenmp
+FCFLAGS += -IMKL_ROOT/include -IMKL_ROOT/include/fftw
+FCFLAGS += -I$(LIBXSMM)/include
+FCFLAGS += -I$(LIBXC)/include
+FCFLAGS += -I$(LIBINT)/include
+LDFLAGS  = $(FCFLAGS) -static-intel
+LDFLAGS_C = $(FCFLAGS) -static-intel -nofor_main
+MKL_LIB  = MKL_ROOT/lib/intel64
+LIBS     = -L$(LIBXSMM)/lib -lxsmmf -lxsmm
+LIBS    += -L$(LIBXC)/lib -lxcf03 -lxc
+LIBS    += -L$(LIBINT)/lib -lint2
+LIBS    += $(MKL_LIB)/libmkl_scalapack_lp64.a -Wl,--start-group \
+	   $(MKL_LIB)/libmkl_intel_lp64.a ${MKL_LIB}/libmkl_sequential.a \
+	   $(MKL_LIB)/libmkl_core.a \
+           ${MKL_LIB}/libmkl_blacs_INTELMPITYPE_lp64.a -Wl,--end-group \
+           -lpthread -lm
+LIBS    += CUDALIBS -ldl -lstdc++
+
+NVCC = NVCCPATH
+CUDAFLAGS = -D__ACC -D__DBCSR_ACC -D__PW_CUDA
+NVFLAGS = -ccbin `which icpc` -Xcompiler='-qopenmp' $(CUDAFLAGS) $(DFLAGS) -O2 -gencode arch=compute_30,code=sm_30 -gencode arch=compute_37,code=sm_37 -gencode arch=compute_50,code=sm_50 -gencode arch=compute_60,code=sm_60 -gencode arch=compute_61,code=sm_61 -gencode arch=compute_70,code=sm_70

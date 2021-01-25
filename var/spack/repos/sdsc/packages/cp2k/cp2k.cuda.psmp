@@ -1,0 +1,8 @@
+#!/bin/bash
+cuda_capability=`CUDABIN/deviceQuery 2>&1 | grep 'CUDA Capability' |uniq |awk  '{print $6}'|sed 's/\.//' 2>/dev/null`
+
+if test ! -z cuda_capability; then
+  PKGROOT/bin/cp2k.${cuda_capability}.psmp $@
+else
+  echo "POSSIBLY NOT ON A GPU NODE"
+fi

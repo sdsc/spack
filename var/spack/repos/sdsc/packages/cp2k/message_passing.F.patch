@@ -1,0 +1,12 @@
+--- cp2k-7.1/src/mpiwrap/message_passing.F	2019-12-23 12:11:56.000000000 -0800
++++ patch-files/message_passing.F	2020-05-23 13:00:23.099847825 -0700
+@@ -744,7 +744,9 @@
+ !$    no_threading_support = .FALSE.
+ #endif
+ !$    IF (no_threading_support) THEN
++         write(6,*) 'BEFORE MPI_INIT'
+          CALL mpi_init(ierr)
++         write(6,*) 'AFTER MPI_INIT'
+          IF (ierr /= 0) CALL mp_stop(ierr, "mpi_init @ mp_world_init")
+ !$    ELSE
+ !$OMP MASTER

@@ -1,0 +1,12 @@
+--- cp2k-7.1/src/start/cp2k.F	2019-12-23 12:11:57.000000000 -0800
++++ patch-files/cp2k.F	2020-05-23 13:37:34.356843266 -0700
+@@ -195,7 +195,9 @@
+       command_line_error = .TRUE.
+    END IF
+ 
++   write(6,*) 'BEFORE INIT_CP2K'
+    CALL init_cp2k(init_mpi=.TRUE., ierr=ierr)
++   write(6,*) 'AFTER INIT_CP2K'
+ 
+    IF (ierr == 0) THEN
+       ! some first info concerning how to run CP2K
