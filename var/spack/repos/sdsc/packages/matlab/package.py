@@ -1,0 +1,93 @@
+# Copyright 2013-2020 Lawrence Livermore National Security, LLC and other
+# Spack Project Developers. See the top-level COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: (Apache-2.0 OR MIT)
+
+from spack import *
+import os
+import subprocess
+
+
+class Matlab(Package):
+    """MATLAB (MATrix LABoratory) is a multi-paradigm numerical computing
+    environment and fourth-generation programming language. A proprietary
+    programming language developed by MathWorks, MATLAB allows matrix
+    manipulations, plotting of functions and data, implementation of
+    algorithms, creation of user interfaces, and interfacing with programs
+    written in other languages, including C, C++, C#, Java, Fortran and Python.
+
+    Note: MATLAB is licensed software. You will need to create an account on
+    the MathWorks homepage and download MATLAB yourself. Spack will search your
+    current directory for the download file. Alternatively, add this file to a
+    mirror so that Spack can find it. For instructions on how to set up a
+    mirror, see http://spack.readthedocs.io/en/latest/mirrors.html"""
+
+    homepage = "https://www.mathworks.com/products/matlab.html"
+    manual_download = True
+
+    version('2019b', sha256='c85ae9fb4d05af8b0ac9d808172df8d5728d568b75df95cad761e43335909d48')
+    version('2020a', sha256='c65c4e5122c1ca7b1f8467feb8cd6e0d4765c232322a1288747352a5e9e8e331')
+    version('2020b', sha256='7de3708cb95691391b0624bd21920872904d6be1c43ee59e240fe84087dd7e01')
+
+    variant(
+        'mode',
+        default='interactive',
+        values=('interactive', 'silent', 'automated'),
+        description='Installation mode (interactive, silent, or automated)'
+    )
+
+    variant(
+        'key',
+        default='<installation-key-here>',
+        values=lambda x: True,  # Anything goes as a key
+        description='The file installation key to use'
+    )
+
+    # Licensing
+    license_required = True
+    license_comment  = '#'
+    license_files    = ['licenses/license.dat']
+    license_vars     = ['LM_LICENSE_FILE']
+    license_url      = 'https://www.mathworks.com/help/install/index.html'
+
+    extendable = True
+    args=[]
+
+    def url_for_version(self, version):
+        return "file://{0}/matlab-{1}.tar.gz".format(os.getcwd(), version)
+
+    def configure(self, spec, prefix):
+        self.args = [
+            './install',
+            '-destinationFolder',
+            prefix,
+            '-mode',
+            spec.variants['mode'].value,
+            '-fileInstallationKey',
+            spec.variants['key'].value,
+            '-licensePath',
+            self.global_license_file,
+            '-agreeToLicense',
+             'yes',
+            '-outputFile',
+             '/tmp/matlab.log',
+            '-lmgrFiles',
+            'false',
+            '-lmgrService',
+            'false'
+        ]
+
+    def install(self, spec, prefix):
+        self.configure(spec, prefix)
+
+        # Run silent installation script
+        # Full path required
+#       input_file = join_path(
+#           self.stage.source_path, 'spack_installer_input.txt')
+        with open('/tmp/o','w') as fp:
+            print(self.args,file=fp)
+        out=subprocess.run(self.args,stdout=subprocess.PIPE)
+#       out = out.stdout.decode("utf-8").rstrip()
+#       with open('/tmp/o','a') as fp:
+#           print(out,file=fp)
+
