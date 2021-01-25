@@ -10,8 +10,8 @@ __pycache__/
 *~
 .DS_Store
 .idea
-# Ignore everything in /etc/spack except /etc/spack/defaults
-/etc/spack/*
+# DO NOT Ignore everything in /etc/spack except /etc/spack/defaults
+#/etc/spack/*
 !/etc/spack/defaults
 /etc/spackconfig
 /share/spack/dotkit
