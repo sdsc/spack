@@ -1,0 +1,11 @@
+--- gaussian-16.C.01/g16/bsd/bldg16	2019-02-21 12:48:51.000000000 -0800
++++ patch-files/bldg16	2019-08-09 14:52:47.101165826 -0700
+@@ -168,7 +168,7 @@
+   cc -o gau-machine -DNECSXACE bsd/machine.c
+ else
+   set zzz = `which ifort`
+-  if ($status) unsetenv LD_LIBRARY_PATH
++# if ($status) unsetenv LD_LIBRARY_PATH
+   setenv NPES 1
+   cc -o gau-machine $machflag bsd/machine.c
+   unsetenv NPES
