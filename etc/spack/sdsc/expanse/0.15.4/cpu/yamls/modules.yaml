@@ -1,0 +1,18 @@
+modules:
+  enable::
+    - lmod
+  lmod:
+    core_compilers:
+      - 'gcc@8.3.1'
+    hierarchy:
+      - mpi
+    hash_length: 0
+    whilelist:
+      - gcc
+      - intel
+    blacklist:
+      - '%gcc@8.3.1'
+    blacklist_implicits: true
+    naming_scheme: '{name}/{version}'
+    projections:
+      all: '{name}/{version}'
