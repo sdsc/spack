@@ -7,7 +7,7 @@ modules:
     hierarchy:
       - mpi
     hash_length: 0
-    whilelist:
+    whitelist:
       - gcc
       - intel
     blacklist:
