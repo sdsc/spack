@@ -3,4 +3,6 @@ packages:
     externals:
       - spec: 'openssl@1.1.1c % gcc@8.3.1 arch=linux-centos8-zen'
         prefix: /usr
+      - spec: 'openssl@1.1.1c % gcc@10.2.0 arch=linux-centos8-zen2'
+        prefix: /usr
     buildable: false
