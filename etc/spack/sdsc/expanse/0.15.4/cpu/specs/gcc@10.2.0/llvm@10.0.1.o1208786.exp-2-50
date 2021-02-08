@@ -1,0 +1,4581 @@
+1612727029 1208786 9a9fad7256f3c2f01e15fe68f52e112d  /home/mkandes/cm/shared/apps/spack/0.15.4/cpu/etc/spack/sdsc/expanse/0.15.4/cpu/specs/gcc@10.2.0/llvm@10.0.1.sh afterok:1208782
+
+#!/usr/bin/env bash
+
+#SBATCH --job-name=llvm@10.0.1
+#SBATCH --account=use300
+#SBATCH --partition=compute
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=1
+#SBATCH --cpus-per-task=128
+#SBATCH --mem=248G
+#SBATCH --time=01:00:00
+#SBATCH --output=%x.o%j.%N
+
+declare -xr LOCAL_TIME="$(date +'%Y%m%dT%H%M%S%z')"
+declare -xir UNIX_TIME="$(date +'%s')"
+
+declare -xr SYSTEM_NAME='expanse'
+
+declare -xr SPACK_VERSION='0.15.4'
+declare -xr SPACK_INSTANCE_NAME='cpu'
+declare -xr SPACK_INSTANCE_DIR="${HOME}/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}"
+
+declare -xr SLURM_JOB_SCRIPT="$(scontrol show job ${SLURM_JOB_ID} | awk -F= '/Command=/{print $2}')"
+declare -xr SLURM_JOB_MD5SUM="$(md5sum ${SLURM_JOB_SCRIPT})"
+
+declare -xr SCHEDULER_MODULE='slurm/expanse/20.02.3'
+
+echo "${UNIX_TIME} ${SLURM_JOB_ID} ${SLURM_JOB_MD5SUM} ${SLURM_JOB_DEPENDENCY}" 
+echo ""
+
+cat "${SLURM_JOB_SCRIPT}"
+
+module purge
+module load "${SCHEDULER_MODULE}"
+module list
+. "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
+
+declare -xr SPACK_PACKAGE='llvm@10.0.1'
+declare -xr SPACK_COMPILER='gcc@10.2.0'
+declare -xr SPACK_VARIANTS='+python'
+declare -xr SPACK_DEPENDENCIES="^python@3.8.5/$(spack find --format '{hash:7}' python@3.8.5 % ${SPACK_COMPILER})"
+declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
+
+printenv
+
+spack config get compilers  
+spack config get config  
+spack config get mirrors
+spack config get modules
+spack config get packages
+spack config get repos
+spack config get upstreams
+
+spack spec --long --namespaces --types "${SPACK_SPEC}"
+spack spec --yaml "${SPACK_SPEC}"
+
+time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all "${SPACK_SPEC}"
+
+spack module lmod refresh --delete-tree -y
+
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'openjdk@11.0.2.sh'
+
+Currently Loaded Modules:
+  1) slurm/expanse/20.02.3
+
+ 
+
+LD_LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:/cm/shared/apps/slurm/current/lib64
+LS_COLORS=rs=0:di=38;5;33:ln=38;5;51:mh=00:pi=40;38;5;11:so=38;5;13:do=38;5;5:bd=48;5;232;38;5;11:cd=48;5;232;38;5;3:or=48;5;232;38;5;9:mi=01;05;37;41:su=48;5;196;38;5;15:sg=48;5;11;38;5;16:ca=48;5;196;38;5;226:tw=48;5;10;38;5;16:ow=48;5;10;38;5;21:st=48;5;21;38;5;15:ex=38;5;40:*.tar=38;5;9:*.tgz=38;5;9:*.arc=38;5;9:*.arj=38;5;9:*.taz=38;5;9:*.lha=38;5;9:*.lz4=38;5;9:*.lzh=38;5;9:*.lzma=38;5;9:*.tlz=38;5;9:*.txz=38;5;9:*.tzo=38;5;9:*.t7z=38;5;9:*.zip=38;5;9:*.z=38;5;9:*.dz=38;5;9:*.gz=38;5;9:*.lrz=38;5;9:*.lz=38;5;9:*.lzo=38;5;9:*.xz=38;5;9:*.zst=38;5;9:*.tzst=38;5;9:*.bz2=38;5;9:*.bz=38;5;9:*.tbz=38;5;9:*.tbz2=38;5;9:*.tz=38;5;9:*.deb=38;5;9:*.rpm=38;5;9:*.jar=38;5;9:*.war=38;5;9:*.ear=38;5;9:*.sar=38;5;9:*.rar=38;5;9:*.alz=38;5;9:*.ace=38;5;9:*.zoo=38;5;9:*.cpio=38;5;9:*.7z=38;5;9:*.rz=38;5;9:*.cab=38;5;9:*.wim=38;5;9:*.swm=38;5;9:*.dwm=38;5;9:*.esd=38;5;9:*.jpg=38;5;13:*.jpeg=38;5;13:*.mjpg=38;5;13:*.mjpeg=38;5;13:*.gif=38;5;13:*.bmp=38;5;13:*.pbm=38;5;13:*.pgm=38;5;13:*.ppm=38;5;13:*.tga=38;5;13:*.xbm=38;5;13:*.xpm=38;5;13:*.tif=38;5;13:*.tiff=38;5;13:*.png=38;5;13:*.svg=38;5;13:*.svgz=38;5;13:*.mng=38;5;13:*.pcx=38;5;13:*.mov=38;5;13:*.mpg=38;5;13:*.mpeg=38;5;13:*.m2v=38;5;13:*.mkv=38;5;13:*.webm=38;5;13:*.ogm=38;5;13:*.mp4=38;5;13:*.m4v=38;5;13:*.mp4v=38;5;13:*.vob=38;5;13:*.qt=38;5;13:*.nuv=38;5;13:*.wmv=38;5;13:*.asf=38;5;13:*.rm=38;5;13:*.rmvb=38;5;13:*.flc=38;5;13:*.avi=38;5;13:*.fli=38;5;13:*.flv=38;5;13:*.gl=38;5;13:*.dl=38;5;13:*.xcf=38;5;13:*.xwd=38;5;13:*.yuv=38;5;13:*.cgm=38;5;13:*.emf=38;5;13:*.ogv=38;5;13:*.ogx=38;5;13:*.aac=38;5;45:*.au=38;5;45:*.flac=38;5;45:*.m4a=38;5;45:*.mid=38;5;45:*.midi=38;5;45:*.mka=38;5;45:*.mp3=38;5;45:*.mpc=38;5;45:*.ogg=38;5;45:*.ra=38;5;45:*.wav=38;5;45:*.oga=38;5;45:*.opus=38;5;45:*.spx=38;5;45:*.xspf=38;5;45:
+SLURM_NODEID=0
+SLURM_TASK_PID=102895
+__LMOD_REF_COUNT_PATH=/cm/shared/apps/slurm/current/sbin:1;/cm/shared/apps/slurm/current/bin:1;/home/mkandes/cm/shared/apps/spack/0.15.4/cpu/bin:1;/usr/local/bin:1;/usr/bin:1;/usr/local/sbin:1;/usr/sbin:1;/opt/dell/srvadmin/bin:1;/home/mkandes/.local/bin:1;/home/mkandes/bin:1
+_ModuleTable002_=ZXMiLCIvdXNyL3NoYXJlL21vZHVsZWZpbGVzIiwiL3Vzci9zaGFyZS9Nb2R1bGVzL21vZHVsZWZpbGVzIiwiL2NtL3NoYXJlZC9tb2R1bGVmaWxlcyIsfSxbInN5c3RlbUJhc2VNUEFUSCJdPSIvY20vbG9jYWwvbW9kdWxlZmlsZXM6L2NtL3NoYXJlZC9hcHBzL3hzZWRlL21vZHVsZWZpbGVzOi9jbS9zaGFyZWQvbW9kdWxlZmlsZXM6L2V0Yy9tb2R1bGVmaWxlczovdXNyL3NoYXJlL21vZHVsZWZpbGVzOi91c3Ivc2hhcmUvTW9kdWxlcy9tb2R1bGVmaWxlcyIsfQ==
+SSH_CONNECTION=208.58.214.56 49268 198.202.100.14 22
+SLURM_PRIO_PROCESS=0
+LANG=en_US.UTF-8
+SLURM_SUBMIT_DIR=/home/mkandes/cm/shared/apps/spack/0.15.4/cpu/etc/spack/sdsc/expanse/0.15.4/cpu/specs/gcc@10.2.0
+HISTCONTROL=ignoredups
+HOSTNAME=exp-2-50
+LMOD_SYSTEM_DEFAULT_MODULES=DefaultModules
+SLURM_JOB_DEPENDENCY=afterok:1208782
+OLDPWD=/home/mkandes/cm/shared/apps/spack/0.15.4/cpu/etc/spack/sdsc/expanse/0.15.4/cpu/specs
+__LMOD_REF_COUNT__LMFILES_=/cm/local/modulefiles/slurm/expanse/20.02.3:1
+SLURM_CPUS_PER_TASK=128
+SPACK_DEPENDENCIES=^python@3.8.5/pwkt76p
+ENVIRONMENT=BATCH
+SPACK_VERSION=0.15.4
+SLURM_PROCID=0
+SLURM_JOB_GID=300
+SPACK_VARIANTS=+python
+SPACK_INSTANCE_DIR=/home/mkandes/cm/shared/apps/spack/0.15.4/cpu
+__LMOD_REF_COUNT_LD_LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:1;/cm/shared/apps/slurm/current/lib64:1
+SLURM_JOB_SCRIPT=/home/mkandes/cm/shared/apps/spack/0.15.4/cpu/etc/spack/sdsc/expanse/0.15.4/cpu/specs/gcc@10.2.0/llvm@10.0.1.sh
+SLURMD_NODENAME=exp-2-50
+SLURM_TASKS_PER_NODE=1
+S_COLORS=auto
+SPACK_COMPILER=gcc@10.2.0
+XDG_SESSION_ID=312103
+SLURM_NNODES=1
+USER=mkandes
+SLURM_NTASKS_PER_NODE=1
+__LMOD_REF_COUNT_MODULEPATH=/cm/local/modulefiles:1;/cm/shared/apps/xsede/modulefiles:1;/etc/modulefiles:1;/usr/share/modulefiles:1;/usr/share/Modules/modulefiles:1;/cm/shared/modulefiles:1
+__LMOD_REF_COUNT_LOADEDMODULES=slurm/expanse/20.02.3:1
+PWD=/home/mkandes/cm/shared/apps/spack/0.15.4/cpu/etc/spack/sdsc/expanse/0.15.4/cpu/specs/gcc@10.2.0
+ENABLE_LMOD=1
+SLURM_JOB_NODELIST=exp-2-50
+HOME=/home/mkandes
+SLURM_CLUSTER_NAME=expanse
+LMOD_COLORIZE=yes
+LOCAL_TIME=20210207T114349-0800
+SLURM_NODELIST=exp-2-50
+SSH_CLIENT=208.58.214.56 49268 22
+LMOD_VERSION=8.2.4
+CPATH=/cm/shared/apps/slurm/current/include
+SLURM_NTASKS=1
+LMOD_SETTARG_CMD=:
+SLURM_JOB_CPUS_PER_NODE=128
+BASH_ENV=/usr/share/lmod/lmod/init/bash
+SLURM_TOPOLOGY_ADDR=exp-2-50
+SLURM_WORKING_CLUSTER=expanse:mgr1:6817:8960:109
+SLURM_JOB_MD5SUM=9a9fad7256f3c2f01e15fe68f52e112d  /home/mkandes/cm/shared/apps/spack/0.15.4/cpu/etc/spack/sdsc/expanse/0.15.4/cpu/specs/gcc@10.2.0/llvm@10.0.1.sh
+SPACK_PACKAGE=llvm@10.0.1
+__LMOD_REF_COUNT_LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:1;/cm/shared/apps/slurm/current/lib64:1
+SLURM_JOB_NAME=llvm@10.0.1
+TMPDIR=/tmp
+LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:/cm/shared/apps/slurm/current/lib64
+LMOD_sys=Linux
+SLURM_JOBID=1208786
+SYSTEM_NAME=expanse
+_ModuleTable001_=X01vZHVsZVRhYmxlXz17WyJNVHZlcnNpb24iXT0zLFsiY19yZWJ1aWxkVGltZSJdPWZhbHNlLFsiY19zaG9ydFRpbWUiXT1mYWxzZSxkZXB0aFQ9e30sZmFtaWx5PXt9LG1UPXtzbHVybT17WyJmbiJdPSIvY20vbG9jYWwvbW9kdWxlZmlsZXMvc2x1cm0vZXhwYW5zZS8yMC4wMi4zIixbImZ1bGxOYW1lIl09InNsdXJtL2V4cGFuc2UvMjAuMDIuMyIsWyJsb2FkT3JkZXIiXT0xLHByb3BUPXt9LFsic3RhY2tEZXB0aCJdPTAsWyJzdGF0dXMiXT0iYWN0aXZlIixbInVzZXJOYW1lIl09InNsdXJtL2V4cGFuc2UvMjAuMDIuMyIsfSx9LG1wYXRoQT17Ii9jbS9sb2NhbC9tb2R1bGVmaWxlcyIsIi9jbS9zaGFyZWQvYXBwcy94c2VkZS9tb2R1bGVmaWxlcyIsIi9ldGMvbW9kdWxlZmls
+SLURM_CONF=/cm/shared/apps/slurm/var/etc/expanse/slurm.conf
+LOADEDMODULES=slurm/expanse/20.02.3
+__LMOD_REF_COUNT_MANPATH=/cm/shared/apps/slurm/current/man:2;/usr/share/lmod/lmod/share/man:1;/usr/local/share/man:1;/usr/share/man:1;/cm/local/apps/environment-modules/current/share/man:1
+_ModuleTable003_=dXNlck5hbWUiXT0ic2x1cm0iLH0sfSxtcGF0aEE9eyIvY20vc2hhcmVkL2FwcHMvc3BhY2svY3B1L2xtb2QvbGludXgtY2VudG9zOC14ODZfNjQvQ29yZSIsIi9jbS9sb2NhbC9tb2R1bGVmaWxlcyIsIi9jbS9zaGFyZWQvYXBwcy94c2VkZS9tb2R1bGVmaWxlcyIsIi9ldGMvbW9kdWxlZmlsZXMiLCIvdXNyL3NoYXJlL21vZHVsZWZpbGVzIiwiL3Vzci9zaGFyZS9Nb2R1bGVzL21vZHVsZWZpbGVzIiwiL2NtL3NoYXJlZC9tb2R1bGVmaWxlcyIsfSxbInN5c3RlbUJhc2VNUEFUSCJdPSIvY20vbG9jYWwvbW9kdWxlZmlsZXM6L2NtL3NoYXJlZC9hcHBzL3hzZWRlL21vZHVsZWZpbGVzOi9jbS9zaGFyZWQvbW9kdWxlZmlsZXM6L2V0Yy9tb2R1bGVmaWxlczovdXNyL3NoYXJlL21v
+SLURM_NODE_ALIASES=(null)
+SLURM_JOB_QOS=normal-qos
+LMOD_ROOT=/usr/share/lmod
+SLURM_TOPOLOGY_ADDR_PATTERN=node
+SSH_TTY=/dev/pts/53
+MAIL=/var/spool/mail/mkandes
+SLURM_CPUS_ON_NODE=128
+LMOD_arch=x86_64
+SLURM_JOB_NUM_NODES=1
+__Init_Default_Modules=1
+CMD_WLM_CLUSTER_NAME=expanse
+SLURM_MEM_PER_NODE=253952
+SPACK_ROOT=/home/mkandes/cm/shared/apps/spack/0.15.4/cpu
+SHELL=/bin/bash
+TERM=xterm-256color
+SLURM_JOB_UID=501506
+_ModuleTable_Sz_=2
+__LMOD_REF_COUNT_CPATH=/cm/shared/apps/slurm/current/include:1
+SLURM_JOB_PARTITION=compute
+SPACK_INSTANCE_NAME=cpu
+SLURM_JOB_USER=mkandes
+SLURM_NPROCS=1
+SHLVL=18
+SLURM_SUBMIT_HOST=exp-2-50
+UNIX_TIME=1612727029
+SLURM_JOB_ACCOUNT=use300
+MANPATH=/cm/shared/apps/slurm/current/man:/usr/share/lmod/lmod/share/man::/usr/local/share/man:/usr/share/man:/cm/local/apps/environment-modules/current/share/man
+SPACK_LD_LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:/cm/shared/apps/slurm/current/lib64
+LMOD_PREPEND_BLOCK=normal
+MODULEPATH=/cm/local/modulefiles:/cm/shared/apps/xsede/modulefiles:/etc/modulefiles:/usr/share/modulefiles:/usr/share/Modules/modulefiles:/cm/shared/modulefiles
+SLURM_GTIDS=0
+LOGNAME=mkandes
+DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/501506/bus
+XDG_RUNTIME_DIR=/run/user/501506
+MODULEPATH_ROOT=/usr/share/modulefiles
+PATH=/cm/shared/apps/slurm/current/sbin:/cm/shared/apps/slurm/current/bin:/home/mkandes/cm/shared/apps/spack/0.15.4/cpu/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/opt/dell/srvadmin/bin:/home/mkandes/.local/bin:/home/mkandes/bin
+SLURM_JOB_ID=1208786
+_LMFILES_=/cm/local/modulefiles/slurm/expanse/20.02.3
+SCHEDULER_MODULE=slurm/expanse/20.02.3
+MODULESHOME=/usr/share/lmod/lmod
+LMOD_SETTARG_FULL_SUPPORT=no
+HISTSIZE=1000
+LMOD_PKG=/usr/share/lmod/lmod
+SPACK_SPEC=llvm@10.0.1 % gcc@10.2.0 +python ^python@3.8.5/pwkt76p
+LMOD_CMD=/usr/share/lmod/lmod/libexec/lmod
+SLURM_LOCALID=0
+LESSOPEN=||/usr/bin/lesspipe.sh %s
+LMOD_FULL_SETTARG_SUPPORT=no
+LMOD_DIR=/usr/share/lmod/lmod/libexec
+BASH_FUNC_module%%=() {  eval $($LMOD_CMD bash "$@") && eval $(${LMOD_SETTARG_CMD:-:} -s sh)
+}
+BASH_FUNC_spack%%=() {  for var in LD_LIBRARY_PATH DYLD_LIBRARY_PATH DYLD_FALLBACK_LIBRARY_PATH;
+ do
+ eval "if [ -n \"\${${var}-}\" ]; then export SPACK_$var=\${${var}}; fi";
+ done;
+ if [ -n "${ZSH_VERSION:-}" ]; then
+ emulate -L sh;
+ fi;
+ _sp_flags="";
+ while [ ! -z ${1+x} ] && [ "${1#-}" != "${1}" ]; do
+ _sp_flags="$_sp_flags $1";
+ shift;
+ done;
+ if [ -n "$_sp_flags" ] && [ "${_sp_flags#*h}" != "${_sp_flags}" ] || [ "${_sp_flags#*V}" != "${_sp_flags}" ]; then
+ command spack $_sp_flags "$@";
+ return;
+ fi;
+ _sp_subcommand="";
+ if [ ! -z ${1+x} ]; then
+ _sp_subcommand="$1";
+ shift;
+ fi;
+ case $_sp_subcommand in 
+ "cd")
+ _sp_arg="";
+ if [ -n "$1" ]; then
+ _sp_arg="$1";
+ shift;
+ fi;
+ if [ "$_sp_arg" = "-h" ] || [ "$_sp_arg" = "--help" ]; then
+ command spack cd -h;
+ else
+ LOC="$(spack location $_sp_arg "$@")";
+ if [ -d "$LOC" ]; then
+ cd "$LOC";
+ else
+ return 1;
+ fi;
+ fi;
+ return
+ ;;
+ "env")
+ _sp_arg="";
+ if [ -n "$1" ]; then
+ _sp_arg="$1";
+ shift;
+ fi;
+ if [ "$_sp_arg" = "-h" ] || [ "$_sp_arg" = "--help" ]; then
+ command spack env -h;
+ else
+ case $_sp_arg in 
+ activate)
+ _a=" $@";
+ if [ -z ${1+x} ] || [ "${_a#* --sh}" != "$_a" ] || [ "${_a#* --csh}" != "$_a" ] || [ "${_a#* -h}" != "$_a" ] || [ "${_a#* --help}" != "$_a" ]; then
+ command spack env activate "$@";
+ else
+ eval $(command spack $_sp_flags env activate --sh "$@");
+ fi
+ ;;
+ deactivate)
+ _a=" $@";
+ if [ "${_a#* --sh}" != "$_a" ] || [ "${_a#* --csh}" != "$_a" ]; then
+ command spack env deactivate "$@";
+ else
+ if [ -n "$*" ]; then
+ command spack env deactivate -h;
+ else
+ eval $(command spack $_sp_flags env deactivate --sh);
+ fi;
+ fi
+ ;;
+ *)
+ command spack env $_sp_arg "$@"
+ ;;
+ esac;
+ fi;
+ return
+ ;;
+ "load" | "unload")
+ _a=" $@";
+ if [ "${_a#* --sh}" != "$_a" ] || [ "${_a#* --csh}" != "$_a" ] || [ "${_a#* -h}" != "$_a" ] || [ "${_a#* --help}" != "$_a" ]; then
+ command spack $_sp_flags $_sp_subcommand "$@";
+ else
+ eval $(command spack $_sp_flags $_sp_subcommand --sh "$@" ||                     echo "return 1");
+ fi
+ ;;
+ *)
+ command spack $_sp_flags $_sp_subcommand "$@"
+ ;;
+ esac
+}
+BASH_FUNC_ml%%=() {  eval $($LMOD_DIR/ml_cmd "$@")
+}
+_=/usr/bin/printenv
+compilers:
+- compiler:
+    spec: gcc@8.3.1
+    paths:
+      cc: /usr/bin/gcc
+      cxx: /usr/bin/g++
+      f77: /usr/bin/gfortran
+      fc: /usr/bin/gfortran
+    flags:
+      cflags: -O2 -march=native
+      cxxflags: -O2 -march=native
+      fflags: -O2 -march=native
+    operating_system: centos8
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+- compiler:
+    spec: gcc@10.2.0
+    paths:
+      cc: /home/mkandes/cm/shared/apps/spack/0.15.4/cpu/opt/spack/linux-centos8-zen/gcc-8.3.1/gcc-10.2.0-l7hz3e5lm6qrajgevsompjxkrwszyewy/bin/gcc
+      cxx: /home/mkandes/cm/shared/apps/spack/0.15.4/cpu/opt/spack/linux-centos8-zen/gcc-8.3.1/gcc-10.2.0-l7hz3e5lm6qrajgevsompjxkrwszyewy/bin/g++
+      f77: /home/mkandes/cm/shared/apps/spack/0.15.4/cpu/opt/spack/linux-centos8-zen/gcc-8.3.1/gcc-10.2.0-l7hz3e5lm6qrajgevsompjxkrwszyewy/bin/gfortran
+      fc: /home/mkandes/cm/shared/apps/spack/0.15.4/cpu/opt/spack/linux-centos8-zen/gcc-8.3.1/gcc-10.2.0-l7hz3e5lm6qrajgevsompjxkrwszyewy/bin/gfortran
+    flags:
+      cflags: -O2 -march=native
+      cxxflags: -O2 -march=native
+      fflags: -O2 -march=native
+    operating_system: centos8
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+config:
+  debug: false
+  connect_timeout: 10
+  verify_ssl: true
+  checksum: true
+  dirty: false
+  build_jobs: 16
+  build_stage:
+  - $tempdir/$user/spack-stage
+  - ~/.spack/stage
+  # - $spack/var/spack/stage
+
+
+  # Cache directory for already downloaded source tarballs and archived
+  # repositories. This can be purged with `spack clean --downloads`.
+  install_tree:
+    root: $spack/opt/spack
+    projections:
+      all: ${ARCHITECTURE}/${COMPILERNAME}-${COMPILERVER}/${PACKAGE}-${VERSION}-${HASH}
+  template_dirs:
+  - $spack/share/spack/templates
+
+
+  # Locations where different types of modules should be installed.
+  module_roots:
+    tcl: $spack/share/spack/modules
+    lmod: $spack/share/spack/lmod
+  source_cache: $spack/var/spack/cache
+  misc_cache: ~/.spack/cache
+  suppress_gpg_warnings: false
+  install_missing_compilers: false
+  build_language: C
+  locks: true
+  ccache: false
+  db_lock_timeout: 3
+  package_lock_timeout:
+  shared_linking: rpath
+  allow_sgid: true
+mirrors:
+  spack-public: https://spack-llnl-mirror.s3-us-west-2.amazonaws.com/
+modules:
+  enable:
+  - lmod
+  prefix_inspections:
+    bin:
+    - PATH
+    man:
+    - MANPATH
+    share/man:
+    - MANPATH
+    share/aclocal:
+    - ACLOCAL_PATH
+    lib:
+    - LD_LIBRARY_PATH
+    - LIBRARY_PATH
+    lib64:
+    - LD_LIBRARY_PATH
+    - LIBRARY_PATH
+    include:
+    - C_INCLUDE_PATH
+    - CPLUS_INCLUDE_PATH
+    
+      # The INCLUDE env variable specifies paths to look for
+      # .mod file for Intel Fortran compilers
+    - INCLUDE
+    lib/pkgconfig:
+    - PKG_CONFIG_PATH
+    lib64/pkgconfig:
+    - PKG_CONFIG_PATH
+    share/pkgconfig:
+    - PKG_CONFIG_PATH
+    ? ''
+    : - CMAKE_PREFIX_PATH
+
+  lmod:
+    hierarchy:
+    - mpi
+    core_compilers:
+    - gcc@8.3.1
+    hash_length: 0
+    whitelist:
+    - gcc
+    - intel
+    blacklist:
+    - '%gcc@8.3.1'
+    blacklist_implicits: true
+    naming_scheme: '{name}/{version}'
+    projections:
+      all: '{name}/{version}'
+packages:
+  all:
+    compiler: [gcc, intel, pgi, clang, xl, nag, fj]
+    providers:
+      D: [ldc]
+      awk: [gawk]
+      blas: [openblas]
+      daal: [intel-daal]
+      elf: [elfutils]
+      fftw-api: [fftw]
+      gl: [mesa+opengl, opengl]
+      glx: [mesa+glx, opengl]
+      glu: [mesa-glu, openglu]
+      golang: [gcc]
+      iconv: [libiconv]
+      ipp: [intel-ipp]
+      java: [openjdk, jdk, ibm-java]
+      jpeg: [libjpeg-turbo, libjpeg]
+      lapack: [openblas]
+      mariadb-client: [mariadb-c-client, mariadb]
+      mkl: [intel-mkl]
+      mpe: [mpe2]
+      mpi: [openmpi, mpich]
+      mysql-client: [mysql, mariadb-c-client]
+      opencl: [pocl]
+      pil: [py-pillow-simd]
+      pkgconfig: [pkgconf, pkg-config]
+      rpc: [libtirpc]
+      scalapack: [netlib-scalapack]
+      sycl: [hipsycl]
+      szip: [libszip, libaec]
+      tbb: [intel-tbb]
+      unwind: [libunwind]
+    permissions:
+      read: world
+      write: user
+  openssl:
+    externals:
+    - spec: openssl@1.1.1c % gcc@8.3.1 arch=linux-centos8-zen
+      prefix: /usr
+    - spec: openssl@1.1.1c % gcc@10.2.0 arch=linux-centos8-zen2
+      prefix: /usr
+    buildable: false
+repos:
+- $spack/var/spack/repos/sdsc
+- $spack/var/spack/repos/builtin
+upstreams: {}
+Input spec
+--------------------------------
+[    ]  .llvm@10.0.1%gcc@10.2.0+python
+[    ]      ^builtin.python@3.8.5%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +bz2+ctypes+dbm~debug+libxml2+lzma~nis+optimizations+pic+pyexpat+pythoncmd+readline+shared+sqlite3+ssl~tix+tkinter~ucs4+uuid+zlib patches=0d98e93189bc278fbc37a50ed7f183bd8aaf249a8e1670a465f0db6bb4f8cf87 arch=linux-centos8-zen2
+[bl  ]          ^builtin.bzip2@1.0.8%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +shared arch=linux-centos8-zen2
+[bl  ]          ^builtin.expat@2.2.9%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +libbsd arch=linux-centos8-zen2
+[bl  ]              ^builtin.libbsd@0.10.0%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-centos8-zen2
+[bl  ]          ^builtin.gdbm@1.18.1%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  patches=7f569b9287e9e5a4236636eef32ff3428f0462ec17aea359e0ebee07649f1f16 arch=linux-centos8-zen2
+[bl  ]              ^builtin.readline@8.0%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-centos8-zen2
+[bl  ]                  ^builtin.ncurses@6.2%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~symlinks+termlib arch=linux-centos8-zen2
+[bl  ]          ^builtin.gettext@0.21%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +bzip2+curses+git~libunistring+libxml2+tar+xz arch=linux-centos8-zen2
+[bl  ]              ^builtin.libiconv@1.16%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-centos8-zen2
+[bl  ]              ^builtin.libxml2@2.9.10%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~python arch=linux-centos8-zen2
+[blr ]                  ^builtin.xz@5.2.5%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~pic arch=linux-centos8-zen2
+[bl  ]                  ^builtin.zlib@1.2.11%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +optimize+pic+shared arch=linux-centos8-zen2
+[bl  ]              ^builtin.tar@1.32%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-centos8-zen2
+[bl  ]          ^builtin.libffi@3.3%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  patches=26f26c6f29a7ce9bf370ad3ab2610f99365b4bdd7b82e7c31df41a3370d685c0 arch=linux-centos8-zen2
+[bl  ]          ^builtin.libuuid@1.0.3%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-centos8-zen2
+[bl  ]          ^builtin.openssl@1.1.1c%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +systemcerts arch=linux-centos8-zen2
+[bl  ]          ^builtin.sqlite@3.33.0%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +column_metadata+fts+functions+rtree arch=linux-centos8-zen2
+[bl  ]          ^builtin.tcl@8.5.19%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-centos8-zen2
+[bl  ]          ^builtin.tk@8.5.19%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +xft+xss arch=linux-centos8-zen2
+[bl  ]              ^builtin.libx11@1.6.7%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-centos8-zen2
+[bl  ]                  ^builtin.kbproto@1.0.7%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-centos8-zen2
+[bl  ]                  ^builtin.libxcb@1.13%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-centos8-zen2
+[bl  ]                      ^builtin.libpthread-stubs@0.4%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-centos8-zen2
+[bl  ]                      ^builtin.libxau@1.0.8%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-centos8-zen2
+[bl  ]                          ^builtin.xproto@7.0.31%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-centos8-zen2
+[bl  ]                      ^builtin.libxdmcp@1.1.2%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-centos8-zen2
+[bl  ]                  ^builtin.xextproto@7.3.0%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-centos8-zen2
+[bl  ]              ^builtin.libxft@2.3.2%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-centos8-zen2
+[bl  ]                  ^builtin.fontconfig@2.13.1%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-centos8-zen2
+[bl  ]                      ^builtin.font-util@1.3.2%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  fonts=encodings,font-adobe-100dpi,font-adobe-75dpi,font-adobe-utopia-100dpi,font-adobe-utopia-75dpi,font-adobe-utopia-type1,font-alias,font-arabic-misc,font-bh-100dpi,font-bh-75dpi,font-bh-lucidatypewriter-100dpi,font-bh-lucidatypewriter-75dpi,font-bh-ttf,font-bh-type1,font-bitstream-100dpi,font-bitstream-75dpi,font-bitstream-speedo,font-bitstream-type1,font-cronyx-cyrillic,font-cursor-misc,font-daewoo-misc,font-dec-misc,font-ibm-type1,font-isas-misc,font-jis-misc,font-micro-misc,font-misc-cyrillic,font-misc-ethiopic,font-misc-meltho,font-misc-misc,font-mutt-misc,font-schumacher-misc,font-screen-cyrillic,font-sun-misc,font-winitzki-cyrillic,font-xfree86-type1 arch=linux-centos8-zen2
+[bl  ]                      ^builtin.freetype@2.10.1%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-centos8-zen2
+[bl  ]                          ^builtin.libpng@1.6.37%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-centos8-zen2
+[bl  ]                  ^builtin.libxrender@0.9.10%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-centos8-zen2
+[bl  ]                      ^builtin.renderproto@0.11.1%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-centos8-zen2
+[bl  ]              ^builtin.libxscrnsaver@1.2.2%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-centos8-zen2
+[bl  ]                  ^builtin.libxext@1.3.3%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-centos8-zen2
+[bl  ]                  ^builtin.scrnsaverproto@1.2.2%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-centos8-zen2
+
+Concretized
+--------------------------------
+vdyzfg3  [    ]  builtin.llvm@10.0.1%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~all_targets+clang~code_signing+compiler-rt~cuda+gold+internal_unwind+libcxx+lld+lldb~mlir~omp_debug~omp_tsan+polly+python~shared_libs~split_dwarf build_type=Release cuda_arch=none patches=332fe65f78b2b4a242045ec2394eee8db631fbcbe27b0016d5e5c859e34f47af arch=linux-centos8-zen2
+wihsdyi  [bl  ]      ^builtin.binutils@2.35%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +gold~headers~interwork~ld~libiberty~lto+nls~plugins arch=linux-centos8-zen2
+xfogxau  [b   ]          ^builtin.diffutils@3.7%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-centos8-zen2
+ujwsyth  [bl  ]              ^builtin.libiconv@1.16%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-centos8-zen2
+qsns4bj  [bl  ]          ^builtin.gettext@0.21%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +bzip2+curses+git~libunistring+libxml2+tar+xz arch=linux-centos8-zen2
+vou456l  [bl  ]              ^builtin.bzip2@1.0.8%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +shared arch=linux-centos8-zen2
+66b7zji  [bl  ]              ^builtin.libxml2@2.9.10%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~python arch=linux-centos8-zen2
+dqjhyjw  [blr ]                  ^builtin.xz@5.2.5%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~pic arch=linux-centos8-zen2
+55omrwx  [bl  ]                  ^builtin.zlib@1.2.11%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +optimize+pic+shared arch=linux-centos8-zen2
+czycxp2  [bl  ]              ^builtin.ncurses@6.2%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~symlinks+termlib arch=linux-centos8-zen2
+xrnciuq  [bl  ]              ^builtin.tar@1.32%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-centos8-zen2
+qwyui3j  [b   ]      ^builtin.cmake@3.18.2%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~doc+ncurses+openssl+ownlibs~qt arch=linux-centos8-zen2
+shq645m  [bl  ]          ^builtin.openssl@1.1.1c%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +systemcerts arch=linux-centos8-zen2
+udmyfdh  [bl  ]      ^builtin.hwloc@2.2.0%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~cairo~cuda~gl~libudev+libxml2~netloc~nvml+pci+shared arch=linux-centos8-zen2
+xucueix  [bl  ]          ^builtin.libpciaccess@0.16%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-centos8-zen2
+i5qvgng  [b   ]              ^builtin.libtool@2.4.6%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-centos8-zen2
+qoe3jva  [b   ]                  ^builtin.m4@1.4.18%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +sigsegv patches=3877ab548f88597ab2327a2230ee048d2d07ace1062efe81fc92e91b7f39cd00,fc9b61654a3ba1a8d6cd78ce087e7c96366c290bc8d2c299f09828d793b853c8 arch=linux-centos8-zen2
+hqwhgoe  [bl  ]                      ^builtin.libsigsegv@2.12%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-centos8-zen2
+3poj262  [b   ]              ^builtin.pkgconf@1.7.3%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-centos8-zen2
+oagwpgm  [b   ]              ^builtin.util-macros@1.19.1%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-centos8-zen2
+tsigau2  [bl  ]      ^builtin.libedit@3.1-20191231%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-centos8-zen2
+yxfueuq  [b   ]      ^builtin.perl-data-dumper@2.173%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-centos8-zen2
+2jh26ue  [blr ]          ^builtin.perl@5.30.3%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +cpanm+shared+threads arch=linux-centos8-zen2
+p4ou74m  [bl  ]              ^builtin.berkeley-db@18.1.40%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-centos8-zen2
+jj57peh  [bl  ]              ^builtin.gdbm@1.18.1%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  patches=7f569b9287e9e5a4236636eef32ff3428f0462ec17aea359e0ebee07649f1f16 arch=linux-centos8-zen2
+zabqjiv  [bl  ]                  ^builtin.readline@8.0%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-centos8-zen2
+grvozxr  [bl  ]      ^builtin.py-six@1.14.0%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-centos8-zen2
+pwkt76p  [blr ]          ^builtin.python@3.8.5%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +bz2+ctypes+dbm~debug+libxml2+lzma~nis+optimizations+pic+pyexpat+pythoncmd+readline+shared+sqlite3+ssl~tix+tkinter~ucs4+uuid+zlib patches=0d98e93189bc278fbc37a50ed7f183bd8aaf249a8e1670a465f0db6bb4f8cf87 arch=linux-centos8-zen2
+y664o5r  [bl  ]              ^builtin.expat@2.2.9%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +libbsd arch=linux-centos8-zen2
+zreavlf  [bl  ]                  ^builtin.libbsd@0.10.0%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-centos8-zen2
+xrl3opj  [bl  ]              ^builtin.libffi@3.3%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  patches=26f26c6f29a7ce9bf370ad3ab2610f99365b4bdd7b82e7c31df41a3370d685c0 arch=linux-centos8-zen2
+7cxem3w  [bl  ]              ^builtin.libuuid@1.0.3%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-centos8-zen2
+e4v55df  [bl  ]              ^builtin.sqlite@3.33.0%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +column_metadata+fts+functions+rtree arch=linux-centos8-zen2
+zo6leeg  [bl  ]              ^builtin.tcl@8.5.19%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-centos8-zen2
+mrrqnn5  [bl  ]              ^builtin.tk@8.5.19%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +xft+xss arch=linux-centos8-zen2
+2x6kmtk  [bl  ]                  ^builtin.libx11@1.6.7%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-centos8-zen2
+xbg3skd  [bl  ]                      ^builtin.kbproto@1.0.7%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-centos8-zen2
+lzbi3oe  [bl  ]                      ^builtin.libxcb@1.13%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-centos8-zen2
+exhqq4g  [bl  ]                          ^builtin.libpthread-stubs@0.4%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-centos8-zen2
+mcpthhu  [bl  ]                          ^builtin.libxau@1.0.8%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-centos8-zen2
+dh6ja36  [bl  ]                              ^builtin.xproto@7.0.31%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-centos8-zen2
+kgz56yj  [bl  ]                          ^builtin.libxdmcp@1.1.2%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-centos8-zen2
+3lqkjrn  [bl  ]                      ^builtin.xextproto@7.3.0%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-centos8-zen2
+d623ceg  [bl  ]                  ^builtin.libxft@2.3.2%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-centos8-zen2
+v5fwzbl  [bl  ]                      ^builtin.fontconfig@2.13.1%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-centos8-zen2
+qdxlpxv  [bl  ]                          ^builtin.font-util@1.3.2%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  fonts=encodings,font-adobe-100dpi,font-adobe-75dpi,font-adobe-utopia-100dpi,font-adobe-utopia-75dpi,font-adobe-utopia-type1,font-alias,font-arabic-misc,font-bh-100dpi,font-bh-75dpi,font-bh-lucidatypewriter-100dpi,font-bh-lucidatypewriter-75dpi,font-bh-ttf,font-bh-type1,font-bitstream-100dpi,font-bitstream-75dpi,font-bitstream-speedo,font-bitstream-type1,font-cronyx-cyrillic,font-cursor-misc,font-daewoo-misc,font-dec-misc,font-ibm-type1,font-isas-misc,font-jis-misc,font-micro-misc,font-misc-cyrillic,font-misc-ethiopic,font-misc-meltho,font-misc-misc,font-mutt-misc,font-schumacher-misc,font-screen-cyrillic,font-sun-misc,font-winitzki-cyrillic,font-xfree86-type1 arch=linux-centos8-zen2
+a37oegp  [bl  ]                          ^builtin.freetype@2.10.1%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-centos8-zen2
+dr7nh5z  [bl  ]                              ^builtin.libpng@1.6.37%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-centos8-zen2
+y2iaqbj  [bl  ]                      ^builtin.libxrender@0.9.10%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-centos8-zen2
+vtyc4ob  [bl  ]                          ^builtin.renderproto@0.11.1%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-centos8-zen2
+np4xtiz  [bl  ]                  ^builtin.libxscrnsaver@1.2.2%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-centos8-zen2
+bqo3puj  [bl  ]                      ^builtin.libxext@1.3.3%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-centos8-zen2
+hhgpohq  [bl  ]                      ^builtin.scrnsaverproto@1.2.2%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-centos8-zen2
+j6wtm7d  [bl  ]      ^builtin.swig@4.0.2%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-centos8-zen2
+q7wsmit  [bl  ]          ^builtin.pcre@8.44%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~jit+multibyte+utf arch=linux-centos8-zen2
+bvofrkg  [bl  ]      ^builtin.z3@4.8.7%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +python arch=linux-centos8-zen2
+slipxs3  [  r ]          ^builtin.py-setuptools@50.1.0%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-centos8-zen2
+
+spec:
+- llvm:
+    version: 10.0.1
+    arch:
+      platform: linux
+      platform_os: centos8
+      target:
+        name: zen2
+        vendor: AuthenticAMD
+        features:
+        - abm
+        - aes
+        - avx
+        - avx2
+        - bmi1
+        - bmi2
+        - clflushopt
+        - clwb
+        - clzero
+        - cx16
+        - f16c
+        - fma
+        - fsgsbase
+        - mmx
+        - movbe
+        - pclmulqdq
+        - popcnt
+        - rdseed
+        - sse
+        - sse2
+        - sse4_1
+        - sse4_2
+        - sse4a
+        - ssse3
+        - xsavec
+        - xsaveopt
+        generation: 0
+        parents:
+        - zen
+    compiler:
+      name: gcc
+      version: 10.2.0
+    namespace: builtin
+    parameters:
+      all_targets: false
+      build_type: Release
+      clang: true
+      code_signing: false
+      compiler-rt: true
+      cuda: false
+      cuda_arch:
+      - none
+      gold: true
+      internal_unwind: true
+      libcxx: true
+      lld: true
+      lldb: true
+      mlir: false
+      omp_debug: false
+      omp_tsan: false
+      patches:
+      - 332fe65f78b2b4a242045ec2394eee8db631fbcbe27b0016d5e5c859e34f47af
+      polly: true
+      python: true
+      shared_libs: false
+      split_dwarf: false
+      cflags:
+      - -O2
+      - -march=native
+      cppflags: []
+      cxxflags:
+      - -O2
+      - -march=native
+      fflags:
+      - -O2
+      - -march=native
+      ldflags: []
+      ldlibs: []
+    patches:
+    - 332fe65f78b2b4a242045ec2394eee8db631fbcbe27b0016d5e5c859e34f47af
+    dependencies:
+      binutils:
+        hash: 2eqc7li7eqwwrn2j4cv6tbraomge7vo4
+        type:
+        - build
+        - link
+      cmake:
+        hash: qwyui3jvc5wnqlv7go6rlqdx4bo4z7nt
+        type:
+        - build
+      hwloc:
+        hash: ebl23ug5yyas5ytxaycsn2ssm3cgwll3
+        type:
+        - build
+        - link
+      libedit:
+        hash: tsigau235wk2vwsniwooyud3syvrpnx4
+        type:
+        - build
+        - link
+      ncurses:
+        hash: czycxp2spvrkybvtqywj7qvzayd3byss
+        type:
+        - build
+        - link
+      perl-data-dumper:
+        hash: yxfueuqi5n7ljkljzau2hfjmpdjyxcw5
+        type:
+        - build
+      py-six:
+        hash: grvozxrnoswl6qswseqtyg6jhr2c7ojy
+        type:
+        - build
+        - link
+      python:
+        hash: pwkt76p3o2wk2ay3bv27szze2pnhbsbr
+        type:
+        - build
+        - link
+      swig:
+        hash: rf42sbe4tabsihezx3mx2iarjpodx6wn
+        type:
+        - build
+        - link
+      z3:
+        hash: bvofrkgnv7wfvzf6hsj5nngyze6uelra
+        type:
+        - build
+        - link
+    hash: vdyzfg3kszqw6sgcmcmkjgnchby263il
+    build_hash: 2esgi5ll52swor7vhrfatxoqtmurmor7
+- binutils:
+    version: '2.35'
+    arch:
+      platform: linux
+      platform_os: centos8
+      target:
+        name: zen2
+        vendor: AuthenticAMD
+        features:
+        - abm
+        - aes
+        - avx
+        - avx2
+        - bmi1
+        - bmi2
+        - clflushopt
+        - clwb
+        - clzero
+        - cx16
+        - f16c
+        - fma
+        - fsgsbase
+        - mmx
+        - movbe
+        - pclmulqdq
+        - popcnt
+        - rdseed
+        - sse
+        - sse2
+        - sse4_1
+        - sse4_2
+        - sse4a
+        - ssse3
+        - xsavec
+        - xsaveopt
+        generation: 0
+        parents:
+        - zen
+    compiler:
+      name: gcc
+      version: 10.2.0
+    namespace: builtin
+    parameters:
+      gold: true
+      headers: false
+      interwork: false
+      ld: false
+      libiberty: false
+      lto: false
+      nls: true
+      plugins: false
+      cflags:
+      - -O2
+      - -march=native
+      cppflags: []
+      cxxflags:
+      - -O2
+      - -march=native
+      fflags:
+      - -O2
+      - -march=native
+      ldflags: []
+      ldlibs: []
+    dependencies:
+      diffutils:
+        hash: xfogxau2brsres3r7tqjaxa7hr7ixdy6
+        type:
+        - build
+      gettext:
+        hash: qsns4bj6njucvpak6xvxtezgavp25tfe
+        type:
+        - build
+        - link
+      zlib:
+        hash: 55omrwxdycckdj5oqhmpsx5tjn6lmhn6
+        type:
+        - build
+        - link
+    hash: wihsdyi2ah4trphxtobdpu32ejevvpmb
+    build_hash: 2eqc7li7eqwwrn2j4cv6tbraomge7vo4
+- diffutils:
+    version: '3.7'
+    arch:
+      platform: linux
+      platform_os: centos8
+      target:
+        name: zen2
+        vendor: AuthenticAMD
+        features:
+        - abm
+        - aes
+        - avx
+        - avx2
+        - bmi1
+        - bmi2
+        - clflushopt
+        - clwb
+        - clzero
+        - cx16
+        - f16c
+        - fma
+        - fsgsbase
+        - mmx
+        - movbe
+        - pclmulqdq
+        - popcnt
+        - rdseed
+        - sse
+        - sse2
+        - sse4_1
+        - sse4_2
+        - sse4a
+        - ssse3
+        - xsavec
+        - xsaveopt
+        generation: 0
+        parents:
+        - zen
+    compiler:
+      name: gcc
+      version: 10.2.0
+    namespace: builtin
+    parameters:
+      cflags:
+      - -O2
+      - -march=native
+      cppflags: []
+      cxxflags:
+      - -O2
+      - -march=native
+      fflags:
+      - -O2
+      - -march=native
+      ldflags: []
+      ldlibs: []
+    dependencies:
+      libiconv:
+        hash: ujwsythqjzsnxszbfl7rrlftda6uesol
+        type:
+        - build
+        - link
+    hash: xfogxau2brsres3r7tqjaxa7hr7ixdy6
+    build_hash: xfogxau2brsres3r7tqjaxa7hr7ixdy6
+- libiconv:
+    version: '1.16'
+    arch:
+      platform: linux
+      platform_os: centos8
+      target:
+        name: zen2
+        vendor: AuthenticAMD
+        features:
+        - abm
+        - aes
+        - avx
+        - avx2
+        - bmi1
+        - bmi2
+        - clflushopt
+        - clwb
+        - clzero
+        - cx16
+        - f16c
+        - fma
+        - fsgsbase
+        - mmx
+        - movbe
+        - pclmulqdq
+        - popcnt
+        - rdseed
+        - sse
+        - sse2
+        - sse4_1
+        - sse4_2
+        - sse4a
+        - ssse3
+        - xsavec
+        - xsaveopt
+        generation: 0
+        parents:
+        - zen
+    compiler:
+      name: gcc
+      version: 10.2.0
+    namespace: builtin
+    parameters:
+      cflags:
+      - -O2
+      - -march=native
+      cppflags: []
+      cxxflags:
+      - -O2
+      - -march=native
+      fflags:
+      - -O2
+      - -march=native
+      ldflags: []
+      ldlibs: []
+    hash: ujwsythqjzsnxszbfl7rrlftda6uesol
+    build_hash: ujwsythqjzsnxszbfl7rrlftda6uesol
+- gettext:
+    version: '0.21'
+    arch:
+      platform: linux
+      platform_os: centos8
+      target:
+        name: zen2
+        vendor: AuthenticAMD
+        features:
+        - abm
+        - aes
+        - avx
+        - avx2
+        - bmi1
+        - bmi2
+        - clflushopt
+        - clwb
+        - clzero
+        - cx16
+        - f16c
+        - fma
+        - fsgsbase
+        - mmx
+        - movbe
+        - pclmulqdq
+        - popcnt
+        - rdseed
+        - sse
+        - sse2
+        - sse4_1
+        - sse4_2
+        - sse4a
+        - ssse3
+        - xsavec
+        - xsaveopt
+        generation: 0
+        parents:
+        - zen
+    compiler:
+      name: gcc
+      version: 10.2.0
+    namespace: builtin
+    parameters:
+      bzip2: true
+      curses: true
+      git: true
+      libunistring: false
+      libxml2: true
+      tar: true
+      xz: true
+      cflags:
+      - -O2
+      - -march=native
+      cppflags: []
+      cxxflags:
+      - -O2
+      - -march=native
+      fflags:
+      - -O2
+      - -march=native
+      ldflags: []
+      ldlibs: []
+    dependencies:
+      bzip2:
+        hash: vou456lo6afmp73y7aoqqajykgy24s4e
+        type:
+        - build
+        - link
+      libiconv:
+        hash: ujwsythqjzsnxszbfl7rrlftda6uesol
+        type:
+        - build
+        - link
+      libxml2:
+        hash: 66b7zjik6byvj73pjevxtyt4ddclbrdp
+        type:
+        - build
+        - link
+      ncurses:
+        hash: czycxp2spvrkybvtqywj7qvzayd3byss
+        type:
+        - build
+        - link
+      tar:
+        hash: xrnciuqee6hxawtoltvvfzm5hmwzpxoz
+        type:
+        - build
+        - link
+      xz:
+        hash: dqjhyjwlia7pu3en3wirjs2trtn6s42y
+        type:
+        - build
+        - link
+        - run
+    hash: qsns4bj6njucvpak6xvxtezgavp25tfe
+    build_hash: qsns4bj6njucvpak6xvxtezgavp25tfe
+- bzip2:
+    version: 1.0.8
+    arch:
+      platform: linux
+      platform_os: centos8
+      target:
+        name: zen2
+        vendor: AuthenticAMD
+        features:
+        - abm
+        - aes
+        - avx
+        - avx2
+        - bmi1
+        - bmi2
+        - clflushopt
+        - clwb
+        - clzero
+        - cx16
+        - f16c
+        - fma
+        - fsgsbase
+        - mmx
+        - movbe
+        - pclmulqdq
+        - popcnt
+        - rdseed
+        - sse
+        - sse2
+        - sse4_1
+        - sse4_2
+        - sse4a
+        - ssse3
+        - xsavec
+        - xsaveopt
+        generation: 0
+        parents:
+        - zen
+    compiler:
+      name: gcc
+      version: 10.2.0
+    namespace: builtin
+    parameters:
+      shared: true
+      cflags:
+      - -O2
+      - -march=native
+      cppflags: []
+      cxxflags:
+      - -O2
+      - -march=native
+      fflags:
+      - -O2
+      - -march=native
+      ldflags: []
+      ldlibs: []
+    hash: vou456lo6afmp73y7aoqqajykgy24s4e
+    build_hash: vou456lo6afmp73y7aoqqajykgy24s4e
+- libxml2:
+    version: 2.9.10
+    arch:
+      platform: linux
+      platform_os: centos8
+      target:
+        name: zen2
+        vendor: AuthenticAMD
+        features:
+        - abm
+        - aes
+        - avx
+        - avx2
+        - bmi1
+        - bmi2
+        - clflushopt
+        - clwb
+        - clzero
+        - cx16
+        - f16c
+        - fma
+        - fsgsbase
+        - mmx
+        - movbe
+        - pclmulqdq
+        - popcnt
+        - rdseed
+        - sse
+        - sse2
+        - sse4_1
+        - sse4_2
+        - sse4a
+        - ssse3
+        - xsavec
+        - xsaveopt
+        generation: 0
+        parents:
+        - zen
+    compiler:
+      name: gcc
+      version: 10.2.0
+    namespace: builtin
+    parameters:
+      python: false
+      cflags:
+      - -O2
+      - -march=native
+      cppflags: []
+      cxxflags:
+      - -O2
+      - -march=native
+      fflags:
+      - -O2
+      - -march=native
+      ldflags: []
+      ldlibs: []
+    dependencies:
+      libiconv:
+        hash: ujwsythqjzsnxszbfl7rrlftda6uesol
+        type:
+        - build
+        - link
+      xz:
+        hash: dqjhyjwlia7pu3en3wirjs2trtn6s42y
+        type:
+        - build
+        - link
+      zlib:
+        hash: 55omrwxdycckdj5oqhmpsx5tjn6lmhn6
+        type:
+        - build
+        - link
+    hash: 66b7zjik6byvj73pjevxtyt4ddclbrdp
+    build_hash: 66b7zjik6byvj73pjevxtyt4ddclbrdp
+- xz:
+    version: 5.2.5
+    arch:
+      platform: linux
+      platform_os: centos8
+      target:
+        name: zen2
+        vendor: AuthenticAMD
+        features:
+        - abm
+        - aes
+        - avx
+        - avx2
+        - bmi1
+        - bmi2
+        - clflushopt
+        - clwb
+        - clzero
+        - cx16
+        - f16c
+        - fma
+        - fsgsbase
+        - mmx
+        - movbe
+        - pclmulqdq
+        - popcnt
+        - rdseed
+        - sse
+        - sse2
+        - sse4_1
+        - sse4_2
+        - sse4a
+        - ssse3
+        - xsavec
+        - xsaveopt
+        generation: 0
+        parents:
+        - zen
+    compiler:
+      name: gcc
+      version: 10.2.0
+    namespace: builtin
+    parameters:
+      pic: false
+      cflags:
+      - -O2
+      - -march=native
+      cppflags: []
+      cxxflags:
+      - -O2
+      - -march=native
+      fflags:
+      - -O2
+      - -march=native
+      ldflags: []
+      ldlibs: []
+    hash: dqjhyjwlia7pu3en3wirjs2trtn6s42y
+    build_hash: dqjhyjwlia7pu3en3wirjs2trtn6s42y
+- zlib:
+    version: 1.2.11
+    arch:
+      platform: linux
+      platform_os: centos8
+      target:
+        name: zen2
+        vendor: AuthenticAMD
+        features:
+        - abm
+        - aes
+        - avx
+        - avx2
+        - bmi1
+        - bmi2
+        - clflushopt
+        - clwb
+        - clzero
+        - cx16
+        - f16c
+        - fma
+        - fsgsbase
+        - mmx
+        - movbe
+        - pclmulqdq
+        - popcnt
+        - rdseed
+        - sse
+        - sse2
+        - sse4_1
+        - sse4_2
+        - sse4a
+        - ssse3
+        - xsavec
+        - xsaveopt
+        generation: 0
+        parents:
+        - zen
+    compiler:
+      name: gcc
+      version: 10.2.0
+    namespace: builtin
+    parameters:
+      optimize: true
+      pic: true
+      shared: true
+      cflags:
+      - -O2
+      - -march=native
+      cppflags: []
+      cxxflags:
+      - -O2
+      - -march=native
+      fflags:
+      - -O2
+      - -march=native
+      ldflags: []
+      ldlibs: []
+    hash: 55omrwxdycckdj5oqhmpsx5tjn6lmhn6
+    build_hash: 55omrwxdycckdj5oqhmpsx5tjn6lmhn6
+- ncurses:
+    version: '6.2'
+    arch:
+      platform: linux
+      platform_os: centos8
+      target:
+        name: zen2
+        vendor: AuthenticAMD
+        features:
+        - abm
+        - aes
+        - avx
+        - avx2
+        - bmi1
+        - bmi2
+        - clflushopt
+        - clwb
+        - clzero
+        - cx16
+        - f16c
+        - fma
+        - fsgsbase
+        - mmx
+        - movbe
+        - pclmulqdq
+        - popcnt
+        - rdseed
+        - sse
+        - sse2
+        - sse4_1
+        - sse4_2
+        - sse4a
+        - ssse3
+        - xsavec
+        - xsaveopt
+        generation: 0
+        parents:
+        - zen
+    compiler:
+      name: gcc
+      version: 10.2.0
+    namespace: builtin
+    parameters:
+      symlinks: false
+      termlib: true
+      cflags:
+      - -O2
+      - -march=native
+      cppflags: []
+      cxxflags:
+      - -O2
+      - -march=native
+      fflags:
+      - -O2
+      - -march=native
+      ldflags: []
+      ldlibs: []
+    hash: czycxp2spvrkybvtqywj7qvzayd3byss
+    build_hash: czycxp2spvrkybvtqywj7qvzayd3byss
+- tar:
+    version: '1.32'
+    arch:
+      platform: linux
+      platform_os: centos8
+      target:
+        name: zen2
+        vendor: AuthenticAMD
+        features:
+        - abm
+        - aes
+        - avx
+        - avx2
+        - bmi1
+        - bmi2
+        - clflushopt
+        - clwb
+        - clzero
+        - cx16
+        - f16c
+        - fma
+        - fsgsbase
+        - mmx
+        - movbe
+        - pclmulqdq
+        - popcnt
+        - rdseed
+        - sse
+        - sse2
+        - sse4_1
+        - sse4_2
+        - sse4a
+        - ssse3
+        - xsavec
+        - xsaveopt
+        generation: 0
+        parents:
+        - zen
+    compiler:
+      name: gcc
+      version: 10.2.0
+    namespace: builtin
+    parameters:
+      cflags:
+      - -O2
+      - -march=native
+      cppflags: []
+      cxxflags:
+      - -O2
+      - -march=native
+      fflags:
+      - -O2
+      - -march=native
+      ldflags: []
+      ldlibs: []
+    dependencies:
+      libiconv:
+        hash: ujwsythqjzsnxszbfl7rrlftda6uesol
+        type:
+        - build
+        - link
+    hash: xrnciuqee6hxawtoltvvfzm5hmwzpxoz
+    build_hash: xrnciuqee6hxawtoltvvfzm5hmwzpxoz
+- cmake:
+    version: 3.18.2
+    arch:
+      platform: linux
+      platform_os: centos8
+      target:
+        name: zen2
+        vendor: AuthenticAMD
+        features:
+        - abm
+        - aes
+        - avx
+        - avx2
+        - bmi1
+        - bmi2
+        - clflushopt
+        - clwb
+        - clzero
+        - cx16
+        - f16c
+        - fma
+        - fsgsbase
+        - mmx
+        - movbe
+        - pclmulqdq
+        - popcnt
+        - rdseed
+        - sse
+        - sse2
+        - sse4_1
+        - sse4_2
+        - sse4a
+        - ssse3
+        - xsavec
+        - xsaveopt
+        generation: 0
+        parents:
+        - zen
+    compiler:
+      name: gcc
+      version: 10.2.0
+    namespace: builtin
+    parameters:
+      doc: false
+      ncurses: true
+      openssl: true
+      ownlibs: true
+      qt: false
+      cflags:
+      - -O2
+      - -march=native
+      cppflags: []
+      cxxflags:
+      - -O2
+      - -march=native
+      fflags:
+      - -O2
+      - -march=native
+      ldflags: []
+      ldlibs: []
+    dependencies:
+      ncurses:
+        hash: czycxp2spvrkybvtqywj7qvzayd3byss
+        type:
+        - build
+        - link
+      openssl:
+        hash: shq645m6wo5rsni2xjwpou5ya254c24o
+        type:
+        - build
+        - link
+    hash: qwyui3jvc5wnqlv7go6rlqdx4bo4z7nt
+    build_hash: qwyui3jvc5wnqlv7go6rlqdx4bo4z7nt
+- openssl:
+    version: 1.1.1c
+    arch:
+      platform: linux
+      platform_os: centos8
+      target:
+        name: zen2
+        vendor: AuthenticAMD
+        features:
+        - abm
+        - aes
+        - avx
+        - avx2
+        - bmi1
+        - bmi2
+        - clflushopt
+        - clwb
+        - clzero
+        - cx16
+        - f16c
+        - fma
+        - fsgsbase
+        - mmx
+        - movbe
+        - pclmulqdq
+        - popcnt
+        - rdseed
+        - sse
+        - sse2
+        - sse4_1
+        - sse4_2
+        - sse4a
+        - ssse3
+        - xsavec
+        - xsaveopt
+        generation: 0
+        parents:
+        - zen
+    compiler:
+      name: gcc
+      version: 10.2.0
+    namespace: builtin
+    parameters:
+      systemcerts: true
+      cflags:
+      - -O2
+      - -march=native
+      cppflags: []
+      cxxflags:
+      - -O2
+      - -march=native
+      fflags:
+      - -O2
+      - -march=native
+      ldflags: []
+      ldlibs: []
+    external:
+      path: /usr
+      module:
+      extra_attributes: {}
+    hash: shq645m6wo5rsni2xjwpou5ya254c24o
+    build_hash: shq645m6wo5rsni2xjwpou5ya254c24o
+- hwloc:
+    version: 2.2.0
+    arch:
+      platform: linux
+      platform_os: centos8
+      target:
+        name: zen2
+        vendor: AuthenticAMD
+        features:
+        - abm
+        - aes
+        - avx
+        - avx2
+        - bmi1
+        - bmi2
+        - clflushopt
+        - clwb
+        - clzero
+        - cx16
+        - f16c
+        - fma
+        - fsgsbase
+        - mmx
+        - movbe
+        - pclmulqdq
+        - popcnt
+        - rdseed
+        - sse
+        - sse2
+        - sse4_1
+        - sse4_2
+        - sse4a
+        - ssse3
+        - xsavec
+        - xsaveopt
+        generation: 0
+        parents:
+        - zen
+    compiler:
+      name: gcc
+      version: 10.2.0
+    namespace: builtin
+    parameters:
+      cairo: false
+      cuda: false
+      gl: false
+      libudev: false
+      libxml2: true
+      netloc: false
+      nvml: false
+      pci: true
+      shared: true
+      cflags:
+      - -O2
+      - -march=native
+      cppflags: []
+      cxxflags:
+      - -O2
+      - -march=native
+      fflags:
+      - -O2
+      - -march=native
+      ldflags: []
+      ldlibs: []
+    dependencies:
+      libpciaccess:
+        hash: mwkvglkyqu2kfq4agzzbmi4fvq6gjuzh
+        type:
+        - build
+        - link
+      libxml2:
+        hash: 66b7zjik6byvj73pjevxtyt4ddclbrdp
+        type:
+        - build
+        - link
+      pkgconf:
+        hash: 3poj262tz4onydb2eo27ewbk5za3sidp
+        type:
+        - build
+    hash: udmyfdhr2iyqglidewtzv5drdtrbe4qw
+    build_hash: ebl23ug5yyas5ytxaycsn2ssm3cgwll3
+- libpciaccess:
+    version: '0.16'
+    arch:
+      platform: linux
+      platform_os: centos8
+      target:
+        name: zen2
+        vendor: AuthenticAMD
+        features:
+        - abm
+        - aes
+        - avx
+        - avx2
+        - bmi1
+        - bmi2
+        - clflushopt
+        - clwb
+        - clzero
+        - cx16
+        - f16c
+        - fma
+        - fsgsbase
+        - mmx
+        - movbe
+        - pclmulqdq
+        - popcnt
+        - rdseed
+        - sse
+        - sse2
+        - sse4_1
+        - sse4_2
+        - sse4a
+        - ssse3
+        - xsavec
+        - xsaveopt
+        generation: 0
+        parents:
+        - zen
+    compiler:
+      name: gcc
+      version: 10.2.0
+    namespace: builtin
+    parameters:
+      cflags:
+      - -O2
+      - -march=native
+      cppflags: []
+      cxxflags:
+      - -O2
+      - -march=native
+      fflags:
+      - -O2
+      - -march=native
+      ldflags: []
+      ldlibs: []
+    dependencies:
+      libtool:
+        hash: j3txhenqdn6lcnrnphpva3ashvwbkynj
+        type:
+        - build
+      pkgconf:
+        hash: 3poj262tz4onydb2eo27ewbk5za3sidp
+        type:
+        - build
+      util-macros:
+        hash: oagwpgmhbpsa5i5trqxkmhk573zgvpy4
+        type:
+        - build
+    hash: xucueixy3gxvkqrvj7rno47gqdynepau
+    build_hash: mwkvglkyqu2kfq4agzzbmi4fvq6gjuzh
+- libtool:
+    version: 2.4.6
+    arch:
+      platform: linux
+      platform_os: centos8
+      target:
+        name: zen2
+        vendor: AuthenticAMD
+        features:
+        - abm
+        - aes
+        - avx
+        - avx2
+        - bmi1
+        - bmi2
+        - clflushopt
+        - clwb
+        - clzero
+        - cx16
+        - f16c
+        - fma
+        - fsgsbase
+        - mmx
+        - movbe
+        - pclmulqdq
+        - popcnt
+        - rdseed
+        - sse
+        - sse2
+        - sse4_1
+        - sse4_2
+        - sse4a
+        - ssse3
+        - xsavec
+        - xsaveopt
+        generation: 0
+        parents:
+        - zen
+    compiler:
+      name: gcc
+      version: 10.2.0
+    namespace: builtin
+    parameters:
+      cflags:
+      - -O2
+      - -march=native
+      cppflags: []
+      cxxflags:
+      - -O2
+      - -march=native
+      fflags:
+      - -O2
+      - -march=native
+      ldflags: []
+      ldlibs: []
+    dependencies:
+      m4:
+        hash: qoe3jvau6tfilufz6rgaxlbzod7dv4kg
+        type:
+        - build
+    hash: i5qvgnguj2magyf73sxtvryw33oeqa7k
+    build_hash: j3txhenqdn6lcnrnphpva3ashvwbkynj
+- m4:
+    version: 1.4.18
+    arch:
+      platform: linux
+      platform_os: centos8
+      target:
+        name: zen2
+        vendor: AuthenticAMD
+        features:
+        - abm
+        - aes
+        - avx
+        - avx2
+        - bmi1
+        - bmi2
+        - clflushopt
+        - clwb
+        - clzero
+        - cx16
+        - f16c
+        - fma
+        - fsgsbase
+        - mmx
+        - movbe
+        - pclmulqdq
+        - popcnt
+        - rdseed
+        - sse
+        - sse2
+        - sse4_1
+        - sse4_2
+        - sse4a
+        - ssse3
+        - xsavec
+        - xsaveopt
+        generation: 0
+        parents:
+        - zen
+    compiler:
+      name: gcc
+      version: 10.2.0
+    namespace: builtin
+    parameters:
+      patches:
+      - 3877ab548f88597ab2327a2230ee048d2d07ace1062efe81fc92e91b7f39cd00
+      - fc9b61654a3ba1a8d6cd78ce087e7c96366c290bc8d2c299f09828d793b853c8
+      sigsegv: true
+      cflags:
+      - -O2
+      - -march=native
+      cppflags: []
+      cxxflags:
+      - -O2
+      - -march=native
+      fflags:
+      - -O2
+      - -march=native
+      ldflags: []
+      ldlibs: []
+    patches:
+    - 3877ab548f88597ab2327a2230ee048d2d07ace1062efe81fc92e91b7f39cd00
+    - fc9b61654a3ba1a8d6cd78ce087e7c96366c290bc8d2c299f09828d793b853c8
+    dependencies:
+      libsigsegv:
+        hash: hqwhgoeparoxyox7aivznsfs74nx3skd
+        type:
+        - build
+        - link
+    hash: qoe3jvau6tfilufz6rgaxlbzod7dv4kg
+    build_hash: qoe3jvau6tfilufz6rgaxlbzod7dv4kg
+- libsigsegv:
+    version: '2.12'
+    arch:
+      platform: linux
+      platform_os: centos8
+      target:
+        name: zen2
+        vendor: AuthenticAMD
+        features:
+        - abm
+        - aes
+        - avx
+        - avx2
+        - bmi1
+        - bmi2
+        - clflushopt
+        - clwb
+        - clzero
+        - cx16
+        - f16c
+        - fma
+        - fsgsbase
+        - mmx
+        - movbe
+        - pclmulqdq
+        - popcnt
+        - rdseed
+        - sse
+        - sse2
+        - sse4_1
+        - sse4_2
+        - sse4a
+        - ssse3
+        - xsavec
+        - xsaveopt
+        generation: 0
+        parents:
+        - zen
+    compiler:
+      name: gcc
+      version: 10.2.0
+    namespace: builtin
+    parameters:
+      cflags:
+      - -O2
+      - -march=native
+      cppflags: []
+      cxxflags:
+      - -O2
+      - -march=native
+      fflags:
+      - -O2
+      - -march=native
+      ldflags: []
+      ldlibs: []
+    hash: hqwhgoeparoxyox7aivznsfs74nx3skd
+    build_hash: hqwhgoeparoxyox7aivznsfs74nx3skd
+- pkgconf:
+    version: 1.7.3
+    arch:
+      platform: linux
+      platform_os: centos8
+      target:
+        name: zen2
+        vendor: AuthenticAMD
+        features:
+        - abm
+        - aes
+        - avx
+        - avx2
+        - bmi1
+        - bmi2
+        - clflushopt
+        - clwb
+        - clzero
+        - cx16
+        - f16c
+        - fma
+        - fsgsbase
+        - mmx
+        - movbe
+        - pclmulqdq
+        - popcnt
+        - rdseed
+        - sse
+        - sse2
+        - sse4_1
+        - sse4_2
+        - sse4a
+        - ssse3
+        - xsavec
+        - xsaveopt
+        generation: 0
+        parents:
+        - zen
+    compiler:
+      name: gcc
+      version: 10.2.0
+    namespace: builtin
+    parameters:
+      cflags:
+      - -O2
+      - -march=native
+      cppflags: []
+      cxxflags:
+      - -O2
+      - -march=native
+      fflags:
+      - -O2
+      - -march=native
+      ldflags: []
+      ldlibs: []
+    hash: 3poj262tz4onydb2eo27ewbk5za3sidp
+    build_hash: 3poj262tz4onydb2eo27ewbk5za3sidp
+- util-macros:
+    version: 1.19.1
+    arch:
+      platform: linux
+      platform_os: centos8
+      target:
+        name: zen2
+        vendor: AuthenticAMD
+        features:
+        - abm
+        - aes
+        - avx
+        - avx2
+        - bmi1
+        - bmi2
+        - clflushopt
+        - clwb
+        - clzero
+        - cx16
+        - f16c
+        - fma
+        - fsgsbase
+        - mmx
+        - movbe
+        - pclmulqdq
+        - popcnt
+        - rdseed
+        - sse
+        - sse2
+        - sse4_1
+        - sse4_2
+        - sse4a
+        - ssse3
+        - xsavec
+        - xsaveopt
+        generation: 0
+        parents:
+        - zen
+    compiler:
+      name: gcc
+      version: 10.2.0
+    namespace: builtin
+    parameters:
+      cflags:
+      - -O2
+      - -march=native
+      cppflags: []
+      cxxflags:
+      - -O2
+      - -march=native
+      fflags:
+      - -O2
+      - -march=native
+      ldflags: []
+      ldlibs: []
+    hash: oagwpgmhbpsa5i5trqxkmhk573zgvpy4
+    build_hash: oagwpgmhbpsa5i5trqxkmhk573zgvpy4
+- libedit:
+    version: 3.1-20191231
+    arch:
+      platform: linux
+      platform_os: centos8
+      target:
+        name: zen2
+        vendor: AuthenticAMD
+        features:
+        - abm
+        - aes
+        - avx
+        - avx2
+        - bmi1
+        - bmi2
+        - clflushopt
+        - clwb
+        - clzero
+        - cx16
+        - f16c
+        - fma
+        - fsgsbase
+        - mmx
+        - movbe
+        - pclmulqdq
+        - popcnt
+        - rdseed
+        - sse
+        - sse2
+        - sse4_1
+        - sse4_2
+        - sse4a
+        - ssse3
+        - xsavec
+        - xsaveopt
+        generation: 0
+        parents:
+        - zen
+    compiler:
+      name: gcc
+      version: 10.2.0
+    namespace: builtin
+    parameters:
+      cflags:
+      - -O2
+      - -march=native
+      cppflags: []
+      cxxflags:
+      - -O2
+      - -march=native
+      fflags:
+      - -O2
+      - -march=native
+      ldflags: []
+      ldlibs: []
+    dependencies:
+      ncurses:
+        hash: czycxp2spvrkybvtqywj7qvzayd3byss
+        type:
+        - build
+        - link
+    hash: tsigau235wk2vwsniwooyud3syvrpnx4
+    build_hash: tsigau235wk2vwsniwooyud3syvrpnx4
+- perl-data-dumper:
+    version: '2.173'
+    arch:
+      platform: linux
+      platform_os: centos8
+      target:
+        name: zen2
+        vendor: AuthenticAMD
+        features:
+        - abm
+        - aes
+        - avx
+        - avx2
+        - bmi1
+        - bmi2
+        - clflushopt
+        - clwb
+        - clzero
+        - cx16
+        - f16c
+        - fma
+        - fsgsbase
+        - mmx
+        - movbe
+        - pclmulqdq
+        - popcnt
+        - rdseed
+        - sse
+        - sse2
+        - sse4_1
+        - sse4_2
+        - sse4a
+        - ssse3
+        - xsavec
+        - xsaveopt
+        generation: 0
+        parents:
+        - zen
+    compiler:
+      name: gcc
+      version: 10.2.0
+    namespace: builtin
+    parameters:
+      cflags:
+      - -O2
+      - -march=native
+      cppflags: []
+      cxxflags:
+      - -O2
+      - -march=native
+      fflags:
+      - -O2
+      - -march=native
+      ldflags: []
+      ldlibs: []
+    dependencies:
+      perl:
+        hash: 2jh26uepit2ccgt5it4lyej2uh44dtwh
+        type:
+        - build
+        - link
+        - run
+    hash: yxfueuqi5n7ljkljzau2hfjmpdjyxcw5
+    build_hash: yxfueuqi5n7ljkljzau2hfjmpdjyxcw5
+- perl:
+    version: 5.30.3
+    arch:
+      platform: linux
+      platform_os: centos8
+      target:
+        name: zen2
+        vendor: AuthenticAMD
+        features:
+        - abm
+        - aes
+        - avx
+        - avx2
+        - bmi1
+        - bmi2
+        - clflushopt
+        - clwb
+        - clzero
+        - cx16
+        - f16c
+        - fma
+        - fsgsbase
+        - mmx
+        - movbe
+        - pclmulqdq
+        - popcnt
+        - rdseed
+        - sse
+        - sse2
+        - sse4_1
+        - sse4_2
+        - sse4a
+        - ssse3
+        - xsavec
+        - xsaveopt
+        generation: 0
+        parents:
+        - zen
+    compiler:
+      name: gcc
+      version: 10.2.0
+    namespace: builtin
+    parameters:
+      cpanm: true
+      shared: true
+      threads: true
+      cflags:
+      - -O2
+      - -march=native
+      cppflags: []
+      cxxflags:
+      - -O2
+      - -march=native
+      fflags:
+      - -O2
+      - -march=native
+      ldflags: []
+      ldlibs: []
+    dependencies:
+      berkeley-db:
+        hash: p4ou74mazsnlejt4xmhji26h4yg22jom
+        type:
+        - build
+        - link
+      gdbm:
+        hash: jj57peh5tsyg2hjttr7rmrldlmsd7ej7
+        type:
+        - build
+        - link
+    hash: 2jh26uepit2ccgt5it4lyej2uh44dtwh
+    build_hash: 2jh26uepit2ccgt5it4lyej2uh44dtwh
+- berkeley-db:
+    version: 18.1.40
+    arch:
+      platform: linux
+      platform_os: centos8
+      target:
+        name: zen2
+        vendor: AuthenticAMD
+        features:
+        - abm
+        - aes
+        - avx
+        - avx2
+        - bmi1
+        - bmi2
+        - clflushopt
+        - clwb
+        - clzero
+        - cx16
+        - f16c
+        - fma
+        - fsgsbase
+        - mmx
+        - movbe
+        - pclmulqdq
+        - popcnt
+        - rdseed
+        - sse
+        - sse2
+        - sse4_1
+        - sse4_2
+        - sse4a
+        - ssse3
+        - xsavec
+        - xsaveopt
+        generation: 0
+        parents:
+        - zen
+    compiler:
+      name: gcc
+      version: 10.2.0
+    namespace: builtin
+    parameters:
+      cflags:
+      - -O2
+      - -march=native
+      cppflags: []
+      cxxflags:
+      - -O2
+      - -march=native
+      fflags:
+      - -O2
+      - -march=native
+      ldflags: []
+      ldlibs: []
+    hash: p4ou74mazsnlejt4xmhji26h4yg22jom
+    build_hash: p4ou74mazsnlejt4xmhji26h4yg22jom
+- gdbm:
+    version: 1.18.1
+    arch:
+      platform: linux
+      platform_os: centos8
+      target:
+        name: zen2
+        vendor: AuthenticAMD
+        features:
+        - abm
+        - aes
+        - avx
+        - avx2
+        - bmi1
+        - bmi2
+        - clflushopt
+        - clwb
+        - clzero
+        - cx16
+        - f16c
+        - fma
+        - fsgsbase
+        - mmx
+        - movbe
+        - pclmulqdq
+        - popcnt
+        - rdseed
+        - sse
+        - sse2
+        - sse4_1
+        - sse4_2
+        - sse4a
+        - ssse3
+        - xsavec
+        - xsaveopt
+        generation: 0
+        parents:
+        - zen
+    compiler:
+      name: gcc
+      version: 10.2.0
+    namespace: builtin
+    parameters:
+      patches:
+      - 7f569b9287e9e5a4236636eef32ff3428f0462ec17aea359e0ebee07649f1f16
+      cflags:
+      - -O2
+      - -march=native
+      cppflags: []
+      cxxflags:
+      - -O2
+      - -march=native
+      fflags:
+      - -O2
+      - -march=native
+      ldflags: []
+      ldlibs: []
+    patches:
+    - 7f569b9287e9e5a4236636eef32ff3428f0462ec17aea359e0ebee07649f1f16
+    dependencies:
+      readline:
+        hash: zabqjivxg3uwixdosqtwagn7c3e2uvvv
+        type:
+        - build
+        - link
+    hash: jj57peh5tsyg2hjttr7rmrldlmsd7ej7
+    build_hash: jj57peh5tsyg2hjttr7rmrldlmsd7ej7
+- readline:
+    version: '8.0'
+    arch:
+      platform: linux
+      platform_os: centos8
+      target:
+        name: zen2
+        vendor: AuthenticAMD
+        features:
+        - abm
+        - aes
+        - avx
+        - avx2
+        - bmi1
+        - bmi2
+        - clflushopt
+        - clwb
+        - clzero
+        - cx16
+        - f16c
+        - fma
+        - fsgsbase
+        - mmx
+        - movbe
+        - pclmulqdq
+        - popcnt
+        - rdseed
+        - sse
+        - sse2
+        - sse4_1
+        - sse4_2
+        - sse4a
+        - ssse3
+        - xsavec
+        - xsaveopt
+        generation: 0
+        parents:
+        - zen
+    compiler:
+      name: gcc
+      version: 10.2.0
+    namespace: builtin
+    parameters:
+      cflags:
+      - -O2
+      - -march=native
+      cppflags: []
+      cxxflags:
+      - -O2
+      - -march=native
+      fflags:
+      - -O2
+      - -march=native
+      ldflags: []
+      ldlibs: []
+    dependencies:
+      ncurses:
+        hash: czycxp2spvrkybvtqywj7qvzayd3byss
+        type:
+        - build
+        - link
+    hash: zabqjivxg3uwixdosqtwagn7c3e2uvvv
+    build_hash: zabqjivxg3uwixdosqtwagn7c3e2uvvv
+- py-six:
+    version: 1.14.0
+    arch:
+      platform: linux
+      platform_os: centos8
+      target:
+        name: zen2
+        vendor: AuthenticAMD
+        features:
+        - abm
+        - aes
+        - avx
+        - avx2
+        - bmi1
+        - bmi2
+        - clflushopt
+        - clwb
+        - clzero
+        - cx16
+        - f16c
+        - fma
+        - fsgsbase
+        - mmx
+        - movbe
+        - pclmulqdq
+        - popcnt
+        - rdseed
+        - sse
+        - sse2
+        - sse4_1
+        - sse4_2
+        - sse4a
+        - ssse3
+        - xsavec
+        - xsaveopt
+        generation: 0
+        parents:
+        - zen
+    compiler:
+      name: gcc
+      version: 10.2.0
+    namespace: builtin
+    parameters:
+      cflags:
+      - -O2
+      - -march=native
+      cppflags: []
+      cxxflags:
+      - -O2
+      - -march=native
+      fflags:
+      - -O2
+      - -march=native
+      ldflags: []
+      ldlibs: []
+    dependencies:
+      python:
+        hash: pwkt76p3o2wk2ay3bv27szze2pnhbsbr
+        type:
+        - build
+        - link
+        - run
+    hash: grvozxrnoswl6qswseqtyg6jhr2c7ojy
+    build_hash: grvozxrnoswl6qswseqtyg6jhr2c7ojy
+- python:
+    version: 3.8.5
+    arch:
+      platform: linux
+      platform_os: centos8
+      target:
+        name: zen2
+        vendor: AuthenticAMD
+        features:
+        - abm
+        - aes
+        - avx
+        - avx2
+        - bmi1
+        - bmi2
+        - clflushopt
+        - clwb
+        - clzero
+        - cx16
+        - f16c
+        - fma
+        - fsgsbase
+        - mmx
+        - movbe
+        - pclmulqdq
+        - popcnt
+        - rdseed
+        - sse
+        - sse2
+        - sse4_1
+        - sse4_2
+        - sse4a
+        - ssse3
+        - xsavec
+        - xsaveopt
+        generation: 0
+        parents:
+        - zen
+    compiler:
+      name: gcc
+      version: 10.2.0
+    namespace: builtin
+    parameters:
+      bz2: true
+      ctypes: true
+      dbm: true
+      debug: false
+      libxml2: true
+      lzma: true
+      nis: false
+      optimizations: true
+      patches:
+      - 0d98e93189bc278fbc37a50ed7f183bd8aaf249a8e1670a465f0db6bb4f8cf87
+      pic: true
+      pyexpat: true
+      pythoncmd: true
+      readline: true
+      shared: true
+      sqlite3: true
+      ssl: true
+      tix: false
+      tkinter: true
+      ucs4: false
+      uuid: true
+      zlib: true
+      cflags:
+      - -O2
+      - -march=native
+      cppflags: []
+      cxxflags:
+      - -O2
+      - -march=native
+      fflags:
+      - -O2
+      - -march=native
+      ldflags: []
+      ldlibs: []
+    patches:
+    - 0d98e93189bc278fbc37a50ed7f183bd8aaf249a8e1670a465f0db6bb4f8cf87
+    dependencies:
+      bzip2:
+        hash: vou456lo6afmp73y7aoqqajykgy24s4e
+        type:
+        - build
+        - link
+      expat:
+        hash: y664o5rz4xxfqcjpe5crw4nne7ju6ytb
+        type:
+        - build
+        - link
+      gdbm:
+        hash: jj57peh5tsyg2hjttr7rmrldlmsd7ej7
+        type:
+        - build
+        - link
+      gettext:
+        hash: qsns4bj6njucvpak6xvxtezgavp25tfe
+        type:
+        - build
+        - link
+      libffi:
+        hash: xrl3opjldzhjyjbhzsw77oh2sd5r5jop
+        type:
+        - build
+        - link
+      libuuid:
+        hash: 7cxem3wyfmqep2xp3zjjuwlgm7l7fraj
+        type:
+        - build
+        - link
+      ncurses:
+        hash: czycxp2spvrkybvtqywj7qvzayd3byss
+        type:
+        - build
+        - link
+      openssl:
+        hash: shq645m6wo5rsni2xjwpou5ya254c24o
+        type:
+        - build
+        - link
+      readline:
+        hash: zabqjivxg3uwixdosqtwagn7c3e2uvvv
+        type:
+        - build
+        - link
+      sqlite:
+        hash: e4v55df3sreronnnldxslj72dinbbdkn
+        type:
+        - build
+        - link
+      tcl:
+        hash: zo6leeg74jk3ysugf4xxt4g4vlyd635t
+        type:
+        - build
+        - link
+      tk:
+        hash: mrrqnn5ryrzx5beyxjks5ejji4vnqjps
+        type:
+        - build
+        - link
+      xz:
+        hash: dqjhyjwlia7pu3en3wirjs2trtn6s42y
+        type:
+        - build
+        - link
+      zlib:
+        hash: 55omrwxdycckdj5oqhmpsx5tjn6lmhn6
+        type:
+        - build
+        - link
+    hash: pwkt76p3o2wk2ay3bv27szze2pnhbsbr
+    build_hash: pwkt76p3o2wk2ay3bv27szze2pnhbsbr
+- expat:
+    version: 2.2.9
+    arch:
+      platform: linux
+      platform_os: centos8
+      target:
+        name: zen2
+        vendor: AuthenticAMD
+        features:
+        - abm
+        - aes
+        - avx
+        - avx2
+        - bmi1
+        - bmi2
+        - clflushopt
+        - clwb
+        - clzero
+        - cx16
+        - f16c
+        - fma
+        - fsgsbase
+        - mmx
+        - movbe
+        - pclmulqdq
+        - popcnt
+        - rdseed
+        - sse
+        - sse2
+        - sse4_1
+        - sse4_2
+        - sse4a
+        - ssse3
+        - xsavec
+        - xsaveopt
+        generation: 0
+        parents:
+        - zen
+    compiler:
+      name: gcc
+      version: 10.2.0
+    namespace: builtin
+    parameters:
+      libbsd: true
+      cflags:
+      - -O2
+      - -march=native
+      cppflags: []
+      cxxflags:
+      - -O2
+      - -march=native
+      fflags:
+      - -O2
+      - -march=native
+      ldflags: []
+      ldlibs: []
+    dependencies:
+      libbsd:
+        hash: zreavlfiedjfvvtpnofft54k5lwr6rq5
+        type:
+        - build
+        - link
+    hash: y664o5rz4xxfqcjpe5crw4nne7ju6ytb
+    build_hash: y664o5rz4xxfqcjpe5crw4nne7ju6ytb
+- libbsd:
+    version: 0.10.0
+    arch:
+      platform: linux
+      platform_os: centos8
+      target:
+        name: zen2
+        vendor: AuthenticAMD
+        features:
+        - abm
+        - aes
+        - avx
+        - avx2
+        - bmi1
+        - bmi2
+        - clflushopt
+        - clwb
+        - clzero
+        - cx16
+        - f16c
+        - fma
+        - fsgsbase
+        - mmx
+        - movbe
+        - pclmulqdq
+        - popcnt
+        - rdseed
+        - sse
+        - sse2
+        - sse4_1
+        - sse4_2
+        - sse4a
+        - ssse3
+        - xsavec
+        - xsaveopt
+        generation: 0
+        parents:
+        - zen
+    compiler:
+      name: gcc
+      version: 10.2.0
+    namespace: builtin
+    parameters:
+      cflags:
+      - -O2
+      - -march=native
+      cppflags: []
+      cxxflags:
+      - -O2
+      - -march=native
+      fflags:
+      - -O2
+      - -march=native
+      ldflags: []
+      ldlibs: []
+    hash: zreavlfiedjfvvtpnofft54k5lwr6rq5
+    build_hash: zreavlfiedjfvvtpnofft54k5lwr6rq5
+- libffi:
+    version: '3.3'
+    arch:
+      platform: linux
+      platform_os: centos8
+      target:
+        name: zen2
+        vendor: AuthenticAMD
+        features:
+        - abm
+        - aes
+        - avx
+        - avx2
+        - bmi1
+        - bmi2
+        - clflushopt
+        - clwb
+        - clzero
+        - cx16
+        - f16c
+        - fma
+        - fsgsbase
+        - mmx
+        - movbe
+        - pclmulqdq
+        - popcnt
+        - rdseed
+        - sse
+        - sse2
+        - sse4_1
+        - sse4_2
+        - sse4a
+        - ssse3
+        - xsavec
+        - xsaveopt
+        generation: 0
+        parents:
+        - zen
+    compiler:
+      name: gcc
+      version: 10.2.0
+    namespace: builtin
+    parameters:
+      patches:
+      - 26f26c6f29a7ce9bf370ad3ab2610f99365b4bdd7b82e7c31df41a3370d685c0
+      cflags:
+      - -O2
+      - -march=native
+      cppflags: []
+      cxxflags:
+      - -O2
+      - -march=native
+      fflags:
+      - -O2
+      - -march=native
+      ldflags: []
+      ldlibs: []
+    patches:
+    - 26f26c6f29a7ce9bf370ad3ab2610f99365b4bdd7b82e7c31df41a3370d685c0
+    hash: xrl3opjldzhjyjbhzsw77oh2sd5r5jop
+    build_hash: xrl3opjldzhjyjbhzsw77oh2sd5r5jop
+- libuuid:
+    version: 1.0.3
+    arch:
+      platform: linux
+      platform_os: centos8
+      target:
+        name: zen2
+        vendor: AuthenticAMD
+        features:
+        - abm
+        - aes
+        - avx
+        - avx2
+        - bmi1
+        - bmi2
+        - clflushopt
+        - clwb
+        - clzero
+        - cx16
+        - f16c
+        - fma
+        - fsgsbase
+        - mmx
+        - movbe
+        - pclmulqdq
+        - popcnt
+        - rdseed
+        - sse
+        - sse2
+        - sse4_1
+        - sse4_2
+        - sse4a
+        - ssse3
+        - xsavec
+        - xsaveopt
+        generation: 0
+        parents:
+        - zen
+    compiler:
+      name: gcc
+      version: 10.2.0
+    namespace: builtin
+    parameters:
+      cflags:
+      - -O2
+      - -march=native
+      cppflags: []
+      cxxflags:
+      - -O2
+      - -march=native
+      fflags:
+      - -O2
+      - -march=native
+      ldflags: []
+      ldlibs: []
+    hash: 7cxem3wyfmqep2xp3zjjuwlgm7l7fraj
+    build_hash: 7cxem3wyfmqep2xp3zjjuwlgm7l7fraj
+- sqlite:
+    version: 3.33.0
+    arch:
+      platform: linux
+      platform_os: centos8
+      target:
+        name: zen2
+        vendor: AuthenticAMD
+        features:
+        - abm
+        - aes
+        - avx
+        - avx2
+        - bmi1
+        - bmi2
+        - clflushopt
+        - clwb
+        - clzero
+        - cx16
+        - f16c
+        - fma
+        - fsgsbase
+        - mmx
+        - movbe
+        - pclmulqdq
+        - popcnt
+        - rdseed
+        - sse
+        - sse2
+        - sse4_1
+        - sse4_2
+        - sse4a
+        - ssse3
+        - xsavec
+        - xsaveopt
+        generation: 0
+        parents:
+        - zen
+    compiler:
+      name: gcc
+      version: 10.2.0
+    namespace: builtin
+    parameters:
+      column_metadata: true
+      fts: true
+      functions: true
+      rtree: true
+      cflags:
+      - -O2
+      - -march=native
+      cppflags: []
+      cxxflags:
+      - -O2
+      - -march=native
+      fflags:
+      - -O2
+      - -march=native
+      ldflags: []
+      ldlibs: []
+    dependencies:
+      readline:
+        hash: zabqjivxg3uwixdosqtwagn7c3e2uvvv
+        type:
+        - build
+        - link
+      zlib:
+        hash: 55omrwxdycckdj5oqhmpsx5tjn6lmhn6
+        type:
+        - build
+        - link
+    hash: e4v55df3sreronnnldxslj72dinbbdkn
+    build_hash: e4v55df3sreronnnldxslj72dinbbdkn
+- tcl:
+    version: 8.5.19
+    arch:
+      platform: linux
+      platform_os: centos8
+      target:
+        name: zen2
+        vendor: AuthenticAMD
+        features:
+        - abm
+        - aes
+        - avx
+        - avx2
+        - bmi1
+        - bmi2
+        - clflushopt
+        - clwb
+        - clzero
+        - cx16
+        - f16c
+        - fma
+        - fsgsbase
+        - mmx
+        - movbe
+        - pclmulqdq
+        - popcnt
+        - rdseed
+        - sse
+        - sse2
+        - sse4_1
+        - sse4_2
+        - sse4a
+        - ssse3
+        - xsavec
+        - xsaveopt
+        generation: 0
+        parents:
+        - zen
+    compiler:
+      name: gcc
+      version: 10.2.0
+    namespace: builtin
+    parameters:
+      cflags:
+      - -O2
+      - -march=native
+      cppflags: []
+      cxxflags:
+      - -O2
+      - -march=native
+      fflags:
+      - -O2
+      - -march=native
+      ldflags: []
+      ldlibs: []
+    dependencies:
+      zlib:
+        hash: 55omrwxdycckdj5oqhmpsx5tjn6lmhn6
+        type:
+        - build
+        - link
+    hash: zo6leeg74jk3ysugf4xxt4g4vlyd635t
+    build_hash: zo6leeg74jk3ysugf4xxt4g4vlyd635t
+- tk:
+    version: 8.5.19
+    arch:
+      platform: linux
+      platform_os: centos8
+      target:
+        name: zen2
+        vendor: AuthenticAMD
+        features:
+        - abm
+        - aes
+        - avx
+        - avx2
+        - bmi1
+        - bmi2
+        - clflushopt
+        - clwb
+        - clzero
+        - cx16
+        - f16c
+        - fma
+        - fsgsbase
+        - mmx
+        - movbe
+        - pclmulqdq
+        - popcnt
+        - rdseed
+        - sse
+        - sse2
+        - sse4_1
+        - sse4_2
+        - sse4a
+        - ssse3
+        - xsavec
+        - xsaveopt
+        generation: 0
+        parents:
+        - zen
+    compiler:
+      name: gcc
+      version: 10.2.0
+    namespace: builtin
+    parameters:
+      xft: true
+      xss: true
+      cflags:
+      - -O2
+      - -march=native
+      cppflags: []
+      cxxflags:
+      - -O2
+      - -march=native
+      fflags:
+      - -O2
+      - -march=native
+      ldflags: []
+      ldlibs: []
+    dependencies:
+      libx11:
+        hash: 2x6kmtkj6nke2gu34q5egkitaep3xai6
+        type:
+        - build
+        - link
+      libxft:
+        hash: d623ceg55ws5hzxkf2zhqafp5lkocjqe
+        type:
+        - build
+        - link
+      libxscrnsaver:
+        hash: np4xtizomp253x62rbsmagr5km6fsivp
+        type:
+        - build
+        - link
+      tcl:
+        hash: zo6leeg74jk3ysugf4xxt4g4vlyd635t
+        type:
+        - build
+        - link
+    hash: mrrqnn5ryrzx5beyxjks5ejji4vnqjps
+    build_hash: mrrqnn5ryrzx5beyxjks5ejji4vnqjps
+- libx11:
+    version: 1.6.7
+    arch:
+      platform: linux
+      platform_os: centos8
+      target:
+        name: zen2
+        vendor: AuthenticAMD
+        features:
+        - abm
+        - aes
+        - avx
+        - avx2
+        - bmi1
+        - bmi2
+        - clflushopt
+        - clwb
+        - clzero
+        - cx16
+        - f16c
+        - fma
+        - fsgsbase
+        - mmx
+        - movbe
+        - pclmulqdq
+        - popcnt
+        - rdseed
+        - sse
+        - sse2
+        - sse4_1
+        - sse4_2
+        - sse4a
+        - ssse3
+        - xsavec
+        - xsaveopt
+        generation: 0
+        parents:
+        - zen
+    compiler:
+      name: gcc
+      version: 10.2.0
+    namespace: builtin
+    parameters:
+      cflags:
+      - -O2
+      - -march=native
+      cppflags: []
+      cxxflags:
+      - -O2
+      - -march=native
+      fflags:
+      - -O2
+      - -march=native
+      ldflags: []
+      ldlibs: []
+    dependencies:
+      kbproto:
+        hash: xbg3skdw6qsu2oclf5uczno4w6ineatj
+        type:
+        - build
+        - link
+      libxcb:
+        hash: lzbi3oedk4g4jd7eget6ybigb2ch2mw7
+        type:
+        - build
+        - link
+      xextproto:
+        hash: 3lqkjrnfvjhoqxg742knmlbf67vjpmlu
+        type:
+        - build
+        - link
+    hash: 2x6kmtkj6nke2gu34q5egkitaep3xai6
+    build_hash: 2x6kmtkj6nke2gu34q5egkitaep3xai6
+- kbproto:
+    version: 1.0.7
+    arch:
+      platform: linux
+      platform_os: centos8
+      target:
+        name: zen2
+        vendor: AuthenticAMD
+        features:
+        - abm
+        - aes
+        - avx
+        - avx2
+        - bmi1
+        - bmi2
+        - clflushopt
+        - clwb
+        - clzero
+        - cx16
+        - f16c
+        - fma
+        - fsgsbase
+        - mmx
+        - movbe
+        - pclmulqdq
+        - popcnt
+        - rdseed
+        - sse
+        - sse2
+        - sse4_1
+        - sse4_2
+        - sse4a
+        - ssse3
+        - xsavec
+        - xsaveopt
+        generation: 0
+        parents:
+        - zen
+    compiler:
+      name: gcc
+      version: 10.2.0
+    namespace: builtin
+    parameters:
+      cflags:
+      - -O2
+      - -march=native
+      cppflags: []
+      cxxflags:
+      - -O2
+      - -march=native
+      fflags:
+      - -O2
+      - -march=native
+      ldflags: []
+      ldlibs: []
+    hash: xbg3skdw6qsu2oclf5uczno4w6ineatj
+    build_hash: xbg3skdw6qsu2oclf5uczno4w6ineatj
+- libxcb:
+    version: '1.13'
+    arch:
+      platform: linux
+      platform_os: centos8
+      target:
+        name: zen2
+        vendor: AuthenticAMD
+        features:
+        - abm
+        - aes
+        - avx
+        - avx2
+        - bmi1
+        - bmi2
+        - clflushopt
+        - clwb
+        - clzero
+        - cx16
+        - f16c
+        - fma
+        - fsgsbase
+        - mmx
+        - movbe
+        - pclmulqdq
+        - popcnt
+        - rdseed
+        - sse
+        - sse2
+        - sse4_1
+        - sse4_2
+        - sse4a
+        - ssse3
+        - xsavec
+        - xsaveopt
+        generation: 0
+        parents:
+        - zen
+    compiler:
+      name: gcc
+      version: 10.2.0
+    namespace: builtin
+    parameters:
+      cflags:
+      - -O2
+      - -march=native
+      cppflags: []
+      cxxflags:
+      - -O2
+      - -march=native
+      fflags:
+      - -O2
+      - -march=native
+      ldflags: []
+      ldlibs: []
+    dependencies:
+      libpthread-stubs:
+        hash: exhqq4giadqkiwufpbbfgwmixpiu6qee
+        type:
+        - build
+        - link
+      libxau:
+        hash: mcpthhuuct7i4sf6kgmfpg3ko7aafhpg
+        type:
+        - build
+        - link
+      libxdmcp:
+        hash: kgz56yjr5qcdfadbodvwry2ana7wu3u7
+        type:
+        - build
+        - link
+    hash: lzbi3oedk4g4jd7eget6ybigb2ch2mw7
+    build_hash: lzbi3oedk4g4jd7eget6ybigb2ch2mw7
+- libpthread-stubs:
+    version: '0.4'
+    arch:
+      platform: linux
+      platform_os: centos8
+      target:
+        name: zen2
+        vendor: AuthenticAMD
+        features:
+        - abm
+        - aes
+        - avx
+        - avx2
+        - bmi1
+        - bmi2
+        - clflushopt
+        - clwb
+        - clzero
+        - cx16
+        - f16c
+        - fma
+        - fsgsbase
+        - mmx
+        - movbe
+        - pclmulqdq
+        - popcnt
+        - rdseed
+        - sse
+        - sse2
+        - sse4_1
+        - sse4_2
+        - sse4a
+        - ssse3
+        - xsavec
+        - xsaveopt
+        generation: 0
+        parents:
+        - zen
+    compiler:
+      name: gcc
+      version: 10.2.0
+    namespace: builtin
+    parameters:
+      cflags:
+      - -O2
+      - -march=native
+      cppflags: []
+      cxxflags:
+      - -O2
+      - -march=native
+      fflags:
+      - -O2
+      - -march=native
+      ldflags: []
+      ldlibs: []
+    hash: exhqq4giadqkiwufpbbfgwmixpiu6qee
+    build_hash: exhqq4giadqkiwufpbbfgwmixpiu6qee
+- libxau:
+    version: 1.0.8
+    arch:
+      platform: linux
+      platform_os: centos8
+      target:
+        name: zen2
+        vendor: AuthenticAMD
+        features:
+        - abm
+        - aes
+        - avx
+        - avx2
+        - bmi1
+        - bmi2
+        - clflushopt
+        - clwb
+        - clzero
+        - cx16
+        - f16c
+        - fma
+        - fsgsbase
+        - mmx
+        - movbe
+        - pclmulqdq
+        - popcnt
+        - rdseed
+        - sse
+        - sse2
+        - sse4_1
+        - sse4_2
+        - sse4a
+        - ssse3
+        - xsavec
+        - xsaveopt
+        generation: 0
+        parents:
+        - zen
+    compiler:
+      name: gcc
+      version: 10.2.0
+    namespace: builtin
+    parameters:
+      cflags:
+      - -O2
+      - -march=native
+      cppflags: []
+      cxxflags:
+      - -O2
+      - -march=native
+      fflags:
+      - -O2
+      - -march=native
+      ldflags: []
+      ldlibs: []
+    dependencies:
+      xproto:
+        hash: dh6ja36bneirvjo7stwckr5mav3sbflp
+        type:
+        - build
+        - link
+    hash: mcpthhuuct7i4sf6kgmfpg3ko7aafhpg
+    build_hash: mcpthhuuct7i4sf6kgmfpg3ko7aafhpg
+- xproto:
+    version: 7.0.31
+    arch:
+      platform: linux
+      platform_os: centos8
+      target:
+        name: zen2
+        vendor: AuthenticAMD
+        features:
+        - abm
+        - aes
+        - avx
+        - avx2
+        - bmi1
+        - bmi2
+        - clflushopt
+        - clwb
+        - clzero
+        - cx16
+        - f16c
+        - fma
+        - fsgsbase
+        - mmx
+        - movbe
+        - pclmulqdq
+        - popcnt
+        - rdseed
+        - sse
+        - sse2
+        - sse4_1
+        - sse4_2
+        - sse4a
+        - ssse3
+        - xsavec
+        - xsaveopt
+        generation: 0
+        parents:
+        - zen
+    compiler:
+      name: gcc
+      version: 10.2.0
+    namespace: builtin
+    parameters:
+      cflags:
+      - -O2
+      - -march=native
+      cppflags: []
+      cxxflags:
+      - -O2
+      - -march=native
+      fflags:
+      - -O2
+      - -march=native
+      ldflags: []
+      ldlibs: []
+    hash: dh6ja36bneirvjo7stwckr5mav3sbflp
+    build_hash: dh6ja36bneirvjo7stwckr5mav3sbflp
+- libxdmcp:
+    version: 1.1.2
+    arch:
+      platform: linux
+      platform_os: centos8
+      target:
+        name: zen2
+        vendor: AuthenticAMD
+        features:
+        - abm
+        - aes
+        - avx
+        - avx2
+        - bmi1
+        - bmi2
+        - clflushopt
+        - clwb
+        - clzero
+        - cx16
+        - f16c
+        - fma
+        - fsgsbase
+        - mmx
+        - movbe
+        - pclmulqdq
+        - popcnt
+        - rdseed
+        - sse
+        - sse2
+        - sse4_1
+        - sse4_2
+        - sse4a
+        - ssse3
+        - xsavec
+        - xsaveopt
+        generation: 0
+        parents:
+        - zen
+    compiler:
+      name: gcc
+      version: 10.2.0
+    namespace: builtin
+    parameters:
+      cflags:
+      - -O2
+      - -march=native
+      cppflags: []
+      cxxflags:
+      - -O2
+      - -march=native
+      fflags:
+      - -O2
+      - -march=native
+      ldflags: []
+      ldlibs: []
+    dependencies:
+      libbsd:
+        hash: zreavlfiedjfvvtpnofft54k5lwr6rq5
+        type:
+        - build
+        - link
+    hash: kgz56yjr5qcdfadbodvwry2ana7wu3u7
+    build_hash: kgz56yjr5qcdfadbodvwry2ana7wu3u7
+- xextproto:
+    version: 7.3.0
+    arch:
+      platform: linux
+      platform_os: centos8
+      target:
+        name: zen2
+        vendor: AuthenticAMD
+        features:
+        - abm
+        - aes
+        - avx
+        - avx2
+        - bmi1
+        - bmi2
+        - clflushopt
+        - clwb
+        - clzero
+        - cx16
+        - f16c
+        - fma
+        - fsgsbase
+        - mmx
+        - movbe
+        - pclmulqdq
+        - popcnt
+        - rdseed
+        - sse
+        - sse2
+        - sse4_1
+        - sse4_2
+        - sse4a
+        - ssse3
+        - xsavec
+        - xsaveopt
+        generation: 0
+        parents:
+        - zen
+    compiler:
+      name: gcc
+      version: 10.2.0
+    namespace: builtin
+    parameters:
+      cflags:
+      - -O2
+      - -march=native
+      cppflags: []
+      cxxflags:
+      - -O2
+      - -march=native
+      fflags:
+      - -O2
+      - -march=native
+      ldflags: []
+      ldlibs: []
+    hash: 3lqkjrnfvjhoqxg742knmlbf67vjpmlu
+    build_hash: 3lqkjrnfvjhoqxg742knmlbf67vjpmlu
+- libxft:
+    version: 2.3.2
+    arch:
+      platform: linux
+      platform_os: centos8
+      target:
+        name: zen2
+        vendor: AuthenticAMD
+        features:
+        - abm
+        - aes
+        - avx
+        - avx2
+        - bmi1
+        - bmi2
+        - clflushopt
+        - clwb
+        - clzero
+        - cx16
+        - f16c
+        - fma
+        - fsgsbase
+        - mmx
+        - movbe
+        - pclmulqdq
+        - popcnt
+        - rdseed
+        - sse
+        - sse2
+        - sse4_1
+        - sse4_2
+        - sse4a
+        - ssse3
+        - xsavec
+        - xsaveopt
+        generation: 0
+        parents:
+        - zen
+    compiler:
+      name: gcc
+      version: 10.2.0
+    namespace: builtin
+    parameters:
+      cflags:
+      - -O2
+      - -march=native
+      cppflags: []
+      cxxflags:
+      - -O2
+      - -march=native
+      fflags:
+      - -O2
+      - -march=native
+      ldflags: []
+      ldlibs: []
+    dependencies:
+      fontconfig:
+        hash: v5fwzbleu77ww3biu63qqgb7m2i2f4ds
+        type:
+        - build
+        - link
+      freetype:
+        hash: a37oegpxixrl6fwwlgruakieyt3xs5qe
+        type:
+        - build
+        - link
+      libx11:
+        hash: 2x6kmtkj6nke2gu34q5egkitaep3xai6
+        type:
+        - build
+        - link
+      libxrender:
+        hash: y2iaqbjkzdfmsuxzxgmghjeaavytoqca
+        type:
+        - build
+        - link
+    hash: d623ceg55ws5hzxkf2zhqafp5lkocjqe
+    build_hash: d623ceg55ws5hzxkf2zhqafp5lkocjqe
+- fontconfig:
+    version: 2.13.1
+    arch:
+      platform: linux
+      platform_os: centos8
+      target:
+        name: zen2
+        vendor: AuthenticAMD
+        features:
+        - abm
+        - aes
+        - avx
+        - avx2
+        - bmi1
+        - bmi2
+        - clflushopt
+        - clwb
+        - clzero
+        - cx16
+        - f16c
+        - fma
+        - fsgsbase
+        - mmx
+        - movbe
+        - pclmulqdq
+        - popcnt
+        - rdseed
+        - sse
+        - sse2
+        - sse4_1
+        - sse4_2
+        - sse4a
+        - ssse3
+        - xsavec
+        - xsaveopt
+        generation: 0
+        parents:
+        - zen
+    compiler:
+      name: gcc
+      version: 10.2.0
+    namespace: builtin
+    parameters:
+      cflags:
+      - -O2
+      - -march=native
+      cppflags: []
+      cxxflags:
+      - -O2
+      - -march=native
+      fflags:
+      - -O2
+      - -march=native
+      ldflags: []
+      ldlibs: []
+    dependencies:
+      font-util:
+        hash: qdxlpxvg4ultfheg4alocqqvmhyubvkb
+        type:
+        - build
+        - link
+      freetype:
+        hash: a37oegpxixrl6fwwlgruakieyt3xs5qe
+        type:
+        - build
+        - link
+      libuuid:
+        hash: 7cxem3wyfmqep2xp3zjjuwlgm7l7fraj
+        type:
+        - build
+        - link
+      libxml2:
+        hash: 66b7zjik6byvj73pjevxtyt4ddclbrdp
+        type:
+        - build
+        - link
+    hash: v5fwzbleu77ww3biu63qqgb7m2i2f4ds
+    build_hash: v5fwzbleu77ww3biu63qqgb7m2i2f4ds
+- font-util:
+    version: 1.3.2
+    arch:
+      platform: linux
+      platform_os: centos8
+      target:
+        name: zen2
+        vendor: AuthenticAMD
+        features:
+        - abm
+        - aes
+        - avx
+        - avx2
+        - bmi1
+        - bmi2
+        - clflushopt
+        - clwb
+        - clzero
+        - cx16
+        - f16c
+        - fma
+        - fsgsbase
+        - mmx
+        - movbe
+        - pclmulqdq
+        - popcnt
+        - rdseed
+        - sse
+        - sse2
+        - sse4_1
+        - sse4_2
+        - sse4a
+        - ssse3
+        - xsavec
+        - xsaveopt
+        generation: 0
+        parents:
+        - zen
+    compiler:
+      name: gcc
+      version: 10.2.0
+    namespace: builtin
+    parameters:
+      fonts:
+      - encodings
+      - font-adobe-100dpi
+      - font-adobe-75dpi
+      - font-adobe-utopia-100dpi
+      - font-adobe-utopia-75dpi
+      - font-adobe-utopia-type1
+      - font-alias
+      - font-arabic-misc
+      - font-bh-100dpi
+      - font-bh-75dpi
+      - font-bh-lucidatypewriter-100dpi
+      - font-bh-lucidatypewriter-75dpi
+      - font-bh-ttf
+      - font-bh-type1
+      - font-bitstream-100dpi
+      - font-bitstream-75dpi
+      - font-bitstream-speedo
+      - font-bitstream-type1
+      - font-cronyx-cyrillic
+      - font-cursor-misc
+      - font-daewoo-misc
+      - font-dec-misc
+      - font-ibm-type1
+      - font-isas-misc
+      - font-jis-misc
+      - font-micro-misc
+      - font-misc-cyrillic
+      - font-misc-ethiopic
+      - font-misc-meltho
+      - font-misc-misc
+      - font-mutt-misc
+      - font-schumacher-misc
+      - font-screen-cyrillic
+      - font-sun-misc
+      - font-winitzki-cyrillic
+      - font-xfree86-type1
+      cflags:
+      - -O2
+      - -march=native
+      cppflags: []
+      cxxflags:
+      - -O2
+      - -march=native
+      fflags:
+      - -O2
+      - -march=native
+      ldflags: []
+      ldlibs: []
+    hash: qdxlpxvg4ultfheg4alocqqvmhyubvkb
+    build_hash: qdxlpxvg4ultfheg4alocqqvmhyubvkb
+- freetype:
+    version: 2.10.1
+    arch:
+      platform: linux
+      platform_os: centos8
+      target:
+        name: zen2
+        vendor: AuthenticAMD
+        features:
+        - abm
+        - aes
+        - avx
+        - avx2
+        - bmi1
+        - bmi2
+        - clflushopt
+        - clwb
+        - clzero
+        - cx16
+        - f16c
+        - fma
+        - fsgsbase
+        - mmx
+        - movbe
+        - pclmulqdq
+        - popcnt
+        - rdseed
+        - sse
+        - sse2
+        - sse4_1
+        - sse4_2
+        - sse4a
+        - ssse3
+        - xsavec
+        - xsaveopt
+        generation: 0
+        parents:
+        - zen
+    compiler:
+      name: gcc
+      version: 10.2.0
+    namespace: builtin
+    parameters:
+      cflags:
+      - -O2
+      - -march=native
+      cppflags: []
+      cxxflags:
+      - -O2
+      - -march=native
+      fflags:
+      - -O2
+      - -march=native
+      ldflags: []
+      ldlibs: []
+    dependencies:
+      bzip2:
+        hash: vou456lo6afmp73y7aoqqajykgy24s4e
+        type:
+        - build
+        - link
+      libpng:
+        hash: dr7nh5ziis5qfn4vf2srhg2uprtumxqc
+        type:
+        - build
+        - link
+    hash: a37oegpxixrl6fwwlgruakieyt3xs5qe
+    build_hash: a37oegpxixrl6fwwlgruakieyt3xs5qe
+- libpng:
+    version: 1.6.37
+    arch:
+      platform: linux
+      platform_os: centos8
+      target:
+        name: zen2
+        vendor: AuthenticAMD
+        features:
+        - abm
+        - aes
+        - avx
+        - avx2
+        - bmi1
+        - bmi2
+        - clflushopt
+        - clwb
+        - clzero
+        - cx16
+        - f16c
+        - fma
+        - fsgsbase
+        - mmx
+        - movbe
+        - pclmulqdq
+        - popcnt
+        - rdseed
+        - sse
+        - sse2
+        - sse4_1
+        - sse4_2
+        - sse4a
+        - ssse3
+        - xsavec
+        - xsaveopt
+        generation: 0
+        parents:
+        - zen
+    compiler:
+      name: gcc
+      version: 10.2.0
+    namespace: builtin
+    parameters:
+      cflags:
+      - -O2
+      - -march=native
+      cppflags: []
+      cxxflags:
+      - -O2
+      - -march=native
+      fflags:
+      - -O2
+      - -march=native
+      ldflags: []
+      ldlibs: []
+    dependencies:
+      zlib:
+        hash: 55omrwxdycckdj5oqhmpsx5tjn6lmhn6
+        type:
+        - build
+        - link
+    hash: dr7nh5ziis5qfn4vf2srhg2uprtumxqc
+    build_hash: dr7nh5ziis5qfn4vf2srhg2uprtumxqc
+- libxrender:
+    version: 0.9.10
+    arch:
+      platform: linux
+      platform_os: centos8
+      target:
+        name: zen2
+        vendor: AuthenticAMD
+        features:
+        - abm
+        - aes
+        - avx
+        - avx2
+        - bmi1
+        - bmi2
+        - clflushopt
+        - clwb
+        - clzero
+        - cx16
+        - f16c
+        - fma
+        - fsgsbase
+        - mmx
+        - movbe
+        - pclmulqdq
+        - popcnt
+        - rdseed
+        - sse
+        - sse2
+        - sse4_1
+        - sse4_2
+        - sse4a
+        - ssse3
+        - xsavec
+        - xsaveopt
+        generation: 0
+        parents:
+        - zen
+    compiler:
+      name: gcc
+      version: 10.2.0
+    namespace: builtin
+    parameters:
+      cflags:
+      - -O2
+      - -march=native
+      cppflags: []
+      cxxflags:
+      - -O2
+      - -march=native
+      fflags:
+      - -O2
+      - -march=native
+      ldflags: []
+      ldlibs: []
+    dependencies:
+      libx11:
+        hash: 2x6kmtkj6nke2gu34q5egkitaep3xai6
+        type:
+        - build
+        - link
+      renderproto:
+        hash: vtyc4obbnq2zhmq5oc6le7vii6w3met3
+        type:
+        - build
+        - link
+    hash: y2iaqbjkzdfmsuxzxgmghjeaavytoqca
+    build_hash: y2iaqbjkzdfmsuxzxgmghjeaavytoqca
+- renderproto:
+    version: 0.11.1
+    arch:
+      platform: linux
+      platform_os: centos8
+      target:
+        name: zen2
+        vendor: AuthenticAMD
+        features:
+        - abm
+        - aes
+        - avx
+        - avx2
+        - bmi1
+        - bmi2
+        - clflushopt
+        - clwb
+        - clzero
+        - cx16
+        - f16c
+        - fma
+        - fsgsbase
+        - mmx
+        - movbe
+        - pclmulqdq
+        - popcnt
+        - rdseed
+        - sse
+        - sse2
+        - sse4_1
+        - sse4_2
+        - sse4a
+        - ssse3
+        - xsavec
+        - xsaveopt
+        generation: 0
+        parents:
+        - zen
+    compiler:
+      name: gcc
+      version: 10.2.0
+    namespace: builtin
+    parameters:
+      cflags:
+      - -O2
+      - -march=native
+      cppflags: []
+      cxxflags:
+      - -O2
+      - -march=native
+      fflags:
+      - -O2
+      - -march=native
+      ldflags: []
+      ldlibs: []
+    hash: vtyc4obbnq2zhmq5oc6le7vii6w3met3
+    build_hash: vtyc4obbnq2zhmq5oc6le7vii6w3met3
+- libxscrnsaver:
+    version: 1.2.2
+    arch:
+      platform: linux
+      platform_os: centos8
+      target:
+        name: zen2
+        vendor: AuthenticAMD
+        features:
+        - abm
+        - aes
+        - avx
+        - avx2
+        - bmi1
+        - bmi2
+        - clflushopt
+        - clwb
+        - clzero
+        - cx16
+        - f16c
+        - fma
+        - fsgsbase
+        - mmx
+        - movbe
+        - pclmulqdq
+        - popcnt
+        - rdseed
+        - sse
+        - sse2
+        - sse4_1
+        - sse4_2
+        - sse4a
+        - ssse3
+        - xsavec
+        - xsaveopt
+        generation: 0
+        parents:
+        - zen
+    compiler:
+      name: gcc
+      version: 10.2.0
+    namespace: builtin
+    parameters:
+      cflags:
+      - -O2
+      - -march=native
+      cppflags: []
+      cxxflags:
+      - -O2
+      - -march=native
+      fflags:
+      - -O2
+      - -march=native
+      ldflags: []
+      ldlibs: []
+    dependencies:
+      libx11:
+        hash: 2x6kmtkj6nke2gu34q5egkitaep3xai6
+        type:
+        - build
+        - link
+      libxext:
+        hash: bqo3pujb3dagmx4s7v5xolij4bju5hne
+        type:
+        - build
+        - link
+      scrnsaverproto:
+        hash: hhgpohqdwasmlgnzastz3nrlhxqfpw2s
+        type:
+        - build
+        - link
+    hash: np4xtizomp253x62rbsmagr5km6fsivp
+    build_hash: np4xtizomp253x62rbsmagr5km6fsivp
+- libxext:
+    version: 1.3.3
+    arch:
+      platform: linux
+      platform_os: centos8
+      target:
+        name: zen2
+        vendor: AuthenticAMD
+        features:
+        - abm
+        - aes
+        - avx
+        - avx2
+        - bmi1
+        - bmi2
+        - clflushopt
+        - clwb
+        - clzero
+        - cx16
+        - f16c
+        - fma
+        - fsgsbase
+        - mmx
+        - movbe
+        - pclmulqdq
+        - popcnt
+        - rdseed
+        - sse
+        - sse2
+        - sse4_1
+        - sse4_2
+        - sse4a
+        - ssse3
+        - xsavec
+        - xsaveopt
+        generation: 0
+        parents:
+        - zen
+    compiler:
+      name: gcc
+      version: 10.2.0
+    namespace: builtin
+    parameters:
+      cflags:
+      - -O2
+      - -march=native
+      cppflags: []
+      cxxflags:
+      - -O2
+      - -march=native
+      fflags:
+      - -O2
+      - -march=native
+      ldflags: []
+      ldlibs: []
+    dependencies:
+      libx11:
+        hash: 2x6kmtkj6nke2gu34q5egkitaep3xai6
+        type:
+        - build
+        - link
+    hash: bqo3pujb3dagmx4s7v5xolij4bju5hne
+    build_hash: bqo3pujb3dagmx4s7v5xolij4bju5hne
+- scrnsaverproto:
+    version: 1.2.2
+    arch:
+      platform: linux
+      platform_os: centos8
+      target:
+        name: zen2
+        vendor: AuthenticAMD
+        features:
+        - abm
+        - aes
+        - avx
+        - avx2
+        - bmi1
+        - bmi2
+        - clflushopt
+        - clwb
+        - clzero
+        - cx16
+        - f16c
+        - fma
+        - fsgsbase
+        - mmx
+        - movbe
+        - pclmulqdq
+        - popcnt
+        - rdseed
+        - sse
+        - sse2
+        - sse4_1
+        - sse4_2
+        - sse4a
+        - ssse3
+        - xsavec
+        - xsaveopt
+        generation: 0
+        parents:
+        - zen
+    compiler:
+      name: gcc
+      version: 10.2.0
+    namespace: builtin
+    parameters:
+      cflags:
+      - -O2
+      - -march=native
+      cppflags: []
+      cxxflags:
+      - -O2
+      - -march=native
+      fflags:
+      - -O2
+      - -march=native
+      ldflags: []
+      ldlibs: []
+    hash: hhgpohqdwasmlgnzastz3nrlhxqfpw2s
+    build_hash: hhgpohqdwasmlgnzastz3nrlhxqfpw2s
+- swig:
+    version: 4.0.2
+    arch:
+      platform: linux
+      platform_os: centos8
+      target:
+        name: zen2
+        vendor: AuthenticAMD
+        features:
+        - abm
+        - aes
+        - avx
+        - avx2
+        - bmi1
+        - bmi2
+        - clflushopt
+        - clwb
+        - clzero
+        - cx16
+        - f16c
+        - fma
+        - fsgsbase
+        - mmx
+        - movbe
+        - pclmulqdq
+        - popcnt
+        - rdseed
+        - sse
+        - sse2
+        - sse4_1
+        - sse4_2
+        - sse4a
+        - ssse3
+        - xsavec
+        - xsaveopt
+        generation: 0
+        parents:
+        - zen
+    compiler:
+      name: gcc
+      version: 10.2.0
+    namespace: builtin
+    parameters:
+      cflags:
+      - -O2
+      - -march=native
+      cppflags: []
+      cxxflags:
+      - -O2
+      - -march=native
+      fflags:
+      - -O2
+      - -march=native
+      ldflags: []
+      ldlibs: []
+    dependencies:
+      pcre:
+        hash: q7wsmitcfs6iouddcmcy32mxxzqhu6rq
+        type:
+        - build
+        - link
+      pkgconf:
+        hash: 3poj262tz4onydb2eo27ewbk5za3sidp
+        type:
+        - build
+    hash: j6wtm7d5dc2yr4jhrubyaygifv2dwxum
+    build_hash: rf42sbe4tabsihezx3mx2iarjpodx6wn
+- pcre:
+    version: '8.44'
+    arch:
+      platform: linux
+      platform_os: centos8
+      target:
+        name: zen2
+        vendor: AuthenticAMD
+        features:
+        - abm
+        - aes
+        - avx
+        - avx2
+        - bmi1
+        - bmi2
+        - clflushopt
+        - clwb
+        - clzero
+        - cx16
+        - f16c
+        - fma
+        - fsgsbase
+        - mmx
+        - movbe
+        - pclmulqdq
+        - popcnt
+        - rdseed
+        - sse
+        - sse2
+        - sse4_1
+        - sse4_2
+        - sse4a
+        - ssse3
+        - xsavec
+        - xsaveopt
+        generation: 0
+        parents:
+        - zen
+    compiler:
+      name: gcc
+      version: 10.2.0
+    namespace: builtin
+    parameters:
+      jit: false
+      multibyte: true
+      utf: true
+      cflags:
+      - -O2
+      - -march=native
+      cppflags: []
+      cxxflags:
+      - -O2
+      - -march=native
+      fflags:
+      - -O2
+      - -march=native
+      ldflags: []
+      ldlibs: []
+    hash: q7wsmitcfs6iouddcmcy32mxxzqhu6rq
+    build_hash: q7wsmitcfs6iouddcmcy32mxxzqhu6rq
+- z3:
+    version: 4.8.7
+    arch:
+      platform: linux
+      platform_os: centos8
+      target:
+        name: zen2
+        vendor: AuthenticAMD
+        features:
+        - abm
+        - aes
+        - avx
+        - avx2
+        - bmi1
+        - bmi2
+        - clflushopt
+        - clwb
+        - clzero
+        - cx16
+        - f16c
+        - fma
+        - fsgsbase
+        - mmx
+        - movbe
+        - pclmulqdq
+        - popcnt
+        - rdseed
+        - sse
+        - sse2
+        - sse4_1
+        - sse4_2
+        - sse4a
+        - ssse3
+        - xsavec
+        - xsaveopt
+        generation: 0
+        parents:
+        - zen
+    compiler:
+      name: gcc
+      version: 10.2.0
+    namespace: builtin
+    parameters:
+      python: true
+      cflags:
+      - -O2
+      - -march=native
+      cppflags: []
+      cxxflags:
+      - -O2
+      - -march=native
+      fflags:
+      - -O2
+      - -march=native
+      ldflags: []
+      ldlibs: []
+    dependencies:
+      py-setuptools:
+        hash: slipxs3u2drmy7j6bh5nro7csuq6v6su
+        type:
+        - run
+      python:
+        hash: pwkt76p3o2wk2ay3bv27szze2pnhbsbr
+        type:
+        - build
+        - link
+        - run
+    hash: bvofrkgnv7wfvzf6hsj5nngyze6uelra
+    build_hash: bvofrkgnv7wfvzf6hsj5nngyze6uelra
+- py-setuptools:
+    version: 50.1.0
+    arch:
+      platform: linux
+      platform_os: centos8
+      target:
+        name: zen2
+        vendor: AuthenticAMD
+        features:
+        - abm
+        - aes
+        - avx
+        - avx2
+        - bmi1
+        - bmi2
+        - clflushopt
+        - clwb
+        - clzero
+        - cx16
+        - f16c
+        - fma
+        - fsgsbase
+        - mmx
+        - movbe
+        - pclmulqdq
+        - popcnt
+        - rdseed
+        - sse
+        - sse2
+        - sse4_1
+        - sse4_2
+        - sse4a
+        - ssse3
+        - xsavec
+        - xsaveopt
+        generation: 0
+        parents:
+        - zen
+    compiler:
+      name: gcc
+      version: 10.2.0
+    namespace: builtin
+    parameters:
+      cflags:
+      - -O2
+      - -march=native
+      cppflags: []
+      cxxflags:
+      - -O2
+      - -march=native
+      fflags:
+      - -O2
+      - -march=native
+      ldflags: []
+      ldlibs: []
+    dependencies:
+      python:
+        hash: pwkt76p3o2wk2ay3bv27szze2pnhbsbr
+        type:
+        - build
+        - link
+        - run
+    hash: slipxs3u2drmy7j6bh5nro7csuq6v6su
+    build_hash: slipxs3u2drmy7j6bh5nro7csuq6v6su
+[+] /home/mkandes/cm/shared/apps/spack/0.15.4/cpu/opt/spack/linux-centos8-zen2/gcc-10.2.0/libiconv-1.16-ujwsythqjzsnxszbfl7rrlftda6uesol
+[+] /home/mkandes/cm/shared/apps/spack/0.15.4/cpu/opt/spack/linux-centos8-zen2/gcc-10.2.0/bzip2-1.0.8-vou456lo6afmp73y7aoqqajykgy24s4e
+[+] /home/mkandes/cm/shared/apps/spack/0.15.4/cpu/opt/spack/linux-centos8-zen2/gcc-10.2.0/xz-5.2.5-dqjhyjwlia7pu3en3wirjs2trtn6s42y
+[+] /home/mkandes/cm/shared/apps/spack/0.15.4/cpu/opt/spack/linux-centos8-zen2/gcc-10.2.0/zlib-1.2.11-55omrwxdycckdj5oqhmpsx5tjn6lmhn6
+[+] /home/mkandes/cm/shared/apps/spack/0.15.4/cpu/opt/spack/linux-centos8-zen2/gcc-10.2.0/ncurses-6.2-czycxp2spvrkybvtqywj7qvzayd3byss
+==> openssl@1.1.1c : externally installed in /usr
+[+] /usr
+[+] /home/mkandes/cm/shared/apps/spack/0.15.4/cpu/opt/spack/linux-centos8-zen2/gcc-10.2.0/libsigsegv-2.12-hqwhgoeparoxyox7aivznsfs74nx3skd
+[+] /home/mkandes/cm/shared/apps/spack/0.15.4/cpu/opt/spack/linux-centos8-zen2/gcc-10.2.0/pkgconf-1.7.3-3poj262tz4onydb2eo27ewbk5za3sidp
+[+] /home/mkandes/cm/shared/apps/spack/0.15.4/cpu/opt/spack/linux-centos8-zen2/gcc-10.2.0/util-macros-1.19.1-oagwpgmhbpsa5i5trqxkmhk573zgvpy4
+[+] /home/mkandes/cm/shared/apps/spack/0.15.4/cpu/opt/spack/linux-centos8-zen2/gcc-10.2.0/berkeley-db-18.1.40-p4ou74mazsnlejt4xmhji26h4yg22jom
+[+] /home/mkandes/cm/shared/apps/spack/0.15.4/cpu/opt/spack/linux-centos8-zen2/gcc-10.2.0/libbsd-0.10.0-zreavlfiedjfvvtpnofft54k5lwr6rq5
+[+] /home/mkandes/cm/shared/apps/spack/0.15.4/cpu/opt/spack/linux-centos8-zen2/gcc-10.2.0/libffi-3.3-xrl3opjldzhjyjbhzsw77oh2sd5r5jop
+[+] /home/mkandes/cm/shared/apps/spack/0.15.4/cpu/opt/spack/linux-centos8-zen2/gcc-10.2.0/libuuid-1.0.3-7cxem3wyfmqep2xp3zjjuwlgm7l7fraj
+[+] /home/mkandes/cm/shared/apps/spack/0.15.4/cpu/opt/spack/linux-centos8-zen2/gcc-10.2.0/kbproto-1.0.7-xbg3skdw6qsu2oclf5uczno4w6ineatj
+[+] /home/mkandes/cm/shared/apps/spack/0.15.4/cpu/opt/spack/linux-centos8-zen2/gcc-10.2.0/libpthread-stubs-0.4-exhqq4giadqkiwufpbbfgwmixpiu6qee
+[+] /home/mkandes/cm/shared/apps/spack/0.15.4/cpu/opt/spack/linux-centos8-zen2/gcc-10.2.0/xproto-7.0.31-dh6ja36bneirvjo7stwckr5mav3sbflp
+[+] /home/mkandes/cm/shared/apps/spack/0.15.4/cpu/opt/spack/linux-centos8-zen2/gcc-10.2.0/xextproto-7.3.0-3lqkjrnfvjhoqxg742knmlbf67vjpmlu
+[+] /home/mkandes/cm/shared/apps/spack/0.15.4/cpu/opt/spack/linux-centos8-zen2/gcc-10.2.0/font-util-1.3.2-qdxlpxvg4ultfheg4alocqqvmhyubvkb
+[+] /home/mkandes/cm/shared/apps/spack/0.15.4/cpu/opt/spack/linux-centos8-zen2/gcc-10.2.0/renderproto-0.11.1-vtyc4obbnq2zhmq5oc6le7vii6w3met3
+[+] /home/mkandes/cm/shared/apps/spack/0.15.4/cpu/opt/spack/linux-centos8-zen2/gcc-10.2.0/scrnsaverproto-1.2.2-hhgpohqdwasmlgnzastz3nrlhxqfpw2s
+==> Installing pcre
+==> No binary for pcre found: installing from source
+==> Fetching https://spack-llnl-mirror.s3-us-west-2.amazonaws.com/_source-cache/archive/19/19108658b23b3ec5058edc9f66ac545ea19f9537234be1ec62b714c84399366d.tar.bz2
+==> pcre: Executing phase: 'autoreconf'
+==> pcre: Executing phase: 'configure'
+==> pcre: Executing phase: 'build'
+==> pcre: Executing phase: 'install'
+[+] /home/mkandes/cm/shared/apps/spack/0.15.4/cpu/opt/spack/linux-centos8-zen2/gcc-10.2.0/pcre-8.44-q7wsmitcfs6iouddcmcy32mxxzqhu6rq
+[+] /home/mkandes/cm/shared/apps/spack/0.15.4/cpu/opt/spack/linux-centos8-zen2/gcc-10.2.0/diffutils-3.7-xfogxau2brsres3r7tqjaxa7hr7ixdy6
+[+] /home/mkandes/cm/shared/apps/spack/0.15.4/cpu/opt/spack/linux-centos8-zen2/gcc-10.2.0/tar-1.32-xrnciuqee6hxawtoltvvfzm5hmwzpxoz
+[+] /home/mkandes/cm/shared/apps/spack/0.15.4/cpu/opt/spack/linux-centos8-zen2/gcc-10.2.0/tcl-8.5.19-zo6leeg74jk3ysugf4xxt4g4vlyd635t
+[+] /home/mkandes/cm/shared/apps/spack/0.15.4/cpu/opt/spack/linux-centos8-zen2/gcc-10.2.0/libxml2-2.9.10-66b7zjik6byvj73pjevxtyt4ddclbrdp
+[+] /home/mkandes/cm/shared/apps/spack/0.15.4/cpu/opt/spack/linux-centos8-zen2/gcc-10.2.0/libpng-1.6.37-dr7nh5ziis5qfn4vf2srhg2uprtumxqc
+==> Installing libedit
+==> No binary for libedit found: installing from source
+==> Using cached archive: /home/mkandes/cm/shared/apps/spack/0.15.4/cpu/var/spack/cache/_source-cache/archive/db/dbb82cb7e116a5f8025d35ef5b4f7d4a3cdd0a3909a146a39112095a2d229071.tar.gz
+==> libedit: Executing phase: 'autoreconf'
+==> libedit: Executing phase: 'configure'
+==> libedit: Executing phase: 'build'
+==> libedit: Executing phase: 'install'
+[+] /home/mkandes/cm/shared/apps/spack/0.15.4/cpu/opt/spack/linux-centos8-zen2/gcc-10.2.0/libedit-3.1-20191231-tsigau235wk2vwsniwooyud3syvrpnx4
+[+] /home/mkandes/cm/shared/apps/spack/0.15.4/cpu/opt/spack/linux-centos8-zen2/gcc-10.2.0/readline-8.0-zabqjivxg3uwixdosqtwagn7c3e2uvvv
+[+] /home/mkandes/cm/shared/apps/spack/0.15.4/cpu/opt/spack/linux-centos8-zen2/gcc-10.2.0/cmake-3.18.2-qwyui3jvc5wnqlv7go6rlqdx4bo4z7nt
+[+] /home/mkandes/cm/shared/apps/spack/0.15.4/cpu/opt/spack/linux-centos8-zen2/gcc-10.2.0/m4-1.4.18-qoe3jvau6tfilufz6rgaxlbzod7dv4kg
+[+] /home/mkandes/cm/shared/apps/spack/0.15.4/cpu/opt/spack/linux-centos8-zen2/gcc-10.2.0/libxdmcp-1.1.2-kgz56yjr5qcdfadbodvwry2ana7wu3u7
+[+] /home/mkandes/cm/shared/apps/spack/0.15.4/cpu/opt/spack/linux-centos8-zen2/gcc-10.2.0/expat-2.2.9-y664o5rz4xxfqcjpe5crw4nne7ju6ytb
+[+] /home/mkandes/cm/shared/apps/spack/0.15.4/cpu/opt/spack/linux-centos8-zen2/gcc-10.2.0/libxau-1.0.8-mcpthhuuct7i4sf6kgmfpg3ko7aafhpg
+==> Installing swig
+==> No binary for swig found: installing from source
+==> Fetching https://spack-llnl-mirror.s3-us-west-2.amazonaws.com/_source-cache/archive/d5/d53be9730d8d58a16bf0cbd1f8ac0c0c3e1090573168bfa151b01eb47fa906fc.tar.gz
+==> swig: Executing phase: 'autoreconf'
+==> swig: Executing phase: 'configure'
+==> swig: Executing phase: 'build'
+==> swig: Executing phase: 'install'
+[+] /home/mkandes/cm/shared/apps/spack/0.15.4/cpu/opt/spack/linux-centos8-zen2/gcc-10.2.0/swig-4.0.2-j6wtm7d5dc2yr4jhrubyaygifv2dwxum
+[+] /home/mkandes/cm/shared/apps/spack/0.15.4/cpu/opt/spack/linux-centos8-zen2/gcc-10.2.0/gettext-0.21-qsns4bj6njucvpak6xvxtezgavp25tfe
+[+] /home/mkandes/cm/shared/apps/spack/0.15.4/cpu/opt/spack/linux-centos8-zen2/gcc-10.2.0/freetype-2.10.1-a37oegpxixrl6fwwlgruakieyt3xs5qe
+[+] /home/mkandes/cm/shared/apps/spack/0.15.4/cpu/opt/spack/linux-centos8-zen2/gcc-10.2.0/gdbm-1.18.1-jj57peh5tsyg2hjttr7rmrldlmsd7ej7
+[+] /home/mkandes/cm/shared/apps/spack/0.15.4/cpu/opt/spack/linux-centos8-zen2/gcc-10.2.0/sqlite-3.33.0-e4v55df3sreronnnldxslj72dinbbdkn
+==> Installing libtool
+==> No binary for libtool found: installing from source
+==> Using cached archive: /home/mkandes/cm/shared/apps/spack/0.15.4/cpu/var/spack/cache/_source-cache/archive/e3/e3bd4d5d3d025a36c21dd6af7ea818a2afcd4dfc1ea5a17b39d7854bcd0c06e3.tar.gz
+==> libtool: Executing phase: 'autoreconf'
+==> libtool: Executing phase: 'configure'
+==> libtool: Executing phase: 'build'
+==> libtool: Executing phase: 'install'
+[+] /home/mkandes/cm/shared/apps/spack/0.15.4/cpu/opt/spack/linux-centos8-zen2/gcc-10.2.0/libtool-2.4.6-i5qvgnguj2magyf73sxtvryw33oeqa7k
+[+] /home/mkandes/cm/shared/apps/spack/0.15.4/cpu/opt/spack/linux-centos8-zen2/gcc-10.2.0/libxcb-1.13-lzbi3oedk4g4jd7eget6ybigb2ch2mw7
+==> Installing binutils
+==> No binary for binutils found: installing from source
+==> Fetching https://spack-llnl-mirror.s3-us-west-2.amazonaws.com/_source-cache/archive/7d/7d24660f87093670738e58bcc7b7b06f121c0fcb0ca8fc44368d675a5ef9cff7.tar.bz2
+==> binutils: Executing phase: 'autoreconf'
+==> binutils: Executing phase: 'configure'
+==> binutils: Executing phase: 'build'
+==> binutils: Executing phase: 'install'
+[+] /home/mkandes/cm/shared/apps/spack/0.15.4/cpu/opt/spack/linux-centos8-zen2/gcc-10.2.0/binutils-2.35-wihsdyi2ah4trphxtobdpu32ejevvpmb
+[+] /home/mkandes/cm/shared/apps/spack/0.15.4/cpu/opt/spack/linux-centos8-zen2/gcc-10.2.0/fontconfig-2.13.1-v5fwzbleu77ww3biu63qqgb7m2i2f4ds
+[+] /home/mkandes/cm/shared/apps/spack/0.15.4/cpu/opt/spack/linux-centos8-zen2/gcc-10.2.0/perl-5.30.3-2jh26uepit2ccgt5it4lyej2uh44dtwh
+==> Installing libpciaccess
+==> No binary for libpciaccess found: installing from source
+==> Fetching https://spack-llnl-mirror.s3-us-west-2.amazonaws.com/_source-cache/archive/84/84413553994aef0070cf420050aa5c0a51b1956b404920e21b81e96db6a61a27.tar.gz
+==> libpciaccess: Executing phase: 'autoreconf'
+==> libpciaccess: Executing phase: 'configure'
+==> libpciaccess: Executing phase: 'build'
+==> libpciaccess: Executing phase: 'install'
+[+] /home/mkandes/cm/shared/apps/spack/0.15.4/cpu/opt/spack/linux-centos8-zen2/gcc-10.2.0/libpciaccess-0.16-xucueixy3gxvkqrvj7rno47gqdynepau
+[+] /home/mkandes/cm/shared/apps/spack/0.15.4/cpu/opt/spack/linux-centos8-zen2/gcc-10.2.0/libx11-1.6.7-2x6kmtkj6nke2gu34q5egkitaep3xai6
+==> Installing perl-data-dumper
+==> No binary for perl-data-dumper found: installing from source
+==> Fetching https://spack-llnl-mirror.s3-us-west-2.amazonaws.com/_source-cache/archive/69/697608b39330988e519131be667ff47168aaaaf99f06bd2095d5b46ad05d76fa.tar.gz
+==> perl-data-dumper: Executing phase: 'configure'
+==> perl-data-dumper: Executing phase: 'build'
+==> perl-data-dumper: Executing phase: 'install'
+[+] /home/mkandes/cm/shared/apps/spack/0.15.4/cpu/opt/spack/linux-centos8-zen2/gcc-10.2.0/perl-data-dumper-2.173-yxfueuqi5n7ljkljzau2hfjmpdjyxcw5
+==> Installing hwloc
+==> No binary for hwloc found: installing from source
+==> Fetching https://spack-llnl-mirror.s3-us-west-2.amazonaws.com/_source-cache/archive/2d/2defba03ddd91761b858cbbdc2e3a6e27b44e94696dbfa21380191328485a433.tar.gz
+==> hwloc: Executing phase: 'autoreconf'
+==> hwloc: Executing phase: 'configure'
+==> hwloc: Executing phase: 'build'
+==> hwloc: Executing phase: 'install'
+[+] /home/mkandes/cm/shared/apps/spack/0.15.4/cpu/opt/spack/linux-centos8-zen2/gcc-10.2.0/hwloc-2.2.0-udmyfdhr2iyqglidewtzv5drdtrbe4qw
+[+] /home/mkandes/cm/shared/apps/spack/0.15.4/cpu/opt/spack/linux-centos8-zen2/gcc-10.2.0/libxrender-0.9.10-y2iaqbjkzdfmsuxzxgmghjeaavytoqca
+[+] /home/mkandes/cm/shared/apps/spack/0.15.4/cpu/opt/spack/linux-centos8-zen2/gcc-10.2.0/libxext-1.3.3-bqo3pujb3dagmx4s7v5xolij4bju5hne
+[+] /home/mkandes/cm/shared/apps/spack/0.15.4/cpu/opt/spack/linux-centos8-zen2/gcc-10.2.0/libxft-2.3.2-d623ceg55ws5hzxkf2zhqafp5lkocjqe
+[+] /home/mkandes/cm/shared/apps/spack/0.15.4/cpu/opt/spack/linux-centos8-zen2/gcc-10.2.0/libxscrnsaver-1.2.2-np4xtizomp253x62rbsmagr5km6fsivp
+[+] /home/mkandes/cm/shared/apps/spack/0.15.4/cpu/opt/spack/linux-centos8-zen2/gcc-10.2.0/tk-8.5.19-mrrqnn5ryrzx5beyxjks5ejji4vnqjps
+[+] /home/mkandes/cm/shared/apps/spack/0.15.4/cpu/opt/spack/linux-centos8-zen2/gcc-10.2.0/python-3.8.5-pwkt76p3o2wk2ay3bv27szze2pnhbsbr
+[+] /home/mkandes/cm/shared/apps/spack/0.15.4/cpu/opt/spack/linux-centos8-zen2/gcc-10.2.0/py-six-1.14.0-grvozxrnoswl6qswseqtyg6jhr2c7ojy
+[+] /home/mkandes/cm/shared/apps/spack/0.15.4/cpu/opt/spack/linux-centos8-zen2/gcc-10.2.0/py-setuptools-50.1.0-slipxs3u2drmy7j6bh5nro7csuq6v6su
+==> Installing z3
+==> No binary for z3 found: installing from source
+==> Fetching https://spack-llnl-mirror.s3-us-west-2.amazonaws.com/_source-cache/archive/8c/8c1c49a1eccf5d8b952dadadba3552b0eac67482b8a29eaad62aa7343a0732c3.tar.gz
+==> z3: Executing phase: 'bootstrap'
+==> z3: Executing phase: 'build'
+==> z3: Executing phase: 'install'
+[+] /home/mkandes/cm/shared/apps/spack/0.15.4/cpu/opt/spack/linux-centos8-zen2/gcc-10.2.0/z3-4.8.7-bvofrkgnv7wfvzf6hsj5nngyze6uelra
+==> Installing llvm
+==> No binary for llvm found: installing from source
+==> Fetching https://spack-llnl-mirror.s3-us-west-2.amazonaws.com/_source-cache/archive/c7/c7ccb735c37b4ec470f66a6c35fbae4f029c0f88038f6977180b1a8ddc255637.tar.gz
+==> llvm: Executing phase: 'cmake'
+==> llvm: Executing phase: 'build'
+==> llvm: Executing phase: 'install'
+[+] /home/mkandes/cm/shared/apps/spack/0.15.4/cpu/opt/spack/linux-centos8-zen2/gcc-10.2.0/llvm-10.0.1-vdyzfg3kszqw6sgcmcmkjgnchby263il
+real 1344.50
+user 20862.23
+sys 5555.97
+==> Regenerating lmod module files
+Submitted batch job 1208835

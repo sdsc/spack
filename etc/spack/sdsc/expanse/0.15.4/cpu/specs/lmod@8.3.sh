@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=cmake@3.18.2
+#SBATCH --job-name=lmod@8.3
 #SBATCH --account=use300
 #SBATCH --partition=compute
 #SBATCH --nodes=1
@@ -34,8 +34,8 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-declare -xr SPACK_PACKAGE='cmake@3.18.2'
-declare -xr SPACK_COMPILER='gcc@10.2.0'
+declare -xr SPACK_PACKAGE='lmod@8.3'
+declare -xr SPACK_COMPILER='gcc@8.3.1'
 declare -xr SPACK_VARIANTS=''
 declare -xr SPACK_DEPENDENCIES=''
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
@@ -55,6 +55,9 @@ spack spec --yaml "${SPACK_SPEC}"
 
 time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all "${SPACK_SPEC}"
 
+. "$(spack location -i ${SPACK_PACKAGE})/lmod/lmod/init/bash"
 spack module lmod refresh --delete-tree -y
+. "${SPACK_ROOT}/share/spack/setup-env.sh"
+module use "${SPACK_ROOT}/share/spack/lmod/linux-centos8-x86_64/Core"
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'perl@5.30.3.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'gcc@10.2.0.sh'

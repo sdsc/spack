@@ -56,5 +56,8 @@ spack spec --yaml "${SPACK_SPEC}"
 time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all "${SPACK_SPEC}"
 
 spack compiler add --scope site "$(spack location -i ${SPACK_PACKAGE})"
+spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" "${SPACK_PACKAGE}/cmake@3.18.2.sh"
+cd "${SPACK_PACKAGE}"
+
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'cmake@3.18.2.sh'

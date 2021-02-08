@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=cmake@3.18.2
+#SBATCH --job-name=tcl@8.5.19
 #SBATCH --account=use300
 #SBATCH --partition=compute
 #SBATCH --nodes=1
@@ -34,7 +34,7 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-declare -xr SPACK_PACKAGE='cmake@3.18.2'
+declare -xr SPACK_PACKAGE='tcl@8.5.19'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
 declare -xr SPACK_VARIANTS=''
 declare -xr SPACK_DEPENDENCIES=''
@@ -57,4 +57,4 @@ time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all "
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'perl@5.30.3.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'tk@8.5.19.sh'
