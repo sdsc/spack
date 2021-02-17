@@ -37,7 +37,7 @@ module list
 declare -xr SPACK_PACKAGE='tk@8.5.19'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
 declare -xr SPACK_VARIANTS=''
-declare -xr SPACK_DEPENDENCIES="^tcl@8.5.19/$(spack find --format '{hash:7}' tcl@8.5.19 % gcc@10.2.0)"
+declare -xr SPACK_DEPENDENCIES="^tcl@8.5.19/$(spack find --format '{hash:7}' tcl@8.5.19 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv

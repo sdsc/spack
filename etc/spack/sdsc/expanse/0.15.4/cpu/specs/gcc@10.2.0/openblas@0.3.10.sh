@@ -36,9 +36,9 @@ module list
 
 declare -xr SPACK_PACKAGE='openblas@0.3.10'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS=''
+declare -xr SPACK_VARIANTS='threads=none'
 declare -xr SPACK_DEPENDENCIES=''
-declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
+declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS}"
 
 printenv
 
@@ -57,4 +57,4 @@ time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all "
 
 spack module lmod refresh --delete-tree -y
 
-#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'perl@5.30.3.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'openblas@0.3.10-openmp.sh'

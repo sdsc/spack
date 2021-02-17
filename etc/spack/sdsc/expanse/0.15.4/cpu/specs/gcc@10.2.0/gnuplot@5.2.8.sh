@@ -57,4 +57,4 @@ time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all "
 
 spack module lmod refresh --delete-tree -y
 
-#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'perl@5.30.3.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'eigen@3.3.7.sh'

@@ -57,4 +57,4 @@ time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all "
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'python@3.8.5.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'pigz@2.4.sh'

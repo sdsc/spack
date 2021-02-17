@@ -37,7 +37,7 @@ module list
 declare -xr SPACK_PACKAGE='python@3.8.5'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
 declare -xr SPACK_VARIANTS='+optimizations +tkinter'
-declare -xr SPACK_DEPENDENCIES="^tk@8.5.19/$(spack find --format '{hash:7}' tk@8.5.19 % gcc@10.2.0) ^sqlite@3.33.0/$(spack find --format '{hash:7}' sqlite@3.33.0 % gcc@10.2.0)"
+declare -xr SPACK_DEPENDENCIES="^tk@8.5.19/$(spack find --format '{hash:7}' tk@8.5.19 % ${SPACK_COMPILER}) ^sqlite@3.33.0/$(spack find --format '{hash:7}' sqlite@3.33.0 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
