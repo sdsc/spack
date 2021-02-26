@@ -2,11 +2,11 @@
 
 #SBATCH --job-name=python@3.8.5
 #SBATCH --account=use300
-#SBATCH --partition=compute
+#SBATCH --partition=shared
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=128
-#SBATCH --mem=248G
+#SBATCH --cpus-per-task=16
+#SBATCH --mem=32G
 #SBATCH --time=01:00:00
 #SBATCH --output=%x.o%j.%N
 
@@ -36,8 +36,8 @@ module list
 
 declare -xr SPACK_PACKAGE='python@3.8.5'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS='+optimizations +tkinter'
-declare -xr SPACK_DEPENDENCIES="^tk@8.5.19/$(spack find --format '{hash:7}' tk@8.5.19 % ${SPACK_COMPILER}) ^sqlite@3.33.0/$(spack find --format '{hash:7}' sqlite@3.33.0 % ${SPACK_COMPILER})"
+declare -xr SPACK_VARIANTS='+optimizations ~libxml2' # https://github.com/spack/spack/issues/13637
+declare -xr SPACK_DEPENDENCIES="^sqlite@3.33.0/$(spack find --format '{hash:7}' sqlite@3.33.0 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -51,10 +51,19 @@ spack config get repos
 spack config get upstreams
 
 spack spec --long --namespaces --types "${SPACK_SPEC}"
-spack spec --yaml "${SPACK_SPEC}"
+if [[ "${?}" -ne 0 ]]; then
+  echo 'ERROR: spack concretization failed.'
+  exit 1
+fi
 
 time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all "${SPACK_SPEC}"
+if [[ "${?}" -ne 0 ]]; then
+  echo 'ERROR: spack install failed.'
+  exit 1
+fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'py-setuptools@50.1.0.sh'
+#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'py-setuptools@50.1.0.sh'
+
+sleep 60
