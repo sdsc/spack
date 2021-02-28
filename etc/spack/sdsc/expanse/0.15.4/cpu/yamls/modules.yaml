@@ -33,4 +33,6 @@ modules:
         '+complex': complex
     slepc:
       suffixes:
-        '^petsc +complex': complex 
+        '^petsc +complex': complex
+    ^python:
+      autoload: 'direct'
