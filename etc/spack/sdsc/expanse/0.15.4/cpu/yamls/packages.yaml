@@ -1,8 +1,23 @@
 packages:
+  lustre:
+    externals:
+      - spec: 'lustre@2.12.5 % gcc@10.2.0 arch=linux-centos8-zen2'
+        prefix: /usr
+    buildable: false
   openssl:
     externals:
       - spec: 'openssl@1.1.1c % gcc@8.3.1 arch=linux-centos8-zen'
         prefix: /usr
       - spec: 'openssl@1.1.1c % gcc@10.2.0 arch=linux-centos8-zen2'
         prefix: /usr
+    buildable: false
+  rdma-core:
+    externals:
+      - spec: 'rdma-core@47 % gcc@10.2.0 arch=linux-centos8-zen2'
+        prefix: /usr
+    buildable: false
+  slurm:
+    externals:
+      - spec: 'slurm@20.02.3 % gcc@10.2.0 arch=linux-centos8-zen2'
+        prefix: /cm/shared/apps/slurm/20.02.3
     buildable: false
