@@ -7,27 +7,23 @@ modules:
     hierarchy:
       - mpi
     hash_length: 0
-    whitelist:
-      - gcc
-      - intel
-    blacklist:
-      - '%gcc@8.3.1'
     blacklist_implicits: true
     naming_scheme: '{name}/{version}'
     projections:
       all: '{name}/{version}'
     adol-c:
       suffixes:
-        '+openmp': openmp
+        '+openmp': omp
     fftw:
       suffixes:
-        '+openmp': openmp
+        '+openmp': omp
     hypre:
       suffixes:
-        '+openmp': openmp
+        '+openmp': omp
     openblas:
       suffixes:
-        'threads=openmp': openmp
+        'threads=openmp': omp
+        '+ilp64': i64
     petsc:
       suffixes:
         '+complex': complex

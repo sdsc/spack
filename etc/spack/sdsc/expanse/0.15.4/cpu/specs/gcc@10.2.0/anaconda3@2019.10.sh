@@ -2,11 +2,11 @@
 
 #SBATCH --job-name=anaconda3@2019.10
 #SBATCH --account=use300
-#SBATCH --partition=compute
+#SBATCH --partition=shared
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=128
-#SBATCH --mem=248G
+#SBATCH --cpus-per-task=16
+#SBATCH --mem=32G
 #SBATCH --time=01:00:00
 #SBATCH --output=%x.o%j.%N
 
@@ -36,13 +36,8 @@ module list
 
 declare -xr SPACK_PACKAGE='anaconda3@2019.10'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS='+X +external-lapack ~rmath'
-# Problem with +rmath variantl; try again in the future
-# >> 2964    cp: cannot create regular file '/home/mkandes/cm/shared/apps/spack
-#             /0.15.4/cpu/opt/spack/linux-centos8-zen2/gcc-10.2.0/r-4.0.2-ei3a3l
-#             o4hrd5vrk2n4u55jmrmxi23hbt/include/Rmath.h': No such file or direc
-#             tory
-declare -xr SPACK_DEPENDENCIES="^openblas@0.3.10/$(spack find --format '{hash:7}' openblas@0.3.10 % ${SPACK_COMPILER} threads=none) ^python@3.8.5/$(spack find --format '{hash:7}' python@3.8.5 % ${SPACK_COMPILER})"
+declare -xr SPACK_VARIANTS=''
+declare -xr SPACK_DEPENDENCIES=''
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -56,9 +51,16 @@ spack config get repos
 spack config get upstreams
 
 spack spec --long --namespaces --types "${SPACK_SPEC}"
-spack spec --yaml "${SPACK_SPEC}"
+if [[ "${?}" -ne 0 ]]; then
+  echo 'ERROR: spack concretization failed.'
+  exit 1
+fi
 
 time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all "${SPACK_SPEC}"
+if [[ "${?}" -ne 0 ]]; then
+  echo 'ERROR: spack install failed.'
+  exit 1
+fi
 
 spack module lmod refresh --delete-tree -y
 

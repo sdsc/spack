@@ -2,11 +2,11 @@
 
 #SBATCH --job-name=py-matplotlib@3.3.2
 #SBATCH --account=use300
-#SBATCH --partition=shared
+#SBATCH --partition=compute
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=16
-#SBATCH --mem=32G
+#SBATCH --cpus-per-task=128
+#SBATCH --mem=248G
 #SBATCH --time=04:00:00
 #SBATCH --output=%x.o%j.%N
 

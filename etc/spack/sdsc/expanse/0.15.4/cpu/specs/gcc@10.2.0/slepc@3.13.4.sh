@@ -37,7 +37,7 @@ module list
 declare -xr SPACK_PACKAGE='slepc@3.13.4'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
 declare -xr SPACK_VARIANTS=''
-declare -xr SPACK_DEPENDENCIES="^arpack-ng@3.7.0/$(spack find --format '{hash:7}' arpack-ng@3.7.0 % ${SPACK_COMPILER}) ^petsc@3.13.4/$(spack find --format '{hash:7}' petsc@3.13.4 % ${SPACK_COMPILER} ~complex) ^python@3.8.5/$(spack find --format '{hash:7}' python@3.8.5 % ${SPACK_COMPILER})"
+declare -xr SPACK_DEPENDENCIES="^arpack-ng@3.7.0/$(spack find --format '{hash:7}' arpack-ng@3.7.0 % ${SPACK_COMPILER}) ^petsc@3.13.4/$(spack find --format '{hash:7}' petsc@3.13.4 % ${SPACK_COMPILER} ~mpi ~complex) ^python@3.8.5/$(spack find --format '{hash:7}' python@3.8.5 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv

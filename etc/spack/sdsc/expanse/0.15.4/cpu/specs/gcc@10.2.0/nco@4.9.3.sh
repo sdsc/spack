@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=gcc@10.2.0
+#SBATCH --job-name=nco@4.9.3
 #SBATCH --account=use300
 #SBATCH --partition=shared
 #SBATCH --nodes=1
@@ -34,10 +34,10 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-declare -xr SPACK_PACKAGE='gcc@10.2.0'
-declare -xr SPACK_COMPILER='gcc@8.3.1'
+declare -xr SPACK_PACKAGE='nco@4.9.3'
+declare -xr SPACK_COMPILER='gcc@10.2.0'
 declare -xr SPACK_VARIANTS=''
-declare -xr SPACK_DEPENDENCIES=''
+declare -xr SPACK_DEPENDENCIES="^netcdf-c@4.7.4/$(spack find --format '{hash:7}' netcdf-c@4.7.4 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -62,11 +62,8 @@ if [[ "${?}" -ne 0 ]]; then
   exit 1
 fi
 
-spack compiler add --scope site "$(spack location -i ${SPACK_PACKAGE})"
 spack module lmod refresh --delete-tree -y
 
-cd "${SPACK_PACKAGE}"
-
-#sbatch --dependency="afterok:${SLURM_JOB_ID}" ''
+#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'netcdf-cxx4@4.3.1.sh'
 
 sleep 60

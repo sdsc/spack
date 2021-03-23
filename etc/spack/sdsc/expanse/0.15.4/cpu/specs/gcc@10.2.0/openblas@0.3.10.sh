@@ -36,7 +36,7 @@ module list
 
 declare -xr SPACK_PACKAGE='openblas@0.3.10'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS='+ilp64 threads=none'
+declare -xr SPACK_VARIANTS='threads=none'
 declare -xr SPACK_DEPENDENCIES=''
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS}"
 
