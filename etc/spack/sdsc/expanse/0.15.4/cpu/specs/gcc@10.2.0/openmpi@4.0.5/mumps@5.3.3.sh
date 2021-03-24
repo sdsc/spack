@@ -34,12 +34,12 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
+# >> 62     Error: Type mismatch between actual argument at (1) and actual argu
+#            ment at (2) (INTEGER(8)/INTEGER(4)).
 declare -xr SPACK_PACKAGE='mumps@5.3.3'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS='~mpi'
-# mumps not compiling for serial, non-mpi version with following error
-# >> 65    Error: Type mismatch in argument 's' at (1); passed INTEGER(4) to IN           TEGER(8)
-declare -xr SPACK_DEPENDENCIES=''
+declare -xr SPACK_VARIANTS='+complex +double +float ~int64 +metis +mpi +parmetis ~ptscotch +scotch +shared'
+declare -xr SPACK_DEPENDENCIES="^netlib-scalapack@2.1.0/$(spack find --format '{hash:7}' netlib-scalapack@2.1.0 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv

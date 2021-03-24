@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=mumps@5.3.3
+#SBATCH --job-name=petsc@3.13.4
 #SBATCH --account=use300
-#SBATCH --partition=compute
+#SBATCH --partition=shared
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=128
-#SBATCH --mem=248G
+#SBATCH --cpus-per-task=16
+#SBATCH --mem=32G
 #SBATCH --time=01:00:00
 #SBATCH --output=%x.o%j.%N
 
@@ -34,12 +34,10 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-declare -xr SPACK_PACKAGE='mumps@5.3.3'
+declare -xr SPACK_PACKAGE='petsc@3.13.4'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS='~mpi'
-# mumps not compiling for serial, non-mpi version with following error
-# >> 65    Error: Type mismatch in argument 's' at (1); passed INTEGER(4) to IN           TEGER(8)
-declare -xr SPACK_DEPENDENCIES=''
+declare -xr SPACK_VARIANTS='~X ~batch ~cgns ~complex ~cuda ~debug +double ~exodusii +fftw ~giflib +hdf5 +hypre ~int64 ~jpeg ~knl ~libpng ~libyaml ~memkind +metis ~moab ~mpfr +mpi ~mumps ~p4est ~random123 ~saws +shared +suite-sparse +superlu-dist ~trilinos ~valgrind'
+declare -xr SPACK_DEPENDENCIES="^openmpi@4.0.5/$(spack find --format '{hash:7}' openmpi@4.0.5 % ${SPACK_COMPILER}) ^fftw@3.3.8/$(spack find --format '{hash:7}' fftw@3.3.8 % ${SPACK_COMPILER} +mpi) ^hdf5@1.10.7/$(spack find --format '{hash:7}' hdf5@1.10.7 % ${SPACK_COMPILER} +mpi) ^hypre@2.19.0/$(spack find --format '{hash:7}' hypre@2.19.0 % ${SPACK_COMPILER} +mpi) ^metis@5.1.0/$(spack find --format '{hash:7}' metis@5.1.0 % ${SPACK_COMPILER}) ^suite-sparse@5.7.2/$(spack find --format '{hash:7}' suite-sparse@5.7.2 % ${SPACK_COMPILER}) ^superlu-dist@6.3.1/$(spack find --format '{hash:7}' superlu-dist@6.3.1 % ${SPACK_COMPILER})" 
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -66,4 +64,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'mumps@5.3.3-complex.sh'
+#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'petsc@3.13.4-complex.sh'
+
+sleep 60
