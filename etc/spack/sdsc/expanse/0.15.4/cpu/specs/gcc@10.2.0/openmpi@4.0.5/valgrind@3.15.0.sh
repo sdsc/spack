@@ -36,8 +36,8 @@ module list
 
 declare -xr SPACK_PACKAGE='valgrind@3.15.0'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS='+boost ~mpi +only64bit +ubsan'
-declare -xr SPACK_DEPENDENCIES="^boost@1.74.0/$(spack find --format '{hash:7}' boost@1.74.0 % ${SPACK_COMPILER})"
+declare -xr SPACK_VARIANTS='+boost +mpi +only64bit +ubsan'
+declare -xr SPACK_DEPENDENCIES="^boost@1.74.0/$(spack find --format '{hash:7}' boost@1.74.0 % ${SPACK_COMPILER} +mpi)"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv

@@ -2,11 +2,11 @@
 
 #SBATCH --job-name=mumps@5.3.3
 #SBATCH --account=use300
-#SBATCH --partition=compute
+#SBATCH --partition=shared
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=128
-#SBATCH --mem=248G
+#SBATCH --cpus-per-task=16
+#SBATCH --mem=32G
 #SBATCH --time=01:00:00
 #SBATCH --output=%x.o%j.%N
 
@@ -34,12 +34,11 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-# >> 62     Error: Type mismatch between actual argument at (1) and actual argu
-#            ment at (2) (INTEGER(8)/INTEGER(4)).
+# Twice dep problem; cannot install; try again later; maybe reduce +variants
 declare -xr SPACK_PACKAGE='mumps@5.3.3'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS='+complex +double +float ~int64 +metis +mpi +parmetis ~ptscotch +scotch +shared'
-declare -xr SPACK_DEPENDENCIES="^netlib-scalapack@2.1.0/$(spack find --format '{hash:7}' netlib-scalapack@2.1.0 % ${SPACK_COMPILER})"
+declare -xr SPACK_VARIANTS='+complex +double +float +int64 +metis +mpi +parmetis +ptscotch +scotch +shared'
+declare -xr SPACK_DEPENDENCIES="^openblas@0.3.10/$(spack find --format '{hash:7}' openblas@0.3.10 % ${SPACK_COMPILER} +ilp64 threads=none) ^metis@5.1.0/$(spack find --format '{hash:7}' metis@5.1.0 % ${SPACK_COMPILER} +int64 +real64) ^parmetis@4.0.3/$(spack find --format '{hash:7}' parmetis@4.0.3 % ${SPACK_COMPILER} +int64) ^netlib-scalapack@2.1.0/$(spack find --format '{hash:7}' netlib-scalapack@2.1.0 % ${SPACK_COMPILER}) ^scotch@6.0.10/$(spack find --format '{hash:7}' scotch@6.0.10 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv

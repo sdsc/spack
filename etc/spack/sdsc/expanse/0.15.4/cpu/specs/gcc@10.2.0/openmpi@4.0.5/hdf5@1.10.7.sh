@@ -36,7 +36,7 @@ module list
 
 declare -xr SPACK_PACKAGE='hdf5@1.10.7'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS='+cxx +fortran +hl +java +mpi +szip'
+declare -xr SPACK_VARIANTS='+cxx ~debug +fortran +hl +java +mpi +pic +shared +szip ~threadsafe'
 declare -xr SPACK_DEPENDENCIES="^openmpi@4.0.5/$(spack find --format '{hash:7}' openmpi@4.0.5 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
@@ -64,6 +64,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'metis@5.1.0.sh'
+#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'parmetis@4.0.3.sh'
 
 sleep 60

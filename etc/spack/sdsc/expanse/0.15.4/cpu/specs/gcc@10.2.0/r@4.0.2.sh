@@ -2,11 +2,11 @@
 
 #SBATCH --job-name=r@4.0.2
 #SBATCH --account=use300
-#SBATCH --partition=shared
+#SBATCH --partition=compute
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=16
-#SBATCH --mem=32G
+#SBATCH --cpus-per-task=128
+#SBATCH --mem=248G
 #SBATCH --time=01:00:00
 #SBATCH --output=%x.o%j.%N
 
@@ -34,14 +34,28 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
+# Cannot set +rmath
+# 1 error found in build log:
+#     2447    make[1]: Leaving directory '/tmp/mkandes/spack-stage/spack-stage-r
+#             -4.0.2-6d64d4jctyf3mpeqogghciieoi5znnqo/spack-src/tests'
+#     2448    ==> [2021-03-29-12:45:47.986087] 'make' '-j128' 'install'
+#     2449    make[1]: Entering directory '/tmp/mkandes/spack-stage/spack-stage-
+#             r-4.0.2-6d64d4jctyf3mpeqogghciieoi5znnqo/spack-src/src/include'
+#     2450    make[1]: 'Rmath.h' is up to date.
+#     2451    make[1]: Leaving directory '/tmp/mkandes/spack-stage/spack-stage-r
+#             -4.0.2-6d64d4jctyf3mpeqogghciieoi5znnqo/spack-src/src/include'
+#     2452    mkdir -p -- /home/mkandes/cm/shared/apps/spack/0.15.4/cpu/opt/spac
+#             k/linux-centos8-zen2/gcc-10.2.0/r-4.0.2-6d64d4jctyf3mpeqogghciieoi
+#             5znnqo/include
+#  >> 2453    cp: cannot create regular file '/home/mkandes/cm/shared/apps/spack
+#             /0.15.4/cpu/opt/spack/linux-centos8-zen2/gcc-10.2.0/r-4.0.2-6d64d4
+#             jctyf3mpeqogghciieoi5znnqo/include/Rmath.h': No such file or direc
+#             tory
+#     2454    make: *** [Makefile:154: install-header] Error 1
+#     2455    make: *** Waiting for unfinished jobs.... 
 declare -xr SPACK_PACKAGE='r@4.0.2'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS='+X +external-lapack ~rmath'
-# Problem with +rmath variant; try again in the future
-# >> 2964    cp: cannot create regular file '/home/mkandes/cm/shared/apps/spack
-#             /0.15.4/cpu/opt/spack/linux-centos8-zen2/gcc-10.2.0/r-4.0.2-ei3a3l
-#             o4hrd5vrk2n4u55jmrmxi23hbt/include/Rmath.h': No such file or direc
-#             tory
+declare -xr SPACK_VARIANTS='~X +external-lapack ~memory_profiling ~rmath'
 declare -xr SPACK_DEPENDENCIES="^openblas@0.3.10/$(spack find --format '{hash:7}' openblas@0.3.10 % ${SPACK_COMPILER} +ilp64 threads=none) ^python@3.8.5/$(spack find --format '{hash:7}' python@3.8.5 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 

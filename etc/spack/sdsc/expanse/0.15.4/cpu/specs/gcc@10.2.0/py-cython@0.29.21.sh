@@ -2,7 +2,7 @@
 
 #SBATCH --job-name=py-cython@0.29.21
 #SBATCH --account=use300
-#SBATCH --partition=shared
+#SBATCH --partition=compute
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=16
@@ -64,6 +64,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'py-joblib@0.14.0.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'py-joblib@0.14.0.sh'
 
 sleep 60

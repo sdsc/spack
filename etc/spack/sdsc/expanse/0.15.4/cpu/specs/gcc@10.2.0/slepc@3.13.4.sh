@@ -2,7 +2,7 @@
 
 #SBATCH --job-name=slepc@3.13.4
 #SBATCH --account=use300
-#SBATCH --partition=shared
+#SBATCH --partition=compute
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=16
@@ -34,10 +34,11 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
+# Error: Package slepc does not depend on arpack-ng
 declare -xr SPACK_PACKAGE='slepc@3.13.4'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS=''
-declare -xr SPACK_DEPENDENCIES="^arpack-ng@3.7.0/$(spack find --format '{hash:7}' arpack-ng@3.7.0 % ${SPACK_COMPILER}) ^petsc@3.13.4/$(spack find --format '{hash:7}' petsc@3.13.4 % ${SPACK_COMPILER} ~mpi ~complex) ^python@3.8.5/$(spack find --format '{hash:7}' python@3.8.5 % ${SPACK_COMPILER})"
+declare -xr SPACK_VARIANTS='~arpack ~blopex'
+declare -xr SPACK_DEPENDENCIES="^petsc@3.13.4/$(spack find --format '{hash:7}' petsc@3.13.4 % ${SPACK_COMPILER} ~mpi ~complex) ^python@3.8.5/$(spack find --format '{hash:7}' python@3.8.5 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -64,6 +65,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'slepc@3.13.4-complex.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'slepc@3.13.4-complex.sh'
 
 sleep 60

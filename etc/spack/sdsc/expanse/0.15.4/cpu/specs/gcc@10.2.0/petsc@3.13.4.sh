@@ -2,7 +2,7 @@
 
 #SBATCH --job-name=petsc@3.13.4
 #SBATCH --account=use300
-#SBATCH --partition=shared
+#SBATCH --partition=compute
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=16
@@ -36,10 +36,8 @@ module list
 
 declare -xr SPACK_PACKAGE='petsc@3.13.4'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS='~mpi ~hdf5 ~hypre ~superlu-dist'
-# Cannot build with +valgrind due to following dependency erro; try again in future
-# ==> Error: Cannot depend on 'bzip2@1.0.8%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +shared arch=linux-centos8-zen2' twice
-declare -xr SPACK_DEPENDENCIES="^python@3.8.5/$(spack find --format '{hash:7}' python@3.8.5 % ${SPACK_COMPILER})"
+declare -xr SPACK_VARIANTS='~X ~batch ~cgns ~complex ~cuda ~debug +double ~exodusii ~fftw ~giflib ~hdf5 ~hypre +int64 ~jpeg ~knl ~libpng ~libyaml ~memkind +metis ~moab ~mpfr ~mpi ~mumps ~p4est ~random123 ~saws +shared ~suite-sparse ~superlu-dist ~trilinos ~valgrind'
+declare -xr SPACK_DEPENDENCIES="^python@3.8.5/$(spack find --format '{hash:7}' python@3.8.5 % ${SPACK_COMPILER}) ^openblas@0.3.10/$(spack find --format '{hash:7}' openblas@0.3.10 % ${SPACK_COMPILER} +ilp64 threads=none) ^metis@5.1.0/$(spack find --format '{hash:7}' metis@5.1.0 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -66,6 +64,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'petsc@3.13.4-complex.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'petsc@3.13.4-complex.sh'
 
 sleep 60

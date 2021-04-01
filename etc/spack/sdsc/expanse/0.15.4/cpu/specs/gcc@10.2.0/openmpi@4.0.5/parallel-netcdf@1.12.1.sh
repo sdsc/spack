@@ -64,6 +64,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'netcdf-cxx4@4.3.1.sh'
+#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'netcdf-c@4.7.4.sh'
 
 sleep 60

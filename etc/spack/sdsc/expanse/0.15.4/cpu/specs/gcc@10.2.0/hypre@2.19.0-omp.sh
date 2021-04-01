@@ -2,7 +2,7 @@
 
 #SBATCH --job-name=hypre@2.19.0-openmp
 #SBATCH --account=use300
-#SBATCH --partition=shared
+#SBATCH --partition=compute
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=16
@@ -36,7 +36,7 @@ module list
 
 declare -xr SPACK_PACKAGE='hypre@2.19.0'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS='~mpi +openmp'
+declare -xr SPACK_VARIANTS='~complex ~debug +int64 ~internal-superlu ~mixedint ~mpi +openmp +shared ~superlu-dist'
 # Unable to compile with +openmp; possible linking issue to libomp? sort out another time; Spack package existing hypre options are not extensive when compared to configure options; also complex support should probbaly not be an option at this time; complex support very limited
 #751    /tmp/mkandes/spack-stage/spack-stage-hypre-2.19.0-lbbskfsddqisbif5d
 #            4nhrafc4352avyy/spack-src/src/utilities/hypre_prefix_sum.o: In func
@@ -83,8 +83,7 @@ declare -xr SPACK_VARIANTS='~mpi +openmp'
 #     769    make[1]: Leaving directory '/tmp/mkandes/spack-stage/spack-stage-hy
 #            pre-2.19.0-lbbskfsddqisbif5d4nhrafc4352avyy/spack-src/src/lib'
 #     770    make: *** [Makefile:86: all] Error 1
-declare -xr SPACK_DEPENDENCIES=''
-#declare -xr SPACK_DEPENDENCIES="^openblas@0.3.10/$(spack find --format '{hash:7}' openblas@0.3.10  % gcc@10.2.0 threads=openmp)"
+declare -xr SPACK_DEPENDENCIES="^openblas@0.3.10/$(spack find --format '{hash:7}' openblas@0.3.10  % gcc@10.2.0 +ilp64 threads=none)"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv

@@ -34,10 +34,13 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
+#==> Error: Detected uninstalled dependencies for libpng: {'zlib'}
+#==> Error: Cannot proceed with libpng: 1 uninstalled dependency: zlib
 declare -xr SPACK_PACKAGE='py-matplotlib@3.3.2'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS='+animation +fonts +latex' # +movies conflict when ffmpeg +X is explicit dependency --- ==> Error: Cannot depend on 'kbproto@1.0.7%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-centos8-zen2' twice ; see https://github.com/spack/spack/issues/2807
-declare -xr SPACK_DEPENDENCIES="^python@3.8.5/$(spack find --format '{hash:7}' python@3.8.5 % ${SPACK_COMPILER}) ^imagemagick@7.0.8-7/$(spack find --format '{hash:7}' imagemagick@7.0.8-7 % ${SPACK_COMPILER})"
+declare -xr SPACK_VARIANTS='+animation +fonts +image +latex ~movies' 
+declare -xr SPACK_DEPENDENCIES="^openblas@0.3.10/$(spack find --format '{hash:7}' openblas@0.3.10 % ${SPACK_COMPILER} +ilp64 threads=none) ^imagemagick@7.0.8-7/$(spack find --format '{hash:7}' imagemagick@7.0.8-7 % ${SPACK_COMPILER})"
+#^ffmpeg@4.2.2/$(spack find --format '{hash:7}' ffmpeg@4.2.2 % ${SPACK_COMPILER}) ^zlib@1.2.11/$(spack find --format '{hash:7}' zlib@1.2.11 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -64,6 +67,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'py-scikit-optimize@0.5.2.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'py-scikit-optimize@0.5.2.sh'
 
 sleep 60

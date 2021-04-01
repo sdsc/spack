@@ -36,8 +36,8 @@ module list
 
 declare -xr SPACK_PACKAGE='hypre@2.19.0'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS='~complex ~debug ~int64 ~internal-superlu ~mixedint +mpi ~openmp +shared +superlu-dist'
-declare -xr SPACK_DEPENDENCIES="^openmpi@4.0.5/$(spack find --format '{hash:7}' openmpi@4.0.5 % ${SPACK_COMPILER})"
+declare -xr SPACK_VARIANTS='~complex ~debug +int64 ~internal-superlu ~mixedint +mpi ~openmp +shared +superlu-dist'
+declare -xr SPACK_DEPENDENCIES="^superlu-dist@6.3.1/$(spack find --format '{hash:7}' superlu-dist@6.3.1 % ${SPACK_COMPILER} ^openmpi@4.0.5)"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv

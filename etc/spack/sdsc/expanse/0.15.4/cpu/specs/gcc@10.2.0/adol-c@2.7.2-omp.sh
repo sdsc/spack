@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=adol-c@2.7.2-openmp
+#SBATCH --job-name=adol-c@2.7.2-omp
 #SBATCH --account=use300
-#SBATCH --partition=shared
+#SBATCH --partition=compute
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=16
@@ -36,7 +36,7 @@ module list
 
 declare -xr SPACK_PACKAGE='adol-c@2.7.2'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS='+boost +openmp ~sparse'
+declare -xr SPACK_VARIANTS='~advanced_branching +atrig_erf +boost ~doc +examples +openmp ~sparse'
 # Problem installing with +sparse; try and resolve another time.
 #==> Installing adol-c
 #==> No binary for adol-c found: installing from source
@@ -114,7 +114,7 @@ declare -xr SPACK_VARIANTS='+boost +openmp ~sparse'
 #make[1]: Leaving directory '/tmp/mkandes/spack-stage/spack-stage-adol-c-2.7.2-yxhqaj7lcm3yy2ne5womoypirginxaq4/spack-src/ADOL-C'
 #make: *** [Makefile:537: install-recursive] Error 1
 #[mkandes@login02 cpu]$
-declare -xr SPACK_DEPENDENCIES="^boost@1.74.0/$(spack find --format '{hash:7}' boost@1.74.0 % ${SPACK_COMPILER})"
+declare -xr SPACK_DEPENDENCIES="^boost@1.74.0/$(spack find --format '{hash:7}' boost@1.74.0 % ${SPACK_COMPILER} ~mpi)"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -141,6 +141,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'hypre@2.19.0.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'hypre@2.19.0.sh'
 
 sleep 60

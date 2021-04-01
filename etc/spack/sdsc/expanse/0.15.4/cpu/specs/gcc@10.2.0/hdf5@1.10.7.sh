@@ -2,7 +2,7 @@
 
 #SBATCH --job-name=hdf5@1.10.7
 #SBATCH --account=use300
-#SBATCH --partition=shared
+#SBATCH --partition=compute
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=16
@@ -36,7 +36,7 @@ module list
 
 declare -xr SPACK_PACKAGE='hdf5@1.10.7'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS='+cxx +fortran +hl +java ~mpi +szip'
+declare -xr SPACK_VARIANTS='+cxx ~debug +fortran +hl +java ~mpi +pic +shared +szip ~threadsafe'
 declare -xr SPACK_DEPENDENCIES=''
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 

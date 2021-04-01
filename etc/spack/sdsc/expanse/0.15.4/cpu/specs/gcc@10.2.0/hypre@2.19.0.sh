@@ -2,7 +2,7 @@
 
 #SBATCH --job-name=hypre@2.19.0
 #SBATCH --account=use300
-#SBATCH --partition=shared
+#SBATCH --partition=compute
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=16
@@ -36,8 +36,8 @@ module list
 
 declare -xr SPACK_PACKAGE='hypre@2.19.0'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS='~mpi'
-declare -xr SPACK_DEPENDENCIES="^openblas@0.3.10/$(spack find --format '{hash:7}' openblas@0.3.10 % ${SPACK_COMPILER} ~ilp64 threads=none)"
+declare -xr SPACK_VARIANTS='~complex ~debug +int64 ~internal-superlu ~mixedint ~mpi ~openmp +shared ~superlu-dist'
+declare -xr SPACK_DEPENDENCIES="^openblas@0.3.10/$(spack find --format '{hash:7}' openblas@0.3.10 % ${SPACK_COMPILER} +ilp64 threads=none)"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -64,6 +64,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'suite-sparse@5.7.2.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'suite-sparse@5.7.2.sh'
 
 sleep 60

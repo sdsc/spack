@@ -37,8 +37,8 @@ module list
 declare -xr SPACK_PACKAGE='netcdf-c@4.7.4'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
 # failed to build with +parallel-netcdf support; try again in future and/or investigate if this integration is even appropriate in netcdf-c package.py
-declare -xr SPACK_VARIANTS='~dap ~hdf4 ~jna +mpi ~parallel-netcdf +pic +shared'
-declare -xr SPACK_DEPENDENCIES="^openmpi@4.0.5/$(spack find --format '{hash:7}' openmpi@4.0.5 % ${SPACK_COMPILER}) ^hdf5@1.10.7/$(spack find --format '{hash:7}' hdf5@1.10.7 % ${SPACK_COMPILER} +mpi)"
+declare -xr SPACK_VARIANTS='~dap ~hdf4 ~jna +mpi +parallel-netcdf +pic +shared'
+declare -xr SPACK_DEPENDENCIES="^hdf5@1.10.7/$(spack find --format '{hash:7}' hdf5@1.10.7 % ${SPACK_COMPILER} +mpi)"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv

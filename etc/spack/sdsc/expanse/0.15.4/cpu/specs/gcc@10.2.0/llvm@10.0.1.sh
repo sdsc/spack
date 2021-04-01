@@ -2,7 +2,7 @@
 
 #SBATCH --job-name=llvm@10.0.1
 #SBATCH --account=use300
-#SBATCH --partition=shared
+#SBATCH --partition=compute
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=16
@@ -36,7 +36,7 @@ module list
 
 declare -xr SPACK_PACKAGE='llvm@10.0.1'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS='+python' 
+declare -xr SPACK_VARIANTS='~all_targets +clang ~code_signing +compiler-rt ~cuda +gold +internal_unwind +libcxx +lld +lldb +mlir ~omp_debug ~omp_tsan +polly +python ~shared_libs ~split_dwarf' 
 declare -xr SPACK_DEPENDENCIES="^python@3.8.5/$(spack find --format '{hash:7}' python@3.8.5 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 

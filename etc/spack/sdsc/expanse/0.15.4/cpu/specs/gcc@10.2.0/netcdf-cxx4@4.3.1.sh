@@ -2,7 +2,7 @@
 
 #SBATCH --job-name=netcdf-cxx4@4.3.1
 #SBATCH --account=use300
-#SBATCH --partition=shared
+#SBATCH --partition=compute
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=16
@@ -36,8 +36,8 @@ module list
 
 declare -xr SPACK_PACKAGE='netcdf-cxx4@4.3.1'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS='~doxygen'
-declare -xr SPACK_DEPENDENCIES="^netcdf-c@4.7.4/$(spack find --format '{hash:7}' netcdf-c@4.7.4 % ${SPACK_COMPILER})"
+declare -xr SPACK_VARIANTS='~doxygen +pic +shared +static' 
+declare -xr SPACK_DEPENDENCIES="^netcdf-c@4.7.4/$(spack find --format '{hash:7}' netcdf-c@4.7.4 % ${SPACK_COMPILER} ~mpi)"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -64,6 +64,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'netcdf-fortran@4.5.3.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'netcdf-fortran@4.5.3.sh'
 
 sleep 60

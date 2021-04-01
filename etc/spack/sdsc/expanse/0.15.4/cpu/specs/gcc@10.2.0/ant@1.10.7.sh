@@ -2,7 +2,7 @@
 
 #SBATCH --job-name=ant@1.10.7
 #SBATCH --account=use300
-#SBATCH --partition=shared
+#SBATCH --partition=compute
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=16
@@ -64,6 +64,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'git@2.28.0.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'ffmpeg@4.2.2.sh'
 
 sleep 60

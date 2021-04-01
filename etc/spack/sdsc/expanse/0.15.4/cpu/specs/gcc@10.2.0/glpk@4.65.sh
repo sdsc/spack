@@ -2,7 +2,7 @@
 
 #SBATCH --job-name=glpk@4.65
 #SBATCH --account=use300
-#SBATCH --partition=shared
+#SBATCH --partition=compute
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=16
@@ -64,6 +64,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'qhull@2020.1.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'qhull@2020.1.sh'
 
 sleep 60

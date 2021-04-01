@@ -23,7 +23,6 @@ modules:
     openblas:
       suffixes:
         'threads=openmp': omp
-        '+ilp64': i64
     petsc:
       suffixes:
         '+complex': complex
