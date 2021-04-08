@@ -5,11 +5,10 @@
 #SBATCH --partition=compute
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=128
-#SBATCH --mem=248G
+#SBATCH --cpus-per-task=16
+#SBATCH --mem=32G
 #SBATCH --time=01:00:00
 #SBATCH --output=%x.o%j.%N
-#SBATCH -x exp-1-02
 
 declare -xr LOCAL_TIME="$(date +'%Y%m%dT%H%M%S%z')"
 declare -xir UNIX_TIME="$(date +'%s')"
@@ -35,10 +34,49 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
+# Failed to build with +superlu-dist ... problem unknown; may be intsize-related
+# >> 443    superlu.c:25:4: error: unknown type name 'LUstruct_t'
+#     444       25 |    LUstruct_t dslu_data_LU;
+#     445          |    ^~~~~~~~~~
+#  >> 446    superlu.c:29:4: error: unknown type name 'ScalePermstruct_t'
+#     447       29 |    ScalePermstruct_t dslu_ScalePermstruct;
+#     448          |    ^~~~~~~~~~~~~~~~~
+#  >> 449    superlu.c:30:4: error: unknown type name 'SOLVEstruct_t'
+#     450       30 |    SOLVEstruct_t dslu_solve;
+#     451          |    ^~~~~~~~~~~~~
+#     452    In file included from _hypre_parcsr_ls.h:17,
+#     453                     from superlu.c:8:
+#     454    superlu.c: In function 'hypre_SLUDistSetup':
+#     455    ./../seq_mv/seq_mv.h:77:57: warning: passing argument 8 of 'dCreate
+#            _CompRowLoc_Matrix_dist' from incompatible pointer type [-Wincompat
+#            ible-pointer-types]
+#
+#     ...
+#
+#     578          |                                                  |
+#     579          |                                                  int *
+#     580    In file included from superlu.c:15:
+#     581    /home/mkandes/cm/shared/apps/spack/0.15.4/cpu/opt/spack/linux-cento
+#            s8-zen2/gcc-10.2.0/superlu-dist-6.3.0-ucxl6pek4rqu6z3mo56pk3oowqbgz
+#            h72/include/superlu_ddefs.h:427:54: note: expected 'dSOLVEstruct_t 
+#            *' but argument is of type 'int *'
+#     582      427 | extern void dSolveFinalize(superlu_dist_options_t *, dSOLVE
+#            struct_t *);
+#     583          |                                                      ^~~~~~
+#            ~~~~~~~~~~
+#  >> 584    make[1]: *** [../config/Makefile.config:42: superlu.o] Error 1
+#     585    make[1]: *** Waiting for unfinished jobs....
+#     586    make[1]: Leaving directory '/tmp/mkandes/spack-stage/spack-stage-hy
+#            pre-2.18.2-hbi6fnyzv66kmg4zks2l454f4d6z4f45/spack-src/src/parcsr_ls
+#            '
+#     587    make: *** [Makefile:86: all] Error 1
+#
+# Set ~superlu-dist for now ...
 declare -xr SPACK_PACKAGE='hypre@2.18.2'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS='~complex ~debug +int64 ~internal-superlu ~mixedint +mpi ~openmp +shared +superlu-dist'
-declare -xr SPACK_DEPENDENCIES="^superlu-dist@6.3.1/$(spack find --format '{hash:7}' superlu-dist@6.3.1 % ${SPACK_COMPILER} ^openmpi@4.0.5)"
+declare -xr SPACK_VARIANTS='~complex ~debug +int64 ~internal-superlu ~mixedint +mpi ~openmp +shared ~superlu-dist'
+declare -xr SPACK_DEPENDENCIES="^openblas@0.3.10/$(spack find --format '{hash:7}' openblas@0.3.10 % ${SPACK_COMPILER} +ilp64 threads=none) ^openmpi@4.0.5/$(spack find --format '{hash:7}' openmpi@4.0.5 % ${SPACK_COMPILER})"
+#^superlu-dist@6.3.0/$(spack find --format '{hash:7}' superlu-dist@6.3.0 % ${SPACK_COMPILER} ^openmpi@4.0.5)"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -65,6 +103,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'suite-sparse@5.7.2.sh'
+#sbatch --dependency="afterok:${SLURM_JOB_ID}" ''
 
 sleep 60

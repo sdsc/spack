@@ -2,7 +2,7 @@
 
 #SBATCH --job-name=parallel-netcdf@1.12.1
 #SBATCH --account=use300
-#SBATCH --partition=shared
+#SBATCH --partition=compute
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=16
@@ -64,6 +64,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'netcdf-c@4.7.4.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'netcdf-c@4.7.4.sh'
 
 sleep 60

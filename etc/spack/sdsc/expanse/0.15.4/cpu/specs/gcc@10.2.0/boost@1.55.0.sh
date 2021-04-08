@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=sprng@5.0
+#SBATCH --job-name=boost@1.55.0
 #SBATCH --account=use300
-#SBATCH --partition=shared
+#SBATCH --partition=compute
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=16
@@ -34,11 +34,16 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-declare -xr SPACK_PACKAGE='sprng@5.0'
+# Request by user pwolberg during VEUP because he said that it is the 
+# last version of boost that will compile using C++98; set only default
+# +variants; may be able to eliminate in the future as cxxstd=98 is the
+# default for boost; we should clarify this point in the future to 
+# determine if this older version is really necessary.
+declare -xr SPACK_PACKAGE='boost@1.55.0'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS='+mpi +fortran'
-declare -xr SPACK_DEPENDENCIES="^openmpi@4.0.5/$(spack find --format '{hash:7}' openmpi@4.0.5 % ${SPACK_COMPILER})"
-declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
+declare -xr SPACK_VARIANTS='+atomic +chrono ~clanglibcpp ~container ~context ~coroutine +date_time ~debug +exception ~fiber +filesystem +graph ~icu +iostreams +locale +log +math ~mpi +multithreaded ~numpy ~pic +program_options ~python +random +regex +serialization +shared +signals ~singlethreaded +system ~taggedlayout +test +thread +timer ~versionedlayout +wave'
+declare -xr SPACK_DEPENDENCIES=''
+declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER}" #${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
 
@@ -64,6 +69,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'valgrind@3.15.0.sh'
+#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'adol-c@2.7.2.sh'
 
 sleep 60

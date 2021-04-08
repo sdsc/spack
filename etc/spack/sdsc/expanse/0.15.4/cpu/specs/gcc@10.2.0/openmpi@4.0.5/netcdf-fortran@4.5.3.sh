@@ -2,7 +2,7 @@
 
 #SBATCH --job-name=netcdf-fortran@4.5.3
 #SBATCH --account=use300
-#SBATCH --partition=shared
+#SBATCH --partition=compute
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=16
@@ -64,6 +64,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'ncview@2.1.8.sh'
+#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'py-mpi4py@3.0.3.sh'
 
 sleep 60

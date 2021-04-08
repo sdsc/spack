@@ -2,7 +2,7 @@
 
 #SBATCH --job-name=netlib-scalapack@2.1.0
 #SBATCH --account=use300
-#SBATCH --partition=shared
+#SBATCH --partition=compute
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=16
@@ -64,6 +64,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'gsl@2.5.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'fftw@3.3.8.sh'
 
 sleep 60

@@ -36,7 +36,7 @@ module list
 
 declare -xr SPACK_PACKAGE='openmpi@4.0.5'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS='+legacylaunchers +lustre +pmi schedulers=slurm fabrics=ucx'
+declare -xr SPACK_VARIANTS='~atomics ~cuda ~cxx ~cxx_exceptions ~gpfs ~java +legacylaunchers +lustre ~memchecker +pmi ~singularity ~sqlite3 +static +thread_multiple +wrapper-rpath'
 declare -xr SPACK_DEPENDENCIES='^hwloc@1.11.11 ^lustre@2.12.5 ^slurm@20.02.3 ^rdma-core@47'
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
@@ -54,13 +54,13 @@ echo "${SPACK_SPEC}"
 # concretization fails for some reason when using SPACK_SPEC environment variable; investigate again in the future
 # openmpi@4.0.5 % gcc@10.2.0 +legacylaunchers +lustre +pmi schedulers=slurm fabrics=ucx ^hwloc@1.11.11 ^lustre@2.12.5 ^slurm@20.02.3 ^rdma-core@47
 # ==> Error: invalid values for variant "schedulers" in package "openmpi": ['slurm fabrics=ucx ^hwloc@1.11.11 ^lustre@2.12.5 ^slurm@20.02.3 ^rdma-core@47']
-spack spec --long --namespaces --types openmpi@4.0.5 % gcc@10.2.0 +legacylaunchers +lustre +pmi schedulers=slurm fabrics=ucx ^hwloc@1.11.11 ^lustre@2.12.5 ^slurm@20.02.3 ^rdma-core@47
+spack spec --long --namespaces --types openmpi@4.0.5 % gcc@10.2.0 ~atomics ~cuda ~cxx ~cxx_exceptions ~gpfs ~java +legacylaunchers +lustre ~memchecker +pmi ~singularity ~sqlite3 +static +thread_multiple +wrapper-rpath schedulers=slurm fabrics=ucx ^hwloc@1.11.11 ^lustre@2.12.5 ^slurm@20.02.3 ^rdma-core@47
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack concretization failed.'
   exit 1
 fi
 
-time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all openmpi@4.0.5 % gcc@10.2.0 +legacylaunchers +lustre +pmi schedulers=slurm fabrics=ucx ^hwloc@1.11.11 ^lustre@2.12.5 ^slurm@20.02.3 ^rdma-core@47
+time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all openmpi@4.0.5 % gcc@10.2.0 ~atomics ~cuda ~cxx ~cxx_exceptions ~gpfs ~java +legacylaunchers +lustre ~memchecker +pmi ~singularity ~sqlite3 +static +thread_multiple +wrapper-rpath schedulers=slurm fabrics=ucx ^hwloc@1.11.11 ^lustre@2.12.5 ^slurm@20.02.3 ^rdma-core@47
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
   exit 1

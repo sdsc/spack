@@ -64,6 +64,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-#sbatch --dependency="afterok:${SLURM_JOB_ID}" ''
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'py-numpy@1.19.2.sh'
 
 sleep 60

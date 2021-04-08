@@ -83,6 +83,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'octave@5.2.0.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'julia@1.5.3.sh'
 
 sleep 60

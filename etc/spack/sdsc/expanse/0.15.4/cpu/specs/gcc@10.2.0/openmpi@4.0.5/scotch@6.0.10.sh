@@ -2,7 +2,7 @@
 
 #SBATCH --job-name=scotch@6.0.10
 #SBATCH --account=use300
-#SBATCH --partition=shared
+#SBATCH --partition=compute
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=16
@@ -34,6 +34,9 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
+# Setting +metis doesn't seem to create dependecy to metis when 
+# concretized; investigate in the future why this is the case.
+# mumps requires scotch constrain a concrete spec scotch+esmumps~metis+mpi
 declare -xr SPACK_PACKAGE='scotch@6.0.10'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
 declare -xr SPACK_VARIANTS='+compression +esmumps +int64 ~metis +mpi +shared'
@@ -64,6 +67,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'valgrind@3.15.0.sh'
+#sbatch --dependency="afterok:${SLURM_JOB_ID}" ''
 
 sleep 60

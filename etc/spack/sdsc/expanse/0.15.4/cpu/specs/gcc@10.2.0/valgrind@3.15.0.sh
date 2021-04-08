@@ -64,6 +64,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'petsc@3.13.4.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'petsc@3.13.4.sh'
 
 sleep 60

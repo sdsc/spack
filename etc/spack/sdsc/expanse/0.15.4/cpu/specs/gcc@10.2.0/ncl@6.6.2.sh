@@ -43,7 +43,15 @@ module list
 declare -xr SPACK_PACKAGE='ncl@6.6.2'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
 declare -xr SPACK_VARIANTS='~gdal ~hdf4 +openmp +triangle +udunits2'
-declare -xr SPACK_DEPENDENCIES="^netcdf-c@4.7.4/$(spack find --format '{hash:7}' netcdf-c@4.7.4 % ${SPACK_COMPILER} ~mpi) ^esmf@7.1.0r/$(spack find --format '{hash:7}' esmf@7.1.0r % ${SPACK_COMPILER} ~mpi) ^python@3.8.5/$(spack find --format '{hash:7}' python@3.8.5 % ${SPACK_COMPILER})"
+declare -xr SPACK_DEPENDENCIES="^esmf@7.1.0r/$(spack find --format '{hash:7}' esmf@7.1.0r % ${SPACK_COMPILER} ~mpi) ^python@3.8.5/$(spack find --format '{hash:7}' python@3.8.5 % ${SPACK_COMPILER})"
+
+#"^netcdf-c@4.7.4/$(spack find --format '{hash:7}' netcdf-c@4.7.4 % ${SPACK_COMPILER} ~mpi)"
+
+#"^hdf5@1.10.7/$(spack find --format '{hash:7}' hdf5@1.10.7 % ${SPACK_COMPILER} ~mpi)"
+
+#"^gdal@2.4.4/$(spack find --format '{hash:7}' gdal@2.4.4 % ${SPACK_COMPILER}) ^esmf@7.1.0r/$(spack find --format '{hash:7}' esmf@7.1.0r % ${SPACK_COMPILER} ~mpi)"
+
+#"^netcdf-c@4.7.4/$(spack find --format '{hash:7}' netcdf-c@4.7.4 % ${SPACK_COMPILER} ~mpi) ^esmf@7.1.0r/$(spack find --format '{hash:7}' esmf@7.1.0r % ${SPACK_COMPILER} ~mpi) ^python@3.8.5/$(spack find --format '{hash:7}' python@3.8.5 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -70,6 +78,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'py-numpy@1.19.2.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'raja@0.12.1.sh'
 
 sleep 60

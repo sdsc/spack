@@ -2,7 +2,7 @@
 
 #SBATCH --job-name=netcdf-c@4.7.4
 #SBATCH --account=use300
-#SBATCH --partition=shared
+#SBATCH --partition=compute
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=16
@@ -34,11 +34,14 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
+# failed to build with +parallel-netcdf support; try again in future 
+# and/or investigate if this integration is even appropriate in 
+# netcdf-c package.py
+#==> Error: Cannot depend on 'hwloc@1.11.11 twice
 declare -xr SPACK_PACKAGE='netcdf-c@4.7.4'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-# failed to build with +parallel-netcdf support; try again in future and/or investigate if this integration is even appropriate in netcdf-c package.py
-declare -xr SPACK_VARIANTS='~dap ~hdf4 ~jna +mpi +parallel-netcdf +pic +shared'
-declare -xr SPACK_DEPENDENCIES="^hdf5@1.10.7/$(spack find --format '{hash:7}' hdf5@1.10.7 % ${SPACK_COMPILER} +mpi)"
+declare -xr SPACK_VARIANTS='~dap ~hdf4 ~jna +mpi ~parallel-netcdf +pic +shared'
+declare -xr SPACK_DEPENDENCIES="^hdf5@1.10.7/$(spack find --format '{hash:7}' hdf5@1.10.7 % ${SPACK_COMPILER} +mpi ^openmpi@4.0.5)"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -65,6 +68,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'netcdf-cxx4@4.3.1.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'netcdf-cxx4@4.3.1.sh'
 
 sleep 60

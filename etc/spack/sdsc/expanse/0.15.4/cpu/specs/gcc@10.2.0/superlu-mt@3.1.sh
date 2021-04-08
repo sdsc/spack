@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=py-slepc4py@3.13.0
+#SBATCH --job-name=superlu-mt@3.1
 #SBATCH --account=use300
 #SBATCH --partition=compute
 #SBATCH --nodes=1
@@ -34,11 +34,10 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-# Cannot depend on 'metis@5.1.0 twice
-declare -xr SPACK_PACKAGE='py-slepc4py@3.13.0'
+declare -xr SPACK_PACKAGE='superlu-mt@3.1'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS=''
-declare -xr SPACK_DEPENDENCIES="^metis@5.1.0 ^py-petsc4py@3.13.0/$(spack find --format '{hash:7}' py-petsc4py@3.13.0 % ${SPACK_COMPILER} ~mpi) ^slepc@3.13.4/$(spack find --format '{hash:7}' slepc@3.13.4 % ${SPACK_COMPILER} ^petsc@3.13.4 ~mpi ~complex)"
+declare -xr SPACK_VARIANTS='+blas +int64 +openmp +pic ~pthread'
+declare -xr SPACK_DEPENDENCIES="^openblas@0.3.10/$(spack find --format '{hash:7}' openblas@0.3.10 % ${SPACK_COMPILER} +ilp64 threads=none)"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -65,6 +64,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-#sbatch --dependency="afterok:${SLURM_JOB_ID}" ''
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'sprng@5.0.sh'
 
 sleep 60

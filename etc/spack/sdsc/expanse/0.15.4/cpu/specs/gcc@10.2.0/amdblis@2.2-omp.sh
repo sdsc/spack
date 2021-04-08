@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=py-slepc4py@3.13.0
+#SBATCH --job-name=amdblis@2.2-omp
 #SBATCH --account=use300
 #SBATCH --partition=compute
 #SBATCH --nodes=1
@@ -34,11 +34,10 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-# Cannot depend on 'metis@5.1.0 twice
-declare -xr SPACK_PACKAGE='py-slepc4py@3.13.0'
+declare -xr SPACK_PACKAGE='amdblis@2.2'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS=''
-declare -xr SPACK_DEPENDENCIES="^metis@5.1.0 ^py-petsc4py@3.13.0/$(spack find --format '{hash:7}' py-petsc4py@3.13.0 % ${SPACK_COMPILER} ~mpi) ^slepc@3.13.4/$(spack find --format '{hash:7}' slepc@3.13.4 % ${SPACK_COMPILER} ^petsc@3.13.4 ~mpi ~complex)"
+declare -xr SPACK_VARIANTS='+blas +cblas +shared +static threads=openmp'
+declare -xr SPACK_DEPENDENCIES="^python@3.8.5/$(spack find --format '{hash:7}' python@3.8.5 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -51,13 +50,14 @@ spack config get packages
 spack config get repos
 spack config get upstreams
 
-spack spec --long --namespaces --types "${SPACK_SPEC}"
+# ==> Error: invalid values for variant "threads" in package "amdblis": ['none ^python@3.8.5/y47j26d']
+spack spec --long --namespaces --types amdblis@2.2 % gcc@10.2.0 +blas +cblas +shared +static threads=openmp "^python@3.8.5/$(spack find --format '{hash:7}' python@3.8.5 % ${SPACK_COMPILER})"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack concretization failed.'
   exit 1
 fi
 
-time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all "${SPACK_SPEC}"
+time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all amdblis@2.2 % gcc@10.2.0 +blas +cblas +shared +static threads=openmp "^python@3.8.5/$(spack find --format '{hash:7}' python@3.8.5 % ${SPACK_COMPILER})"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
   exit 1
@@ -65,6 +65,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-#sbatch --dependency="afterok:${SLURM_JOB_ID}" ''
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'openblas@0.3.10.sh'
 
 sleep 60

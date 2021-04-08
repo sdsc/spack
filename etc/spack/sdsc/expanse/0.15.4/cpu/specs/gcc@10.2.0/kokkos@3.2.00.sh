@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=py-slepc4py@3.13.0
+#SBATCH --job-name=kokkos@3.2.00
 #SBATCH --account=use300
 #SBATCH --partition=compute
 #SBATCH --nodes=1
@@ -34,11 +34,10 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-# Cannot depend on 'metis@5.1.0 twice
-declare -xr SPACK_PACKAGE='py-slepc4py@3.13.0'
+declare -xr SPACK_PACKAGE='kokkos@3.2.00'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS=''
-declare -xr SPACK_DEPENDENCIES="^metis@5.1.0 ^py-petsc4py@3.13.0/$(spack find --format '{hash:7}' py-petsc4py@3.13.0 % ${SPACK_COMPILER} ~mpi) ^slepc@3.13.4/$(spack find --format '{hash:7}' slepc@3.13.4 % ${SPACK_COMPILER} ^petsc@3.13.4 ~mpi ~complex)"
+declare -xr SPACK_VARIANTS='~aggressive_vectorization ~compiler_warnings ~cuda ~cuda_lambda ~cuda_ldg_intrinsic ~cuda_relocatable_device_code ~cuda_uvm ~debug ~debug_bounds_check ~debug_dualview_modify_check ~deprecated_code ~examples ~explicit_instantiation ~hip ~hpx ~hpx_async_dispatch ~hwloc ~memkind ~numactl ~openmp +pic +profiling ~profiling_load_print ~pthread ~qthread +serial +shared ~tests~wrapper'
+declare -xr SPACK_DEPENDENCIES=''
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv

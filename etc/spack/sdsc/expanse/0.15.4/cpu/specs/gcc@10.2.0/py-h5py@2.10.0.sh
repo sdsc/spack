@@ -64,6 +64,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'py-sympy@1.4.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'py-netcdf4@1.5.3.sh'
 
 sleep 60

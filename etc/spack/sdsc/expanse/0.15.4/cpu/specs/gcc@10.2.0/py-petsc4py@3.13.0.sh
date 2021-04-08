@@ -64,6 +64,11 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
+# Still cannot install py-slepc4py due to metis twice dependency 
+# problem; must try again when new concretizer is available in 
+# Spack 0.17.X+. For now, skip over an install R.
+
 #sbatch --dependency="afterok:${SLURM_JOB_ID}" 'py-slepc4py@3.13.0.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'r@4.0.2.sh'
 
 sleep 60

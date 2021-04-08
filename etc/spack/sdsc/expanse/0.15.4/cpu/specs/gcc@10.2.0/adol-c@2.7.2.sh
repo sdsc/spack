@@ -141,6 +141,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'adol-c@2.7.2-openmp.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'adol-c@2.7.2-omp.sh'
 
 sleep 60

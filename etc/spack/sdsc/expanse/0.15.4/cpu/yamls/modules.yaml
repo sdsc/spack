@@ -14,10 +14,16 @@ modules:
     adol-c:
       suffixes:
         '+openmp': omp
+    amdblis:
+      suffixes:
+        'threads=openmp': omp
     fftw:
       suffixes:
         '+openmp': omp
     hypre:
+      suffixes:
+        '+openmp': omp
+    kokkos:
       suffixes:
         '+openmp': omp
     openblas:

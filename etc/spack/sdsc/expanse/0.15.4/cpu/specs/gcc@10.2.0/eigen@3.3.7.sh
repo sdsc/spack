@@ -64,6 +64,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'openblas@0.3.10.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'amdblis@2.2.sh'
 
 sleep 60

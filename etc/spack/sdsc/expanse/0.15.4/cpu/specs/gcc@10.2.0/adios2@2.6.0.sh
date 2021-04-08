@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=mumps@5.3.3
+#SBATCH --job-name=adios2@2.6.0
 #SBATCH --account=use300
 #SBATCH --partition=compute
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=128
-#SBATCH --mem=248G
+#SBATCH --cpus-per-task=16
+#SBATCH --mem=32G
 #SBATCH --time=01:00:00
 #SBATCH --output=%x.o%j.%N
 
@@ -34,12 +34,11 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-declare -xr SPACK_PACKAGE='mumps@5.3.3'
+# Set ~dataman because build failed; may be int32->int64 issue
+declare -xr SPACK_PACKAGE='adios2@2.6.0'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS='~mpi'
-# mumps not compiling for serial, non-mpi version with following error
-# >> 65    Error: Type mismatch in argument 's' at (1); passed INTEGER(4) to IN           TEGER(8)
-declare -xr SPACK_DEPENDENCIES=''
+declare -xr SPACK_VARIANTS='+blosc +bzip2 ~dataman ~dataspaces ~endian_reverse +fortran +hdf5 ~mpi +pic +png +python +shared +ssc +sst +sz +zfp'
+declare -xr SPACK_DEPENDENCIES="^py-numpy@1.19.2/$(spack find --format '{hash:7}' py-numpy@1.19.2 % ${SPACK_COMPILER}) ^openblas@0.3.10/$(spack find --format '{hash:7}' openblas@0.3.10 % ${SPACK_COMPILER} +ilp64 threads=none) ^hdf5@1.10.7/$(spack find --format '{hash:7}' hdf5@1.10.7 % ${SPACK_COMPILER} ~mpi)"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -66,4 +65,4 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'mumps@5.3.3-complex.sh'
+#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'adios2@2.6.0-complex.sh'

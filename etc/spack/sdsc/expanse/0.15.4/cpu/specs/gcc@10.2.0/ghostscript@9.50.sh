@@ -64,6 +64,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'imagemagick@7.0.8-7.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'imagemagick@7.0.8-7.sh'
 
 sleep 60

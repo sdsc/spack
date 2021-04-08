@@ -34,10 +34,12 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
+#==> Error: Detected uninstalled dependencies for py-setuptools: {'python'}
+#==> Error: Cannot proceed with py-setuptools: 1 uninstalled dependency: python
 declare -xr SPACK_PACKAGE='adios2@2.6.0'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS='+blosc +bzip2 +dataman ~dataspaces ~endian_reverse +fortran +hdf5 +mpi +pic +png +python +shared +ssc +sst +sz +zfp'
-declare -xr SPACK_DEPENDENCIES="^openmpi@4.0.5/$(spack find --format '{hash:7}' openmpi@4.0.5 % ${SPACK_COMPILER})"
+declare -xr SPACK_VARIANTS='+blosc +bzip2 ~dataman ~dataspaces ~endian_reverse +fortran +hdf5 +mpi +pic +png +python +shared +ssc +sst +sz +zfp'
+declare -xr SPACK_DEPENDENCIES="^python@3.8.5/$(spack find --format '{hash:7}' python@3.8.5 % ${SPACK_COMPILER}) ^hdf5@1.10.7/$(spack find --format '{hash:7}' hdf5@1.10.7 % ${SPACK_COMPILER} +mpi) ^openblas@0.3.10/$(spack find --format '{hash:7}' openblas@0.3.10 % ${SPACK_COMPILER} +ilp64 threads=none)"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
