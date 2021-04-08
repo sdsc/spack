@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=git@2.28.0
+#SBATCH --job-name=mercurial@5.3
 #SBATCH --account=use300
 #SBATCH --partition=compute
 #SBATCH --nodes=1
@@ -34,10 +34,10 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-declare -xr SPACK_PACKAGE='git@2.28.0'
-declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS='+tcltk'
-declare -xr SPACK_DEPENDENCIES="^tk@8.5.19/$(spack find --format '{hash:7}' tk@8.5.19 % ${SPACK_COMPILER})"
+declare -xr SPACK_PACKAGE='mercurial@5.3'
+declare -xr SPACK_COMPILER='gcc@8.3.1'
+declare -xr SPACK_VARIANTS=''
+declare -xr SPACK_DEPENDENCIES=''
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -64,6 +64,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'go@1.15.1.sh'
+#sbatch --dependency="afterok:${SLURM_JOB_ID}" ''
 
 sleep 60
