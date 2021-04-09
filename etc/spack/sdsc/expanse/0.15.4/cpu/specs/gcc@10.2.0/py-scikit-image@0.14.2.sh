@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=py-dask@2.16.0
+#SBATCH --job-name=py-scikit-image@0.14.2
 #SBATCH --account=use300
 #SBATCH --partition=compute
 #SBATCH --nodes=1
@@ -34,10 +34,14 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-declare -xr SPACK_PACKAGE='py-dask@2.16.0'
+# Remove +pyexpt variant on python as a fix? Do we really need it? Or create custom sdsc expat package with ~libbsd?
+#==> Error: Cannot depend on 'libbsd@0.10.0%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-centos8-zen2' twice
+# https://github.com/spack/spack/commit/f24398cde6902ae7871d7bd1992a0e1a08c47ab0#diff-17bd1a5eb144733789e892fe6fb2f8f4c0f0bb31155d5793e731f1f9fd5bb50a
+# we could also set ~diagnostics on py-dask and then everything should concretize correctly with only ^py-matplotlib
+declare -xr SPACK_PACKAGE='py-scikit-image@0.14.2'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS='+array +bag +dataframe +delayed ~diagnostics +distributed +yaml'
-declare -xr SPACK_DEPENDENCIES="^py-pandas@1.1.2/$(spack find --format '{hash:7}' py-pandas@1.1.2 % ${SPACK_COMPILER})"
+declare -xr SPACK_VARIANTS=''
+declare -xr SPACK_DEPENDENCIES="^py-dask@2.16.0/$(spack find --format '{hash:7}' py-dask@2.16.0 % ${SPACK_COMPILER}) ^py-matplotlib@3.3.2/$(spack find --format '{hash:7}' py-matplotlib@3.3.2 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -64,6 +68,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'arpack-ng@3.7.0.sh'
+#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'arpack-ng@3.7.0.sh'
 
 sleep 60
