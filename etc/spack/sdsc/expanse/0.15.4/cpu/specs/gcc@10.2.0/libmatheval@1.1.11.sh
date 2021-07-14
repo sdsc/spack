@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=sprng@5.0
+#SBATCH --job-name=libmatheval@1.1.11
 #SBATCH --account=use300
 #SBATCH --partition=compute
 #SBATCH --nodes=1
@@ -34,9 +34,9 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-declare -xr SPACK_PACKAGE='sprng@5.0'
+declare -xr SPACK_PACKAGE='libmatheval@1.1.11'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS='+fortran ~mpi'
+declare -xr SPACK_VARIANTS=''
 declare -xr SPACK_DEPENDENCIES=''
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
@@ -64,6 +64,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'libmatheval@1.1.11.sh'
+#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'libbeagle@3.1.2.sh'
 
 sleep 60
