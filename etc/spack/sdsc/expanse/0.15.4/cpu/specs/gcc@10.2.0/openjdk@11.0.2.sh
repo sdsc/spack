@@ -64,6 +64,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'ant@1.10.7.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'openjdk@1.8.0_222-b10.sh'
 
 sleep 60
