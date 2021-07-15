@@ -1,46 +1,35 @@
-# Copyright 2013-2020 Lawrence Livermore National Security, LLC and other
+# Copyright 2013-2021 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
 
-# ----------------------------------------------------------------------------
-# If you submit this package back to Spack as a pull request,
-# please first remove this boilerplate and all FIXME comments.
-#
-# This is a template package file for Spack.  We've put "FIXME"
-# next to all the things you'll want to change. Once you've handled
-# them, you can save this file and test your package like this:
-#
-#     spack install raxml-ng
-#
-# You can edit this file again by typing:
-#
-#     spack edit raxml-ng
-#
-# See the Spack documentation for more information on packaging.
-# ----------------------------------------------------------------------------
-
 from spack import *
 
 
-class RaxmlNg(Package):
-    """FIXME: Put a proper description of your package here."""
+class RaxmlNg(CMakePackage):
+    """RAxML-NG is a phylogenetic tree inference tool which uses
+    maximum-likelihood (ML) optimality criterion.
 
-    # FIXME: Add a proper url for your package's homepage here.
-    homepage = "https://www.example.com"
-    url      = "https://github.com/amkozlov/raxml-ng"
+    Its search heuristic is based on iteratively performing a series
+    of Subtree Pruning and Regrafting (SPR) moves,
+    which allows to quickly navigate to the best-known ML tree.
+    RAxML-NG is a successor of RAxML (Stamatakis 2014) and leverages
+    the highly optimized likelihood computation implemented in libpll
+    (Flouri et al. 2014)."""
 
-    # FIXME: Add a list of GitHub accounts to
-    # notify when the package is updated.
-    # maintainers = ['github_user1', 'github_user2']
+    homepage = "https://github.com/amkozlov/raxml-ng/wiki"
+    url      = "https://github.com/amkozlov/raxml-ng/archive/1.0.1.tar.gz"
+    git      = "https://github.com/amkozlov/raxml-ng.git"
 
-    # FIXME: Add proper versions and checksums here.
-    # version('1.2.3', '0123456789abcdef0123456789abcdef')
+    version('1.0.2', submodules=True)
+    version('1.0.1', submodules=True)
 
-    # FIXME: Add dependencies if required.
-    # depends_on('foo')
+    variant("mpi", default=True, description="Use MPI")
 
-    def install(self, spec, prefix):
-        # FIXME: Unknown build system
-        make()
-        make('install')
+    depends_on('bison')
+    depends_on('flex')
+    depends_on('gmp')
+    depends_on('mpi', when='+mpi')
+
+    def cmake_args(self):
+        return [self.define_from_variant('USE_MPI', 'mpi')]
