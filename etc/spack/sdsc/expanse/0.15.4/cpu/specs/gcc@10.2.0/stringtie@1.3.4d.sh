@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=star@2.7.9a
+#SBATCH --job-name=stringtie@1.3.4d
 #SBATCH --account=use300
 #SBATCH --partition=debug
 #SBATCH --nodes=1
@@ -34,10 +34,10 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-declare -xr SPACK_PACKAGE='star@2.7.9a'
+declare -xr SPACK_PACKAGE='stringtie@1.3.4d'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
 declare -xr SPACK_VARIANTS=''
-declare -xr SPACK_DEPENDENCIES=''
+declare -xr SPACK_DEPENDENCIES="^samtools@1.10/$(spack find --format '{hash:7}' samtools@1.10 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -64,6 +64,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'stringtie@1.3.4d.sh'
+#sbatch --dependency="afterok:${SLURM_JOB_ID}" ''
 
 sleep 60
