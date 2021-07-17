@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=jellyfish@2.2.7
+#SBATCH --job-name=mafft@7.481
 #SBATCH --account=use300
 #SBATCH --partition=debug
 #SBATCH --nodes=1
@@ -34,7 +34,7 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-declare -xr SPACK_PACKAGE='jellyfish@2.2.7'
+declare -xr SPACK_PACKAGE='mafft@7.481'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
 declare -xr SPACK_VARIANTS=''
 declare -xr SPACK_DEPENDENCIES=''
@@ -64,6 +64,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'mafft@7.481.sh'
+#sbatch --dependency="afterok:${SLURM_JOB_ID}" ''
 
 sleep 60
