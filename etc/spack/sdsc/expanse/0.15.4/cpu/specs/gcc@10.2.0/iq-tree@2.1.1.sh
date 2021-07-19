@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=salmon@1.4.0
+#SBATCH --job-name=iq-tree@2.1.1
 #SBATCH --account=use300
 #SBATCH --partition=debug
 #SBATCH --nodes=1
@@ -34,9 +34,9 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-declare -xr SPACK_PACKAGE='salmon@1.4.0'
+declare -xr SPACK_PACKAGE='iq-tree@2.1.1'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS=''
+declare -xr SPACK_VARIANTS='~lsd2 ~mpi +openmp'
 declare -xr SPACK_DEPENDENCIES="^boost@1.74.0/$(spack find --format '{hash:7}' boost@1.74.0 % ${SPACK_COMPILER} ~mpi)"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
@@ -64,6 +64,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'iq-tree@2.1.1.sh'
+#sbatch --dependency="afterok:${SLURM_JOB_ID}" ''
 
 sleep 60
