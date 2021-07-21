@@ -40,7 +40,7 @@ module list
 declare -xr SPACK_PACKAGE='bcftools@1.10.2'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
 declare -xr SPACK_VARIANTS='~libgsl ~perl-filters'
-declare -xr SPACK_DEPENDENCIES="^htslib@1.10.2/$(spack find --format '{hash:7}' htslib@1.10.2 % ${SPACK_COMPILER}) ^py-matplotlib@3.3.2/$(spack find --format '{hash:7}' py-matplotlib@3.3.2 % ${SPACK_COMPILER})"
+declare -xr SPACK_DEPENDENCIES="^py-matplotlib@3.3.2/$(spack find --format '{hash:7}' py-matplotlib@3.3.2 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -67,6 +67,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-#sbatch --dependency="afterok:${SLURM_JOB_ID}" ''
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'samtools@1.10.sh'
 
 sleep 60

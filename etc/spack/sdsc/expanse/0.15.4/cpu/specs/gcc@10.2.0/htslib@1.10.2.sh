@@ -64,6 +64,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'samtools@1.10.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'bcftools@1.10.2.sh'
 
 sleep 60
