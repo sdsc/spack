@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=trinity@2.12.0
+#SBATCH --job-name=trinity@2.6.6
 #SBATCH --account=use300
 #SBATCH --partition=debug
 #SBATCH --nodes=1
@@ -34,7 +34,7 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-declare -xr SPACK_PACKAGE='trinity@2.12.0'
+declare -xr SPACK_PACKAGE='trinity@2.6.6'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
 declare -xr SPACK_VARIANTS=''
 declare -xr SPACK_DEPENDENCIES="^boost@1.74.0/$(spack find --format '{hash:7}' boost@1.74.0 % ${SPACK_COMPILER} ~mpi)"
