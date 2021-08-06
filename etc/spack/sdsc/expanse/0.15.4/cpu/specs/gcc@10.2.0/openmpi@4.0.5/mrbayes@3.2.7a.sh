@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=exabayes@1.5.1
+#SBATCH --job-name=mrbayes@3.2.7a
 #SBATCH --account=use300
-#SBATCH --partition=compute
+#SBATCH --partition=debug
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=16
 #SBATCH --mem=32G
-#SBATCH --time=01:00:00
+#SBATCH --time=00:30:00
 #SBATCH --output=%x.o%j.%N
 
 declare -xr LOCAL_TIME="$(date +'%Y%m%dT%H%M%S%z')"
@@ -34,10 +34,10 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-declare -xr SPACK_PACKAGE='exabayes@1.5.1'
+declare -xr SPACK_PACKAGE='mrbayes@3.2.7a'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS='+mpi'
-declare -xr SPACK_DEPENDENCIES="^openmpi@4.0.5/$(spack find --format '{hash:7}' openmpi@4.0.5 % ${SPACK_COMPILER})"
+declare -xr SPACK_VARIANTS='+beagle +mpi ~readline'
+declare -xr SPACK_DEPENDENCIES="^libbeagle@3.1.2/$(spack find --format '{hash:7}' libbeagle@3.1.2 % ${SPACK_COMPILER} ~cuda) ^openmpi@4.0.5/$(spack find --format '{hash:7}' openmpi@4.0.5 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -64,6 +64,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'mrbayes@3.2.7a.sh'
+#sbatch --dependency="afterok:${SLURM_JOB_ID}" ''
 
 sleep 60
