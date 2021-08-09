@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=gromacs@2020.4
+#SBATCH --job-name=charmpp@6.8.2
 #SBATCH --account=use300
 #SBATCH --partition=debug
 #SBATCH --nodes=1
@@ -34,10 +34,10 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-declare -xr SPACK_PACKAGE='gromacs@2020.4'
+declare -xr SPACK_PACKAGE='charmpp@6.8.2'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS='~cuda ~double ~double_precision +hwloc +lapack ~mdrun_only +mpi ~nosuffix ~opencl +openmp ~plumed +shared'
-declare -xr SPACK_DEPENDENCIES="^fftw@3.3.8/$(spack find --format '{hash:7}' fftw@3.3.8 % ${SPACK_COMPILER} +mpi ^openmpi@4.0.5) ^openblas@0.3.10/$(spack find --format '{hash:7}' openblas@0.3.10 % ${SPACK_COMPILER} +ilp64 threads=none)"
+declare -xr SPACK_VARIANTS='backend=mpi build-target=charm++ ~cuda ~omp ~papi pmi=none +production ~pthreads +shared +smp ~syncft ~tcp ~tracing'
+declare -xr SPACK_DEPENDENCIES="^openmpi@4.0.5/$(spack find --format '{hash:7}' openmpi@4.0.5 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -50,13 +50,15 @@ spack config get packages
 spack config get repos
 spack config get upstreams
 
-spack spec --long --namespaces --types "${SPACK_SPEC}"
+#spack spec --long --namespaces --types "${SPACK_SPEC}"
+spack spec --long --namespaces --types charmpp@6.8.2 % gcc@10.2.0 backend=mpi build-target=charm++ ~cuda ~omp ~papi pmi=none +production ~pthreads +shared +smp ~syncft ~tcp ~tracing "${SPACK_DEPENDENCIES}"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack concretization failed.'
   exit 1
 fi
 
-time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all "${SPACK_SPEC}"
+#time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all "${SPACK_SPEC}"
+time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all charmpp@6.8.2 % gcc@10.2.0 backend=mpi build-target=charm++ ~cuda ~omp ~papi pmi=none +production ~pthreads +shared +smp ~syncft ~tcp ~tracing "${SPACK_DEPENDENCIES}"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
   exit 1
@@ -64,6 +66,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'charmpp@6.8.2.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'charmpp@6.10.2.sh'
 
 sleep 60
