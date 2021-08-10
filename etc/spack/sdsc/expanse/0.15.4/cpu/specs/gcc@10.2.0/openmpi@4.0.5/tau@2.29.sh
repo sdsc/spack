@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=mpip@3.5
+#SBATCH --job-name=tau@2.29
 #SBATCH --account=use300
 #SBATCH --partition=debug
 #SBATCH --nodes=1
@@ -34,17 +34,10 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-# checking libunwind.h usability... no
-#checking libunwind.h presence... no
-#checking for libunwind.h... no
-#
-#  mpiP on x86_64 platforms requires libunwind.
-#  Please install libunwind and, if necessary, configure mpiP with 
-#  appropriate CFLAGS and LDFLAGS settings.
-declare -xr SPACK_PACKAGE='mpip@3.5'
+declare -xr SPACK_PACKAGE='tau@2.29'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS='~add_shared_target ~bfd ~demangling ~libunwind +mpi_io +mpi_nbc +mpi_rma ~setjmp'
-declare -xr SPACK_DEPENDENCIES="^openmpi@4.0.5/$(spack find --format '{hash:7}' openmpi@4.0.5 % ${SPACK_COMPILER}) ^python@3.8.5/$(spack find --format '{hash:7}' python@3.8.5 % ${SPACK_COMPILER})"
+declare -xr SPACK_VARIANTS='~adios2 +binutils ~comm ~craycnl ~cuda +fortran ~gasnet +io +libdwarf +libelf +libunwind ~likwid +mpi ~ompt ~opari ~openmp +otf2 +papi +pdt ~phase ~ppc64le ~profileparam +pthreads ~python ~scorep ~shmem ~sqlite ~x86_64'
+declare -xr SPACK_DEPENDENCIES="^openmpi@4.0.5/$(spack find --format '{hash:7}' openmpi@4.0.5 % ${SPACK_COMPILER}) ^papi@6.0.0.1/$(spack find --format '{hash:7}' papi@6.0.0.1 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -71,6 +64,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'tau@2.29.sh'
+#sbatch --dependency="afterok:${SLURM_JOB_ID}" ''
 
 sleep 60
