@@ -2,7 +2,7 @@
 
 #SBATCH --job-name=subversion@1.14.0
 #SBATCH --account=use300
-#SBATCH --partition=compute
+#SBATCH --partition=shared
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=16

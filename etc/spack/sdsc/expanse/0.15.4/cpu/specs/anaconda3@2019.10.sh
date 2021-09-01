@@ -64,4 +64,4 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'parallel@20200822.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" ''

@@ -2,7 +2,7 @@
 
 #SBATCH --job-name=gcc@10.2.0
 #SBATCH --account=use300
-#SBATCH --partition=compute
+#SBATCH --partition=shared
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=16
@@ -67,6 +67,6 @@ spack module lmod refresh --delete-tree -y
 
 cd "${SPACK_PACKAGE}"
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'cmake@3.18.2.sh'
+#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'cmake@3.18.2.sh'
 
 sleep 60
