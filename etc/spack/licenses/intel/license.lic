@@ -1,0 +1,31 @@
+#
+# A license is required to use package 'intel'.
+#
+# * If your system is already properly configured for such a license, save this
+#   file UNCHANGED. The system may be configured if:
+#
+#    - A license file is installed in a default location.
+#    - One of the following environment variable(s) is set for you, possibly via
+#      a module file:
+#
+#	INTEL_LICENSE_FILE
+#
+# * Otherwise, depending on the license you have, enter AT THE BEGINNING of
+#   this file:
+#
+#   - the contents of your license file, or
+#   - the address(es) of your license server.
+#
+#   After installation, the following symlink(s) will be added to point to
+#   this Spack-global file (relative to the installation prefix).
+#
+#	Licenses/license.lic
+#	/home/mkandes/cm/shared/apps/spack/0.15.4/cpu/opt/spack/linux-centos8-zen/gcc-8.3.1/intel-20.0.2-vlybp5iyomyecz7syntx2ydohjtcceiv/compilers_and_libraries/linux/bin/intel64/license.lic
+#
+# * For further information on licensing, see:
+#
+#	https://software.intel.com/en-us/articles/intel-license-manager-faq
+#
+# Recap:
+# - You may not need to modify this file at all.
+# - Otherwise, enter your license or server address AT THE BEGINNING.
