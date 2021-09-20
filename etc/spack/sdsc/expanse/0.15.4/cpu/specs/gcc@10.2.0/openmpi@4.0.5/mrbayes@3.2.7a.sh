@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
+# real 38.14
 
 #SBATCH --job-name=mrbayes@3.2.7a
 #SBATCH --account=use300
-#SBATCH --partition=debug
+#SBATCH --partition=shared
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=16
@@ -64,6 +65,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-#sbatch --dependency="afterok:${SLURM_JOB_ID}" ''
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'raxml@8.2.12.sh'
 
 sleep 60

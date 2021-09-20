@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
+# real 114.02
 
 #SBATCH --job-name=relion@3.1.1
 #SBATCH --account=use300
-#SBATCH --partition=debug
+#SBATCH --partition=shared
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=16
@@ -64,6 +65,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-#sbatch --dependency="afterok:${SLURM_JOB_ID}" ''
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'plumed@2.5.5.sh'
 
 sleep 60

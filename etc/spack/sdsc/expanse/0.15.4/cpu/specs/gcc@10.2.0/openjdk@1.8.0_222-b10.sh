@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# real 43.86
 
 #SBATCH --job-name=openjdk@1.8.0_222-b10
 #SBATCH --account=use300

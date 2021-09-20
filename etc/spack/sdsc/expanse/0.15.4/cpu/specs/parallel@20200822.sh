@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# real 7.66
 
 #SBATCH --job-name=parallel@20200822
 #SBATCH --account=use300

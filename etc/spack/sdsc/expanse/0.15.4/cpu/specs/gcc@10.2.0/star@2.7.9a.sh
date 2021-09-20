@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
+# real 41.67
 
 #SBATCH --job-name=star@2.7.9a
 #SBATCH --account=use300
-#SBATCH --partition=debug
+#SBATCH --partition=shared
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=16

@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
+# real 9970.37
 
 #SBATCH --job-name=py-matplotlib@3.3.2
 #SBATCH --account=use300
-#SBATCH --partition=compute
+#SBATCH --partition=shared
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=128
-#SBATCH --mem=248G
+#SBATCH --cpus-per-task=16
+#SBATCH --mem=32G
 #SBATCH --time=04:00:00
 #SBATCH --output=%x.o%j.%N
 

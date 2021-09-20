@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
+# real 2029.96
 
 #SBATCH --job-name=ncl@6.6.2
 #SBATCH --account=use300
-#SBATCH --partition=compute
+#SBATCH --partition=shared
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=16

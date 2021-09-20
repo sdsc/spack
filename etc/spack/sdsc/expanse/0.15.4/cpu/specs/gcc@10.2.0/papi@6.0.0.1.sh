@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# real 26.27
 
 #SBATCH --job-name=papi@6.0.0.1
 #SBATCH --account=use300
@@ -64,6 +65,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-#sbatch --dependency="afterok:${SLURM_JOB_ID}" ''
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'libbeagle@3.1.2.sh'
 
 sleep 60

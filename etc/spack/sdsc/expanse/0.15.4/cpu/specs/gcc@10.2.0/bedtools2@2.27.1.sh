@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
+# real 20.87
 
 #SBATCH --job-name=bedtools2@2.27.1
 #SBATCH --account=use300
-#SBATCH --partition=debug
+#SBATCH --partition=shared
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=16

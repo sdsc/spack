@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
+# real 290.12
 
 #SBATCH --job-name=lammps@20200721
 #SBATCH --account=use300
-#SBATCH --partition=debug
+#SBATCH --partition=shared
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=16
@@ -34,11 +35,14 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
+#==> Error: Detected uninstalled dependencies for python: {'gettext'}
+#==> Error: Cannot proceed with python: 1 uninstalled dependency: gettext
+#ERROR: spack install failed.
+
 declare -xr SPACK_PACKAGE='lammps@20200721'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS='+asphere +body +class2 +colloid +compress +coreshell ~cuda +dipole +exceptions +ffmpeg +granular +jpeg +kim +kokkos +kspace +latte +lib +manybody +mc ~meam +misc +mliap +molecule +mpi +mpiio ~opencl +openmp +opt +peri +png +poems +python +qeq +replica +rigid +shock +snap +spin +srd +user-adios +user-atc +user-awpmd +user-bocs +user-cgsdk +user-colvars +user-diffraction +user-dpd +user-drude +user-eff +user-fep +user-h5md +user-lb +user-manifold +user-meamc +user-mesodpd +user-mesont +user-mgpt +user-misc +user-mofff +user-netcdf ~user-omp +user-phonon +user-plumed +user-ptm +user-qtb +user-reaction +user-reaxc +user-sdpd +user-smd +user-sph +user-tally +user-uef +user-yaff +voronoi'
-
-declare -xr SPACK_DEPENDENCIES="^fftw@3.3.8/$(spack find --format '{hash:7}' fftw@3.3.8 % ${SPACK_COMPILER} +mpi ^openmpi@4.0.5) ^openblas@0.3.10/$(spack find --format '{hash:7}' openblas@0.3.10 % ${SPACK_COMPILER} +ilp64 threads=none)"
+declare -xr SPACK_VARIANTS='+asphere +body +class2 +colloid +compress +coreshell ~cuda +dipole +exceptions +ffmpeg +granular +jpeg +kim +kokkos +kspace +latte +lib +manybody +mc ~meam +misc +mliap +molecule +mpi +mpiio ~opencl +openmp +opt +peri +png +poems ~python +qeq +replica +rigid +shock +snap +spin +srd ~user-adios +user-atc +user-awpmd +user-bocs +user-cgsdk +user-colvars +user-diffraction +user-dpd +user-drude +user-eff +user-fep ~user-h5md +user-lb +user-manifold +user-meamc +user-mesodpd +user-mesont +user-mgpt +user-misc +user-mofff ~user-netcdf ~user-omp +user-phonon ~user-plumed +user-ptm +user-qtb +user-reaction +user-reaxc +user-sdpd +user-smd +user-sph +user-tally +user-uef +user-yaff +voronoi'
+declare -xr SPACK_DEPENDENCIES="^openblas@0.3.10/$(spack find --format '{hash:7}' openblas@0.3.10 % ${SPACK_COMPILER} +ilp64 threads=none) ^fftw@3.3.8/$(spack find --format '{hash:7}' fftw@3.3.8 % ${SPACK_COMPILER} +mpi ^openmpi@4.0.5) ^kokkos@3.1.01/$(spack find --format '{hash:7}' kokkos@3.1.01 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv

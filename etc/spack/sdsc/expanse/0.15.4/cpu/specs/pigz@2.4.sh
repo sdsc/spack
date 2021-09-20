@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# real 3.28
 
 #SBATCH --job-name=pigz@2.4
 #SBATCH --account=use300

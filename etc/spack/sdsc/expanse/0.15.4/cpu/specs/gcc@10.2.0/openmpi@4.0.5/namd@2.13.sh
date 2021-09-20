@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
+# real 47.91
 
 #SBATCH --job-name=namd@2.13
 #SBATCH --account=use300
-#SBATCH --partition=debug
+#SBATCH --partition=shared
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=16

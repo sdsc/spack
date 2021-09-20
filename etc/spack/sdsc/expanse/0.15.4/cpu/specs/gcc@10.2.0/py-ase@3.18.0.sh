@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
+# real 152.41
 
 #SBATCH --job-name=py-ase@3.18.0
 #SBATCH --account=use300
-#SBATCH --partition=debug
+#SBATCH --partition=shared
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=16

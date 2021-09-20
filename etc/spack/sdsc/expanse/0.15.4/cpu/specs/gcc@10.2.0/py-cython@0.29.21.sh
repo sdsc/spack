@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
+# real 144.44
 
 #SBATCH --job-name=py-cython@0.29.21
 #SBATCH --account=use300
-#SBATCH --partition=compute
+#SBATCH --partition=shared
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=16

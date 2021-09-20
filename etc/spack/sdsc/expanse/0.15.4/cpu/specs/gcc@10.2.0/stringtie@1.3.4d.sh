@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
+# real 21.53
 
 #SBATCH --job-name=stringtie@1.3.4d
 #SBATCH --account=use300
-#SBATCH --partition=debug
+#SBATCH --partition=shared
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=16

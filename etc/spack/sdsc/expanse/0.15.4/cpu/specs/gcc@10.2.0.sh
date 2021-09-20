@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# real 1050.25
 
 #SBATCH --job-name=gcc@10.2.0
 #SBATCH --account=use300
@@ -67,6 +68,6 @@ spack module lmod refresh --delete-tree -y
 
 cd "${SPACK_PACKAGE}"
 
-#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'cmake@3.18.2.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'cmake@3.18.2.sh'
 
 sleep 60
