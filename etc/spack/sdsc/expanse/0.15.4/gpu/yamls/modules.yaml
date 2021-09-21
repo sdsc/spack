@@ -1,0 +1,47 @@
+modules:
+  enable::
+    - lmod
+  lmod:
+    core_compilers:
+      - 'gcc@8.3.1'
+    hierarchy:
+      - mpi
+    hash_length: 0
+    blacklist_implicits: true
+    naming_scheme: '{name}/{version}'
+    projections:
+      all: '{name}/{version}'
+    adol-c:
+      suffixes:
+        '+openmp': omp
+    amdblis:
+      suffixes:
+        'threads=openmp': omp
+    fftw:
+      suffixes:
+        '+openmp': omp
+    hypre:
+      suffixes:
+        '+openmp': omp
+    intel:
+      environment:
+        set:
+          INTEL_LICENSE_FILE: 40000@elprado.sdsc.edu:40200@elprado.sdsc.edu
+    intel-mpi:
+      environment:
+        set:
+          INTEL_LICENSE_FILE: 40000@elprado.sdsc.edu:40200@elprado.sdsc.edu
+    kokkos:
+      suffixes:
+        '+openmp': omp
+    openblas:
+      suffixes:
+        'threads=openmp': omp
+    petsc:
+      suffixes:
+        '+complex': complex
+    slepc:
+      suffixes:
+        '^petsc +complex': complex
+    ^python:
+      autoload: 'direct'
