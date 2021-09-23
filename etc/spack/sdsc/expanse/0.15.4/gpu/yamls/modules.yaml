@@ -45,3 +45,7 @@ modules:
         '^petsc +complex': complex
     ^python:
       autoload: 'direct'
+    cuda:
+      environment:
+        prepend_path:
+          LD_LIBRARY_PATH: /cm/local/apps/cuda/libs/current/lib64
