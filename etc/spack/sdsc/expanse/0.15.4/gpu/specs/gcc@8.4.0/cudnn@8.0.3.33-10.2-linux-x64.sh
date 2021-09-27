@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=cuda@10.2.89
+#SBATCH --job-name=cudnn@8.0.3.33-10.2-linux-x64
 #SBATCH --account=use300
 #SBATCH --partition=gpu-debug
 #SBATCH --nodes=1
@@ -35,7 +35,7 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-declare -xr SPACK_PACKAGE='cuda@10.2.89'
+declare -xr SPACK_PACKAGE='cudnn@8.0.3.33-10.2-linux-x64'
 declare -xr SPACK_COMPILER='gcc@8.4.0'
 declare -xr SPACK_VARIANTS=''
 declare -xr SPACK_DEPENDENCIES=''
@@ -65,6 +65,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'cudnn@8.0.3.33-10.2-linux-x64.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'nccl@2.7.8-1.sh'
 
 sleep 60
