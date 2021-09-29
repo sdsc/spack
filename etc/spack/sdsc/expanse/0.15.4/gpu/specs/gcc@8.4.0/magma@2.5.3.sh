@@ -38,7 +38,7 @@ module list
 declare -xr SPACK_PACKAGE='magma@2.5.3'
 declare -xr SPACK_COMPILER='gcc@8.4.0'
 declare -xr SPACK_VARIANTS='+cuda cuda_arch=70'
-declare -xr SPACK_DEPENDENCIES="^cuda@10.2.89/$(spack find --format '{hash:7}' cuda@10.2.89 % ${SPACK_COMPILER})"
+declare -xr SPACK_DEPENDENCIES="^cuda@10.2.89 ^openblas@0.3.10/$(spack find --format '{hash:7}' openblas@0.3.10 % ${SPACK_COMPILER} +ilp64 threads=none)"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -51,13 +51,13 @@ spack config get packages
 spack config get repos
 spack config get upstreams
 
-spack spec --long --namespaces --types magma@2.5.3 % gcc@8.4.0 +cuda cuda_arch=70 +fortran +shared ^cuda@10.2.89
+spack spec --long --namespaces --types magma@2.5.3 % gcc@8.4.0 +cuda cuda_arch=70 +fortran +shared "^cuda@10.2.89 ^openblas@0.3.10/$(spack find --format '{hash:7}' openblas@0.3.10 % ${SPACK_COMPILER} +ilp64 threads=none)"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack concretization failed.'
   exit 1
 fi
 
-time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all magma@2.5.3 % gcc@8.4.0 +cuda cuda_arch=70 +fortran +shared ^cuda@10.2.89
+time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all magma@2.5.3 % gcc@8.4.0 +cuda cuda_arch=70 +fortran +shared "^cuda@10.2.89 ^openblas@0.3.10/$(spack find --format '{hash:7}' openblas@0.3.10 % ${SPACK_COMPILER} +ilp64 threads=none)"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
   exit 1
@@ -65,6 +65,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'gsl@2.5.sh'
+#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'gsl@2.5.sh'
 
 sleep 60
