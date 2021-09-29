@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=py-pycuda@2019.1.2
+#SBATCH --job-name=libbeagle@3.1.2
 #SBATCH --account=use300
 #SBATCH --partition=gpu-debug
 #SBATCH --nodes=1
@@ -35,12 +35,10 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-# ==> Error: Detected uninstalled dependencies for cuda: {'libxml2'}
-#==> Error: Cannot proceed with cuda: 1 uninstalled dependency: libxml2
-declare -xr SPACK_PACKAGE='py-pycuda@2019.1.2'
+declare -xr SPACK_PACKAGE='libbeagle@3.1.2'
 declare -xr SPACK_COMPILER='gcc@8.4.0'
-declare -xr SPACK_VARIANTS=''
-declare -xr SPACK_DEPENDENCIES="^cuda@10.2.89 ^boost@1.74.0/$(spack find --format '{hash:7}' boost@1.74.0 % ${SPACK_COMPILER} ~mpi)"
+declare -xr SPACK_VARIANTS='+cuda cuda_arch=70'
+declare -xr SPACK_DEPENDENCIES="^cuda@10.2.89 ^python@3.8.5/$(spack find --format '{hash:7}' python@3.8.5 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -53,13 +51,13 @@ spack config get packages
 spack config get repos
 spack config get upstreams
 
-spack spec --long --namespaces --types "${SPACK_SPEC}"
+spack spec --long --namespaces --types libbeagle@3.1.2 % gcc@8.4.0 +cuda cuda_arch=70 "^cuda@10.2.89 ^python@3.8.5/$(spack find --format '{hash:7}' python@3.8.5 % ${SPACK_COMPILER})"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack concretization failed.'
   exit 1
 fi
 
-time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all "${SPACK_SPEC}"
+time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all libbeagle@3.1.2 % gcc@8.4.0 +cuda cuda_arch=70 "^cuda@10.2.89 ^python@3.8.5/$(spack find --format '{hash:7}' python@3.8.5 % ${SPACK_COMPILER})"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
   exit 1
@@ -67,6 +65,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'libbeagle@3.1.2.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'beast1@1.8.4.sh'
 
 sleep 60
