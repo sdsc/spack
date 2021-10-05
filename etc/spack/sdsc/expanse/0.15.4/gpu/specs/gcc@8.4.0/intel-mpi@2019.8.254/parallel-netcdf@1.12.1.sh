@@ -38,7 +38,7 @@ module list
 declare -xr SPACK_PACKAGE='parallel-netcdf@1.12.1'
 declare -xr SPACK_COMPILER='gcc@8.4.0'
 declare -xr SPACK_VARIANTS='+cxx +fortran +pic +shared'
-declare -xr SPACK_DEPENDENCIES="^mvapich2@2.3.4/$(spack find --format '{hash:7}' mvapich2@2.3.4 % ${SPACK_COMPILER})"
+declare -xr SPACK_DEPENDENCIES="^intel-mpi@2019.8.254/$(spack find --format '{hash:7}' intel-mpi@2019.8.254 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
