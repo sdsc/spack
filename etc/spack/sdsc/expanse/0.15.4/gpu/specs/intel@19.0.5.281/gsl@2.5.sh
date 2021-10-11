@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=openblas@0.3.10-omp
+#SBATCH --job-name=gsl@2.5
 #SBATCH --account=use300
 #SBATCH --partition=gpu-debug
 #SBATCH --nodes=1
@@ -36,11 +36,11 @@ module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
 declare -xr INTEL_LICENSE_FILE='40000@elprado.sdsc.edu:40200@elprado.sdsc.edu'
-declare -xr SPACK_PACKAGE='openblas@0.3.10'
-declare -xr SPACK_COMPILER='intel@19.1.2.254'
-declare -xr SPACK_VARIANTS='~consistent_fpcsr +ilp64 +pic +shared threads=openmp'
+declare -xr SPACK_PACKAGE='gsl@2.5'
+declare -xr SPACK_COMPILER='intel@19.0.5.281'
+declare -xr SPACK_VARIANTS='~external-cblas'
 declare -xr SPACK_DEPENDENCIES=''
-declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS}"
+declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
 
@@ -66,6 +66,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'netlib-lapack@3.8.0.sh'
+#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'fftw@3.3.8.sh'
 
 sleep 60

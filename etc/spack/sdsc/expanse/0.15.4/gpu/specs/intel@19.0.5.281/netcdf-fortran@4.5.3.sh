@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=openblas@0.3.10
+#SBATCH --job-name=netcdf-fortran@4.5.3
 #SBATCH --account=use300
 #SBATCH --partition=gpu-debug
 #SBATCH --nodes=1
@@ -35,18 +35,12 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-
-#ld: /home/mkandes/cm/shared/apps/spack/0.15.4/gpu/opt/spack/linux-centos8-skylake_avx512/gcc-8.3.1/intel-19.1.2.254-ugebwxc62iwwmer3mloyn2hyaebeawxg/compilers_and_libraries_2020.2.254/linux/bin/intel64/../../lib/LLVMgold.so: error loading plugin: libimf.so: cannot open shared object file: No such file or directory
-#make[1]: *** [Makefile:154: ../libopenblas_skylakex-r0.3.10.so] Error 1
-#make[1]: Leaving directory '/tmp/mkandes/spack-stage/spack-stage-openblas-0.3.10-4ftyenz2z2qoi7r2udito6ksrryyprgb/spack-src/exports'
-#make: *** [Makefile:116: shared] Error 2
-
 declare -xr INTEL_LICENSE_FILE='40000@elprado.sdsc.edu:40200@elprado.sdsc.edu'
-declare -xr SPACK_PACKAGE='openblas@0.3.10'
-declare -xr SPACK_COMPILER='intel@19.1.2.254'
-declare -xr SPACK_VARIANTS='~consistent_fpcsr +ilp64 +pic +shared threads=none'
-declare -xr SPACK_DEPENDENCIES=''
-declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS}"
+declare -xr SPACK_PACKAGE='netcdf-fortran@4.5.3'
+declare -xr SPACK_COMPILER='intel@19.0.5.281'
+declare -xr SPACK_VARIANTS='~doc +pic +shared'
+declare -xr SPACK_DEPENDENCIES="^netcdf-c@4.7.4/$(spack find --format '{hash:7}' netcdf-c@4.7.4 % ${SPACK_COMPILER} ~mpi)"
+declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
 
@@ -72,6 +66,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'openblas@0.3.10-omp.sh'
+#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'py-numpy@1.19.2.sh'
 
 sleep 60

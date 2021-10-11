@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=netlib-lapack@3.8.0
+#SBATCH --job-name=perl@5.30.3
 #SBATCH --account=use300
 #SBATCH --partition=gpu-debug
 #SBATCH --nodes=1
@@ -35,31 +35,10 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-
-#3 errors found in build log:
-#     3     -- The Fortran compiler identification is Intel 19.1.2.20200623
-#     4     -- The C compiler identification is Intel 19.1.2.20200623
-#     5     -- Detecting Fortran compiler ABI info
-#     6     -- Detecting Fortran compiler ABI info - failed
-#     7     -- Check for working Fortran compiler: /home/mkandes/cm/shared/apps/
-#           spack/0.15.4/gpu/lib/spack/env/intel/ifort
-#     8     -- Check for working Fortran compiler: /home/mkandes/cm/shared/apps/
-#           spack/0.15.4/gpu/lib/spack/env/intel/ifort - broken
-#  >> 9     CMake Error at /home/mkandes/cm/shared/apps/spack/0.15.4/gpu/opt/spa
-#           ck/linux-centos8-cascadelake/intel-19.1.2.254/cmake-3.18.2-qtqxuiqm5
-#           iiyzhdwgecwvwm7qt3rz7q5/share/cmake-3.18/Modules/CMakeTestFortranCom
-#           piler.cmake:51 (message):
-#     10      The Fortran compiler
-#     11    
-#     12        "/home/mkandes/cm/shared/apps/spack/0.15.4/gpu/lib/spack/env/int
-#           el/ifort"
-#     13    
-#     14      is not able to compile a simple test program.
-
 declare -xr INTEL_LICENSE_FILE='40000@elprado.sdsc.edu:40200@elprado.sdsc.edu'
-declare -xr SPACK_PACKAGE='netlib-lapack@3.8.0'
-declare -xr SPACK_COMPILER='intel@19.1.2.254'
-declare -xr SPACK_VARIANTS='~external-blas +lapacke +shared ~xblas'
+declare -xr SPACK_PACKAGE='perl@5.30.3'
+declare -xr SPACK_COMPILER='intel@19.0.5.281'
+declare -xr SPACK_VARIANTS='+cpanm +shared +threads'
 declare -xr SPACK_DEPENDENCIES=''
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
@@ -87,6 +66,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'intel-mkl@2020.3.279.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'tcl@8.5.19.sh'
 
 sleep 60

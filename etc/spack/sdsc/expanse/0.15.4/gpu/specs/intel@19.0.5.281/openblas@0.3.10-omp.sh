@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=intel-mkl@2020.3.279
+#SBATCH --job-name=openblas@0.3.10-omp
 #SBATCH --account=use300
 #SBATCH --partition=gpu-debug
 #SBATCH --nodes=1
@@ -36,9 +36,9 @@ module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
 declare -xr INTEL_LICENSE_FILE='40000@elprado.sdsc.edu:40200@elprado.sdsc.edu'
-declare -xr SPACK_PACKAGE='intel-mkl@2020.3.279'
-declare -xr SPACK_COMPILER='intel@19.1.2.254'
-declare -xr SPACK_VARIANTS='+ilp64 +shared threads=none'
+declare -xr SPACK_PACKAGE='openblas@0.3.10'
+declare -xr SPACK_COMPILER='intel@19.0.5.281'
+declare -xr SPACK_VARIANTS='~consistent_fpcsr +ilp64 +pic +shared threads=openmp'
 declare -xr SPACK_DEPENDENCIES=''
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS}"
 
@@ -64,11 +64,8 @@ if [[ "${?}" -ne 0 ]]; then
   exit 1
 fi
 
-spack compiler add --scope site "$(spack location -i ${SPACK_PACKAGE})"
 spack module lmod refresh --delete-tree -y
 
-cd "${SPACK_PACKAGE}"
-
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'intel-mkl@2020.3.279-omp.sh'
+#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'netlib-lapack@3.8.0.sh'
 
 sleep 60

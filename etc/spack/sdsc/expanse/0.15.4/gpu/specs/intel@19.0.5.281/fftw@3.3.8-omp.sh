@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=fftw@3.3.8
+#SBATCH --job-name=fftw@3.3.8-omp
 #SBATCH --account=use300
 #SBATCH --partition=gpu-debug
 #SBATCH --nodes=1
@@ -37,8 +37,8 @@ module list
 
 declare -xr INTEL_LICENSE_FILE='40000@elprado.sdsc.edu:40200@elprado.sdsc.edu'
 declare -xr SPACK_PACKAGE='fftw@3.3.8'
-declare -xr SPACK_COMPILER='intel@19.1.2.254'
-declare -xr SPACK_VARIANTS='~mpi ~openmp ~pfft_patches'
+declare -xr SPACK_COMPILER='intel@19.0.5.281'
+declare -xr SPACK_VARIANTS='~mpi +openmp ~pfft_patches'
 declare -xr SPACK_DEPENDENCIES=''
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
@@ -66,6 +66,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'fftw@3.3.8-omp.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'hdf5@1.10.7.sh'
 
 sleep 60

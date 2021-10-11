@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=hdf5@1.10.7
+#SBATCH --job-name=netcdf-cxx4@4.3.1
 #SBATCH --account=use300
-#SBATCH --partition=gpu-debug
+#SBATCH --partition=gpu-shared
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=10
 #SBATCH --mem=93G
 #SBATCH --gpus=1
-#SBATCH --time=00:30:00
+#SBATCH --time=02:00:00
 #SBATCH --output=%x.o%j.%N
 
 declare -xr LOCAL_TIME="$(date +'%Y%m%dT%H%M%S%z')"
@@ -36,10 +36,10 @@ module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
 declare -xr INTEL_LICENSE_FILE='40000@elprado.sdsc.edu:40200@elprado.sdsc.edu'
-declare -xr SPACK_PACKAGE='hdf5@1.10.7'
-declare -xr SPACK_COMPILER='intel@19.1.2.254'
-declare -xr SPACK_VARIANTS='+cxx ~debug +fortran +hl +java ~mpi +pic +shared +szip ~threadsafe'
-declare -xr SPACK_DEPENDENCIES=''
+declare -xr SPACK_PACKAGE='netcdf-cxx4@4.3.1'
+declare -xr SPACK_COMPILER='intel@19.0.5.281'
+declare -xr SPACK_VARIANTS='~doxygen +pic +shared +static' 
+declare -xr SPACK_DEPENDENCIES="^netcdf-c@4.7.4/$(spack find --format '{hash:7}' netcdf-c@4.7.4 % ${SPACK_COMPILER} ~mpi)"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -66,6 +66,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'netcdf-c@4.7.4.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'netcdf-fortran@4.5.3.sh'
 
 sleep 60

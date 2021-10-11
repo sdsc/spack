@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=intel@19.1.2.254
+#SBATCH --job-name=cmake@3.18.2
 #SBATCH --account=use300
 #SBATCH --partition=gpu-debug
 #SBATCH --nodes=1
@@ -36,9 +36,9 @@ module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
 declare -xr INTEL_LICENSE_FILE='40000@elprado.sdsc.edu:40200@elprado.sdsc.edu'
-declare -xr SPACK_PACKAGE='intel@19.1.2.254'
-declare -xr SPACK_COMPILER='gcc@8.3.1'
-declare -xr SPACK_VARIANTS=''
+declare -xr SPACK_PACKAGE='cmake@3.18.2'
+declare -xr SPACK_COMPILER='intel@19.0.5.281'
+declare -xr SPACK_VARIANTS='~doc +ncurses +openssl +ownlibs ~qt'
 declare -xr SPACK_DEPENDENCIES=''
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
@@ -64,11 +64,8 @@ if [[ "${?}" -ne 0 ]]; then
   exit 1
 fi
 
-spack compiler add --scope site "$(spack location -i ${SPACK_PACKAGE})"
 spack module lmod refresh --delete-tree -y
 
-cd "${SPACK_PACKAGE}"
-
-#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'cmake@3.18.2.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'perl@5.30.3.sh'
 
 sleep 60

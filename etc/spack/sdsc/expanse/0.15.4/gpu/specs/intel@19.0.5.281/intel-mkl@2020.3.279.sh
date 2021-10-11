@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=netcdf-cxx4@4.3.1
+#SBATCH --job-name=intel-mkl@2020.3.279
 #SBATCH --account=use300
 #SBATCH --partition=gpu-debug
 #SBATCH --nodes=1
@@ -36,11 +36,11 @@ module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
 declare -xr INTEL_LICENSE_FILE='40000@elprado.sdsc.edu:40200@elprado.sdsc.edu'
-declare -xr SPACK_PACKAGE='netcdf-cxx4@4.3.1'
-declare -xr SPACK_COMPILER='intel@19.1.2.254'
-declare -xr SPACK_VARIANTS='~doxygen +pic +shared +static' 
-declare -xr SPACK_DEPENDENCIES="^netcdf-c@4.7.4/$(spack find --format '{hash:7}' netcdf-c@4.7.4 % ${SPACK_COMPILER} ~mpi)"
-declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
+declare -xr SPACK_PACKAGE='intel-mkl@2020.3.279'
+declare -xr SPACK_COMPILER='intel@19.0.5.281'
+declare -xr SPACK_VARIANTS='+ilp64 +shared threads=none'
+declare -xr SPACK_DEPENDENCIES=''
+declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS}"
 
 printenv
 
@@ -64,8 +64,11 @@ if [[ "${?}" -ne 0 ]]; then
   exit 1
 fi
 
+spack compiler add --scope site "$(spack location -i ${SPACK_PACKAGE})"
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'netcdf-fortran@4.5.3.sh'
+cd "${SPACK_PACKAGE}"
+
+#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'intel-mkl@2020.3.279-omp.sh'
 
 sleep 60

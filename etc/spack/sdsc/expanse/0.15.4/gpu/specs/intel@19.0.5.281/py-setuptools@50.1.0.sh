@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=cudnn@8.0.3.33-10.2-linux-x64
+#SBATCH --job-name=py-setuptools@50.1.0
 #SBATCH --account=use300
 #SBATCH --partition=gpu-debug
 #SBATCH --nodes=1
@@ -36,10 +36,10 @@ module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
 declare -xr INTEL_LICENSE_FILE='40000@elprado.sdsc.edu:40200@elprado.sdsc.edu'
-declare -xr SPACK_PACKAGE='cudnn@8.0.3.33-10.2-linux-x64'
-declare -xr SPACK_COMPILER='intel@19.1.2.254'
+declare -xr SPACK_PACKAGE='py-setuptools@50.1.0'
+declare -xr SPACK_COMPILER='intel@19.0.5.281'
 declare -xr SPACK_VARIANTS=''
-declare -xr SPACK_DEPENDENCIES=''
+declare -xr SPACK_DEPENDENCIES="^python@3.8.5/$(spack find --format '{hash:7}' python@3.8.5 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -66,6 +66,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'nccl@2.7.8-1.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'py-pip@20.2.sh'
 
 sleep 60

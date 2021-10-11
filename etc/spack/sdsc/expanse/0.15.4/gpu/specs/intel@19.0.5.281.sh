@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=magma@2.5.3
+#SBATCH --job-name=intel@19.0.5.281
 #SBATCH --account=use300
-#SBATCH --partition=gpu-debug
+#SBATCH --partition=gpu-shared
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=10
 #SBATCH --mem=93G
 #SBATCH --gpus=1
-#SBATCH --time=00:30:00
+#SBATCH --time=01:00:00
 #SBATCH --output=%x.o%j.%N
 
 declare -xr LOCAL_TIME="$(date +'%Y%m%dT%H%M%S%z')"
@@ -36,10 +36,10 @@ module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
 declare -xr INTEL_LICENSE_FILE='40000@elprado.sdsc.edu:40200@elprado.sdsc.edu'
-declare -xr SPACK_PACKAGE='magma@2.5.3'
-declare -xr SPACK_COMPILER='intel@19.1.2.254'
-declare -xr SPACK_VARIANTS='+cuda cuda_arch=70'
-declare -xr SPACK_DEPENDENCIES="^cuda@10.2.89 ^intel-mkl@2020.3.279/$(spack find --format '{hash:7}' intel-mkl@2020.3.279 % ${SPACK_COMPILER} +ilp64 threads=none)"
+declare -xr SPACK_PACKAGE='intel@19.0.5.281'
+declare -xr SPACK_COMPILER='gcc@8.3.1'
+declare -xr SPACK_VARIANTS=''
+declare -xr SPACK_DEPENDENCIES=''
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -52,20 +52,23 @@ spack config get packages
 spack config get repos
 spack config get upstreams
 
-spack spec --long --namespaces --types magma@2.5.3 % intel@19.1.2.254 +cuda cuda_arch=70 +fortran +shared "^cuda@10.2.89 ^intel-mkl@2020.3.279/$(spack find --format '{hash:7}' intel-mkl@2020.3.279 % ${SPACK_COMPILER} +ilp64 threads=none)"
+spack spec --long --namespaces --types "${SPACK_SPEC}"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack concretization failed.'
   exit 1
 fi
 
-time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all magma@2.5.3 % intel@19.1.2.254 +cuda cuda_arch=70 +fortran +shared "^cuda@10.2.89 ^intel-mkl@2020.3.279/$(spack find --format '{hash:7}' intel-mkl@2020.3.279 % ${SPACK_COMPILER} +ilp64 threads=none)"
+time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all "${SPACK_SPEC}"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
   exit 1
 fi
 
+spack compiler add --scope site "$(spack location -i ${SPACK_PACKAGE})"
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'gsl@2.5.sh'
+cd "${SPACK_PACKAGE}"
+
+#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'cuda@10.2.89.sh'
 
 sleep 60

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=python@3.8.5
+#SBATCH --job-name=sqlite@3.33.0
 #SBATCH --account=use300
 #SBATCH --partition=gpu-debug
 #SBATCH --nodes=1
@@ -36,11 +36,10 @@ module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
 declare -xr INTEL_LICENSE_FILE='40000@elprado.sdsc.edu:40200@elprado.sdsc.edu'
-declare -xr SPACK_PACKAGE='python@3.8.5'
-declare -xr SPACK_COMPILER='intel@19.1.2.254'
-# set ~libxml2 due to https://github.com/spack/spack/issues/13637
-declare -xr SPACK_VARIANTS='+bz2 +ctypes +dbm ~debug ~libxml2 +lzma ~nis +optimizations +pic +pyexpat +pythoncmd +readline +shared +sqlite3 +ssl ~tix ~tkinter ~ucs4 +uuid +zlib'
-declare -xr SPACK_DEPENDENCIES="^sqlite@3.33.0/$(spack find --format '{hash:7}' sqlite@3.33.0 % ${SPACK_COMPILER} +functions+rtree)"
+declare -xr SPACK_PACKAGE='sqlite@3.33.0'
+declare -xr SPACK_COMPILER='intel@19.0.5.281'
+declare -xr SPACK_VARIANTS='+column_metadata +fts +functions +rtree'
+declare -xr SPACK_DEPENDENCIES=''
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -67,6 +66,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'py-setuptools@50.1.0.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'python@3.8.5.sh'
 
 sleep 60
