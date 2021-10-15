@@ -39,7 +39,7 @@ declare -xr INTEL_LICENSE_FILE='40000@elprado.sdsc.edu:40200@elprado.sdsc.edu'
 declare -xr SPACK_PACKAGE='fftw@3.3.8'
 declare -xr SPACK_COMPILER='intel@19.0.5.281'
 declare -xr SPACK_VARIANTS='~mpi +openmp ~pfft_patches'
-declare -xr SPACK_DEPENDENCIES=''
+declare -xr SPACK_DEPENDENCIES='cflags=-gcc-sys'
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -66,6 +66,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'hdf5@1.10.7.sh'
+#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'hdf5@1.10.7.sh'
 
 sleep 60

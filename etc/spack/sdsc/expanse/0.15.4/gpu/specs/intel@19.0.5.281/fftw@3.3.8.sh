@@ -35,11 +35,37 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
+# THE ISSUE BELOW was resolved by appending cflags=-gcc-sys
+# https://www.intel.com/content/www/us/en/develop/documentation/cpp-compiler-developer-guide-and-reference/top/compiler-reference/compiler-options/compiler-option-details/preprocessor-options/gcc-gcc-sys.html
+#
+#==> Installing fftw
+#==> No binary for fftw found: installing from source
+#==> Using cached archive: /home/mkandes/cm/shared/apps/spack/0.15.4/gpu/var/spack/cache/_source-cache/archive/61/6113262f6e92c5bd474f2875fa1b01054c4ad5040f6b0da7c03c
+#98821d9ae303.tar.gz
+#==> fftw: Executing phase: 'autoreconf'
+#==> fftw: Executing phase: 'configure'
+#==> Error: ProcessError: Command exited with status 1:
+#    '../configure' '--prefix=/home/mkandes/cm/shared/apps/spack/0.15.4/gpu/opt/spack/linux-centos8-cascadelake/intel-19.0.5.281/fftw-3.3.8-rg4e3pvpzhhu7rvmlihgeechop
+#225mae' '--enable-shared' '--enable-threads' '--enable-sse2' '--enable-avx' '--enable-avx2' '--enable-avx512' '--disable-avx-128-fma' '--disable-kcvi' '--disable-vsx
+#' '--disable-neon' '--enable-fma'
+#
+#1 error found in build log:
+#     182    checking for ptrdiff_t... no
+#     183    checking for uintptr_t... no
+#     184    checking size of void *... 0
+#     185    checking size of float... 0
+#     186    checking size of double... 0
+#     187    checking size of fftw_r2r_kind... 0
+#  >> 188    configure: error: sizeof(fftw_r2r_kind) test failed
+#
+#See build log for details:
+#  /tmp/mkandes/spack-stage/spack-stage-fftw-3.3.8-rg4e3pvpzhhu7rvmlihgeechop225mae/spack-build-out.txt
+
 declare -xr INTEL_LICENSE_FILE='40000@elprado.sdsc.edu:40200@elprado.sdsc.edu'
 declare -xr SPACK_PACKAGE='fftw@3.3.8'
 declare -xr SPACK_COMPILER='intel@19.0.5.281'
 declare -xr SPACK_VARIANTS='~mpi ~openmp ~pfft_patches'
-declare -xr SPACK_DEPENDENCIES=''
+declare -xr SPACK_DEPENDENCIES='cflags=-gcc-sys'
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
