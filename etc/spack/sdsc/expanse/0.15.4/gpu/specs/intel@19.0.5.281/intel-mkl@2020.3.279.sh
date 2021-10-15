@@ -69,6 +69,6 @@ spack module lmod refresh --delete-tree -y
 
 cd "${SPACK_PACKAGE}"
 
-#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'intel-mkl@2020.3.279-omp.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'intel-mkl@2020.3.279-omp.sh'
 
 sleep 60

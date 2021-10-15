@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# real 6795.46
 
 #SBATCH --job-name=intel@19.0.5.281
 #SBATCH --account=use300
@@ -8,7 +9,7 @@
 #SBATCH --cpus-per-task=10
 #SBATCH --mem=93G
 #SBATCH --gpus=1
-#SBATCH --time=01:00:00
+#SBATCH --time=03:00:00
 #SBATCH --output=%x.o%j.%N
 
 declare -xr LOCAL_TIME="$(date +'%Y%m%dT%H%M%S%z')"
@@ -69,6 +70,6 @@ spack module lmod refresh --delete-tree -y
 
 cd "${SPACK_PACKAGE}"
 
-#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'cuda@10.2.89.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'cmake@3.18.2.sh'
 
 sleep 60

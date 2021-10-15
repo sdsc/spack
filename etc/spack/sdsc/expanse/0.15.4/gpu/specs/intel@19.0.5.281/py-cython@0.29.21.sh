@@ -66,6 +66,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'py-joblib@0.14.0.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'cuda@10.2.89.sh'
 
 sleep 60
