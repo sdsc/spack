@@ -3,7 +3,7 @@ packages:
     externals:
       - spec: 'lustre@2.12.5 % gcc@8.4.0 arch=linux-centos8-skylake_avx512'
         prefix: /usr
-      - spec: 'lustre@2.12.5 % intel@19.1.2.254 arch=linux-centos8-cascadelake'
+      - spec: 'lustre@2.12.5 % intel@19.0.5.281 arch=linux-centos8-cascadelake'
         prefix: /usr
     buildable: false
   openssl:
@@ -12,21 +12,21 @@ packages:
         prefix: /usr
       - spec: 'openssl@1.1.1c % gcc@8.4.0 arch=linux-centos8-skylake_avx512'
         prefix: /usr
-      - spec: 'openssl@1.1.1c % intel@19.1.2.254 arch=linux-centos8-cascadelake'
+      - spec: 'openssl@1.1.1c % intel@19.0.5.281 arch=linux-centos8-cascadelake'
         prefix: /usr
     buildable: false
   rdma-core:
     externals:
       - spec: 'rdma-core@47 % gcc@8.4.0 arch=linux-centos8-skylake_avx512'
         prefix: /usr
-      - spec: 'rdma-core@47 % intel@19.1.2.254 arch=linux-centos8-cascadelake'
+      - spec: 'rdma-core@47 % intel@19.0.5.281 arch=linux-centos8-cascadelake'
         prefix: /usr
     buildable: false
   slurm:
     externals:
       - spec: 'slurm@20.02.3 % gcc@8.4.0 arch=linux-centos8-skylake_avx512'
         prefix: /cm/shared/apps/slurm/20.02.3
-      - spec: 'slurm@20.02.3 % intel@19.1.2.254 arch=linux-centos8-cascadelake'
+      - spec: 'slurm@20.02.3 % intel@19.0.5.281 arch=linux-centos8-cascadelake'
         prefix: /cm/shared/apps/slurm/20.02.3
     buildable: false
   gaussian:
