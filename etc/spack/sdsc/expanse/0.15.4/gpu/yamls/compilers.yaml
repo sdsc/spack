@@ -40,11 +40,13 @@ compilers:
       f77: /home/mkandes/cm/shared/apps/spack/0.15.4/gpu/opt/spack/linux-centos8-skylake_avx512/gcc-8.3.1/intel-19.0.5.281-tixmhivyuws4oztggwzc27bifd57z3dw/bin/ifort
       fc: /home/mkandes/cm/shared/apps/spack/0.15.4/gpu/opt/spack/linux-centos8-skylake_avx512/gcc-8.3.1/intel-19.0.5.281-tixmhivyuws4oztggwzc27bifd57z3dw/bin/ifort
     flags:
-      cflags: -O2 -march=cascadelake -gcc-sys
-      cxxflags: -O2 -march=cascadelake -gcc-sys
-      fflags: -O2 -march=cascadelake -gcc-sys
+      cflags: -O2 -march=cascadelake
+      cxxflags: -O2 -march=cascadelake
+      fflags: -O2 -march=cascadelake
     operating_system: centos8
     target: x86_64
     modules: []
-    environment: {}
+    environment:
+      set:
+        INTEL_LICENSE_FILE: 40000@elprado.sdsc.edu:40200@elprado.sdsc.edu
     extra_rpaths: []
