@@ -52,13 +52,13 @@ spack config get repos
 spack config get upstreams
 
 #==> Error: invalid values for variant "ch3_rank_bits" in package "mvapich2": ['32 ~cuda ~debug file_systems=lustre process_managers=slurm +regcache threads=multiple +wrapperrpath ^slurm@20.02.3 ^rdma-core@47']
-spack spec --long --namespaces --types mvapich2@2.3.4 % gcc@8.4.0 ~alloca ch3_rank_bits=32 +cuda ~debug fabrics=mrail file_systems=lustre process_managers=slurm +regcache threads=multiple +wrapperrpath ^slurm@20.02.3 ^rdma-core@47 ^cuda@10.2.89
+spack spec --long --namespaces --types mvapich2@2.3.4 % gcc@8.4.0 ~alloca ch3_rank_bits=32 +cuda ~debug fabrics=mrail file_systems=lustre process_managers=auto +regcache threads=multiple +wrapperrpath ^rdma-core@47 ^cuda@10.2.89 # ^slurm@20.02.3
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack concretization failed.'
   exit 1
 fi
 
-time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all mvapich2@2.3.4 % gcc@8.4.0 ~alloca ch3_rank_bits=32 +cuda ~debug fabrics=mrail file_systems=lustre process_managers=slurm +regcache threads=multiple +wrapperrpath ^slurm@20.02.3 ^rdma-core@47 ^cuda@10.2.89
+time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all mvapich2@2.3.4 % gcc@8.4.0 ~alloca ch3_rank_bits=32 +cuda ~debug fabrics=mrail file_systems=lustre process_managers=auto +regcache threads=multiple +wrapperrpath ^rdma-core@47 ^cuda@10.2.89 # ^slurm@20.02.3
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
   exit 1
@@ -68,6 +68,6 @@ spack module lmod refresh --delete-tree -y
 
 cd "${SPACK_PACKAGE}"
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'netlib-scalapack@2.1.0.sh'
+#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'netlib-scalapack@2.1.0.sh'
 
 sleep 60

@@ -35,8 +35,6 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-# ==> Error: Detected uninstalled dependencies for cuda: {'libxml2'}
-#==> Error: Cannot proceed with cuda: 1 uninstalled dependency: libxml2
 declare -xr SPACK_PACKAGE='py-pycuda@2019.1.2'
 declare -xr SPACK_COMPILER='gcc@8.4.0'
 declare -xr SPACK_VARIANTS=''
