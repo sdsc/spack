@@ -8,8 +8,8 @@
 /var/spack/repos/*/index.yaml
 /var/spack/repos/*/lock
 /opt
-# Ignore everything in /etc/spack except /etc/spack/defaults
-/etc/spack/*
+# Ignore everything in #/etc/spack/* except /etc/spack/defaults
+#/etc/spack/*
 !/etc/spack/defaults
 /share/spack/modules
 /share/spack/lmod
