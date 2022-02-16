@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=anaconda3@2019.10
+#SBATCH --job-name=anaconda3@2021.05
 #SBATCH --account=use300
 #SBATCH --partition=compute
 #SBATCH --nodes=1
@@ -34,7 +34,7 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-declare -xr SPACK_PACKAGE='anaconda3@2019.10'
+declare -xr SPACK_PACKAGE='anaconda3@2021.05'
 declare -xr SPACK_COMPILER='gcc@8.3.1'
 declare -xr SPACK_VARIANTS=''
 declare -xr SPACK_DEPENDENCIES=''
@@ -64,4 +64,4 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" ''
+#sbatch --dependency="afterok:${SLURM_JOB_ID}" ''
