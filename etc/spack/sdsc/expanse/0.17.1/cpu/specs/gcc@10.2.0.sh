@@ -37,7 +37,7 @@ module list
 
 declare -xr SPACK_PACKAGE='gcc@10.2.0'
 declare -xr SPACK_COMPILER='gcc@8.3.1'
-declare -xr SPACK_VARIANTS='~binutils ~bootstrap ~nvptx ~piclibs ~strip'
+declare -xr SPACK_VARIANTS='~binutils ~bootstrap ~graphite ~nvptx ~piclibs ~strip'
 declare -xr SPACK_DEPENDENCIES=''
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
@@ -68,6 +68,6 @@ spack module lmod refresh --delete-tree -y
 
 cd "${SPACK_PACKAGE}"
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'cmake@3.18.2.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'cmake@3.21.4.sh'
 
 sleep 60
