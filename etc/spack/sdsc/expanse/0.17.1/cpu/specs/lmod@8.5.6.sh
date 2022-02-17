@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
-# real 202.51
+# real 2009.86
 
-#SBATCH --job-name=mercurial@5.3
+#SBATCH --job-name=lmod@8.5.6
 #SBATCH --account=use300
 #SBATCH --partition=shared
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=16
 #SBATCH --mem=32G
-#SBATCH --time=00:30:00
+#SBATCH --time=01:00:00
 #SBATCH --output=%x.o%j.%N
 
 declare -xr LOCAL_TIME="$(date +'%Y%m%dT%H%M%S%z')"
@@ -35,7 +35,7 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-declare -xr SPACK_PACKAGE='mercurial@5.3'
+declare -xr SPACK_PACKAGE='lmod@8.5.6'
 declare -xr SPACK_COMPILER='gcc@8.3.1'
 declare -xr SPACK_VARIANTS=''
 declare -xr SPACK_DEPENDENCIES=''
@@ -63,8 +63,13 @@ if [[ "${?}" -ne 0 ]]; then
   exit 1
 fi
 
-spack module lmod refresh --delete-tree -y
+. "$(spack location -i ${SPACK_PACKAGE})/lmod/lmod/init/bash"
+spack -d module lmod refresh --delete-tree -y
+. "${SPACK_ROOT}/share/spack/setup-env.sh"
+module unuse "${SPACK_ROOT}/share/spack/modules/linux-centos8-zen"
+module unuse "${SPACK_ROOT}/share/spack/modules/linux-centos8-zen2"
+module use "${SPACK_ROOT}/share/spack/lmod/linux-centos8-x86_64/Core"
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'aria2@1.35.0.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'parallel@20210922.sh'
 
 sleep 60
