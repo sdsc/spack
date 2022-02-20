@@ -16,7 +16,7 @@ declare -xir UNIX_TIME="$(date +'%s')"
 
 declare -xr SYSTEM_NAME='expanse'
 
-declare -xr SPACK_VERSION='0.15.4'
+declare -xr SPACK_VERSION='0.17.1'
 declare -xr SPACK_INSTANCE_NAME='cpu'
 declare -xr SPACK_INSTANCE_DIR="${HOME}/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}"
 
@@ -38,7 +38,7 @@ module list
 declare -xr SPACK_PACKAGE='ant@1.10.7'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
 declare -xr SPACK_VARIANTS=''
-declare -xr SPACK_DEPENDENCIES="^openjdk@11.0.2/$(spack find --format '{hash:7}' openjdk@11.0.2 % ${SPACK_COMPILER})"
+declare -xr SPACK_DEPENDENCIES="^openjdk@11.0.12_7/$(spack find --format '{hash:7}' openjdk@11.0.12_7 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -65,6 +65,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'ffmpeg@4.2.2.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'ffmpeg@4.3.2.sh'
 
 sleep 60

@@ -16,7 +16,7 @@ declare -xir UNIX_TIME="$(date +'%s')"
 
 declare -xr SYSTEM_NAME='expanse'
 
-declare -xr SPACK_VERSION='0.15.4'
+declare -xr SPACK_VERSION='0.17.1'
 declare -xr SPACK_INSTANCE_NAME='cpu'
 declare -xr SPACK_INSTANCE_DIR="${HOME}/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}"
 
@@ -38,7 +38,7 @@ module list
 declare -xr SPACK_PACKAGE='netcdf-fortran@4.5.3'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
 declare -xr SPACK_VARIANTS='~doc +pic +shared'
-declare -xr SPACK_DEPENDENCIES="^netcdf-c@4.7.4/$(spack find --format '{hash:7}' netcdf-c@4.7.4 % ${SPACK_COMPILER} ~mpi)"
+declare -xr SPACK_DEPENDENCIES="^netcdf-c@4.8.1/$(spack find --format '{hash:7}' netcdf-c@4.8.1 % ${SPACK_COMPILER} ~mpi)"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv

@@ -16,7 +16,7 @@ declare -xir UNIX_TIME="$(date +'%s')"
 
 declare -xr SYSTEM_NAME='expanse'
 
-declare -xr SPACK_VERSION='0.15.4'
+declare -xr SPACK_VERSION='0.17.1'
 declare -xr SPACK_INSTANCE_NAME='cpu'
 declare -xr SPACK_INSTANCE_DIR="${HOME}/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}"
 
@@ -37,8 +37,9 @@ module list
 
 declare -xr SPACK_PACKAGE='gdal@2.4.4'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS='~armadillo ~cfitsio ~crypto ~cryptopp ~curl ~expat +geos ~gif ~grib ~hdf4 +hdf5 ~jasper ~java +jpeg ~kea ~libiconv ~libkml +liblzma +libtool +libz ~mdb +netcdf ~odbc ~opencl ~openjpeg ~pcre ~perl ~pg +png ~poppler +proj +python +qhull ~sosi +sqlite3 ~xerces ~xml2 ~zstd'
-declare -xr SPACK_DEPENDENCIES="^geos@3.8.1/$(spack find --format '{hash:7}' geos@3.8.1 % ${SPACK_COMPILER} +python) ^openblas@0.3.10/$(spack find --format '{hash:7}' openblas@0.3.10 % ${SPACK_COMPILER} +ilp64 threads=none) ^netcdf-c@4.7.4/$(spack find --format '{hash:7}' netcdf-c@4.7.4 % ${SPACK_COMPILER} ~mpi) ^libgeotiff@1.4.3"
+declare -xr SPACK_VARIANTS='~armadillo ~cfitsio ~crypto ~cryptopp ~curl ~expat +geos ~gif ~grib ~hdf4 +hdf5 ~java +jpeg ~kea ~libiconv ~libkml +liblzma +libtool +libz ~mdb +netcdf ~odbc ~opencl ~openjpeg ~pcre ~perl ~pg +png ~poppler +proj +python ~qhull ~sosi +sqlite3 ~xerces ~xml2'
+declare -xr SPACK_DEPENDENCIES="^geos@3.9.1/$(spack find --format '{hash:7}' geos@3.9.1 % ${SPACK_COMPILER}) ^openblas@0.3.18/$(spack find --format '{hash:7}' openblas@0.3.18 % ${SPACK_COMPILER} +ilp64 threads=none) ^netcdf-c@4.8.1/$(spack find --format '{hash:7}' netcdf-c@4.8.1 % ${SPACK_COMPILER} ~mpi)"
+#^libgeotiff@1.4.3"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -65,6 +66,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'ncl@6.6.2.sh'
+#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'ncl@6.6.2.sh'
 
 sleep 60

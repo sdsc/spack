@@ -16,7 +16,7 @@ declare -xir UNIX_TIME="$(date +'%s')"
 
 declare -xr SYSTEM_NAME='expanse'
 
-declare -xr SPACK_VERSION='0.15.4'
+declare -xr SPACK_VERSION='0.17.1'
 declare -xr SPACK_INSTANCE_NAME='cpu'
 declare -xr SPACK_INSTANCE_DIR="${HOME}/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}"
 
@@ -43,16 +43,16 @@ module list
 # ==> Error: Cannot proceed with tar: 1 uninstalled dependency: libiconv
 declare -xr SPACK_PACKAGE='ncl@6.6.2'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS='~gdal ~hdf4 +openmp +triangle +udunits2'
-declare -xr SPACK_DEPENDENCIES="^esmf@7.1.0r/$(spack find --format '{hash:7}' esmf@7.1.0r % ${SPACK_COMPILER} ~mpi) ^python@3.8.5/$(spack find --format '{hash:7}' python@3.8.5 % ${SPACK_COMPILER})"
+declare -xr SPACK_VARIANTS='+gdal ~hdf4 +openmp +triangle +udunits2'
+declare -xr SPACK_DEPENDENCIES="^gdal@2.4.4/$(spack find --format '{hash:7}' gdal@2.4.4 % ${SPACK_COMPILER}) ^esmf@8.1.1/$(spack find --format '{hash:7}' esmf@8.1.1 % ${SPACK_COMPILER} ~mpi) ^python@3.8.12/$(spack find --format '{hash:7}' python@3.8.12 % ${SPACK_COMPILER})"
 
 #"^netcdf-c@4.7.4/$(spack find --format '{hash:7}' netcdf-c@4.7.4 % ${SPACK_COMPILER} ~mpi)"
 
 #"^hdf5@1.10.7/$(spack find --format '{hash:7}' hdf5@1.10.7 % ${SPACK_COMPILER} ~mpi)"
 
-#"^gdal@2.4.4/$(spack find --format '{hash:7}' gdal@2.4.4 % ${SPACK_COMPILER}) ^esmf@7.1.0r/$(spack find --format '{hash:7}' esmf@7.1.0r % ${SPACK_COMPILER} ~mpi)"
+#"^gdal@2.4.4/$(spack find --format '{hash:7}' gdal@2.4.4 % ${SPACK_COMPILER}) ^esmf@8.1.1/$(spack find --format '{hash:7}' esmf@8.1.1 % ${SPACK_COMPILER} ~mpi)"
 
-#"^netcdf-c@4.7.4/$(spack find --format '{hash:7}' netcdf-c@4.7.4 % ${SPACK_COMPILER} ~mpi) ^esmf@7.1.0r/$(spack find --format '{hash:7}' esmf@7.1.0r % ${SPACK_COMPILER} ~mpi) ^python@3.8.5/$(spack find --format '{hash:7}' python@3.8.5 % ${SPACK_COMPILER})"
+#"^netcdf-c@4.7.4/$(spack find --format '{hash:7}' netcdf-c@4.7.4 % ${SPACK_COMPILER} ~mpi) ^esmf@8.1.1/$(spack find --format '{hash:7}' esmf@8.1.1 % ${SPACK_COMPILER} ~mpi) ^python@3.8.12/$(spack find --format '{hash:7}' python@3.8.12 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv

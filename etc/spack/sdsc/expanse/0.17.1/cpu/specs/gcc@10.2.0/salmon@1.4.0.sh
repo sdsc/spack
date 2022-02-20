@@ -16,7 +16,7 @@ declare -xir UNIX_TIME="$(date +'%s')"
 
 declare -xr SYSTEM_NAME='expanse'
 
-declare -xr SPACK_VERSION='0.15.4'
+declare -xr SPACK_VERSION='0.17.1'
 declare -xr SPACK_INSTANCE_NAME='cpu'
 declare -xr SPACK_INSTANCE_DIR="${HOME}/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}"
 
@@ -38,7 +38,7 @@ module list
 declare -xr SPACK_PACKAGE='salmon@1.4.0'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
 declare -xr SPACK_VARIANTS=''
-declare -xr SPACK_DEPENDENCIES="^boost@1.74.0/$(spack find --format '{hash:7}' boost@1.74.0 % ${SPACK_COMPILER} ~mpi)"
+declare -xr SPACK_DEPENDENCIES="^boost@1.77.0/$(spack find --format '{hash:7}' boost@1.77.0 % ${SPACK_COMPILER} ~mpi)"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv

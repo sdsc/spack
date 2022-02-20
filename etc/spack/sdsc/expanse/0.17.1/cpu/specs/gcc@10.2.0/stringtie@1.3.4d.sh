@@ -16,7 +16,7 @@ declare -xir UNIX_TIME="$(date +'%s')"
 
 declare -xr SYSTEM_NAME='expanse'
 
-declare -xr SPACK_VERSION='0.15.4'
+declare -xr SPACK_VERSION='0.17.1'
 declare -xr SPACK_INSTANCE_NAME='cpu'
 declare -xr SPACK_INSTANCE_DIR="${HOME}/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}"
 
@@ -35,10 +35,11 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
+# latest version is 2.2.1; package.py needs to be updated
 declare -xr SPACK_PACKAGE='stringtie@1.3.4d'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
 declare -xr SPACK_VARIANTS=''
-declare -xr SPACK_DEPENDENCIES="^samtools@1.10/$(spack find --format '{hash:7}' samtools@1.10 % ${SPACK_COMPILER})"
+declare -xr SPACK_DEPENDENCIES="^samtools@1.13/$(spack find --format '{hash:7}' samtools@1.13 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -65,6 +66,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'trimmomatic@0.38.sh'
+#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'trimmomatic@0.38.sh'
 
 sleep 60

@@ -16,7 +16,7 @@ declare -xir UNIX_TIME="$(date +'%s')"
 
 declare -xr SYSTEM_NAME='expanse'
 
-declare -xr SPACK_VERSION='0.15.4'
+declare -xr SPACK_VERSION='0.17.1'
 declare -xr SPACK_INSTANCE_NAME='cpu'
 declare -xr SPACK_INSTANCE_DIR="${HOME}/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}"
 
@@ -37,7 +37,7 @@ module list
 
 declare -xr SPACK_PACKAGE='papi@6.0.0.1'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS='~example ~infiniband ~lmsensors ~powercap ~rapl ~sde +shared ~static_tools'
+declare -xr SPACK_VARIANTS='~cuda ~example ~infiniband ~lmsensors ~nvml ~powercap ~rapl ~rocm ~rocm_smi ~sde +shared ~static_tools'
 declare -xr SPACK_DEPENDENCIES=''
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
@@ -65,6 +65,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'libbeagle@3.1.2.sh'
+#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'libbeagle@3.1.2.sh'
 
 sleep 60
