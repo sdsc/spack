@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
-# real 78.88`
 
-#SBATCH --job-name=openblas@0.3.18-omp
+#SBATCH --job-name=lapackpp@2021.04.00
 #SBATCH --account=use300
 #SBATCH --partition=shared
 #SBATCH --nodes=1
@@ -35,11 +34,11 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-declare -xr SPACK_PACKAGE='openblas@0.3.18'
+declare -xr SPACK_PACKAGE='lapackpp@2021.04.00'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS='~bignuma ~consistent_fpcsr +ilp64 +locking +pic +shared threads=openmp'
-declare -xr SPACK_DEPENDENCIES=''
-declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS}"
+declare -xr SPACK_VARIANTS='~ipo +shared'
+declare -xr SPACK_DEPENDENCIES="^blaspp@2021.04.01/$(spack find --format '{hash:7}' blaspp@2021.04.01 % ${SPACK_COMPILER})"
+declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
 
@@ -65,6 +64,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'blaspp@2021.04.01.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'netlib-lapack@3.9.1.sh'
 
 sleep 60
