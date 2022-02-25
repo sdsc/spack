@@ -4,7 +4,7 @@ modules:
       - lmod
     lmod:
       core_compilers:
-        - 'gcc@8.3.1'
+        - 'gcc@8.5.0'
       hierarchy:
         - mpi
       hash_length: 0
@@ -32,9 +32,9 @@ modules:
           'threads=openmp': omp
       petsc:
         suffixes:
-          '+complex': complex
+          '+complex': cmplx
       slepc:
         suffixes:
-          '^petsc +complex': complex
+          '^petsc +complex': cmplx
       ^python:
         autoload: 'direct'
