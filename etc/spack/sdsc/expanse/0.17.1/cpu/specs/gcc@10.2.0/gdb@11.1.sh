@@ -23,7 +23,7 @@ declare -xr SPACK_INSTANCE_DIR="${HOME}/cm/shared/apps/spack/${SPACK_VERSION}/${
 declare -xr SLURM_JOB_SCRIPT="$(scontrol show job ${SLURM_JOB_ID} | awk -F= '/Command=/{print $2}')"
 declare -xr SLURM_JOB_MD5SUM="$(md5sum ${SLURM_JOB_SCRIPT})"
 
-declare -xr SCHEDULER_MODULE='slurm/expanse/20.02.3'
+declare -xr SCHEDULER_MODULE='slurm/expanse/current'
 
 echo "${UNIX_TIME} ${SLURM_JOB_ID} ${SLURM_JOB_MD5SUM} ${SLURM_JOB_DEPENDENCY}" 
 echo ""
@@ -35,17 +35,52 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-# ==> Error: gdb@11.1%gcc@10.2.0~gold~ld~lto+python~quad~source-highlight~tui+xz ^bzip2@1.0.8%gcc@10.2.0~debug~pic+shared arch=linux-centos8-zen2 ^expat@2.4.1%gcc@10.2.0+libbsd arch=linux-centos8-zen2 ^gdbm@1.21%gcc@10.2.0 arch=linux-centos8-zen2 ^gettext@0.21%gcc@10.2.0+bzip2+curses+git~libunistring~libxml2+tar+xz arch=linux-centos8-zen2 ^libbsd@0.11.3%gcc@10.2.0 arch=linux-centos8-zen2 ^libffi@3.3%gcc@10.2.0 patches=26f26c6f29a7ce9bf370ad3ab2610f99365b4bdd7b82e7c31df41a3370d685c0 arch=linux-centos8-zen2 ^libiconv@1.16%gcc@10.2.0 libs=shared,static arch=linux-centos8-zen2 ^libmd@1.0.3%gcc@10.2.0 arch=linux-centos8-zen2 ^ncurses@6.2%gcc@10.2.0~symlinks+termlib abi=none arch=linux-centos8-zen2 ^openssl@1.1.1c%gcc@10.2.0~docs certs=system arch=linux-centos8-zen2 ^python@3.8.12%gcc@10.2.0+bz2+ctypes+dbm~debug~libxml2+lzma~nis+optimizations+pic+pyexpat+pythoncmd+readline+shared+sqlite3+ssl~tix~tkinter~ucs4+uuid+zlib patches=0d98e93189bc278fbc37a50ed7f183bd8aaf249a8e1670a465f0db6bb4f8cf87,4c2457325f2b608b1b6a2c63087df8c26e07db3e3d493caf36a56f0ecf6fb768,f2fd060afc4b4618fe8104c4c5d771f36dc55b1db5a4623785a4ea707ec72fb4 arch=linux-centos8-zen2 ^readline@8.1%gcc@10.2.0 arch=linux-centos8-zen2 ^sqlite@3.33.0%gcc@10.2.0+column_metadata+fts+functions+rtree arch=linux-centos8-zen2 ^tar@1.34%gcc@10.2.0 arch=linux-centos8-zen2 ^util-linux-uuid@2.36.2%gcc@10.2.0 arch=linux-centos8-zen2 ^xz@5.2.5%gcc@10.2.0~pic libs=shared,static arch=linux-centos8-zen2 ^zlib@1.2.11%gcc@10.2.0+optimize+pic+shared arch=linux-centos8-zen2 is unsatisfiable, errors are:
+
+#[mkandes@login02 ~]$ spack --show-cores=minimized spec -l gdb@11.1 % gcc@10.2.0 ~gold ~ld ~lto +python ~quad ~source-highlight ~tui +xz "^python@3.8.12/$(spack find --format '{hash:7}' python@3.8.12 % ${SPACK_COMPILER})" 
+#Input spec
+#--------------------------------
+#gdb@11.1%gcc@10.2.0~gold~ld~lto+python~quad~source-highlight~tui+xz
+#    ^python@3.8.12%gcc@10.2.0+bz2+ctypes+dbm~debug+libxml2+lzma~nis+optimizations+pic+pyexpat+pythoncmd+readline+shared+sqlite3+ssl~tix~tkinter~ucs4+uuid+zlib patches=0d98e93189bc278fbc37a50ed7f183bd8aaf249a8e1670a465f0db6bb4f8cf87,4c2457325f2b608b1b6a2c63087df8c26e07db3e3d493caf36a56f0ecf6fb768,f2fd060afc4b4618fe8104c4c5d771f36dc55b1db5a4623785a4ea707ec72fb4 arch=linux-rocky8-zen2
+#        ^bzip2@1.0.8%gcc@10.2.0~debug~pic+shared arch=linux-rocky8-zen2
+#        ^expat@2.4.1%gcc@10.2.0+libbsd arch=linux-rocky8-zen2
+#            ^libbsd@0.11.3%gcc@10.2.0 arch=linux-rocky8-zen2
+#                ^libmd@1.0.3%gcc@10.2.0 arch=linux-rocky8-zen2
+#        ^gdbm@1.19%gcc@10.2.0 arch=linux-rocky8-zen2
+#            ^readline@8.1%gcc@10.2.0 arch=linux-rocky8-zen2
+#                ^ncurses@6.2%gcc@10.2.0~symlinks+termlib abi=none arch=linux-rocky8-zen2
+#        ^gettext@0.21%gcc@10.2.0+bzip2+curses+git~libunistring+libxml2+tar+xz arch=linux-rocky8-zen2
+#            ^libiconv@1.16%gcc@10.2.0 libs=shared,static arch=linux-rocky8-zen2
+#            ^libxml2@2.9.12%gcc@10.2.0~python arch=linux-rocky8-zen2
+#                ^xz@5.2.5%gcc@10.2.0~pic libs=shared,static arch=linux-rocky8-zen2
+#                ^zlib@1.2.11%gcc@10.2.0+optimize+pic+shared arch=linux-rocky8-zen2
+#            ^tar@1.34%gcc@10.2.0 arch=linux-rocky8-zen2
+#        ^libffi@3.3%gcc@10.2.0 patches=26f26c6f29a7ce9bf370ad3ab2610f99365b4bdd7b82e7c31df41a3370d685c0 arch=linux-rocky8-zen2
+#        ^openssl@1.1.1k%gcc@10.2.0~docs certs=system arch=linux-rocky8-zen2
+#        ^sqlite@3.36.0%gcc@10.2.0+column_metadata+fts+functions+rtree arch=linux-rocky8-zen2
+#        ^util-linux-uuid@2.36.2%gcc@10.2.0 arch=linux-rocky8-zen2
 #
-#    To see full clingo unsat cores, re-run with `spack --show-cores=full`
-#    For full, subset-minimal unsat cores, re-run with `spack --show-cores=minimized
-#    Warning: This may take (up to) hours for some specs
+#Concretized
+#--------------------------------
+#==> Error: gdb@11.1%gcc@10.2.0~gold~ld~lto+python~quad~source-highlight~tui+xz ^bzip2@1.0.8%gcc@10.2.0~debug~pic+shared arch=linux-rocky8-zen2 ^expat@2.4.1%gcc@10.2.0+libbsd arch=linux-rocky8-zen2 ^gdbm@1.19%gcc@10.2.0 arch=linux-rocky8-zen2 ^gettext@0.21%gcc@10.2.0+bzip2+curses+git~libunistring+libxml2+tar+xz arch=linux-rocky8-zen2 ^libbsd@0.11.3%gcc@10.2.0 arch=linux-rocky8-zen2 ^libffi@3.3%gcc@10.2.0 patches=26f26c6f29a7ce9bf370ad3ab2610f99365b4bdd7b82e7c31df41a3370d685c0 arch=linux-rocky8-zen2 ^libiconv@1.16%gcc@10.2.0 libs=shared,static arch=linux-rocky8-zen2 ^libmd@1.0.3%gcc@10.2.0 arch=linux-rocky8-zen2 ^libxml2@2.9.12%gcc@10.2.0~python arch=linux-rocky8-zen2 ^ncurses@6.2%gcc@10.2.0~symlinks+termlib abi=none arch=linux-rocky8-zen2 ^openssl@1.1.1k%gcc@10.2.0~docs certs=system arch=linux-rocky8-zen2 ^python@3.8.12%gcc@10.2.0+bz2+ctypes+dbm~debug+libxml2+lzma~nis+optimizations+pic+pyexpat+pythoncmd+readline+shared+sqlite3+ssl~tix~tkinter~ucs4+uuid+zlib patches=0d98e93189bc278fbc37a50ed7f183bd8aaf249a8e1670a465f0db6bb4f8cf87,4c2457325f2b608b1b6a2c63087df8c26e07db3e3d493caf36a56f0ecf6fb768,f2fd060afc4b4618fe8104c4c5d771f36dc55b1db5a4623785a4ea707ec72fb4 arch=linux-rocky8-zen2 ^readline@8.1%gcc@10.2.0 arch=linux-rocky8-zen2 ^sqlite@3.36.0%gcc@10.2.0+column_metadata+fts+functions+rtree arch=linux-rocky8-zen2 ^tar@1.34%gcc@10.2.0 arch=linux-rocky8-zen2 ^util-linux-uuid@2.36.2%gcc@10.2.0 arch=linux-rocky8-zen2 ^xz@5.2.5%gcc@10.2.0~pic libs=shared,static arch=linux-rocky8-zen2 ^zlib@1.2.11%gcc@10.2.0+optimize+pic+shared arch=linux-rocky8-zen2 is unsatisfiable, conflicts are:
+#  condition(3738)
+#  condition(713)
+#  condition(724)
+#  dependency_condition(724,"gdb","python")
+#  dependency_type(724,"run")
+#  hash("python","dtdsuje4z5v7rqevinukk4n37p3lxjcn")
+#  imposed_constraint(724,"variant_set","python","debug","True")
+#  root("gdb")
+#  variant_condition(3738,"python","debug")
+#  variant_condition(713,"gdb","python")
+#  variant_set("gdb","python","True")
+
 declare -xr SPACK_PACKAGE='gdb@11.1'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-#declare -xr SPACK_VARIANTS='~gold ~ld ~lto +python ~quad ~source-highlight ~tui +xz'
-#declare -xr SPACK_DEPENDENCIES="^python@3.8.12/$(spack find --format '{hash:7}' python@3.8.12 % ${SPACK_COMPILER})"
 declare -xr SPACK_VARIANTS='~gold ~ld ~lto ~python ~quad ~source-highlight ~tui +xz'
+#declare -xr SPACK_DEPENDENCIES="^python@3.8.12/$(spack find --format '{hash:7}' python@3.8.12 % ${SPACK_COMPILER})"
+#declare -xr SPACK_VARIANTS='~gold ~ld ~lto +python ~quad ~source-highlight ~tui +xz'
 declare -xr SPACK_DEPENDENCIES=''
+declare -xr SPACK_VARIANTS='~gold ~ld ~lto ~python ~quad ~source-highlight ~tui +xz'
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv

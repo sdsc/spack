@@ -22,7 +22,7 @@ declare -xr SPACK_INSTANCE_DIR="${HOME}/cm/shared/apps/spack/${SPACK_VERSION}/${
 declare -xr SLURM_JOB_SCRIPT="$(scontrol show job ${SLURM_JOB_ID} | awk -F= '/Command=/{print $2}')"
 declare -xr SLURM_JOB_MD5SUM="$(md5sum ${SLURM_JOB_SCRIPT})"
 
-declare -xr SCHEDULER_MODULE='slurm/expanse/20.02.3'
+declare -xr SCHEDULER_MODULE='slurm/expanse/current'
 
 echo "${UNIX_TIME} ${SLURM_JOB_ID} ${SLURM_JOB_MD5SUM} ${SLURM_JOB_DEPENDENCY}" 
 echo ""
@@ -37,7 +37,7 @@ module list
 declare -xr SPACK_PACKAGE='openmpi@3.1.4'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
 declare -xr SPACK_VARIANTS='~atomics ~cuda +cxx +cxx_exceptions ~gpfs ~java +legacylaunchers +lustre ~memchecker +pmi ~singularity ~sqlite3 +static +thread_multiple +wrapper-rpath schedulers=slurm fabrics=verbs'
-declare -xr SPACK_DEPENDENCIES='^hwloc@1.11.11 ^lustre@2.12.5 ^slurm@20.02.3 ^rdma-core@47'
+declare -xr SPACK_DEPENDENCIES='^hwloc@1.11.11 ^lustre@2.12.5 ^slurm@current ^rdma-core@47'
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -50,14 +50,14 @@ spack config get packages
 spack config get repos
 spack config get upstreams
 
-# ==> Error: invalid values for variant "schedulers" in package "openmpi": ['slurm fabrics=verbs ^hwloc@1.11.11 ^lustre@2.12.5 ^slurm@20.02.3 ^rdma-core@47']
-spack spec --long --namespaces --types openmpi@3.1.4 % gcc@10.2.0 ~atomics ~cuda +cxx +cxx_exceptions ~gpfs ~java +legacylaunchers +lustre ~memchecker +pmi ~singularity ~sqlite3 +static +thread_multiple +wrapper-rpath schedulers=slurm fabrics=verbs ^hwloc@1.11.11 ^lustre@2.12.5 ^slurm@20.02.3 ^rdma-core@47
+# ==> Error: invalid values for variant "schedulers" in package "openmpi": ['slurm fabrics=verbs ^hwloc@1.11.11 ^lustre@2.12.5 ^slurm@current ^rdma-core@47']
+spack spec --long --namespaces --types openmpi@3.1.4 % gcc@10.2.0 ~atomics ~cuda +cxx +cxx_exceptions ~gpfs ~java +legacylaunchers +lustre ~memchecker +pmi ~singularity ~sqlite3 +static +thread_multiple +wrapper-rpath schedulers=slurm fabrics=verbs ^hwloc@1.11.11 ^lustre@2.12.5 ^slurm@current ^rdma-core@47
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack concretization failed.'
   exit 1
 fi
 
-time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all openmpi@3.1.4 % gcc@10.2.0 ~atomics ~cuda +cxx +cxx_exceptions ~gpfs ~java +legacylaunchers +lustre ~memchecker +pmi ~singularity ~sqlite3 +static +thread_multiple +wrapper-rpath schedulers=slurm fabrics=verbs ^hwloc@1.11.11 ^lustre@2.12.5 ^slurm@20.02.3 ^rdma-core@47
+time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all openmpi@3.1.4 % gcc@10.2.0 ~atomics ~cuda +cxx +cxx_exceptions ~gpfs ~java +legacylaunchers +lustre ~memchecker +pmi ~singularity ~sqlite3 +static +thread_multiple +wrapper-rpath schedulers=slurm fabrics=verbs ^hwloc@1.11.11 ^lustre@2.12.5 ^slurm@current ^rdma-core@47
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
   exit 1

@@ -23,7 +23,7 @@ declare -xr SPACK_INSTANCE_DIR="${HOME}/cm/shared/apps/spack/${SPACK_VERSION}/${
 declare -xr SLURM_JOB_SCRIPT="$(scontrol show job ${SLURM_JOB_ID} | awk -F= '/Command=/{print $2}')"
 declare -xr SLURM_JOB_MD5SUM="$(md5sum ${SLURM_JOB_SCRIPT})"
 
-declare -xr SCHEDULER_MODULE='slurm/expanse/20.02.3'
+declare -xr SCHEDULER_MODULE='slurm/expanse/current'
 
 echo "${UNIX_TIME} ${SLURM_JOB_ID} ${SLURM_JOB_MD5SUM} ${SLURM_JOB_DEPENDENCY}" 
 echo ""
@@ -38,7 +38,7 @@ module list
 declare -xr SPACK_PACKAGE='openmpi@4.1.1'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
 declare -xr SPACK_VARIANTS='~atomics ~cuda ~cxx ~cxx_exceptions ~gpfs ~internal-hwloc ~java +legacylaunchers +lustre ~memchecker +pmi +pmix ~singularity ~sqlite3 +static +thread_multiple +vt +wrapper-rpath'
-declare -xr SPACK_DEPENDENCIES='^ucx@1.10.1 ^lustre@2.12.5 ^slurm@20.02.3 ^rdma-core@47'
+declare -xr SPACK_DEPENDENCIES='^ucx@1.10.1 ^lustre@2.12.8 ^slurm@20.02.7 ^rdma-core@28.0'
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -53,15 +53,15 @@ spack config get upstreams
 
 echo "${SPACK_SPEC}"
 # concretization fails for some reason when using SPACK_SPEC environment variable; investigate again in the future
-# openmpi@4.1.1 % gcc@10.2.0 +legacylaunchers +lustre +pmi schedulers=slurm fabrics=ucx ^hwloc@1.11.11 ^lustre@2.12.5 ^slurm@20.02.3 ^rdma-core@47
-# ==> Error: invalid values for variant "schedulers" in package "openmpi": ['slurm fabrics=ucx ^hwloc@1.11.11 ^lustre@2.12.5 ^slurm@20.02.3 ^rdma-core@47']
-spack spec --long --namespaces --types openmpi@4.1.1 % gcc@10.2.0 ~atomics ~cuda ~cxx ~cxx_exceptions ~gpfs ~internal-hwloc ~java +legacylaunchers +lustre ~memchecker +pmi +pmix ~singularity ~sqlite3 +static +thread_multiple +vt +wrapper-rpath schedulers=slurm fabrics=ucx ^ucx@1.10.1 ^lustre@2.12.5 ^slurm@20.02.3 ^rdma-core@47
+# openmpi@4.1.1 % gcc@10.2.0 +legacylaunchers +lustre +pmi schedulers=slurm fabrics=ucx ^hwloc@1.11.11 ^lustre@2.12.8 ^slurm@20.02.7 ^rdma-core@28.0
+# ==> Error: invalid values for variant "schedulers" in package "openmpi": ['slurm fabrics=ucx ^hwloc@1.11.11 ^lustre@2.12.8 ^slurm@20.02.7 ^rdma-core@28.0']
+spack spec --long --namespaces --types openmpi@4.1.1 % gcc@10.2.0 ~atomics ~cuda ~cxx ~cxx_exceptions ~gpfs ~internal-hwloc ~java +legacylaunchers +lustre ~memchecker +pmi +pmix ~singularity ~sqlite3 +static +thread_multiple +vt +wrapper-rpath schedulers=slurm fabrics=ucx ^ucx@1.10.1 ^lustre@2.12.8 ^slurm@20.02.7 ^rdma-core@28.0
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack concretization failed.'
   exit 1
 fi
 
-time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all openmpi@4.1.1 % gcc@10.2.0 ~atomics ~cuda ~cxx ~cxx_exceptions ~gpfs ~internal-hwloc ~java +legacylaunchers +lustre ~memchecker +pmi +pmix ~singularity ~sqlite3 +static +thread_multiple +vt +wrapper-rpath schedulers=slurm fabrics=ucx ^ucx@1.10.1 ^lustre@2.12.5 ^slurm@20.02.3 ^rdma-core@47
+time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all openmpi@4.1.1 % gcc@10.2.0 ~atomics ~cuda ~cxx ~cxx_exceptions ~gpfs ~internal-hwloc ~java +legacylaunchers +lustre ~memchecker +pmi +pmix ~singularity ~sqlite3 +static +thread_multiple +vt +wrapper-rpath schedulers=slurm fabrics=ucx ^ucx@1.10.1 ^lustre@2.12.8 ^slurm@20.02.7 ^rdma-core@28.0
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
   exit 1

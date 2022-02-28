@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # real 9970.37
 
-#SBATCH --job-name=py-matplotlib@3.3.2
+#SBATCH --job-name=py-matplotlib@3.4.3
 #SBATCH --account=use300
 #SBATCH --partition=shared
 #SBATCH --nodes=1
@@ -23,7 +23,7 @@ declare -xr SPACK_INSTANCE_DIR="${HOME}/cm/shared/apps/spack/${SPACK_VERSION}/${
 declare -xr SLURM_JOB_SCRIPT="$(scontrol show job ${SLURM_JOB_ID} | awk -F= '/Command=/{print $2}')"
 declare -xr SLURM_JOB_MD5SUM="$(md5sum ${SLURM_JOB_SCRIPT})"
 
-declare -xr SCHEDULER_MODULE='slurm/expanse/20.02.3'
+declare -xr SCHEDULER_MODULE='slurm/expanse/current'
 
 echo "${UNIX_TIME} ${SLURM_JOB_ID} ${SLURM_JOB_MD5SUM} ${SLURM_JOB_DEPENDENCY}" 
 echo ""
@@ -35,13 +35,10 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-#==> Error: Detected uninstalled dependencies for libpng: {'zlib'}
-#==> Error: Cannot proceed with libpng: 1 uninstalled dependency: zlib
-declare -xr SPACK_PACKAGE='py-matplotlib@3.3.2'
+declare -xr SPACK_PACKAGE='py-matplotlib@3.4.3'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS='+animation +fonts +image +latex ~movies' 
-declare -xr SPACK_DEPENDENCIES="^openblas@0.3.10/$(spack find --format '{hash:7}' openblas@0.3.10 % ${SPACK_COMPILER} +ilp64 threads=none) ^imagemagick@7.0.8-7/$(spack find --format '{hash:7}' imagemagick@7.0.8-7 % ${SPACK_COMPILER})"
-#^ffmpeg@4.2.2/$(spack find --format '{hash:7}' ffmpeg@4.2.2 % ${SPACK_COMPILER}) ^zlib@1.2.11/$(spack find --format '{hash:7}' zlib@1.2.11 % ${SPACK_COMPILER})"
+declare -xr SPACK_VARIANTS='+animation +fonts +image +latex +movies' 
+declare -xr SPACK_DEPENDENCIES="^py-numpy@1.20.3/$(spack find --format '{hash:7}' py-numpy@1.20.3 % ${SPACK_COMPILER}) ^openblas@0.3.18/$(spack find --format '{hash:7}' openblas@0.3.18 % ${SPACK_COMPILER} +ilp64 threads=none) ^imagemagick@7.0.8-7/$(spack find --format '{hash:7}' imagemagick@7.0.8-7 % ${SPACK_COMPILER}) ^ffmpeg@4.3.2/$(spack find --format '{hash:7}' ffmpeg@4.3.2 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -68,6 +65,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'py-scikit-optimize@0.5.2.sh'
+#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'py-scikit-optimize@0.5.2.sh'
 
 sleep 60
