@@ -21,3 +21,13 @@ packages:
       - spec: 'slurm@20.02.7 % gcc@10.2.0 arch=linux-rocky8-zen2'
         prefix: /cm/shared/apps/slurm/20.02.7
     buildable: false
+  librsvg:
+    externals:
+      - spec: 'librsvg@2.42.7 % gcc@10.2.0 arch=linux-rocky8-zen2'
+        prefix: /usr
+    buildable: false
+  ghostscript:
+    externals:
+      - spec: 'ghostscript@9.27 % gcc@10.2.0 arch=linux-rocky8-zen2'
+        prefix: /usr
+    buildable: false
