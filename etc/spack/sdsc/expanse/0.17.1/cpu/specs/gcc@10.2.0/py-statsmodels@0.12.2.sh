@@ -35,7 +35,7 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-# +plotting does not add py-matplotlib dependency in concretization?
+# +plotting still does not add a py-matplotlib dependency in concretization as of spack v0.17.1?
 declare -xr SPACK_PACKAGE='py-statsmodels@0.12.2'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
 declare -xr SPACK_VARIANTS='~plotting' 
@@ -66,6 +66,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'py-seaborn@0.9.0.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'py-seaborn@0.11.2.sh'
 
 sleep 60

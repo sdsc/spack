@@ -65,6 +65,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'py-statsmodels@0.12.2.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'py-statsmodels@0.12.2.sh'
 
 sleep 60
