@@ -37,7 +37,7 @@ module list
 
 declare -xr SPACK_PACKAGE='py-dask@2021.6.2'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS='+array +bag +dataframe +delayed ~diagnostics +distributed +yaml'
+declare -xr SPACK_VARIANTS='+array +bag +dataframe +delayed +diagnostics +distributed +yaml'
 declare -xr SPACK_DEPENDENCIES="^py-pandas@1.3.4/$(spack find --format '{hash:7}' py-pandas@1.3.4 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
