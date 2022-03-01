@@ -65,6 +65,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'arpack-ng@3.8.0.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'py-jupyterlab@3.2.1.sh'
 
 sleep 60
