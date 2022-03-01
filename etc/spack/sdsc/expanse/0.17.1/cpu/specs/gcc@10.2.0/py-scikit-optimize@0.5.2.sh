@@ -37,8 +37,8 @@ module list
 
 declare -xr SPACK_PACKAGE='py-scikit-optimize@0.5.2'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS='~plots'
-declare -xr SPACK_DEPENDENCIES="^py-scikit-learn@1.0.1/$(spack find --format '{hash:7}' py-scikit-learn@1.0.1 % ${SPACK_COMPILER})"
+declare -xr SPACK_VARIANTS='+plots'
+declare -xr SPACK_DEPENDENCIES="^py-matplotlib@3.4.3/$(spack find --format '{hash:7}' py-matplotlib@3.4.3 % ${SPACK_COMPILER}) ^py-scikit-learn@1.0.1/$(spack find --format '{hash:7}' py-scikit-learn@1.0.1 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -65,6 +65,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'py-statsmodels@0.12.2.sh'
+#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'py-statsmodels@0.12.2.sh'
 
 sleep 60
