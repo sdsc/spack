@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=py-pyscf@1.7.5
+#SBATCH --job-name=cgal@4.13
 #SBATCH --account=use300
 #SBATCH --partition=shared
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=16
 #SBATCH --mem=32G
-#SBATCH --time=00:30:00
+#SBATCH --time=02:00:00
 #SBATCH --output=%x.o%j.%N
 
 declare -xr LOCAL_TIME="$(date +'%Y%m%dT%H%M%S%z')"
@@ -34,10 +34,10 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-declare -xr SPACK_PACKAGE='py-pyscf@1.7.5'
+declare -xr SPACK_PACKAGE='cgal@4.13'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS=''
-declare -xr SPACK_DEPENDENCIES="^py-h5py@3.4.0/$(spack find --format '{hash:7}' py-h5py@3.4.0  % ${SPACK_COMPILER} ~mpi) ^py-scipy@1.5.4/$(spack find --format '{hash:7}' py-scipy@1.5.4 % ${SPACK_COMPILER})"
+declare -xr SPACK_VARIANTS='~core ~demos +eigen ~imageio ~ipo +shared'
+declare -xr SPACK_DEPENDENCIES="^boost@1.77.0/$(spack find --format '{hash:7}' boost@1.77.0 % ${SPACK_COMPILER} ~mpi) ^eigen@3.4.0/$(spack find --format '{hash:7}' eigen@3.4.0 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -64,6 +64,4 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'cgal@5.0.3.sh'
-
-sleep 60
+#sbatch --dependency="afterok:${SLURM_JOB_ID}" ''
