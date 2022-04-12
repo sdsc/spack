@@ -38,7 +38,7 @@ module list
 declare -xr SPACK_PACKAGE='py-ase@3.21.1'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
 declare -xr SPACK_VARIANTS=''
-declare -xr SPACK_DEPENDENCIES="^py-matplotlib@3.3.2/$(spack find --format '{hash:7}' py-matplotlib@3.3.2 % ${SPACK_COMPILER})"
+declare -xr SPACK_DEPENDENCIES="^py-matplotlib@3.4.3/$(spack find --format '{hash:7}' py-matplotlib@3.4.3 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
