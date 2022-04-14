@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=sirius@7.2.7
+#SBATCH --job-name=sirius@6.5.7
 #SBATCH --account=use300
 #SBATCH --partition=shared
 #SBATCH --nodes=1
@@ -64,7 +64,27 @@ module list
 #  variant_condition(6123,"sirius","openmp")
 #  variant_set("sirius","openmp","True")
 
-declare -xr SPACK_PACKAGE='sirius@7.2.7'
+# 5 errors found in build log:
+#     33    -- Found BLAS: /home/mkandes/cm/shared/apps/spack/0.17.1/cpu/opt/spa
+#           ck/linux-rocky8-zen2/gcc-10.2.0/openblas-0.3.18-fxzqxj3ljgy5sox5pq7e
+#           4sjtqrt75pqf/lib/libopenblas.so
+#     34    -- Found LAPACK: /home/mkandes/cm/shared/apps/spack/0.17.1/cpu/opt/s
+#           pack/linux-rocky8-zen2/gcc-10.2.0/openblas-0.3.18-fxzqxj3ljgy5sox5pq
+#           7e4sjtqrt75pqf/lib/libopenblas.so
+#     35    -- Checking for one of the modules 'scalapack'
+#     36    -- Found SCALAPACK: /home/mkandes/cm/shared/apps/spack/0.17.1/cpu/op
+#           t/spack/linux-rocky8-zen2/gcc-10.2.0/netlib-scalapack-2.1.0-admhf4d4
+#           lfmax5zwdsr7ojywil2yp367/lib/libscalapack.so
+#     37    -- Could NOT find Doxygen (missing: DOXYGEN_EXECUTABLE)
+#     38    -- Configuring done
+#  >> 39    CMake Error at src/CMakeLists.txt:94 (add_library):
+#     40      Target "sirius" links to target "OpenMP::OpenMP_CXX" but the targe
+#           t was not
+#     41      found.  Perhaps a find_package() call is missing for an IMPORTED t
+#           arget, or
+#     42      an ALIAS target is missing?
+
+declare -xr SPACK_PACKAGE='sirius@6.5.7'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
 declare -xr SPACK_VARIANTS='+apps ~boost_filesystem ~cuda ~elpa +fortran ~ipo ~magma +memory_pool ~nlcglib ~openmp +profiler ~python +scalapack +shared ~single_precision ~tests ~vdwxc'
 declare -xr SPACK_DEPENDENCIES="^fftw@3.3.10/$(spack find --format '{hash:7}' fftw@3.3.10 % ${SPACK_COMPILER} ~mpi ~openmp) ^gsl@2.7/$(spack find --format '{hash:7}' gsl@2.7 % ${SPACK_COMPILER}) ^hdf5@1.10.7/$(spack find --format '{hash:7}' hdf5@1.10.7 % ${SPACK_COMPILER} ~mpi) ^python@3.8.12/$(spack find --format '{hash:7}' python@3.8.12 % ${SPACK_COMPILER}) ^netlib-scalapack@2.1.0/$(spack find --format '{hash:7}' netlib-scalapack@2.1.0 % ${SPACK_COMPILER} ^openmpi@4.1.1)"
@@ -94,6 +114,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'sirius@6.5.7.sh'
+#sbatch --dependency="afterok:${SLURM_JOB_ID}" ''
 
 sleep 60
