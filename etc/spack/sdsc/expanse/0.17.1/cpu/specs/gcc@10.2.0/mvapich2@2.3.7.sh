@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=mvapich2@2.3.4
+#SBATCH --job-name=mvapich2@2.3.7
 #SBATCH --account=use300
 #SBATCH --partition=compute
 #SBATCH --nodes=1
@@ -15,7 +15,7 @@ declare -xir UNIX_TIME="$(date +'%s')"
 
 declare -xr SYSTEM_NAME='expanse'
 
-declare -xr SPACK_VERSION='0.15.4'
+declare -xr SPACK_VERSION='0.17.1'
 declare -xr SPACK_INSTANCE_NAME='cpu'
 declare -xr SPACK_INSTANCE_DIR="${HOME}/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}"
 
@@ -34,10 +34,10 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-declare -xr SPACK_PACKAGE='mvapich2@2.3.4'
+declare -xr SPACK_PACKAGE='mvapich2@2.3.7'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
 declare -xr SPACK_VARIANTS='~alloca ch3_rank_bits=32 ~cuda ~debug file_systems=lustre process_managers=slurm +regcache threads=multiple +wrapperrpath'
-declare -xr SPACK_DEPENDENCIES='^slurm@current ^rdma-core@47'
+declare -xr SPACK_DEPENDENCIES='^slurm@20.02.7 ^rdma-core@28.0'
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -50,14 +50,13 @@ spack config get packages
 spack config get repos
 spack config get upstreams
 
-#==> Error: invalid values for variant "ch3_rank_bits" in package "mvapich2": ['32 ~cuda ~debug file_systems=lustre process_managers=slurm +regcache threads=multiple +wrapperrpath ^slurm@current ^rdma-core@47']
-spack spec --long --namespaces --types mvapich2@2.3.4 % gcc@10.2.0 ~alloca ch3_rank_bits=32 ~cuda ~debug fabrics=mrail file_systems=lustre process_managers=slurm +regcache threads=multiple +wrapperrpath ^slurm@current ^rdma-core@47
+spack spec --long --namespaces --types mvapich2@2.3.7 % gcc@10.2.0 ~alloca ch3_rank_bits=32 ~cuda ~debug file_systems=lustre process_managers=slurm +regcache threads=multiple +wrapperrpath ^slurm@20.02.7 ^rdma-core@28.0
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack concretization failed.'
   exit 1
 fi
 
-time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all mvapich2@2.3.4 % gcc@10.2.0 ~alloca ch3_rank_bits=32 ~cuda ~debug fabrics=mrail file_systems=lustre process_managers=slurm +regcache threads=multiple +wrapperrpath ^slurm@current ^rdma-core@47
+time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all mvapich2@2.3.7 % gcc@10.2.0 ~alloca ch3_rank_bits=32 ~cuda ~debug file_systems=lustre process_managers=slurm +regcache threads=multiple +wrapperrpath ^slurm@20.02.7 ^rdma-core@28.0
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
   exit 1
