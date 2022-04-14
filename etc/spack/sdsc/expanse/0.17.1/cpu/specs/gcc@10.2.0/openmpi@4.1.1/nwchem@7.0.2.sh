@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
-# real 53.26
 
-#SBATCH --job-name=namd@2.14
+#SBATCH --job-name=nwchem@7.0.2
 #SBATCH --account=use300
 #SBATCH --partition=shared
 #SBATCH --nodes=1
@@ -35,10 +34,10 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-declare -xr SPACK_PACKAGE='namd@2.14'
+declare -xr SPACK_PACKAGE='nwchem@7.0.2'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS='~cuda interface=tcl'
-declare -xr SPACK_DEPENDENCIES="^charmpp@6.10.2/$(spack find --format '{hash:7}' charmpp@6.10.2 % ${SPACK_COMPILER} ^openmpi@4.1.1) ^fftw@3.3.10/$(spack find --format '{hash:7}' fftw@3.3.10 % ${SPACK_COMPILER} ~mpi ~openmp) ^tcl@8.5.9/$(spack find --format '{hash:7}' tcl@8.5.9 % ${SPACK_COMPILER})"
+declare -xr SPACK_VARIANTS=''
+declare -xr SPACK_DEPENDENCIES="^openblas@0.3.18/$(spack find --format '{hash:7}' openblas@0.3.18 % ${SPACK_COMPILER} +ilp64 threads=none) ^python@3.8.12/$(spack find --format '{hash:7}' python@3.8.12 % ${SPACK_COMPILER}) ^netlib-scalapack@2.1.0/$(spack find --format '{hash:7}' netlib-scalapack@2.1.0 % ${SPACK_COMPILER} ^openmpi@4.1.1)"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -51,15 +50,13 @@ spack config get packages
 spack config get repos
 spack config get upstreams
 
-#spack spec --long --namespaces --types "${SPACK_SPEC}"
-spack spec --long --namespaces --types namd@2.14 % gcc@10.2.0 ~cuda interface=tcl "^charmpp@6.10.2/$(spack find --format '{hash:7}' charmpp@6.10.2 % ${SPACK_COMPILER} ^openmpi@4.1.1) ^fftw@3.3.10/$(spack find --format '{hash:7}' fftw@3.3.10 % ${SPACK_COMPILER} ~mpi ~openmp) ^tcl@8.5.9/$(spack find --format '{hash:7}' tcl@8.5.9 % ${SPACK_COMPILER})"
+spack spec --long --namespaces --types "${SPACK_SPEC}"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack concretization failed.'
   exit 1
 fi
 
-#time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all "${SPACK_SPEC}"
-time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all namd@2.14 % gcc@10.2.0 ~cuda interface=tcl "^charmpp@6.10.2/$(spack find --format '{hash:7}' charmpp@6.10.2 % ${SPACK_COMPILER} ^openmpi@4.1.1) ^fftw@3.3.10/$(spack find --format '{hash:7}' fftw@3.3.10 % ${SPACK_COMPILER} ~mpi ~openmp) ^tcl@8.5.9/$(spack find --format '{hash:7}' tcl@8.5.9 % ${SPACK_COMPILER})"
+time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all "${SPACK_SPEC}"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
   exit 1
@@ -67,6 +64,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'lammps@20210310.sh'
+#sbatch --dependency="afterok:${SLURM_JOB_ID}" ''
 
 sleep 60
