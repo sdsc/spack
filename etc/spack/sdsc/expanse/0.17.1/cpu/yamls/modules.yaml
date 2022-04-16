@@ -21,6 +21,9 @@ modules:
       fftw:
         suffixes:
           '+openmp': omp
+      hpl:
+        suffixes:
+          '+openmp': omp
       hypre:
         suffixes:
           '+openmp': omp
