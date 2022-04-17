@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# real 50.19
 
 #SBATCH --job-name=netcdf-fortran@4.5.3
 #SBATCH --account=use300

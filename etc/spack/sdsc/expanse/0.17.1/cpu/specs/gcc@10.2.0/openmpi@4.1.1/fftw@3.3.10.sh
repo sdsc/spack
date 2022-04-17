@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# real 165.74
 
 #SBATCH --job-name=fftw@3.3.10
 #SBATCH --account=use300

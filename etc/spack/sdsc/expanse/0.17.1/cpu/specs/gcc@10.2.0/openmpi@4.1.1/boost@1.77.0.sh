@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# real 494.30
 
 #SBATCH --job-name=boost@1.77.0
 #SBATCH --account=use300

@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# real 533.31
 
 #SBATCH --job-name=charmpp@6.10.2
 #SBATCH --account=use300
@@ -67,6 +66,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'namd@2.14.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'namd@2.14.sh'
 
 sleep 60

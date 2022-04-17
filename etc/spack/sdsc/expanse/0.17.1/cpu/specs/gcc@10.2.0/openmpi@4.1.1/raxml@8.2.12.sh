@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# real 238.36
 
 #SBATCH --job-name=raxml@8.2.12
 #SBATCH --account=use300

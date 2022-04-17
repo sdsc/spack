@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# real 57.25
 
 #SBATCH --job-name=py-netcdf4@1.5.3
 #SBATCH --account=use300

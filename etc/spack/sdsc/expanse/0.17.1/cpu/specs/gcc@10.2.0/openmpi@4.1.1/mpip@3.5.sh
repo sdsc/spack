@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# real 16.54
 
 #SBATCH --job-name=mpip@3.5
 #SBATCH --account=use300

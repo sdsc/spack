@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# real 211.99
 
 #SBATCH --job-name=hdf5@1.10.7
 #SBATCH --account=use300

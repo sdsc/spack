@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# real 125.56
 
 #SBATCH --job-name=valgrind@3.17.0
 #SBATCH --account=use300

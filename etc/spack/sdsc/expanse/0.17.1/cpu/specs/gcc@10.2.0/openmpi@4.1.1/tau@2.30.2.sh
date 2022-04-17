@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# real 847.34
 
 #SBATCH --job-name=tau@2.30.2
 #SBATCH --account=use300
@@ -65,6 +64,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'scotch@6.1.1.sh'
+#sbatch --dependency="afterok:${SLURM_JOB_ID}" ''
 
 sleep 60

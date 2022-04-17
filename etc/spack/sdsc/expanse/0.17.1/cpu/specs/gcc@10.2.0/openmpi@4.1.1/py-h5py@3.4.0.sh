@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# real 100.48
 
 #SBATCH --job-name=py-h5py@3.4.0
 #SBATCH --account=use300

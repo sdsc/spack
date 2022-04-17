@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# real 27.87
 
 #SBATCH --job-name=netcdf-cxx4@4.3.1
 #SBATCH --account=use300

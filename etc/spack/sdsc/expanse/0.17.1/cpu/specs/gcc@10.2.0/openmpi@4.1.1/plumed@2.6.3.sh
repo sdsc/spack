@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# real 762.46
 
 #SBATCH --job-name=plumed@2.6.3
 #SBATCH --account=use300

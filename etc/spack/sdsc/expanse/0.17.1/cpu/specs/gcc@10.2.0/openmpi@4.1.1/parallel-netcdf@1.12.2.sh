@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# real 325.66
 
 #SBATCH --job-name=parallel-netcdf@1.12.2
 #SBATCH --account=use300

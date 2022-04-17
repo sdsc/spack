@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# real 47.21
 
 #SBATCH --job-name=netlib-scalapack@2.1.0
 #SBATCH --account=use300

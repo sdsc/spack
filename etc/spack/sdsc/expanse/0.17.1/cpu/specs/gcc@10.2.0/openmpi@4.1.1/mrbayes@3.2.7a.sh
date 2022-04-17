@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# real 38.14
 
 #SBATCH --job-name=mrbayes@3.2.7a
 #SBATCH --account=use300

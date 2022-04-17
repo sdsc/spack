@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# real 103.43
 
 #SBATCH --job-name=py-mpi4py@3.1.2
 #SBATCH --account=use300

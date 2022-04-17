@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# real 23.24
 
 #SBATCH --job-name=superlu-dist@7.1.1
 #SBATCH --account=use300
@@ -65,6 +64,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'superlu-dist@5.3.0.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'hypre@2.23.0.sh'
 
 sleep 60

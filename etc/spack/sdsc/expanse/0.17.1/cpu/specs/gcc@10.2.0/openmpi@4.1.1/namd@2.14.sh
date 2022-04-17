@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# real 53.26
 
 #SBATCH --job-name=namd@2.14
 #SBATCH --account=use300

@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# real 18.78
 
 #SBATCH --job-name=arpack-ng@3.7.0
 #SBATCH --account=use300
