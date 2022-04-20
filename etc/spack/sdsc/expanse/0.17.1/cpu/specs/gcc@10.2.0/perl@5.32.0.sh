@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
-# real 522.73
 
-#SBATCH --job-name=perl@5.34.0
+#SBATCH --job-name=perl@5.32.0
 #SBATCH --account=use300
 #SBATCH --partition=shared
 #SBATCH --nodes=1
@@ -35,7 +34,7 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-declare -xr SPACK_PACKAGE='perl@5.34.0'
+declare -xr SPACK_PACKAGE='perl@5.32.0'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
 declare -xr SPACK_VARIANTS='+cpanm +shared +threads'
 declare -xr SPACK_DEPENDENCIES=''
