@@ -1,0 +1,1222 @@
+1650382421 11610580 2742ec253f07ee49113b9c3079bf8575  /home/mkandes/cm/shared/apps/spack/0.17.1/cpu/etc/spack/sdsc/expanse/0.17.1/cpu/specs/intel@19.1.3.304/perl@5.34.0.sh 
+
+#!/usr/bin/env bash
+
+#SBATCH --job-name=perl@5.34.0
+#SBATCH --account=use300
+#SBATCH --partition=shared
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=1
+#SBATCH --cpus-per-task=16
+#SBATCH --mem=32G
+#SBATCH --time=00:30:00
+#SBATCH --output=%x.o%j.%N
+
+declare -xr LOCAL_TIME="$(date +'%Y%m%dT%H%M%S%z')"
+declare -xir UNIX_TIME="$(date +'%s')"
+
+declare -xr SYSTEM_NAME='expanse'
+
+declare -xr SPACK_VERSION='0.17.1'
+declare -xr SPACK_INSTANCE_NAME='cpu'
+declare -xr SPACK_INSTANCE_DIR="${HOME}/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}"
+
+declare -xr SLURM_JOB_SCRIPT="$(scontrol show job ${SLURM_JOB_ID} | awk -F= '/Command=/{print $2}')"
+declare -xr SLURM_JOB_MD5SUM="$(md5sum ${SLURM_JOB_SCRIPT})"
+
+declare -xr SCHEDULER_MODULE='slurm/expanse/current'
+
+echo "${UNIX_TIME} ${SLURM_JOB_ID} ${SLURM_JOB_MD5SUM} ${SLURM_JOB_DEPENDENCY}" 
+echo ""
+
+cat "${SLURM_JOB_SCRIPT}"
+
+module purge
+module load "${SCHEDULER_MODULE}"
+module list
+. "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
+
+declare -xr INTEL_LICENSE_FILE='40000@elprado.sdsc.edu:40200@elprado.sdsc.edu'
+declare -xr SPACK_PACKAGE='perl@5.34.0'
+declare -xr SPACK_COMPILER='intel@19.1.3.304'
+declare -xr SPACK_VARIANTS='+cpanm +shared ~threads'
+declare -xr SPACK_DEPENDENCIES=''
+declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
+
+printenv
+
+spack config get compilers  
+spack config get config  
+spack config get mirrors
+spack config get modules
+spack config get packages
+spack config get repos
+spack config get upstreams
+
+spack spec --long --namespaces --types "${SPACK_SPEC}"
+if [[ "${?}" -ne 0 ]]; then
+  echo 'ERROR: spack concretization failed.'
+  exit 1
+fi
+
+time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all "${SPACK_SPEC}"
+if [[ "${?}" -ne 0 ]]; then
+  echo 'ERROR: spack install failed.'
+  exit 1
+fi
+
+spack module lmod refresh --delete-tree -y
+
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'tcl@8.6.11.sh'
+
+sleep 60
+
+Currently Loaded Modules:
+  1) slurm/expanse/current
+
+ 
+
+LD_LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:/cm/shared/apps/slurm/current/lib64
+LS_COLORS=rs=0:di=38;5;33:ln=38;5;51:mh=00:pi=40;38;5;11:so=38;5;13:do=38;5;5:bd=48;5;232;38;5;11:cd=48;5;232;38;5;3:or=48;5;232;38;5;9:mi=01;05;37;41:su=48;5;196;38;5;15:sg=48;5;11;38;5;16:ca=48;5;196;38;5;226:tw=48;5;10;38;5;16:ow=48;5;10;38;5;21:st=48;5;21;38;5;15:ex=38;5;40:*.tar=38;5;9:*.tgz=38;5;9:*.arc=38;5;9:*.arj=38;5;9:*.taz=38;5;9:*.lha=38;5;9:*.lz4=38;5;9:*.lzh=38;5;9:*.lzma=38;5;9:*.tlz=38;5;9:*.txz=38;5;9:*.tzo=38;5;9:*.t7z=38;5;9:*.zip=38;5;9:*.z=38;5;9:*.dz=38;5;9:*.gz=38;5;9:*.lrz=38;5;9:*.lz=38;5;9:*.lzo=38;5;9:*.xz=38;5;9:*.zst=38;5;9:*.tzst=38;5;9:*.bz2=38;5;9:*.bz=38;5;9:*.tbz=38;5;9:*.tbz2=38;5;9:*.tz=38;5;9:*.deb=38;5;9:*.rpm=38;5;9:*.jar=38;5;9:*.war=38;5;9:*.ear=38;5;9:*.sar=38;5;9:*.rar=38;5;9:*.alz=38;5;9:*.ace=38;5;9:*.zoo=38;5;9:*.cpio=38;5;9:*.7z=38;5;9:*.rz=38;5;9:*.cab=38;5;9:*.wim=38;5;9:*.swm=38;5;9:*.dwm=38;5;9:*.esd=38;5;9:*.jpg=38;5;13:*.jpeg=38;5;13:*.mjpg=38;5;13:*.mjpeg=38;5;13:*.gif=38;5;13:*.bmp=38;5;13:*.pbm=38;5;13:*.pgm=38;5;13:*.ppm=38;5;13:*.tga=38;5;13:*.xbm=38;5;13:*.xpm=38;5;13:*.tif=38;5;13:*.tiff=38;5;13:*.png=38;5;13:*.svg=38;5;13:*.svgz=38;5;13:*.mng=38;5;13:*.pcx=38;5;13:*.mov=38;5;13:*.mpg=38;5;13:*.mpeg=38;5;13:*.m2v=38;5;13:*.mkv=38;5;13:*.webm=38;5;13:*.ogm=38;5;13:*.mp4=38;5;13:*.m4v=38;5;13:*.mp4v=38;5;13:*.vob=38;5;13:*.qt=38;5;13:*.nuv=38;5;13:*.wmv=38;5;13:*.asf=38;5;13:*.rm=38;5;13:*.rmvb=38;5;13:*.flc=38;5;13:*.avi=38;5;13:*.fli=38;5;13:*.flv=38;5;13:*.gl=38;5;13:*.dl=38;5;13:*.xcf=38;5;13:*.xwd=38;5;13:*.yuv=38;5;13:*.cgm=38;5;13:*.emf=38;5;13:*.ogv=38;5;13:*.ogx=38;5;13:*.aac=38;5;45:*.au=38;5;45:*.flac=38;5;45:*.m4a=38;5;45:*.mid=38;5;45:*.midi=38;5;45:*.mka=38;5;45:*.mp3=38;5;45:*.mpc=38;5;45:*.ogg=38;5;45:*.ra=38;5;45:*.wav=38;5;45:*.oga=38;5;45:*.opus=38;5;45:*.spx=38;5;45:*.xspf=38;5;45:
+SLURM_NODEID=0
+SLURM_TASK_PID=3602435
+__LMOD_REF_COUNT_PATH=/cm/shared/apps/slurm/current/sbin:1;/cm/shared/apps/slurm/current/bin:1;/cm/shared/apps/sdsc/galyleo:1;/home/mkandes/.local/bin:1;/home/mkandes/bin:1;/usr/local/bin:1;/usr/bin:1;/usr/local/sbin:1;/usr/sbin:1
+_ModuleTable002_=ZXMiLCIvdXNyL3NoYXJlL21vZHVsZWZpbGVzIiwiL3Vzci9zaGFyZS9Nb2R1bGVzL21vZHVsZWZpbGVzIiwiL2NtL3NoYXJlZC9tb2R1bGVmaWxlcyIsfSxbInN5c3RlbUJhc2VNUEFUSCJdPSIvY20vbG9jYWwvbW9kdWxlZmlsZXM6L2NtL3NoYXJlZC9hcHBzL3hzZWRlL21vZHVsZWZpbGVzOi9jbS9zaGFyZWQvbW9kdWxlZmlsZXM6L2V0Yy9tb2R1bGVmaWxlczovdXNyL3NoYXJlL21vZHVsZWZpbGVzOi91c3Ivc2hhcmUvTW9kdWxlcy9tb2R1bGVmaWxlcyIsfQ==
+SSH_CONNECTION=24.233.173.28 56429 198.202.100.13 22
+SPACK_PYTHON=/usr/bin/python3
+SLURM_PRIO_PROCESS=0
+LANG=en_US.UTF-8
+SLURM_SUBMIT_DIR=/home/mkandes/cm/shared/apps/spack/0.17.1/cpu/etc/spack/sdsc/expanse/0.17.1/cpu/specs/intel@19.1.3.304
+HISTCONTROL=ignoredups
+HOSTNAME=exp-2-02
+LMOD_SYSTEM_DEFAULT_MODULES=DefaultModules
+OLDPWD=/home/mkandes/cm/shared/apps/spack/0.17.1/cpu/etc/spack/sdsc/expanse/0.17.1/cpu/specs
+__LMOD_REF_COUNT__LMFILES_=/cm/local/modulefiles/slurm/expanse/current:1
+SLURM_CPUS_PER_TASK=16
+SPACK_DEPENDENCIES=
+ENVIRONMENT=BATCH
+SPACK_VERSION=0.17.1
+SLURM_PROCID=0
+SLURM_JOB_GID=300
+SPACK_VARIANTS=+cpanm +shared ~threads
+SPACK_INSTANCE_DIR=/home/mkandes/cm/shared/apps/spack/0.17.1/cpu
+__LMOD_REF_COUNT_LD_LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:1;/cm/shared/apps/slurm/current/lib64:1
+SLURM_JOB_SCRIPT=/home/mkandes/cm/shared/apps/spack/0.17.1/cpu/etc/spack/sdsc/expanse/0.17.1/cpu/specs/intel@19.1.3.304/perl@5.34.0.sh
+SLURMD_NODENAME=exp-2-02
+SLURM_TASKS_PER_NODE=1
+S_COLORS=auto
+which_declare=declare -f
+SPACK_COMPILER=intel@19.1.3.304
+XDG_SESSION_ID=906940
+SLURM_NNODES=1
+USER=mkandes
+SLURM_NTASKS_PER_NODE=1
+__LMOD_REF_COUNT_MODULEPATH=/cm/local/modulefiles:1;/cm/shared/apps/xsede/modulefiles:1;/etc/modulefiles:1;/usr/share/modulefiles:1;/usr/share/Modules/modulefiles:1;/cm/shared/modulefiles:1
+__LMOD_REF_COUNT_LOADEDMODULES=slurm/expanse/current:1
+PWD=/home/mkandes/cm/shared/apps/spack/0.17.1/cpu/etc/spack/sdsc/expanse/0.17.1/cpu/specs/intel@19.1.3.304
+ENABLE_LMOD=1
+SLURM_JOB_NODELIST=exp-2-02
+HOME=/home/mkandes
+SLURM_CLUSTER_NAME=expanse
+LMOD_COLORIZE=yes
+LOCAL_TIME=20220419T083341-0700
+SLURM_NODELIST=exp-2-02
+SSH_CLIENT=24.233.173.28 56429 22
+LMOD_VERSION=8.2.4
+CPATH=/cm/shared/apps/slurm/current/include
+SLURM_NTASKS=1
+LMOD_SETTARG_CMD=:
+SLURM_JOB_CPUS_PER_NODE=16
+BASH_ENV=/usr/share/lmod/lmod/init/bash
+SLURM_TOPOLOGY_ADDR=exp-2-02
+SLURM_WORKING_CLUSTER=expanse:mgr1:6817:8960:109
+SLURM_JOB_MD5SUM=2742ec253f07ee49113b9c3079bf8575  /home/mkandes/cm/shared/apps/spack/0.17.1/cpu/etc/spack/sdsc/expanse/0.17.1/cpu/specs/intel@19.1.3.304/perl@5.34.0.sh
+SPACK_PACKAGE=perl@5.34.0
+__LMOD_REF_COUNT_LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:1;/cm/shared/apps/slurm/current/lib64:1
+SLURM_JOB_NAME=perl@5.34.0
+TMPDIR=/tmp
+LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:/cm/shared/apps/slurm/current/lib64
+LMOD_sys=Linux
+SLURM_JOBID=11610580
+SYSTEM_NAME=expanse
+_ModuleTable001_=X01vZHVsZVRhYmxlXz17WyJNVHZlcnNpb24iXT0zLFsiY19yZWJ1aWxkVGltZSJdPWZhbHNlLFsiY19zaG9ydFRpbWUiXT1mYWxzZSxkZXB0aFQ9e30sZmFtaWx5PXt9LG1UPXtzbHVybT17WyJmbiJdPSIvY20vbG9jYWwvbW9kdWxlZmlsZXMvc2x1cm0vZXhwYW5zZS9jdXJyZW50IixbImZ1bGxOYW1lIl09InNsdXJtL2V4cGFuc2UvY3VycmVudCIsWyJsb2FkT3JkZXIiXT0xLHByb3BUPXt9LFsic3RhY2tEZXB0aCJdPTAsWyJzdGF0dXMiXT0iYWN0aXZlIixbInVzZXJOYW1lIl09InNsdXJtL2V4cGFuc2UvY3VycmVudCIsfSx9LG1wYXRoQT17Ii9jbS9sb2NhbC9tb2R1bGVmaWxlcyIsIi9jbS9zaGFyZWQvYXBwcy94c2VkZS9tb2R1bGVmaWxlcyIsIi9ldGMvbW9kdWxlZmls
+SLURM_CONF=/cm/shared/apps/slurm/var/etc/expanse/slurm.conf
+LOADEDMODULES=slurm/expanse/current
+__LMOD_REF_COUNT_MANPATH=/cm/shared/apps/slurm/current/man:2;/usr/share/lmod/lmod/share/man:1;/usr/local/share/man:1;/usr/share/man:1;/cm/local/apps/environment-modules/current/share/man:1
+_ModuleTable003_=dXNlck5hbWUiXT0ic2x1cm0iLH0sfSxtcGF0aEE9eyIvY20vc2hhcmVkL2FwcHMvc3BhY2svY3B1L2xtb2QvbGludXgtY2VudG9zOC14ODZfNjQvQ29yZSIsIi9jbS9sb2NhbC9tb2R1bGVmaWxlcyIsIi9jbS9zaGFyZWQvYXBwcy94c2VkZS9tb2R1bGVmaWxlcyIsIi9ldGMvbW9kdWxlZmlsZXMiLCIvdXNyL3NoYXJlL21vZHVsZWZpbGVzIiwiL3Vzci9zaGFyZS9Nb2R1bGVzL21vZHVsZWZpbGVzIiwiL2NtL3NoYXJlZC9tb2R1bGVmaWxlcyIsfSxbInN5c3RlbUJhc2VNUEFUSCJdPSIvY20vbG9jYWwvbW9kdWxlZmlsZXM6L2NtL3NoYXJlZC9hcHBzL3hzZWRlL21vZHVsZWZpbGVzOi9jbS9zaGFyZWQvbW9kdWxlZmlsZXM6L2V0Yy9tb2R1bGVmaWxlczovdXNyL3NoYXJlL21v
+INTEL_LICENSE_FILE=40000@elprado.sdsc.edu:40200@elprado.sdsc.edu
+SLURM_NODE_ALIASES=(null)
+SLURM_JOB_QOS=shared-normal
+LMOD_ROOT=/usr/share/lmod
+SLURM_TOPOLOGY_ADDR_PATTERN=node
+SSH_TTY=/dev/pts/181
+MAIL=/var/spool/mail/mkandes
+SLURM_CPUS_ON_NODE=16
+LMOD_arch=x86_64
+SLURM_JOB_NUM_NODES=1
+__Init_Default_Modules=1
+CMD_WLM_CLUSTER_NAME=expanse
+SLURM_MEM_PER_NODE=32768
+SPACK_ROOT=/home/mkandes/cm/shared/apps/spack/0.17.1/cpu
+SHELL=/bin/bash
+TERM=xterm-256color
+SLURM_JOB_UID=501506
+_ModuleTable_Sz_=2
+__LMOD_REF_COUNT_CPATH=/cm/shared/apps/slurm/current/include:1
+SLURM_JOB_PARTITION=shared
+SPACK_INSTANCE_NAME=cpu
+SLURM_JOB_USER=mkandes
+SLURM_NPROCS=1
+SHLVL=2
+SLURM_SUBMIT_HOST=login01
+UNIX_TIME=1650382421
+SLURM_JOB_ACCOUNT=use300
+MANPATH=/cm/shared/apps/slurm/current/man:/usr/share/lmod/lmod/share/man::/usr/local/share/man:/usr/share/man:/cm/local/apps/environment-modules/current/share/man
+LMOD_PREPEND_BLOCK=normal
+MODULEPATH=/cm/local/modulefiles:/cm/shared/apps/xsede/modulefiles:/etc/modulefiles:/usr/share/modulefiles:/usr/share/Modules/modulefiles:/cm/shared/modulefiles
+SLURM_GTIDS=0
+LOGNAME=mkandes
+DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/501506/bus
+XDG_RUNTIME_DIR=/run/user/501506
+MODULEPATH_ROOT=/usr/share/modulefiles
+PATH=/home/mkandes/cm/shared/apps/spack/0.17.1/cpu/bin:/cm/shared/apps/slurm/current/sbin:/cm/shared/apps/slurm/current/bin:/cm/shared/apps/sdsc/galyleo:/home/mkandes/.local/bin:/home/mkandes/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin
+SLURM_JOB_ID=11610580
+_LMFILES_=/cm/local/modulefiles/slurm/expanse/current
+SCHEDULER_MODULE=slurm/expanse/current
+MODULESHOME=/usr/share/lmod/lmod
+LMOD_SETTARG_FULL_SUPPORT=no
+HISTSIZE=1000
+LMOD_PKG=/usr/share/lmod/lmod
+SPACK_SPEC=perl@5.34.0 % intel@19.1.3.304 +cpanm +shared ~threads 
+LMOD_CMD=/usr/share/lmod/lmod/libexec/lmod
+SLURM_LOCALID=0
+LESSOPEN=||/usr/bin/lesspipe.sh %s
+LMOD_FULL_SETTARG_SUPPORT=no
+LMOD_DIR=/usr/share/lmod/lmod/libexec
+BASH_FUNC_which%%=() {  ( alias;
+ eval ${which_declare} ) | /usr/bin/which --tty-only --read-alias --read-functions --show-tilde --show-dot "$@"
+}
+BASH_FUNC_module%%=() {  eval $($LMOD_CMD bash "$@") && eval $(${LMOD_SETTARG_CMD:-:} -s sh)
+}
+BASH_FUNC_spack%%=() {  : this is a shell function from: /home/mkandes/cm/shared/apps/spack/0.17.1/cpu/share/spack/setup-env.sh;
+ : the real spack script is here: /home/mkandes/cm/shared/apps/spack/0.17.1/cpu/bin/spack;
+ _spack_shell_wrapper "$@";
+ return $?
+}
+BASH_FUNC__spack_shell_wrapper%%=() {  for var in LD_LIBRARY_PATH DYLD_LIBRARY_PATH DYLD_FALLBACK_LIBRARY_PATH;
+ do
+ eval "if [ -n \"\${${var}-}\" ]; then export SPACK_$var=\${${var}}; fi";
+ done;
+ if [ -n "${ZSH_VERSION:-}" ]; then
+ emulate -L sh;
+ fi;
+ _sp_flags="";
+ while [ ! -z ${1+x} ] && [ "${1#-}" != "${1}" ]; do
+ _sp_flags="$_sp_flags $1";
+ shift;
+ done;
+ if [ -n "$_sp_flags" ] && [ "${_sp_flags#*h}" != "${_sp_flags}" ] || [ "${_sp_flags#*V}" != "${_sp_flags}" ]; then
+ command spack $_sp_flags "$@";
+ return;
+ fi;
+ _sp_subcommand="";
+ if [ ! -z ${1+x} ]; then
+ _sp_subcommand="$1";
+ shift;
+ fi;
+ case $_sp_subcommand in 
+ "cd")
+ _sp_arg="";
+ if [ -n "$1" ]; then
+ _sp_arg="$1";
+ shift;
+ fi;
+ if [ "$_sp_arg" = "-h" ] || [ "$_sp_arg" = "--help" ]; then
+ command spack cd -h;
+ else
+ LOC="$(spack location $_sp_arg "$@")";
+ if [ -d "$LOC" ]; then
+ cd "$LOC";
+ else
+ return 1;
+ fi;
+ fi;
+ return
+ ;;
+ "env")
+ _sp_arg="";
+ if [ -n "$1" ]; then
+ _sp_arg="$1";
+ shift;
+ fi;
+ if [ "$_sp_arg" = "-h" ] || [ "$_sp_arg" = "--help" ]; then
+ command spack env -h;
+ else
+ case $_sp_arg in 
+ activate)
+ _a=" $@";
+ if [ -z ${1+x} ] || [ "${_a#* --sh}" != "$_a" ] || [ "${_a#* --csh}" != "$_a" ] || [ "${_a#* -h}" != "$_a" ] || [ "${_a#* --help}" != "$_a" ]; then
+ command spack env activate "$@";
+ else
+ stdout="$(command spack $_sp_flags env activate --sh "$@")" || return;
+ eval "$stdout";
+ fi
+ ;;
+ deactivate)
+ _a=" $@";
+ if [ "${_a#* --sh}" != "$_a" ] || [ "${_a#* --csh}" != "$_a" ]; then
+ command spack env deactivate "$@";
+ else
+ if [ -n "$*" ]; then
+ command spack env deactivate -h;
+ else
+ stdout="$(command spack $_sp_flags env deactivate --sh)" || return;
+ eval "$stdout";
+ fi;
+ fi
+ ;;
+ *)
+ command spack env $_sp_arg "$@"
+ ;;
+ esac;
+ fi;
+ return
+ ;;
+ "load" | "unload")
+ _a=" $@";
+ if [ "${_a#* --sh}" != "$_a" ] || [ "${_a#* --csh}" != "$_a" ] || [ "${_a#* -h}" != "$_a" ] || [ "${_a#* --list}" != "$_a" ] || [ "${_a#* --help}" != "$_a" ]; then
+ command spack $_sp_flags $_sp_subcommand "$@";
+ else
+ stdout="$(command spack $_sp_flags $_sp_subcommand --sh "$@")" || return;
+ eval "$stdout";
+ fi
+ ;;
+ *)
+ command spack $_sp_flags $_sp_subcommand "$@"
+ ;;
+ esac
+}
+BASH_FUNC_ml%%=() {  eval $($LMOD_DIR/ml_cmd "$@")
+}
+_=/usr/bin/printenv
+compilers:
+- compiler:
+    spec: gcc@8.5.0
+    paths:
+      cc: /usr/bin/gcc
+      cxx: /usr/bin/g++
+      f77: /usr/bin/gfortran
+      fc: /usr/bin/gfortran
+    flags:
+      cflags: -O2 -march=native
+      cxxflags: -O2 -march=native
+      fflags: -O2 -march=native
+    operating_system: rocky8
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+- compiler:
+    spec: gcc@10.2.0
+    paths:
+      cc: /home/mkandes/cm/shared/apps/spack/0.17.1/cpu/opt/spack/linux-rocky8-zen/gcc-8.5.0/gcc-10.2.0-npcyll4gxjhf4tejksmdzlsl3d3usqpd/bin/gcc
+      cxx: /home/mkandes/cm/shared/apps/spack/0.17.1/cpu/opt/spack/linux-rocky8-zen/gcc-8.5.0/gcc-10.2.0-npcyll4gxjhf4tejksmdzlsl3d3usqpd/bin/g++
+      f77: /home/mkandes/cm/shared/apps/spack/0.17.1/cpu/opt/spack/linux-rocky8-zen/gcc-8.5.0/gcc-10.2.0-npcyll4gxjhf4tejksmdzlsl3d3usqpd/bin/gfortran
+      fc: /home/mkandes/cm/shared/apps/spack/0.17.1/cpu/opt/spack/linux-rocky8-zen/gcc-8.5.0/gcc-10.2.0-npcyll4gxjhf4tejksmdzlsl3d3usqpd/bin/gfortran
+    flags: {}
+    operating_system: rocky8
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+- compiler:
+    spec: intel@19.1.3.304
+    paths:
+      cc: /home/mkandes/cm/shared/apps/spack/0.17.1/cpu/opt/spack/linux-rocky8-zen/gcc-8.5.0/intel-19.1.3.304-6pv46sozip5o35ezrswc4p77gsiawktn/bin/icc
+      cxx: /home/mkandes/cm/shared/apps/spack/0.17.1/cpu/opt/spack/linux-rocky8-zen/gcc-8.5.0/intel-19.1.3.304-6pv46sozip5o35ezrswc4p77gsiawktn/bin/icpc
+      f77: /home/mkandes/cm/shared/apps/spack/0.17.1/cpu/opt/spack/linux-rocky8-zen/gcc-8.5.0/intel-19.1.3.304-6pv46sozip5o35ezrswc4p77gsiawktn/bin/ifort
+      fc: /home/mkandes/cm/shared/apps/spack/0.17.1/cpu/opt/spack/linux-rocky8-zen/gcc-8.5.0/intel-19.1.3.304-6pv46sozip5o35ezrswc4p77gsiawktn/bin/ifort
+    flags: {}
+    operating_system: rocky8
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+config:
+  install_tree:
+    root: $spack/opt/spack
+    projections:
+      all: ${ARCHITECTURE}/${COMPILERNAME}-${COMPILERVER}/${PACKAGE}-${VERSION}-${HASH}
+  template_dirs:
+  - $spack/share/spack/templates
+
+  # Temporary locations Spack can try to use for builds.
+  #
+  # Recommended options are given below.
+  #
+  # Builds can be faster in temporary directories on some (e.g., HPC) systems.
+  # Specifying `$tempdir` will ensure use of the default temporary directory
+  # (i.e., ``$TMP` or ``$TMPDIR``).
+  #
+  # Another option that prevents conflicts and potential permission issues is
+  # to specify `$user_cache_path/stage`, which ensures each user builds in their
+  # home directory.
+  #
+  # A more traditional path uses the value of `$spack/var/spack/stage`, which
+  # builds directly inside Spack's instance without staging them in a
+  # temporary space.  Problems with specifying a path inside a Spack instance
+  # are that it precludes its use as a system package and its ability to be
+  # pip installable.
+  #
+  # In any case, if the username is not already in the path, Spack will append
+  # the value of `$user` in an attempt to avoid potential conflicts between
+  # users in shared temporary spaces.
+  #
+  # The build stage can be purged with `spack clean --stage` and
+  # `spack clean -a`, so it is important that the specified directory uniquely
+  # identifies Spack staging to avoid accidentally wiping out non-Spack work.
+  build_stage:
+  - $tempdir/$user/spack-stage
+  - $user_cache_path/stage
+  # - $spack/var/spack/stage
+
+  # Directory in which to run tests and store test results.
+  # Tests will be stored in directories named by date/time and package
+  # name/hash.
+  test_stage: $user_cache_path/test
+  source_cache: $spack/var/spack/cache
+  misc_cache: $user_cache_path/cache
+  connect_timeout: 10
+  verify_ssl: true
+  suppress_gpg_warnings: false
+  install_missing_compilers: false
+  checksum: true
+  deprecated: false
+  dirty: false
+  build_language: C
+  locks: true
+  url_fetch_method: urllib
+  ccache: false
+  concretizer: clingo
+  db_lock_timeout: 3
+  package_lock_timeout: null
+  shared_linking: rpath
+  allow_sgid: true
+  terminal_title: false
+  debug: false
+  build_jobs: 16
+mirrors:
+  spack-public: https://mirror.spack.io
+modules:
+  default:
+    'enable:':
+    - lmod
+    lmod:
+      core_compilers:
+      - gcc@8.5.0
+      hierarchy:
+      - mpi
+      hash_length: 0
+      blacklist_implicits: true
+      naming_scheme: '{name}/{version}'
+      projections:
+        all: '{name}/{version}'
+      adol-c:
+        suffixes:
+          +openmp: omp
+      amdblis:
+        suffixes:
+          threads=openmp: omp
+      fftw:
+        suffixes:
+          +openmp: omp
+      hpl:
+        suffixes:
+          +openmp: omp
+      hypre:
+        suffixes:
+          +openmp: omp
+      intel:
+        environment:
+          set:
+            INTEL_LICENSE_FILE: 40000@elprado.sdsc.edu:40200@elprado.sdsc.edu
+      kokkos:
+        suffixes:
+          +openmp: omp
+      openblas:
+        suffixes:
+          threads=openmp: omp
+      petsc:
+        suffixes:
+          +complex: cmplx
+      slepc:
+        suffixes:
+          ^petsc +complex: cmplx
+      ^python:
+        autoload: direct
+  prefix_inspections:
+    lib:
+    - LD_LIBRARY_PATH
+    lib64:
+    - LD_LIBRARY_PATH
+    bin:
+    - PATH
+    man:
+    - MANPATH
+    share/man:
+    - MANPATH
+    share/aclocal:
+    - ACLOCAL_PATH
+    lib/pkgconfig:
+    - PKG_CONFIG_PATH
+    lib64/pkgconfig:
+    - PKG_CONFIG_PATH
+    share/pkgconfig:
+    - PKG_CONFIG_PATH
+    ? ''
+    : - CMAKE_PREFIX_PATH
+
+  # These are configurations for the module set named "default"
+packages:
+  lustre:
+    externals:
+    - spec: lustre@2.12.8 % gcc@10.2.0 arch=linux-rocky8-zen2
+      prefix: /usr
+    buildable: false
+  openssl:
+    externals:
+    - spec: openssl@1.1.1k % gcc@8.5.0 arch=linux-rocky8-zen
+      prefix: /usr
+    - spec: openssl@1.1.1k % gcc@10.2.0 arch=linux-rocky8-zen2
+      prefix: /usr
+    buildable: false
+  rdma-core:
+    externals:
+    - spec: rdma-core@28.0 % gcc@10.2.0 arch=linux-rocky8-zen2
+      prefix: /usr
+    buildable: false
+  slurm:
+    externals:
+    - spec: slurm@20.02.7 % gcc@10.2.0 arch=linux-rocky8-zen2
+      prefix: /cm/shared/apps/slurm/20.02.7
+    buildable: false
+  librsvg:
+    externals:
+    - spec: librsvg@2.42.7 % gcc@10.2.0 arch=linux-rocky8-zen2
+      prefix: /usr
+    buildable: false
+  ghostscript:
+    externals:
+    - spec: ghostscript@9.27 % gcc@10.2.0 arch=linux-rocky8-zen2
+      prefix: /usr
+    buildable: false
+  all:
+    compiler: [gcc, intel, pgi, clang, xl, nag, fj, aocc]
+    providers:
+      awk: [gawk]
+      blas: [openblas, amdblis]
+      D: [ldc]
+      daal: [intel-daal]
+      elf: [elfutils]
+      fftw-api: [fftw, amdfftw]
+      flame: [libflame, amdlibflame]
+      fuse: [libfuse]
+      gl: [mesa+opengl, mesa18, opengl]
+      glu: [mesa-glu, openglu]
+      glx: [mesa+glx, mesa18+glx, opengl]
+      golang: [gcc]
+      iconv: [libiconv]
+      ipp: [intel-ipp]
+      java: [openjdk, jdk, ibm-java]
+      jpeg: [libjpeg-turbo, libjpeg]
+      lapack: [openblas, amdlibflame]
+      lua-lang: [lua, lua-luajit]
+      mariadb-client: [mariadb-c-client, mariadb]
+      mkl: [intel-mkl]
+      mpe: [mpe2]
+      mpi: [openmpi, mpich]
+      mysql-client: [mysql, mariadb-c-client]
+      opencl: [pocl]
+      onedal: [intel-oneapi-dal]
+      osmesa: [mesa+osmesa, mesa18+osmesa]
+      pbs: [openpbs, torque]
+      pil: [py-pillow]
+      pkgconfig: [pkgconf, pkg-config]
+      rpc: [libtirpc]
+      scalapack: [netlib-scalapack, amdscalapack]
+      sycl: [hipsycl]
+      szip: [libaec, libszip]
+      tbb: [intel-tbb]
+      unwind: [libunwind]
+      uuid: [util-linux-uuid, libuuid]
+      xxd: [xxd-standalone, vim]
+      yacc: [bison, byacc]
+      ziglang: [zig]
+    permissions:
+      read: world
+      write: user
+repos:
+- $spack/var/spack/repos/sdsc
+- $spack/var/spack/repos/builtin
+upstreams: {}
+Input spec
+--------------------------------
+[    ]  .perl@5.34.0%intel@19.1.3.304+cpanm+shared~threads
+
+Concretized
+--------------------------------
+zqdx6fw  [    ]  builtin.perl@5.34.0%intel@19.1.3.304+cpanm+shared~threads arch=linux-rocky8-zen2
+e6jxz5y  [bl  ]      ^builtin.berkeley-db@18.1.40%intel@19.1.3.304+cxx~docs+stl patches=b231fcc4d5cff05e5c3a4814f6a5af0e9a966428dc2176540d2c05aff41de522 arch=linux-rocky8-zen2
+umdyucs  [bl  ]      ^builtin.bzip2@1.0.8%intel@19.1.3.304~debug~pic+shared arch=linux-rocky8-zen2
+4tmqpul  [b   ]          ^builtin.diffutils@3.8%intel@19.1.3.304 arch=linux-rocky8-zen2
+avhq3ua  [bl  ]              ^builtin.libiconv@1.16%intel@19.1.3.304 libs=shared,static arch=linux-rocky8-zen2
+6y7k2dv  [bl  ]      ^sdsc.gdbm@1.19%intel@19.1.3.304 arch=linux-rocky8-zen2
+kbqwhsz  [bl  ]          ^builtin.readline@8.1%intel@19.1.3.304 arch=linux-rocky8-zen2
+mfdtybg  [bl  ]              ^builtin.ncurses@6.2%intel@19.1.3.304~symlinks+termlib abi=none arch=linux-rocky8-zen2
+t2dn7r4  [b   ]                  ^builtin.pkgconf@1.8.0%intel@19.1.3.304 arch=linux-rocky8-zen2
+f5jcopl  [bl  ]      ^builtin.zlib@1.2.11%intel@19.1.3.304+optimize+pic+shared arch=linux-rocky8-zen2
+
+[+] /home/mkandes/cm/shared/apps/spack/0.17.1/cpu/opt/spack/linux-rocky8-zen2/intel-19.1.3.304/berkeley-db-18.1.40-e6jxz5y3efpfpcw2igbtwzfnhcgcijyc
+[+] /home/mkandes/cm/shared/apps/spack/0.17.1/cpu/opt/spack/linux-rocky8-zen2/intel-19.1.3.304/libiconv-1.16-avhq3uadbw7u6wisqm2rb5kmw7od3phs
+[+] /home/mkandes/cm/shared/apps/spack/0.17.1/cpu/opt/spack/linux-rocky8-zen2/intel-19.1.3.304/pkgconf-1.8.0-t2dn7r42sabpibwg7nu5i5a2drwwl7fa
+[+] /home/mkandes/cm/shared/apps/spack/0.17.1/cpu/opt/spack/linux-rocky8-zen2/intel-19.1.3.304/zlib-1.2.11-f5jcoplh5kwwwffz6aoo4s4ujzfrs7m7
+[+] /home/mkandes/cm/shared/apps/spack/0.17.1/cpu/opt/spack/linux-rocky8-zen2/intel-19.1.3.304/diffutils-3.8-4tmqpulnodu3c63el2honngyhyr4c2v6
+[+] /home/mkandes/cm/shared/apps/spack/0.17.1/cpu/opt/spack/linux-rocky8-zen2/intel-19.1.3.304/ncurses-6.2-mfdtybg66ia3vxifcvszsoyds5ssf63m
+[+] /home/mkandes/cm/shared/apps/spack/0.17.1/cpu/opt/spack/linux-rocky8-zen2/intel-19.1.3.304/bzip2-1.0.8-umdyucsj4z22fphy7jiqiwxeyqt2bufo
+[+] /home/mkandes/cm/shared/apps/spack/0.17.1/cpu/opt/spack/linux-rocky8-zen2/intel-19.1.3.304/readline-8.1-kbqwhsz4fbip54f3omzwcgjj3lboxcxr
+[+] /home/mkandes/cm/shared/apps/spack/0.17.1/cpu/opt/spack/linux-rocky8-zen2/intel-19.1.3.304/gdbm-1.19-6y7k2dvmru37xtbwmhdrd7wskod3a3ob
+==> Installing perl-5.34.0-zqdx6fwb2qr3e42xravfptozdah7bio7
+==> No binary for perl-5.34.0-zqdx6fwb2qr3e42xravfptozdah7bio7 found: installing from source
+==> Using cached archive: /home/mkandes/cm/shared/apps/spack/0.17.1/cpu/var/spack/cache/_source-cache/archive/55/551efc818b968b05216024fb0b727ef2ad4c100f8cb6b43fab615fa78ae5be9a.tar.gz
+==> Using cached archive: /home/mkandes/cm/shared/apps/spack/0.17.1/cpu/var/spack/cache/_source-cache/archive/9d/9da50e155df72bce55cb69f51f1dbb4b62d23740fb99f6178bb27f22ebdf8a46.tar.gz
+==> Moving resource stage
+	source : /tmp/mkandes/spack-stage/resource-cpanm-zqdx6fwb2qr3e42xravfptozdah7bio7/spack-src/
+	destination : /tmp/mkandes/spack-stage/spack-stage-perl-5.34.0-zqdx6fwb2qr3e42xravfptozdah7bio7/spack-src/cpanm/cpanm
+==> Ran patch() for perl
+==> Warning: Intel's compilers may or may not optimize to the same degree for non-Intel microprocessors for optimizations that are not unique to Intel microprocessors
+==> perl: Executing phase: 'configure'
+==> perl: Executing phase: 'build'
+==> Error: ProcessError: Command exited with status 2:
+    'make' '-j16'
+
+132 errors found in build log:
+     30      cygwin        haiku   	      mirbsd   		sco_2_3_2     uwin
+     31      darwin        hpux   	      mpc   		sco_2_3_3     vos
+     32      dcosx         i386   	      ncr_tower   	sco_2_3_4
+     33      dec_osf       interix         netbsd   		solaris_2
+     34      dos_djgpp     irix_4          newsos4   	stellar
+     35      Which of these apply, if any? [linux]
+  >> 36      gcc: error: unrecognized command line option '-we147'
+  >> 37      gcc: error: unrecognized command line option '-mp'; did you mean '
+             -p'?
+  >> 38      gcc: error: unrecognized command line option '-no-gcc'; did you me
+             an '-fno-dce'?
+     39      Operating system name? [linux]
+     40      Operating system version? [4.18.0-348.12.2.el8_5.x86_64]
+     41      Installation prefix to use? (~name ok)
+     42      [/home/mkandes/cm/shared/apps/spack/0.17.1/cpu/opt/spack/linux-roc
+             ky8-zen2/intel-19.1.3.304/perl-5.34.0-zqdx6fwb2qr3e42xravfptozdah7
+             bio7]
+     43      AFS does not seem to be running...
+     44      What installation prefix should I use for installing files? (~name
+              ok)
+
+     ...
+
+     922     icc: command line remark #10148: option '-mp' not supported
+     923     icc: command line remark #10148: option '-mp' not supported
+     924     icc: command line remark #10148: option '-mp' not supported
+     925     icc: command line remark #10148: option '-mp' not supported
+     926     In file included from perl.h(7109),
+     927                      from pad.c(150):
+  >> 928     inline.h(149): error: identifier "__INT_MAX__" is undefined
+     929           if (COP_SEQ_RANGE_LOW(pn) == PERL_PADSEQ_INTRO)
+     930                                        ^
+     931     
+  >> 932     pad.c(329): error: type name is not allowed
+     933                   if (CvSLABBED(&cvbody)) OpslabREFCNT_dec_padok(OpSLA
+             B(CvROOT(&cvbody)));
+     934                                           ^
+     935     
+  >> 936     pad.c(329): error: identifier "opslot_op" is undefined
+     937                   if (CvSLABBED(&cvbody)) OpslabREFCNT_dec_padok(OpSLA
+             B(CvROOT(&cvbody)));
+     938                                           ^
+     939     
+  >> 940     pad.c(329): error: type name is not allowed
+     941                   if (CvSLABBED(&cvbody)) OpslabREFCNT_dec_padok(OpSLA
+             B(CvROOT(&cvbody)));
+     942                                           ^
+     943     
+  >> 944     pad.c(329): error: expected an expression
+     945                   if (CvSLABBED(&cvbody)) OpslabREFCNT_dec_padok(OpSLA
+             B(CvROOT(&cvbody)));
+     946                                           ^
+     947     
+  >> 948     pad.c(329): error: identifier "opslab_slots" is undefined
+     949                   if (CvSLABBED(&cvbody)) OpslabREFCNT_dec_padok(OpSLA
+             B(CvROOT(&cvbody)));
+     950                                           ^
+     951     
+  >> 952     pad.c(329): error: type name is not allowed
+     953                   if (CvSLABBED(&cvbody)) OpslabREFCNT_dec_padok(OpSLA
+             B(CvROOT(&cvbody)));
+     954                                           ^
+     955     
+  >> 956     pad.c(329): error: type name is not allowed
+     957                   if (CvSLABBED(&cvbody)) OpslabREFCNT_dec_padok(OpSLA
+             B(CvROOT(&cvbody)));
+     958                                           ^
+     959     
+  >> 960     pad.c(329): error: expected an expression
+     961                   if (CvSLABBED(&cvbody)) OpslabREFCNT_dec_padok(OpSLA
+             B(CvROOT(&cvbody)));
+     962                                           ^
+     963     
+  >> 964     pad.c(329): error: type name is not allowed
+     965                   if (CvSLABBED(&cvbody)) OpslabREFCNT_dec_padok(OpSLA
+             B(CvROOT(&cvbody)));
+     966                                           ^
+     967     
+  >> 968     pad.c(329): error: type name is not allowed
+     969                   if (CvSLABBED(&cvbody)) OpslabREFCNT_dec_padok(OpSLA
+             B(CvROOT(&cvbody)));
+     970                                           ^
+     971     
+  >> 972     pad.c(329): error: expected an expression
+     973                   if (CvSLABBED(&cvbody)) OpslabREFCNT_dec_padok(OpSLA
+             B(CvROOT(&cvbody)));
+     974                                           ^
+     975     
+  >> 976     pad.c(503): error: type name is not allowed
+     977           if      (CvROOT(cv))  slab = OpSLAB(CvROOT(cv));
+     978                                        ^
+     979     
+  >> 980     pad.c(503): error: identifier "opslot_op" is undefined
+     981           if      (CvROOT(cv))  slab = OpSLAB(CvROOT(cv));
+     982                                        ^
+     983     
+  >> 984     pad.c(503): error: type name is not allowed
+     985           if      (CvROOT(cv))  slab = OpSLAB(CvROOT(cv));
+     986                                        ^
+     987     
+  >> 988     pad.c(503): error: expected an expression
+     989           if      (CvROOT(cv))  slab = OpSLAB(CvROOT(cv));
+     990                                        ^
+     991     
+  >> 992     pad.c(503): error: identifier "opslab_slots" is undefined
+     993           if      (CvROOT(cv))  slab = OpSLAB(CvROOT(cv));
+     994                                        ^
+     995     
+  >> 996     pad.c(613): error: identifier "__INT_MAX__" is undefined
+     997           COP_SEQ_RANGE_LOW_set(name, PERL_PADSEQ_INTRO);
+     998           ^
+     999     
+  >> 1000    pad.c(875): error: identifier "__INT_MAX__" is undefined
+     1001                  && (   COP_SEQ_RANGE_LOW(sv)  == PERL_PADSEQ_INTRO
+     1002                                                   ^
+     1003    
+  >> 1004    pad.c(903): error: identifier "__INT_MAX__" is undefined
+     1005                      && (   COP_SEQ_RANGE_LOW(sv)  == PERL_PADSEQ_INT
+             RO
+     1006                                                       ^
+     1007    
+  >> 1008    pad.c(979): error: identifier "__INT_MAX__" is undefined
+     1009                  && COP_SEQ_RANGE_LOW(name) == PERL_PADSEQ_INTRO
+     1010                                                ^
+     1011    
+  >> 1012    pad.c(1451): error: identifier "__INT_MAX__" is undefined
+     1013                  && COP_SEQ_RANGE_LOW(sv) == PERL_PADSEQ_INTRO)
+     1014                                              ^
+     1015    
+  >> 1016    pad.c(1463): error: identifier "__INT_MAX__" is undefined
+     1017          COP_SEQMAX_INC;
+     1018          ^
+     1019    
+  >> 1020    pad.c(1505): error: identifier "__INT_MAX__" is undefined
+     1021                  && COP_SEQ_RANGE_HIGH(sv) == PERL_PADSEQ_INTRO)
+     1022                                               ^
+     1023    
+  >> 1024    pad.c(1522): error: identifier "__INT_MAX__" is undefined
+     1025          COP_SEQMAX_INC;
+     1026          ^
+     1027    
+  >> 1028    pad.c(2201): error: expected an expression
+     1029               CvNAME_HEK_set(cv, share_hek_hek(CvNAME_HEK(proto)));
+     1030               ^
+     1031    
+  >> 1032    pad.c(2201): error: identifier "shared_he_hek" is undefined
+     1033               CvNAME_HEK_set(cv, share_hek_hek(CvNAME_HEK(proto)));
+     1034               ^
+     1035    
+  >> 1036    pad.c(2731): error: expected an expression
+     1037          Newxz(alloc2,
+     1038          ^
+     1039    
+  >> 1040    pad.c(2731): error: identifier "xpadn_str" is undefined
+     1041          Newxz(alloc2,
+     1042          ^
+     1043    
+  >> 1044    pad.c(2731): error: expected an expression
+     1045          Newxz(alloc2,
+     1046          ^
+     1047    
+  >> 1048    pad.c(2731): error: expected an expression
+     1049          Newxz(alloc2,
+     1050          ^
+     1051    
+  >> 1052    pad.c(2731): error: expected an expression
+     1053          Newxz(alloc2,
+     1054          ^
+     1055    
+  >> 1056    pad.c(2767): error: expected an expression
+     1057          PadnameREFCNT(PADNAME_FROM_PV(PadnamePV(outer)))++;
+     1058          ^
+     1059    
+  >> 1060    pad.c(2767): error: identifier "xpadn_str" is undefined
+     1061          PadnameREFCNT(PADNAME_FROM_PV(PadnamePV(outer)))++;
+     1062          ^
+     1063    
+  >> 1064    pad.c(2785): error: expected an expression
+     1065                  PadnameREFCNT_dec(PADNAME_FROM_PV(PadnamePV(pn)));
+     1066                  ^
+     1067    
+  >> 1068    pad.c(2785): error: identifier "xpadn_str" is undefined
+     1069                  PadnameREFCNT_dec(PADNAME_FROM_PV(PadnamePV(pn)));
+     1070                  ^
+     1071    
+     1072    compilation aborted for pad.c (code 2)
+  >> 1073    perl.c(611): error: identifier "__INT_MAX__" is undefined
+     1074                      if (grok_atoUV(s, &uv, NULL) && uv <= INT_MAX)
+     1075                                                            ^
+     1076    
+     1077    make: *** [makefile:251: pad.o] Error 2
+     1078    make: *** Waiting for unfinished jobs....
+     1079    In file included from perl.h(7109),
+     1080                     from op.c(163):
+  >> 1081    inline.h(149): error: identifier "__INT_MAX__" is undefined
+     1082          if (COP_SEQ_RANGE_LOW(pn) == PERL_PADSEQ_INTRO)
+     1083                                       ^
+     1084    
+  >> 1085    perl.c(4004): error: identifier "__INT_MAX__" is undefined
+     1086                  && uv <= PERL_INT_MAX
+     1087                           ^
+     1088    
+  >> 1089    op.c(235): error: type name is not allowed
+     1090          size_t sz_bytes = OpSLABSizeBytes(sz);
+     1091                            ^
+     1092    
+  >> 1093    op.c(235): error: identifier "opslab_slots" is undefined
+     1094          size_t sz_bytes = OpSLABSizeBytes(sz);
+     1095                            ^
+     1096    
+  >> 1097    op.c(275): error: type name is not allowed
+     1098          U16 sz = OpSLOT(o)->opslot_size;
+     1099                   ^
+     1100    
+  >> 1101    op.c(275): error: identifier "opslot_op" is undefined
+     1102          U16 sz = OpSLOT(o)->opslot_size;
+     1103                   ^
+     1104    
+  >> 1105    op.c(351): error: type name is not allowed
+     1106          sz_in_p = SIZE_TO_PSIZE(sz + OPSLOT_HEADER);
+     1107                    ^
+     1108    
+  >> 1109    op.c(351): error: identifier "opslot_op" is undefined
+     1110          sz_in_p = SIZE_TO_PSIZE(sz + OPSLOT_HEADER);
+     1111                    ^
+     1112    
+  >> 1113    op.c(509): error: type name is not allowed
+     1114          slab = OpSLAB(o);
+     1115                 ^
+     1116    
+  >> 1117    op.c(509): error: identifier "opslot_op" is undefined
+     1118          slab = OpSLAB(o);
+     1119                 ^
+     1120    
+  >> 1121    op.c(509): error: type name is not allowed
+     1122          slab = OpSLAB(o);
+     1123                 ^
+     1124    
+  >> 1125    op.c(509): error: expected an expression
+     1126          slab = OpSLAB(o);
+     1127                 ^
+     1128    
+  >> 1129    op.c(509): error: identifier "opslab_slots" is undefined
+     1130          slab = OpSLAB(o);
+     1131                 ^
+     1132    
+  >> 1133    toke.c(861): error: type name is not allowed
+     1134      	 && OpSLAB(parser->nextval[nexttoke].opval) == slab) {
+     1135      	    ^
+     1136    
+  >> 1137    toke.c(861): error: identifier "opslot_op" is undefined
+     1138      	 && OpSLAB(parser->nextval[nexttoke].opval) == slab) {
+     1139      	    ^
+     1140    
+  >> 1141    toke.c(861): error: type name is not allowed
+     1142      	 && OpSLAB(parser->nextval[nexttoke].opval) == slab) {
+     1143      	    ^
+     1144    
+  >> 1145    toke.c(861): error: expected an expression
+     1146      	 && OpSLAB(parser->nextval[nexttoke].opval) == slab) {
+     1147      	    ^
+     1148    
+  >> 1149    toke.c(861): error: identifier "opslab_slots" is undefined
+     1150      	 && OpSLAB(parser->nextval[nexttoke].opval) == slab) {
+     1151      	    ^
+     1152    
+     1153    compilation aborted for perlmini.c (code 2)
+  >> 1154    mro_core.c(344): error: expected an expression
+     1155                                  ? newSVhek(SvSHARED_HEK_FROM_PV(SvPV
+             X(val)))
+     1156                                    ^
+     1157    
+  >> 1158    mro_core.c(344): error: identifier "hek_key" is undefined
+     1159                                  ? newSVhek(SvSHARED_HEK_FROM_PV(SvPV
+             X(val)))
+     1160                                    ^
+     1161    
+  >> 1162    hv.c(93): error: type name is not allowed
+     1163          Newx(k, HEK_BASESIZE + len + 2, char);
+     1164          ^
+     1165    
+  >> 1166    hv.c(93): error: identifier "hek_key" is undefined
+     1167          Newx(k, HEK_BASESIZE + len + 2, char);
+     1168          ^
+     1169    
+  >> 1170    hv.c(93): error: type name is not allowed
+     1171          Newx(k, HEK_BASESIZE + len + 2, char);
+     1172          ^
+     1173    
+  >> 1174    hv.c(93): error: type name is not allowed
+     1175          Newx(k, HEK_BASESIZE + len + 2, char);
+     1176          ^
+     1177    
+  >> 1178    hv.c(93): error: type name is not allowed
+     1179          Newx(k, HEK_BASESIZE + len + 2, char);
+     1180          ^
+     1181    
+  >> 1182    hv.c(436): error: type name is not allowed
+     1183                          Newx(k, HEK_BASESIZE + sizeof(const SV *), c
+             har);
+     1184                          ^
+     1185    
+  >> 1186    hv.c(436): error: identifier "hek_key" is undefined
+     1187                          Newx(k, HEK_BASESIZE + sizeof(const SV *), c
+             har);
+     1188                          ^
+     1189    
+  >> 1190    hv.c(436): error: type name is not allowed
+     1191                          Newx(k, HEK_BASESIZE + sizeof(const SV *), c
+             har);
+     1192                          ^
+     1193    
+  >> 1194    hv.c(436): error: type name is not allowed
+     1195                          Newx(k, HEK_BASESIZE + sizeof(const SV *), c
+             har);
+     1196                          ^
+     1197    
+  >> 1198    hv.c(436): error: type name is not allowed
+     1199                          Newx(k, HEK_BASESIZE + sizeof(const SV *), c
+             har);
+     1200                          ^
+     1201    
+     1202    make: *** [makefile:312: perlmini.o] Error 2
+  >> 1203    hv.c(636): error: expected an expression
+     1204                  keysv_hek  = SvSHARED_HEK_FROM_PV(SvPVX_const(keysv)
+             );
+     1205                               ^
+     1206    
+  >> 1207    hv.c(636): error: identifier "hek_key" is undefined
+     1208                  keysv_hek  = SvSHARED_HEK_FROM_PV(SvPVX_const(keysv)
+             );
+     1209                               ^
+     1210    
+  >> 1211    hv.c(637): error: expected an expression
+     1212              hash = SvSHARED_HASH(keysv);
+     1213                     ^
+     1214    
+  >> 1215    hv.c(1191): error: expected an expression
+     1216                  keysv_hek  = SvSHARED_HEK_FROM_PV(SvPVX_const(keysv)
+             );
+     1217                               ^
+     1218    
+  >> 1219    hv.c(1191): error: identifier "hek_key" is undefined
+     1220                  keysv_hek  = SvSHARED_HEK_FROM_PV(SvPVX_const(keysv)
+             );
+     1221                               ^
+     1222    
+  >> 1223    hv.c(1192): error: expected an expression
+     1224              hash = SvSHARED_HASH(keysv);
+     1225                     ^
+     1226    
+  >> 1227    op.c(3077): error: function call is not allowed in a constant expr
+             ession
+     1228          STATIC_ASSERT_STMT(   STRUCT_OFFSET(BINOP,    op_last)
+     1229          ^
+     1230    
+  >> 1231    op.c(3077): error: type name is not allowed
+     1232          STATIC_ASSERT_STMT(   STRUCT_OFFSET(BINOP,    op_last)
+     1233          ^
+     1234    
+  >> 1235    op.c(3077): error: identifier "op_last" is undefined
+     1236          STATIC_ASSERT_STMT(   STRUCT_OFFSET(BINOP,    op_last)
+     1237          ^
+     1238    
+  >> 1239    op.c(3077): error: function call is not allowed in a constant expr
+             ession
+     1240          STATIC_ASSERT_STMT(   STRUCT_OFFSET(BINOP,    op_last)
+     1241          ^
+     1242    
+  >> 1243    op.c(3077): error: type name is not allowed
+     1244          STATIC_ASSERT_STMT(   STRUCT_OFFSET(BINOP,    op_last)
+     1245          ^
+     1246    
+  >> 1247    op.c(3077): error: identifier "op_aux" is undefined
+     1248          STATIC_ASSERT_STMT(   STRUCT_OFFSET(BINOP,    op_last)
+     1249          ^
+     1250    
+  >> 1251    op.c(3079): error: function call is not allowed in a constant expr
+             ession
+     1252          STATIC_ASSERT_STMT(   STRUCT_OFFSET(LISTOP,   op_last)
+     1253          ^
+     1254    
+  >> 1255    op.c(3079): error: type name is not allowed
+     1256          STATIC_ASSERT_STMT(   STRUCT_OFFSET(LISTOP,   op_last)
+     1257          ^
+     1258    
+  >> 1259    op.c(3079): error: identifier "op_last" is undefined
+     1260          STATIC_ASSERT_STMT(   STRUCT_OFFSET(LISTOP,   op_last)
+     1261          ^
+     1262    
+  >> 1263    op.c(3079): error: function call is not allowed in a constant expr
+             ession
+     1264          STATIC_ASSERT_STMT(   STRUCT_OFFSET(LISTOP,   op_last)
+     1265          ^
+     1266    
+  >> 1267    op.c(3079): error: type name is not allowed
+     1268          STATIC_ASSERT_STMT(   STRUCT_OFFSET(LISTOP,   op_last)
+     1269          ^
+     1270    
+  >> 1271    op.c(3079): error: identifier "op_aux" is undefined
+     1272          STATIC_ASSERT_STMT(   STRUCT_OFFSET(LISTOP,   op_last)
+     1273          ^
+     1274    
+  >> 1275    op.c(4159): error: identifier "__INT_MAX__" is undefined
+     1276                  PAD_COMPNAME_GEN_set(o->op_targ, PERL_INT_MAX);
+     1277                  ^
+     1278    
+  >> 1279    op.c(4312): error: identifier "__INT_MAX__" is undefined
+     1280      	    PL_modcount = RETURN_UNLIMITED_NUMBER;
+     1281      	                  ^
+     1282    
+  >> 1283    util.c(4772): error: identifier "__INT_MAX__" is undefined
+     1284                  if (grok_atoUV(p, &uv, &endptr) && uv <= U32_MAX) {
+     1285                                                           ^
+     1286    
+     1287    util.c(4906): warning #69: integer conversion resulted in truncati
+             on
+     1288          u += SEED_C5 * (U32)PTR2UV(&when);
+     1289                         ^
+     1290    
+  >> 1291    op.c(4429): error: identifier "__INT_MAX__" is undefined
+     1292      		if (PL_modcount != RETURN_UNLIMITED_NUMBER)
+     1293      		                   ^
+     1294    
+  >> 1295    op.c(4434): error: identifier "__INT_MAX__" is undefined
+     1296      		PL_modcount = RETURN_UNLIMITED_NUMBER;
+     1297      		              ^
+     1298    
+  >> 1299    op.c(4446): error: identifier "__INT_MAX__" is undefined
+     1300                 PL_modcount = RETURN_UNLIMITED_NUMBER;
+     1301                               ^
+     1302    
+  >> 1303    op.c(4472): error: identifier "__INT_MAX__" is undefined
+     1304             PL_modcount = RETURN_UNLIMITED_NUMBER;
+     1305                           ^
+     1306    
+     1307    compilation aborted for mro_core.c (code 2)
+  >> 1308    hv.c(2719): error: type name is not allowed
+     1309                      Newxz(k, HEK_BASESIZE + sizeof(const SV *), char
+             );
+     1310                      ^
+     1311    
+  >> 1312    hv.c(2719): error: identifier "hek_key" is undefined
+     1313                      Newxz(k, HEK_BASESIZE + sizeof(const SV *), char
+             );
+     1314                      ^
+     1315    
+  >> 1316    hv.c(2719): error: type name is not allowed
+     1317                      Newxz(k, HEK_BASESIZE + sizeof(const SV *), char
+             );
+     1318                      ^
+     1319    
+  >> 1320    hv.c(2719): error: type name is not allowed
+     1321                      Newxz(k, HEK_BASESIZE + sizeof(const SV *), char
+             );
+     1322                      ^
+     1323    
+  >> 1324    hv.c(2719): error: type name is not allowed
+     1325                      Newxz(k, HEK_BASESIZE + sizeof(const SV *), char
+             );
+     1326                      ^
+     1327    
+  >> 1328    hv.c(2970): error: expected an expression
+     1329                                        - STRUCT_OFFSET(struct shared_
+             he,
+     1330                                          ^
+     1331    
+  >> 1332    hv.c(2970): error: identifier "shared_he_hek" is undefined
+     1333                                        - STRUCT_OFFSET(struct shared_
+             he,
+     1334                                          ^
+     1335    
+  >> 1336    op.c(5693): error: identifier "__INT_MAX__" is undefined
+     1337          COP_SEQMAX_INC;
+     1338          ^
+     1339    
+     1340    make: *** [makefile:250: mro_core.o] Error 2
+  >> 1341    hv.c(3130): error: expected an expression
+     1342              Newx(k, STRUCT_OFFSET(struct shared_he,
+     1343              ^
+     1344    
+  >> 1345    hv.c(3130): error: identifier "shared_he_hek" is undefined
+     1346              Newx(k, STRUCT_OFFSET(struct shared_he,
+     1347              ^
+     1348    
+  >> 1349    hv.c(3130): error: expected an expression
+     1350              Newx(k, STRUCT_OFFSET(struct shared_he,
+     1351              ^
+     1352    
+  >> 1353    hv.c(3130): error: expected an expression
+     1354              Newx(k, STRUCT_OFFSET(struct shared_he,
+     1355              ^
+     1356    
+  >> 1357    hv.c(3130): error: expected an expression
+     1358              Newx(k, STRUCT_OFFSET(struct shared_he,
+     1359              ^
+     1360    
+  >> 1361    hv.c(3327): error: expected an expression
+     1362              HeKEY_hek(entry) = share_hek_hek(chain->refcounted_he_he
+             k);
+     1363                                 ^
+     1364    
+  >> 1365    hv.c(3327): error: identifier "shared_he_hek" is undefined
+     1366              HeKEY_hek(entry) = share_hek_hek(chain->refcounted_he_he
+             k);
+     1367                                 ^
+     1368    
+     1369    compilation aborted for util.c (code 2)
+  >> 1370    hv.c(3487): error: expected an expression
+     1371              hash = SvSHARED_HASH(key);
+     1372                     ^
+     1373    
+  >> 1374    hv.c(3487): error: identifier "hek_key" is undefined
+     1375              hash = SvSHARED_HASH(key);
+     1376                     ^
+     1377    
+  >> 1378    toke.c(4713): error: identifier "__INT_MAX__" is undefined
+     1379          unsigned int correct_length = maxlen < 0 ?  PERL_INT_MAX : m
+             axlen;
+     1380                                                      ^
+     1381    
+     1382    make: *** [makefile:250: util.o] Error 2
+  >> 1383    hv.c(3674): error: expected an expression
+     1384              hash = SvSHARED_HASH(key);
+     1385                     ^
+     1386    
+  >> 1387    hv.c(3674): error: identifier "hek_key" is undefined
+     1388              hash = SvSHARED_HASH(key);
+     1389                     ^
+     1390    
+  >> 1391    gv.c(3832): error: type name is not allowed
+     1392                                      STRUCT_OFFSET(XPVIV, xiv_iv));
+     1393                                      ^
+     1394    
+  >> 1395    gv.c(3832): error: identifier "xiv_u" is undefined
+     1396                                      STRUCT_OFFSET(XPVIV, xiv_iv));
+     1397                                      ^
+     1398    
+     1399    compilation aborted for hv.c (code 2)
+     1400    make: *** [makefile:250: hv.o] Error 2
+  >> 1401    op.c(8890): error: identifier "__INT_MAX__" is undefined
+     1402          COP_SEQMAX_INC; /* Purely for B::*'s benefit */
+     1403          ^
+     1404    
+     1405    compilation aborted for gv.c (code 2)
+  >> 1406    op.c(9337): error: identifier "__INT_MAX__" is undefined
+     1407                  else if (PL_modcount < RETURN_UNLIMITED_NUMBER &&
+     1408                                         ^
+     1409    
+     1410    make: *** [makefile:250: gv.o] Error 2
+  >> 1411    op.c(10224): error: identifier "__INT_MAX__" is undefined
+     1412      	    PAD_COMPNAME_GEN_set(padoff, PERL_INT_MAX);
+     1413      	    ^
+     1414    
+  >> 1415    op.c(10291): error: type name is not allowed
+     1416              &&    OpSLOT(loop)->opslot_size
+     1417                    ^
+     1418    
+  >> 1419    op.c(10291): error: identifier "opslot_op" is undefined
+     1420              &&    OpSLOT(loop)->opslot_size
+     1421                    ^
+     1422    
+  >> 1423    op.c(10292): error: type name is not allowed
+     1424                  < SIZE_TO_PSIZE(sizeof(LOOP) + OPSLOT_HEADER))
+     1425                    ^
+     1426    
+  >> 1427    op.c(11069): error: expected an expression
+     1428      	if (hek) (void)share_hek_hek(hek);
+     1429      	               ^
+     1430    
+  >> 1431    op.c(11069): error: identifier "shared_he_hek" is undefined
+     1432      	if (hek) (void)share_hek_hek(hek);
+     1433      	               ^
+     1434    
+  >> 1435    pp_hot.c(4839): error: type name is not allowed
+     1436                              SET_SVANY_FOR_BODYLESS_IV(newsv);
+     1437                              ^
+     1438    
+  >> 1439    pp_hot.c(4839): error: identifier "xiv_u" is undefined
+     1440                              SET_SVANY_FOR_BODYLESS_IV(newsv);
+     1441                              ^
+     1442    
+  >> 1443    op.c(13841): error: identifier "__INT_MAX__" is undefined
+     1444      	PAD_COMPNAME_GEN_set(o->op_targ, PERL_INT_MAX);
+     1445      	^
+     1446    
+  >> 1447    op.c(15701): error: identifier "__INT_MAX__" is undefined
+     1448          if (PAD_COMPNAME_GEN(o->op_targ) == PERL_INT_MAX)
+     1449                                              ^
+     1450    
+     1451    compilation aborted for pp_hot.c (code 2)
+     1452    make: *** [makefile:250: pp_hot.o] Error 2
+     1453    compilation aborted for opmini.c (code 2)
+     1454    make: *** [makefile:304: opmini.o] Error 2
+     1455    compilation aborted for toke.c (code 2)
+     1456    make: *** [makefile:250: toke.o] Error 2
+  >> 1457    regcomp.c(12688): error: identifier "__INT_MAX__" is undefined
+     1458          STATIC_ASSERT_DECL(REG_INFTY <= U32_MAX);
+     1459          ^
+     1460    
+  >> 1461    regcomp.c(21850): error: type name is not allowed
+     1462      	   sizeof(regexp) - STRUCT_OFFSET(regexp, xpv_cur));
+     1463      	                    ^
+     1464    
+  >> 1465    regcomp.c(21850): error: identifier "xpv_cur" is undefined
+     1466      	   sizeof(regexp) - STRUCT_OFFSET(regexp, xpv_cur));
+     1467      	                    ^
+     1468    
+     1469    compilation aborted for regcomp.c (code 2)
+     1470    make: *** [makefile:250: regcomp.o] Error 2
+
+See build log for details:
+  /tmp/mkandes/spack-stage/spack-stage-perl-5.34.0-zqdx6fwb2qr3e42xravfptozdah7bio7/spack-build-out.txt
+
+==> Error: Terminating after first install failure: ProcessError: Command exited with status 2:
+    'make' '-j16'
+real 92.76
+user 55.92
+sys 27.83
+ERROR: spack install failed.

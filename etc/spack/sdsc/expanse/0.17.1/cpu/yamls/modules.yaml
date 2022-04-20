@@ -27,6 +27,10 @@ modules:
       hypre:
         suffixes:
           '+openmp': omp
+      intel:
+        environment:
+          set:
+            INTEL_LICENSE_FILE: '40000@elprado.sdsc.edu:40200@elprado.sdsc.edu'
       kokkos:
         suffixes:
           '+openmp': omp
