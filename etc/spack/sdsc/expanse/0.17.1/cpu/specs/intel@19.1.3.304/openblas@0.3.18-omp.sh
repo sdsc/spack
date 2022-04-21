@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=openblas@0.3.18
+#SBATCH --job-name=openblas@0.3.18-omp
 #SBATCH --account=use300
 #SBATCH --partition=shared
 #SBATCH --nodes=1
@@ -37,9 +37,9 @@ module list
 declare -xr INTEL_LICENSE_FILE='40000@elprado.sdsc.edu:40200@elprado.sdsc.edu'
 declare -xr SPACK_PACKAGE='openblas@0.3.18'
 declare -xr SPACK_COMPILER='intel@19.1.3.304'
-declare -xr SPACK_VARIANTS='~bignuma ~consistent_fpcsr +ilp64 +locking +pic +shared threads=none'
+declare -xr SPACK_VARIANTS='~bignuma ~consistent_fpcsr +ilp64 +locking +pic +shared threads=openmp'
 declare -xr SPACK_DEPENDENCIES=''
-declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
+declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS}"
 
 printenv
 
@@ -65,6 +65,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'openblas@0.3.18-omp.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'netlib-lapack@3.9.1.sh'
 
 sleep 60
