@@ -36,8 +36,9 @@ module list
 
 declare -xr SPACK_PACKAGE='valgrind@3.17.0'
 declare -xr SPACK_COMPILER='intel@19.1.3.304'
-declare -xr SPACK_VARIANTS='+boost ~mpi +only64bit +ubsan'
-declare -xr SPACK_DEPENDENCIES="^boost@1.77.0/$(spack find --format '{hash:7}' boost@1.77.0 % ${SPACK_COMPILER} ~mpi)"
+declare -xr SPACK_VARIANTS='~boost ~mpi +only64bit +ubsan'
+declare -xr SPACK_DEPENDENCIES=''
+#"^boost@1.77.0/$(spack find --format '{hash:7}' boost@1.77.0 % ${SPACK_COMPILER} ~mpi)"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -64,6 +65,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'petsc@3.16.1.sh'
+#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'petsc@3.16.1.sh'
 
 sleep 60

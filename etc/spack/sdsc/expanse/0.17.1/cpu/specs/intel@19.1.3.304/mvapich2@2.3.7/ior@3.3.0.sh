@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=papi@6.0.0.1
+#SBATCH --job-name=ior@3.3.0
 #SBATCH --account=use300
-#SBATCH --partition=debug
+#SBATCH --partition=shared
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=16
@@ -35,15 +35,15 @@ module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
 declare -xr INTEL_LICENSE_FILE='40000@elprado.sdsc.edu:40200@elprado.sdsc.edu'
-declare -xr SPACK_PACKAGE='papi@6.0.0.1'
+declare -xr SPACK_PACKAGE='ior@3.3.0'
 declare -xr SPACK_COMPILER='intel@19.1.3.304'
-declare -xr SPACK_VARIANTS='~cuda ~example ~infiniband ~lmsensors ~nvml ~powercap ~rapl ~rocm ~rocm_smi ~sde +shared ~static_tools'
-declare -xr SPACK_DEPENDENCIES=''
+declare -xr SPACK_VARIANTS='+hdf5 +ncmpi'
+declare -xr SPACK_DEPENDENCIES="^mvapich2@2.3.7/$(spack find --format '{hash:7}' mvapich2@2.3.7 % ${SPACK_COMPILER}) ^hdf5@1.10.7/$(spack find --format '{hash:7}' hdf5@1.10.7 % ${SPACK_COMPILER} +mpi ^mvapich2@2.3.7) ^parallel-netcdf@1.12.2/$(spack find --format '{hash:7}' parallel-netcdf@1.12.2 % ${SPACK_COMPILER} ^mvapich2@2.3.7)"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
 
-spack config get compilers
+spack config get compilers  
 spack config get config  
 spack config get mirrors
 spack config get modules
@@ -65,6 +65,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'valgrind@3.17.0.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'netcdf-c@4.8.1.sh'
 
 sleep 60
