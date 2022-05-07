@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
-# real 24.33
 
-#SBATCH --job-name=kokkos@3.1.01
+#SBATCH --job-name=grace@5.1.25
 #SBATCH --account=use300
 #SBATCH --partition=shared
 #SBATCH --nodes=1
@@ -16,7 +15,7 @@ declare -xir UNIX_TIME="$(date +'%s')"
 
 declare -xr SYSTEM_NAME='expanse'
 
-declare -xr SPACK_VERSION='0.15.4'
+declare -xr SPACK_VERSION='0.17.1'
 declare -xr SPACK_INSTANCE_NAME='cpu'
 declare -xr SPACK_INSTANCE_DIR="${HOME}/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}"
 
@@ -35,10 +34,10 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-declare -xr SPACK_PACKAGE='kokkos@3.1.01'
+declare -xr SPACK_PACKAGE='grace@5.1.25'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS='~aggressive_vectorization ~compiler_warnings ~cuda ~cuda_lambda ~cuda_ldg_intrinsic ~cuda_relocatable_device_code ~cuda_uvm ~debug ~debug_bounds_check ~debug_dualview_modify_check ~deprecated_code ~examples ~explicit_instantiation ~hip ~hpx ~hpx_async_dispatch ~hwloc ~memkind ~numactl ~openmp +pic +profiling ~profiling_load_print ~pthread ~qthread +serial +shared ~tests~wrapper'
-declare -xr SPACK_DEPENDENCIES=''
+declare -xr SPACK_VARIANTS=''
+declare -xr SPACK_DEPENDENCIES="^fftw@2.1.5/$(spack find --format '{hash:7}' fftw@2.1.5 % ${SPACK_COMPILER} ~mpi ~openmp) ^netcdf-c@4.8.1/$(spack find --format '{hash:7}' netcdf-c@4.8.1 % ${SPACK_COMPILER} ~mpi)"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -65,6 +64,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'papi@6.0.0.1.sh'
+#sbatch --dependency="afterok:${SLURM_JOB_ID}" ''
 
 sleep 60

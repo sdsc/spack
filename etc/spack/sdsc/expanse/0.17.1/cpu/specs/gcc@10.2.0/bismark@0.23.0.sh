@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# real 9.42
 
 #SBATCH --job-name=bismark@0.23.0
 #SBATCH --account=use300
@@ -23,7 +22,7 @@ declare -xr SPACK_INSTANCE_DIR="${HOME}/cm/shared/apps/spack/${SPACK_VERSION}/${
 declare -xr SLURM_JOB_SCRIPT="$(scontrol show job ${SLURM_JOB_ID} | awk -F= '/Command=/{print $2}')"
 declare -xr SLURM_JOB_MD5SUM="$(md5sum ${SLURM_JOB_SCRIPT})"
 
-declare -xr SCHEDULER_MODULE='slurm/expanse/current'
+declare -xr SCHEDULER_MODULE='slurm'
 
 echo "${UNIX_TIME} ${SLURM_JOB_ID} ${SLURM_JOB_MD5SUM} ${SLURM_JOB_DEPENDENCY}" 
 echo ""
@@ -36,7 +35,6 @@ module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
 
-# ==> Error: Cannot depend on 'berkeley-db@18.1.40%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-centos8-zen2' twice
 declare -xr SPACK_PACKAGE='bismark@0.23.0'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
 declare -xr SPACK_VARIANTS=''
@@ -67,6 +65,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'jellyfish@2.2.7.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'jellyfish@2.2.7.sh'
 
 sleep 60

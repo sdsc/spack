@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# real 66.31
 
 #SBATCH --job-name=adol-c@2.7.2
 #SBATCH --account=use300
@@ -23,7 +22,7 @@ declare -xr SPACK_INSTANCE_DIR="${HOME}/cm/shared/apps/spack/${SPACK_VERSION}/${
 declare -xr SLURM_JOB_SCRIPT="$(scontrol show job ${SLURM_JOB_ID} | awk -F= '/Command=/{print $2}')"
 declare -xr SLURM_JOB_MD5SUM="$(md5sum ${SLURM_JOB_SCRIPT})"
 
-declare -xr SCHEDULER_MODULE='slurm/expanse/current'
+declare -xr SCHEDULER_MODULE='slurm'
 
 echo "${UNIX_TIME} ${SLURM_JOB_ID} ${SLURM_JOB_MD5SUM} ${SLURM_JOB_DEPENDENCY}" 
 echo ""
@@ -142,6 +141,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'adol-c@2.7.2-omp.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'hypre@2.23.0.sh'
 
 sleep 60

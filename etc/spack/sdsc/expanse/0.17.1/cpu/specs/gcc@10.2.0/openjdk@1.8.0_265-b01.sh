@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
-# real 43.86
 
 #SBATCH --job-name=openjdk@1.8.0_265-b01
 #SBATCH --account=use300
-#SBATCH --partition=debug
+#SBATCH --partition=shared
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=16
@@ -23,7 +22,7 @@ declare -xr SPACK_INSTANCE_DIR="${HOME}/cm/shared/apps/spack/${SPACK_VERSION}/${
 declare -xr SLURM_JOB_SCRIPT="$(scontrol show job ${SLURM_JOB_ID} | awk -F= '/Command=/{print $2}')"
 declare -xr SLURM_JOB_MD5SUM="$(md5sum ${SLURM_JOB_SCRIPT})"
 
-declare -xr SCHEDULER_MODULE='slurm/expanse/current'
+declare -xr SCHEDULER_MODULE='slurm'
 
 echo "${UNIX_TIME} ${SLURM_JOB_ID} ${SLURM_JOB_MD5SUM} ${SLURM_JOB_DEPENDENCY}" 
 echo ""
@@ -35,6 +34,7 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
+# required by gatk@4.2.2.0
 declare -xr SPACK_PACKAGE='openjdk@1.8.0_265-b01'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
 declare -xr SPACK_VARIANTS=''

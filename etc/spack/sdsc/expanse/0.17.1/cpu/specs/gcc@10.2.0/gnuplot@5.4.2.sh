@@ -23,7 +23,7 @@ declare -xr SPACK_INSTANCE_DIR="${HOME}/cm/shared/apps/spack/${SPACK_VERSION}/${
 declare -xr SLURM_JOB_SCRIPT="$(scontrol show job ${SLURM_JOB_ID} | awk -F= '/Command=/{print $2}')"
 declare -xr SLURM_JOB_MD5SUM="$(md5sum ${SLURM_JOB_SCRIPT})"
 
-declare -xr SCHEDULER_MODULE='slurm/expanse/current'
+declare -xr SCHEDULER_MODULE='slurm'
 
 echo "${UNIX_TIME} ${SLURM_JOB_ID} ${SLURM_JOB_MD5SUM} ${SLURM_JOB_DEPENDENCY}" 
 echo ""
@@ -65,6 +65,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'eigen@3.3.7.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'eigen@3.4.0.sh'
 
 sleep 60

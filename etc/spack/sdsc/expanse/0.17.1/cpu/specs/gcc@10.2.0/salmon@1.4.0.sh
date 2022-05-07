@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# real 244.61
 
 #SBATCH --job-name=salmon@1.4.0
 #SBATCH --account=use300
@@ -23,7 +22,7 @@ declare -xr SPACK_INSTANCE_DIR="${HOME}/cm/shared/apps/spack/${SPACK_VERSION}/${
 declare -xr SLURM_JOB_SCRIPT="$(scontrol show job ${SLURM_JOB_ID} | awk -F= '/Command=/{print $2}')"
 declare -xr SLURM_JOB_MD5SUM="$(md5sum ${SLURM_JOB_SCRIPT})"
 
-declare -xr SCHEDULER_MODULE='slurm/expanse/current'
+declare -xr SCHEDULER_MODULE='slurm'
 
 echo "${UNIX_TIME} ${SLURM_JOB_ID} ${SLURM_JOB_MD5SUM} ${SLURM_JOB_DEPENDENCY}" 
 echo ""
@@ -37,7 +36,7 @@ module list
 
 declare -xr SPACK_PACKAGE='salmon@1.4.0'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS=''
+declare -xr SPACK_VARIANTS='~ipo'
 declare -xr SPACK_DEPENDENCIES="^boost@1.77.0/$(spack find --format '{hash:7}' boost@1.77.0 % ${SPACK_COMPILER} ~mpi)"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 

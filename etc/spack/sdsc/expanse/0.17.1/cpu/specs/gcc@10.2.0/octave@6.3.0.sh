@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# real 369.08
 
 #SBATCH --job-name=octave@6.3.0
 #SBATCH --account=use300
@@ -23,7 +22,7 @@ declare -xr SPACK_INSTANCE_DIR="${HOME}/cm/shared/apps/spack/${SPACK_VERSION}/${
 declare -xr SLURM_JOB_SCRIPT="$(scontrol show job ${SLURM_JOB_ID} | awk -F= '/Command=/{print $2}')"
 declare -xr SLURM_JOB_MD5SUM="$(md5sum ${SLURM_JOB_SCRIPT})"
 
-declare -xr SCHEDULER_MODULE='slurm/expanse/current'
+declare -xr SCHEDULER_MODULE='slurm'
 
 echo "${UNIX_TIME} ${SLURM_JOB_ID} ${SLURM_JOB_MD5SUM} ${SLURM_JOB_DEPENDENCY}" 
 echo ""
@@ -35,7 +34,8 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-# will not concretize with +gnuplot at this time due to following conflict; gtkplus requires pango constrain a concrete spec pango+X, but spec asked for pango@1.41.0%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~X; try forcing cario+X at time of gnuplot install in the future; also, install fails when +magick is used; ==> Error: Detected uninstalled dependencies for libpng: {'zlib'} ==> Error: Cannot proceed with libpng: 1 uninstalled dependency: zlib; try again next time; also a problem now with qrupdate: ==> Error: Detected uninstalled dependencies for qrupdate: {'openblas'} ==> Error: Cannot proceed with qrupdate: 1 uninstalled dependency: openblas
+# still have a number of problems building octave with graphical 
+# libraries such as gnuplot and imagemagick; to be revisited in the future
 declare -xr SPACK_PACKAGE='octave@6.3.0'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
 declare -xr SPACK_VARIANTS='+arpack +curl +fftw ~fltk ~fontconfig ~freetype ~gl2ps +glpk ~gnuplot +hdf5 +jdk ~llvm ~magick ~opengl +qhull +qrupdate ~qscintilla ~qt +readline +suitesparse +zlib'
@@ -66,6 +66,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'esmf@8.1.1.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'esmf@8.1.1.sh'
 
 sleep 60

@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# real 17.52
 
 #SBATCH --job-name=samtools@1.13
 #SBATCH --account=use300
@@ -8,7 +7,7 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=16
 #SBATCH --mem=32G
-#SBATCH --time=00:30:00
+#SBATCH --time=48:00:00
 #SBATCH --output=%x.o%j.%N
 
 declare -xr LOCAL_TIME="$(date +'%Y%m%dT%H%M%S%z')"
@@ -23,7 +22,7 @@ declare -xr SPACK_INSTANCE_DIR="${HOME}/cm/shared/apps/spack/${SPACK_VERSION}/${
 declare -xr SLURM_JOB_SCRIPT="$(scontrol show job ${SLURM_JOB_ID} | awk -F= '/Command=/{print $2}')"
 declare -xr SLURM_JOB_MD5SUM="$(md5sum ${SLURM_JOB_SCRIPT})"
 
-declare -xr SCHEDULER_MODULE='slurm/expanse/current'
+declare -xr SCHEDULER_MODULE='slurm'
 
 echo "${UNIX_TIME} ${SLURM_JOB_ID} ${SLURM_JOB_MD5SUM} ${SLURM_JOB_DEPENDENCY}" 
 echo ""
@@ -34,6 +33,14 @@ module purge
 module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
+
+# condition(4150)
+#  hash("python","5tx2iern3t5pycoliyyfyuueulsycthy")
+#  imposed_constraint("5tx2iern3t5pycoliyyfyuueulsycthy","hash","sqlite","jgocl7x
+#y6xkcmfuc4dhb2vqup6twposr")
+#  imposed_constraint("jgocl7xy6xkcmfuc4dhb2vqup6twposr","node","sqlite")
+#  variant_condition(4150,"sqlite","rtree")
+#  variant_set("sqlite","rtree","False")
 
 declare -xr SPACK_PACKAGE='samtools@1.13'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
@@ -51,7 +58,7 @@ spack config get packages
 spack config get repos
 spack config get upstreams
 
-spack spec --long --namespaces --types "${SPACK_SPEC}"
+spack --show-cores=minimized spec --long --namespaces --types "${SPACK_SPEC}"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack concretization failed.'
   exit 1
@@ -65,6 +72,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'bedtools2@2.30.0.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'bedtools2@2.30.0.sh'
 
 sleep 60

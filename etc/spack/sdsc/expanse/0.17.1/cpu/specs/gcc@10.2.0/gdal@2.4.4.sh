@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# real 361.39
 
 #SBATCH --job-name=gdal@2.4.4
 #SBATCH --account=use300
@@ -23,7 +22,7 @@ declare -xr SPACK_INSTANCE_DIR="${HOME}/cm/shared/apps/spack/${SPACK_VERSION}/${
 declare -xr SLURM_JOB_SCRIPT="$(scontrol show job ${SLURM_JOB_ID} | awk -F= '/Command=/{print $2}')"
 declare -xr SLURM_JOB_MD5SUM="$(md5sum ${SLURM_JOB_SCRIPT})"
 
-declare -xr SCHEDULER_MODULE='slurm/expanse/current'
+declare -xr SCHEDULER_MODULE='slurm'
 
 echo "${UNIX_TIME} ${SLURM_JOB_ID} ${SLURM_JOB_MD5SUM} ${SLURM_JOB_DEPENDENCY}" 
 echo ""
@@ -34,6 +33,15 @@ module purge
 module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
+
+# may no longer be able to build due to python 2 to 3 conversion lib 
+# issue; also  affects ncl@6.6.2 build since gdal@2.4.4 is required. 
+# note ncl@6.6.2 is no longer developed or maintained by NCAR
+#
+# 6709    error in GDAL setup command: use_2to3 is invalid.
+#     6710    make[2]: *** [GNUmakefile:73: build] Error 1
+#     6711    make[2]: Leaving directory '/tmp/mkandes/spack-stage/spack-stage-g
+#             dal-2.4.4-viigpdri5t6b6qdcmlj4wlijojopjyip/spack-src/swig/python'
 
 declare -xr SPACK_PACKAGE='gdal@2.4.4'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
@@ -65,6 +73,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'ncl@6.6.2.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'ncl@6.6.2.sh'
 
 sleep 60
