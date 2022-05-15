@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
-# real 32.89
 
-#SBATCH --job-name=netcdf-c@4.7.4
+#SBATCH --job-name=py-mpi4py@3.1.2
 #SBATCH --account=use300
 #SBATCH --partition=shared
 #SBATCH --nodes=1
@@ -16,14 +15,14 @@ declare -xir UNIX_TIME="$(date +'%s')"
 
 declare -xr SYSTEM_NAME='expanse'
 
-declare -xr SPACK_VERSION='0.15.4'
+declare -xr SPACK_VERSION='0.17.1'
 declare -xr SPACK_INSTANCE_NAME='cpu'
 declare -xr SPACK_INSTANCE_DIR="${HOME}/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}"
 
 declare -xr SLURM_JOB_SCRIPT="$(scontrol show job ${SLURM_JOB_ID} | awk -F= '/Command=/{print $2}')"
 declare -xr SLURM_JOB_MD5SUM="$(md5sum ${SLURM_JOB_SCRIPT})"
 
-declare -xr SCHEDULER_MODULE='slurm/expanse/20.02.3'
+declare -xr SCHEDULER_MODULE='slurm'
 
 echo "${UNIX_TIME} ${SLURM_JOB_ID} ${SLURM_JOB_MD5SUM} ${SLURM_JOB_DEPENDENCY}" 
 echo ""
@@ -35,14 +34,10 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-# failed to build with +parallel-netcdf support; try again in future 
-# and/or investigate if this integration is even appropriate in 
-# netcdf-c package.py
-#==> Error: Cannot depend on 'hwloc@1.11.11 twice
-declare -xr SPACK_PACKAGE='netcdf-c@4.7.4'
+declare -xr SPACK_PACKAGE='py-mpi4py@3.1.2'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS='~dap ~hdf4 ~jna +mpi ~parallel-netcdf +pic +shared'
-declare -xr SPACK_DEPENDENCIES="^hdf5@1.10.7/$(spack find --format '{hash:7}' hdf5@1.10.7 % ${SPACK_COMPILER} +mpi ^openmpi@3.1.6)"
+declare -xr SPACK_VARIANTS=''
+declare -xr SPACK_DEPENDENCIES="^openmpi@3.1.6/$(spack find --format '{hash:7}' openmpi@3.1.6 % ${SPACK_COMPILER}) ^python@3.8.12/$(spack find --format '{hash:7}' python@3.8.12 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -69,6 +64,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'netcdf-cxx4@4.3.1.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'py-h5py@3.4.0.sh'
 
 sleep 60

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=netcdf-cxx4@4.3.1
+#SBATCH --job-name=valgrind@3.17.0
 #SBATCH --account=use300
 #SBATCH --partition=shared
 #SBATCH --nodes=1
@@ -34,10 +34,10 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-declare -xr SPACK_PACKAGE='netcdf-cxx4@4.3.1'
+declare -xr SPACK_PACKAGE='valgrind@3.17.0'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS='~doxygen +pic +shared +static'
-declare -xr SPACK_DEPENDENCIES="^netcdf-c@4.8.1/$(spack find --format '{hash:7}' netcdf-c@4.8.1 % ${SPACK_COMPILER} +mpi ^openmpi@3.1.6)"
+declare -xr SPACK_VARIANTS='+boost +mpi +only64bit +ubsan'
+declare -xr SPACK_DEPENDENCIES="^boost@1.77.0/$(spack find --format '{hash:7}' boost@1.77.0 % ${SPACK_COMPILER} +mpi ^openmpi@3.1.6)"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -64,6 +64,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'netcdf-fortran@4.5.3.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'mpip@3.5.sh'
 
 sleep 60
