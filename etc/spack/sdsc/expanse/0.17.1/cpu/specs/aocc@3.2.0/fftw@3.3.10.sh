@@ -64,6 +64,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'fftw@3.3.10-omp.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'amdfftw@3.1.sh'
 
 sleep 60

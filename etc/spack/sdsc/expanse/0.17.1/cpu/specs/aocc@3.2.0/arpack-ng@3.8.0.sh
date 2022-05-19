@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=arpack-ng@3.7.0
+#SBATCH --job-name=arpack-ng@3.8.0
 #SBATCH --account=use300
 #SBATCH --partition=shared
 #SBATCH --nodes=1
@@ -34,11 +34,17 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-declare -xr SPACK_PACKAGE='arpack-ng@3.7.0'
+#>> 125    make[2]: *** [CMakeFiles/arpack.dir/build.make:260: CMakeFiles/arpa
+#            ck.dir/SRC/cgetv0.f.o] Error 1
+#     126    make[2]: *** Waiting for unfinished jobs....
+#     127    F90-S-0034-Syntax error at or near & (/tmp/mkandes/spack-stage/spac
+#            k-stage-arpack-ng-3.8.0-wlbq4hcmk4k4gvd37uemeqbfco4b7fyv/spack-src/
+#            debug.h: 8)
+
+declare -xr SPACK_PACKAGE='arpack-ng@3.8.0'
 declare -xr SPACK_COMPILER='aocc@3.2.0'
 declare -xr SPACK_VARIANTS='~mpi +shared'
 declare -xr SPACK_DEPENDENCIES="^openblas@0.3.18/$(spack find --format '{hash:7}' openblas@0.3.18 % ${SPACK_COMPILER} +ilp64 threads=none)"
-#"^amdlibflame@3.1/$(spack find --format '{hash:7}' amdlibflame@3.1 % ${SPACK_COMPILER} +ilp64 threads=none)"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -65,6 +71,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'boost@1.77.0.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'boost@1.77.0.sh'
 
 sleep 60

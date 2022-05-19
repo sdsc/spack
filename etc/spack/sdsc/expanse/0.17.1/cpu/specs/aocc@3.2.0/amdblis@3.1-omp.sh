@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=amdblis@3.1
+#SBATCH --job-name=amdblis@3.1-omp
 #SBATCH --account=use300
 #SBATCH --partition=shared
 #SBATCH --nodes=1
