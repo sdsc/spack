@@ -39,7 +39,7 @@ declare -xr SPACK_PACKAGE='valgrind@3.17.0'
 declare -xr SPACK_COMPILER='intel@19.1.3.304'
 declare -xr SPACK_VARIANTS='~boost +mpi +only64bit +ubsan'
 declare -xr SPACK_DEPENDENCIES=''
-#"^boost@1.77.0/$(spack find --format '{hash:7}' boost@1.77.0 % ${SPACK_COMPILER} +mpi ^openmpi@4.1.1)"
+#"^boost@1.77.0/$(spack find --format '{hash:7}' boost@1.77.0 % ${SPACK_COMPILER} +mpi ^openmpi@4.1.3)"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv

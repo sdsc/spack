@@ -45,7 +45,7 @@ declare -xr INTEL_LICENSE_FILE='40000@elprado.sdsc.edu:40200@elprado.sdsc.edu'
 declare -xr SPACK_PACKAGE='mpip@3.5'
 declare -xr SPACK_COMPILER='intel@19.1.3.304'
 declare -xr SPACK_VARIANTS='~add_shared_target ~bfd ~demangling +libunwind +mpi_io +mpi_nbc +mpi_rma ~setjmp'
-declare -xr SPACK_DEPENDENCIES="^openmpi@4.1.1/$(spack find --format '{hash:7}' openmpi@4.1.1 % ${SPACK_COMPILER})"
+declare -xr SPACK_DEPENDENCIES="^openmpi@4.1.3/$(spack find --format '{hash:7}' openmpi@4.1.3 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
