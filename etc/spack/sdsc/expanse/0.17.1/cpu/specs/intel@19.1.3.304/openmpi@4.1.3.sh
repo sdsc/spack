@@ -1,14 +1,13 @@
 #!/usr/bin/env bash
-# real 603.07
 
-#SBATCH --job-name=openmpi@4.1.1
+#SBATCH --job-name=openmpi@4.1.3
 #SBATCH --account=use300
 #SBATCH --partition=shared
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=16
 #SBATCH --mem=32G
-#SBATCH --time=00:30:00
+#SBATCH --time=48:00:00
 #SBATCH --output=%x.o%j.%N
 
 declare -xr LOCAL_TIME="$(date +'%Y%m%dT%H%M%S%z')"
@@ -23,7 +22,7 @@ declare -xr SPACK_INSTANCE_DIR="${HOME}/cm/shared/apps/spack/${SPACK_VERSION}/${
 declare -xr SLURM_JOB_SCRIPT="$(scontrol show job ${SLURM_JOB_ID} | awk -F= '/Command=/{print $2}')"
 declare -xr SLURM_JOB_MD5SUM="$(md5sum ${SLURM_JOB_SCRIPT})"
 
-declare -xr SCHEDULER_MODULE='slurm/expanse/current'
+declare -xr SCHEDULER_MODULE='slurm'
 
 echo "${UNIX_TIME} ${SLURM_JOB_ID} ${SLURM_JOB_MD5SUM} ${SLURM_JOB_DEPENDENCY}" 
 echo ""
@@ -35,11 +34,20 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
+#Error: openmpi@4.1.3%intel@19.1.3.304~atomics~cuda~cxx~cxx_exceptions~gpfs~internal-hwloc~java+legacylaunchers+lustre~memchecker+pmi+pmix~singularity~sqlite3+sta
+#tic+thread_multiple+vt+wrapper-rpath fabrics=ucx schedulers=slurm ^lustre@2.12.8 ^rdma-core@28.0 ^slurm@21.08.8 ^ucx@1.10.1 is unsatisfiable, conflicts are:
+#  Unsatisfied conditional variants cannot be set
+#  condition_requirement(2926,"version_satisfies","openmpi","1.5.4:2")
+#  no version satisfies the given constraints
+#  root("openmpi")
+#  variant_set("openmpi","thread_multiple","True")
+#  version_satisfies("openmpi","4.1.3")
+
 declare -xr INTEL_LICENSE_FILE='40000@elprado.sdsc.edu:40200@elprado.sdsc.edu'
-declare -xr SPACK_PACKAGE='openmpi@4.1.1'
+declare -xr SPACK_PACKAGE='openmpi@4.1.3'
 declare -xr SPACK_COMPILER='intel@19.1.3.304'
-declare -xr SPACK_VARIANTS='~atomics ~cuda ~cxx ~cxx_exceptions ~gpfs ~internal-hwloc ~java +legacylaunchers +lustre ~memchecker +pmi +pmix ~singularity ~sqlite3 +static +thread_multiple +vt +wrapper-rpath'
-declare -xr SPACK_DEPENDENCIES='^ucx@1.10.1 ^lustre@2.12.8 ^slurm@20.02.7 ^rdma-core@28.0'
+declare -xr SPACK_VARIANTS='~atomics ~cuda ~cxx ~cxx_exceptions ~gpfs ~internal-hwloc ~java +legacylaunchers +lustre ~memchecker +pmi +pmix ~singularity ~sqlite3 +static +vt +wrapper-rpath'
+declare -xr SPACK_DEPENDENCIES='^ucx@1.10.1 ^lustre@2.12.8 ^slurm@21.08.8 ^rdma-core@28.0'
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -53,16 +61,13 @@ spack config get repos
 spack config get upstreams
 
 echo "${SPACK_SPEC}"
-# concretization fails for some reason when using SPACK_SPEC environment variable; investigate again in the future
-# openmpi@4.1.1 % intel@19.1.3.304 +legacylaunchers +lustre +pmi schedulers=slurm fabrics=ucx ^hwloc@1.11.11 ^lustre@2.12.8 ^slurm@20.02.7 ^rdma-core@28.0
-# ==> Error: invalid values for variant "schedulers" in package "openmpi": ['slurm fabrics=ucx ^hwloc@1.11.11 ^lustre@2.12.8 ^slurm@20.02.7 ^rdma-core@28.0']
-spack spec --long --namespaces --types openmpi@4.1.1 % intel@19.1.3.304 ~atomics ~cuda ~cxx ~cxx_exceptions ~gpfs ~internal-hwloc ~java +legacylaunchers +lustre ~memchecker +pmi +pmix ~singularity ~sqlite3 +static +thread_multiple +vt +wrapper-rpath schedulers=slurm fabrics=ucx ^ucx@1.10.1 ^lustre@2.12.8 ^slurm@20.02.7 ^rdma-core@28.0
+spack spec --long --namespaces --types openmpi@4.1.3 % intel@19.1.3.304 ~atomics ~cuda ~cxx ~cxx_exceptions ~gpfs ~internal-hwloc ~java +legacylaunchers +lustre ~memchecker +pmi +pmix ~singularity ~sqlite3 +static +vt +wrapper-rpath schedulers=slurm fabrics=ucx ^ucx@1.10.1 ^lustre@2.12.8 ^slurm@21.08.8 ^rdma-core@28.0
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack concretization failed.'
   exit 1
 fi
 
-time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all openmpi@4.1.1 % intel@19.1.3.304 ~atomics ~cuda ~cxx ~cxx_exceptions ~gpfs ~internal-hwloc ~java +legacylaunchers +lustre ~memchecker +pmi +pmix ~singularity ~sqlite3 +static +thread_multiple +vt +wrapper-rpath schedulers=slurm fabrics=ucx ^ucx@1.10.1 ^lustre@2.12.8 ^slurm@20.02.7 ^rdma-core@28.0
+time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all openmpi@4.1.3 % intel@19.1.3.304 ~atomics ~cuda ~cxx ~cxx_exceptions ~gpfs ~internal-hwloc ~java +legacylaunchers +lustre ~memchecker +pmi +pmix ~singularity ~sqlite3 +static +vt +wrapper-rpath schedulers=slurm fabrics=ucx ^ucx@1.10.1 ^lustre@2.12.8 ^slurm@21.08.8 ^rdma-core@28.0
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
   exit 1
