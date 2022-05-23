@@ -18,8 +18,8 @@ packages:
     buildable: false
   slurm:
     externals:
-      - spec: 'slurm@20.02.7 % gcc@10.2.0 arch=linux-rocky8-zen2'
-        prefix: /cm/shared/apps/slurm/20.02.7
+      - spec: 'slurm@21.08.8 % gcc@10.2.0 arch=linux-rocky8-zen2'
+        prefix: /cm/shared/apps/slurm/21.08.8
     buildable: false
   librsvg:
     externals:
