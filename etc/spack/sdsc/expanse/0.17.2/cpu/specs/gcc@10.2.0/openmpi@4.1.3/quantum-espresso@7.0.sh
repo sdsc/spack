@@ -15,7 +15,7 @@ declare -xir UNIX_TIME="$(date +'%s')"
 
 declare -xr SYSTEM_NAME='expanse'
 
-declare -xr SPACK_VERSION='0.17.1'
+declare -xr SPACK_VERSION='0.17.2'
 declare -xr SPACK_INSTANCE_NAME='cpu'
 declare -xr SPACK_INSTANCE_DIR="${HOME}/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}"
 
@@ -35,7 +35,7 @@ module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
 # QE v6.7 does not concretize with a +scalapack dependency using 
-# standard package available in spack v0.17.1? Fixed when updating to
+# standard package available in spack v0.17.2? Fixed when updating to
 # latest spack develop branch on 2022/03/11. Placed in sdsc spack 
 # package repo. Then upgraded to QE v7.0 instead.
 
