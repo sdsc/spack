@@ -1,0 +1,33 @@
+packages:
+  lustre:
+    externals:
+      - spec: 'lustre@2.12.8 % gcc@10.2.0 arch=linux-rocky8-zen2'
+        prefix: /usr
+    buildable: false
+  openssl:
+    externals:
+      - spec: 'openssl@1.1.1k % gcc@8.5.0 arch=linux-rocky8-zen'
+        prefix: /usr
+      - spec: 'openssl@1.1.1k % gcc@10.2.0 arch=linux-rocky8-zen2'
+        prefix: /usr
+    buildable: false
+  rdma-core:
+    externals:
+      - spec: 'rdma-core@28.0 % gcc@10.2.0 arch=linux-rocky8-zen2'
+        prefix: /usr
+    buildable: false
+  slurm:
+    externals:
+      - spec: 'slurm@20.02.7 % gcc@10.2.0 arch=linux-rocky8-zen2'
+        prefix: /cm/shared/apps/slurm/20.02.7
+    buildable: false
+  librsvg:
+    externals:
+      - spec: 'librsvg@2.42.7 % gcc@10.2.0 arch=linux-rocky8-zen2'
+        prefix: /usr
+    buildable: false
+  ghostscript:
+    externals:
+      - spec: 'ghostscript@9.27 % gcc@10.2.0 arch=linux-rocky8-zen2'
+        prefix: /usr
+    buildable: false
