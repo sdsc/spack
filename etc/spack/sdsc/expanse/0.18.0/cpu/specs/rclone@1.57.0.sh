@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=git-lfs@2.11.0
+#SBATCH --job-name=rclone@1.57.0
 #SBATCH --account=use300
 #SBATCH --partition=shared
 #SBATCH --nodes=1
@@ -34,7 +34,7 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-declare -xr SPACK_PACKAGE='git-lfs@2.11.0'
+declare -xr SPACK_PACKAGE='rclone@1.57.0'
 declare -xr SPACK_COMPILER='gcc@8.5.0'
 declare -xr SPACK_VARIANTS=''
 declare -xr SPACK_DEPENDENCIES=''
@@ -64,6 +64,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'subversion@1.14.0.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'sratoolkit@2.10.9.sh'
 
 sleep 60

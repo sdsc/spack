@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=rclone@1.56.2
+#SBATCH --job-name=aria2@1.36.0
 #SBATCH --account=use300
 #SBATCH --partition=shared
 #SBATCH --nodes=1
@@ -34,7 +34,7 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-declare -xr SPACK_PACKAGE='rclone@1.56.2'
+declare -xr SPACK_PACKAGE='aria2@1.36.0'
 declare -xr SPACK_COMPILER='gcc@8.5.0'
 declare -xr SPACK_VARIANTS=''
 declare -xr SPACK_DEPENDENCIES=''
@@ -64,6 +64,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'sratoolkit@2.10.9.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'rclone@1.57.0.sh'
 
 sleep 60

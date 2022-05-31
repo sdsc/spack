@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=subversion@1.14.0
+#SBATCH --job-name=subversion@1.14.1
 #SBATCH --account=use300
 #SBATCH --partition=shared
 #SBATCH --nodes=1
@@ -34,9 +34,9 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-declare -xr SPACK_PACKAGE='subversion@1.14.0'
+declare -xr SPACK_PACKAGE='subversion@1.14.1'
 declare -xr SPACK_COMPILER='gcc@8.5.0'
-declare -xr SPACK_VARIANTS='~perl +serf'
+declare -xr SPACK_VARIANTS='+apxs +nls ~perl +serf'
 declare -xr SPACK_DEPENDENCIES=''
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
