@@ -36,7 +36,7 @@ module list
 
 declare -xr SPACK_PACKAGE='git@2.35.2'
 declare -xr SPACK_COMPILER='gcc@8.5.0'
-declare -xr SPACK_VARIANTS='+on +nls +perl +subtree ~svn ~tcltk'
+declare -xr SPACK_VARIANTS='+man +nls +perl +subtree ~svn ~tcltk'
 declare -xr SPACK_DEPENDENCIES=''
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
