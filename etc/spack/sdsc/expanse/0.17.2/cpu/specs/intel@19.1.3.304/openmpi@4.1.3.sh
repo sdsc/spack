@@ -15,7 +15,7 @@ declare -xir UNIX_TIME="$(date +'%s')"
 
 declare -xr SYSTEM_NAME='expanse'
 
-declare -xr SPACK_VERSION='0.17.1'
+declare -xr SPACK_VERSION='0.17.2'
 declare -xr SPACK_INSTANCE_NAME='cpu'
 declare -xr SPACK_INSTANCE_DIR="${HOME}/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}"
 
@@ -61,13 +61,13 @@ spack config get repos
 spack config get upstreams
 
 echo "${SPACK_SPEC}"
-spack spec --long --namespaces --types openmpi@4.1.3 % intel@19.1.3.304 ~atomics ~cuda ~cxx ~cxx_exceptions ~gpfs ~internal-hwloc ~java +legacylaunchers +lustre ~memchecker +pmi +pmix ~singularity ~sqlite3 +static +vt +wrapper-rpath schedulers=slurm fabrics=ucx ^ucx@1.10.1 ^lustre@2.12.8 ^slurm@21.08.8 ^rdma-core@28.0
+spack --show-cores=minimized spec --long --namespaces --types openmpi@4.1.3 % intel@19.1.3.304 ~atomics ~cuda ~cxx ~cxx_exceptions ~gpfs ~internal-hwloc ~java +legacylaunchers +lustre ~memchecker +pmi +pmix ~singularity ~sqlite3 +static +vt +wrapper-rpath schedulers=slurm fabrics=ucx ^ucx@1.10.1 ^lustre@2.12.8 ^slurm@21.08.8 ^rdma-core@28.0
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack concretization failed.'
   exit 1
 fi
 
-time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all openmpi@4.1.3 % intel@19.1.3.304 ~atomics ~cuda ~cxx ~cxx_exceptions ~gpfs ~internal-hwloc ~java +legacylaunchers +lustre ~memchecker +pmi +pmix ~singularity ~sqlite3 +static +vt +wrapper-rpath schedulers=slurm fabrics=ucx ^ucx@1.10.1 ^lustre@2.12.8 ^slurm@21.08.8 ^rdma-core@28.0
+time -p spack --show-cores=minimized install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all openmpi@4.1.3 % intel@19.1.3.304 ~atomics ~cuda ~cxx ~cxx_exceptions ~gpfs ~internal-hwloc ~java +legacylaunchers +lustre ~memchecker +pmi +pmix ~singularity ~sqlite3 +static +vt +wrapper-rpath schedulers=slurm fabrics=ucx ^ucx@1.10.1 ^lustre@2.12.8 ^slurm@21.08.8 ^rdma-core@28.0
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
   exit 1
