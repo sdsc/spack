@@ -15,7 +15,7 @@ declare -xir UNIX_TIME="$(date +'%s')"
 
 declare -xr SYSTEM_NAME='expanse'
 
-declare -xr SPACK_VERSION='0.17.1'
+declare -xr SPACK_VERSION='0.17.2'
 declare -xr SPACK_INSTANCE_NAME='cpu'
 declare -xr SPACK_INSTANCE_DIR="${HOME}/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}"
 
@@ -38,7 +38,7 @@ module list
 # TESTING: resetEnvCompilers from config.setCompilers(/tmp/mkandes/spack-stage/spack-stage-petsc-3.16.1-m6zlbz3ixndpi4a4isgwdiszmw4ev4cx/spack-src/config/BuildSystem/con
 #fig/setCompilers.py:2101)
 #              =============================================================================================
-#                    ***** WARNING: F77 (set to /home/mkandes/cm/shared/apps/spack/0.17.1/cpu/lib/spack/env/aocc/flang) found in environment variables - ignoring 
+#                    ***** WARNING: F77 (set to /home/mkandes/cm/shared/apps/spack/0.17.2/cpu/lib/spack/env/aocc/flang) found in environment variables - ignoring 
 #                     use ./configure F77=$F77 if you really want to use that value ******
 #              =============================================================================================
 #            
@@ -81,6 +81,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'petsc@3.16.1-cmplx.sh'
+#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'petsc@3.16.1-cmplx.sh'
 
 sleep 60

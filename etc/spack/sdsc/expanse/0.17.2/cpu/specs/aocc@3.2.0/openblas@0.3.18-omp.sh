@@ -15,7 +15,7 @@ declare -xir UNIX_TIME="$(date +'%s')"
 
 declare -xr SYSTEM_NAME='expanse'
 
-declare -xr SPACK_VERSION='0.17.1'
+declare -xr SPACK_VERSION='0.17.2'
 declare -xr SPACK_INSTANCE_NAME='cpu'
 declare -xr SPACK_INSTANCE_DIR="${HOME}/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}"
 
@@ -35,7 +35,7 @@ module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
 #==> Error: ProcessError: Command exited with status 2:
-#    'make' '-j16' 'CC=/home/mkandes/cm/shared/apps/spack/0.17.1/cpu/lib/spack/env/aocc/clang' 'FC=/home/mkandes/cm/shared/apps/spack/0.17.1/cpu/lib/spack/env/aocc/flan
+#    'make' '-j16' 'CC=/home/mkandes/cm/shared/apps/spack/0.17.2/cpu/lib/spack/env/aocc/clang' 'FC=/home/mkandes/cm/shared/apps/spack/0.17.2/cpu/lib/spack/env/aocc/flan
 #g' 'MAKE_NB_JOBS=0' 'ARCH=x86_64' 'TARGET=ZEN' 'USE_LOCKING=1' 'USE_OPENMP=1' 'USE_THREAD=1' 'INTERFACE64=1' 'RANLIB=ranlib' 'libs' 'netlib' 'shared'
 #
 #2 errors found in build log:
@@ -48,7 +48,7 @@ module list
 #             Wunused-command-line-argument]
 #     7192    clang-13: warning: argument unused during compilation: '-i8' [-Wun
 #             used-command-line-argument]
-#     7193    /home/mkandes/cm/shared/apps/spack/0.17.1/cpu/lib/spack/env/aocc/c
+#     7193    /home/mkandes/cm/shared/apps/spack/0.17.2/cpu/lib/spack/env/aocc/c
 #             lang -O2 -DSMALL_MATRIX_OPT -DMAX_STACK_ALLOC=2048 -DUSE_LOCKING -
 #             fopenmp -Wall -m64 -DF_INTERFACE_FLANG  -fPIC -DSMP_SERVER -DUSE_O
 #             PENMP -DNO_WARMUP -DMAX_CPU_NUMBER=128 -DMAX_PARALLEL_NUMBER=1 -DB
@@ -59,12 +59,12 @@ module list
 #              -DNO_AFFINITY -I..  -w -o linktest linktest.c ../libopenblas_zenp
 #             -r0.3.18.so -L/usr/lib/gcc/x86_64-redhat-linux/8 -L/usr/lib/gcc/x8
 #             6_64-redhat-linux/8/../../../../lib64 -L/lib/../lib64 -L/usr/lib/.
-#             ./lib64 -L/home/mkandes/cm/shared/apps/spack/0.17.1/cpu/opt/spack/
+#             ./lib64 -L/home/mkandes/cm/shared/apps/spack/0.17.2/cpu/opt/spack/
 #             linux-rocky8-zen/gcc-8.5.0/aocc-3.2.0-io3s466wsnnichqc2o2rikbuloev
 #             5bmq/bin/../lib -L/lib -L/usr/lib -Wl,-rpath,/home/mkandes/cm/shar
-#             ed/apps/spack/0.17.1/cpu/opt/spack/linux-rocky8-zen/gcc-8.5.0/aocc
+#             ed/apps/spack/0.17.2/cpu/opt/spack/linux-rocky8-zen/gcc-8.5.0/aocc
 #             -3.2.0-io3s466wsnnichqc2o2rikbuloev5bmq/bin/../lib -Wl,-rpath,/hom
-#             e/mkandes/cm/shared/apps/spack/0.17.1/cpu/opt/spack/linux-rocky8-z
+#             e/mkandes/cm/shared/apps/spack/0.17.2/cpu/opt/spack/linux-rocky8-z
 #             en/gcc-8.5.0/aocc-3.2.0-io3s466wsnnichqc2o2rikbuloev5bmq/bin/../li
 #             b  -lflangmain -lflang -lflangrti -lpgmath -lquadmath -lomp -lm -l
 #             rt -lpthread -lomp -lpthread -lc  -lflang && echo OK.
