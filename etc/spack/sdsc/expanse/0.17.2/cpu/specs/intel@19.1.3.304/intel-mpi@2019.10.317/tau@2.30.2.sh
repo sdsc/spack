@@ -15,7 +15,7 @@ declare -xir UNIX_TIME="$(date +'%s')"
 
 declare -xr SYSTEM_NAME='expanse'
 
-declare -xr SPACK_VERSION='0.17.1'
+declare -xr SPACK_VERSION='0.17.2'
 declare -xr SPACK_INSTANCE_NAME='cpu'
 declare -xr SPACK_INSTANCE_DIR="${HOME}/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}"
 
@@ -38,13 +38,13 @@ module list
 #
 #      12    Unset ParaProf's cubeclasspath...
 #     13    Unset Perfdmf cubeclasspath...
-#     14    Testing directory /home/mkandes/cm/shared/apps/spack/0.17.1/cpu/opt/
+#     14    Testing directory /home/mkandes/cm/shared/apps/spack/0.17.2/cpu/opt/
 #           spack/linux-rocky8-zen2/intel-19.1.3.304/tau-2.30.2-pqccupl7z4xiffey
 #           kuv74esybsq6bhdt
 #     15    NOTE: /proc/sys/kernel/perf_event_paranoid has a value greater than 
 #           -1, RAPL power measurement disabled.
 #  >> 16    Error: Cannot access MPI include directory /home/mkandes/cm/shared/a
-#           pps/spack/0.17.1/cpu/opt/spack/linux-rocky8-zen2/intel-19.1.3.304/in
+#           pps/spack/0.17.2/cpu/opt/spack/linux-rocky8-zen2/intel-19.1.3.304/in
 #           tel-mpi-2019.10.317-smz2xaj5qs2gcmfrv6p4wdo2bfpmvmql/include
 
 declare -xr INTEL_LICENSE_FILE='40000@elprado.sdsc.edu:40200@elprado.sdsc.edu'
