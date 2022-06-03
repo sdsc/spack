@@ -43,10 +43,19 @@ module list
 #  variant_set("openmpi","thread_multiple","True")
 #  version_satisfies("openmpi","4.1.3")
 
+#==> Error: openmpi@4.1.3%intel@19.1.3.304~atomics~cuda~cxx~cxx_exceptions~gpfs~internal-hwloc~java+legacylaunchers+lustre~memchecker+pmi+pmix~singularity~sqlite
+#3+static+vt+wrapper-rpath fabrics=ucx schedulers=slurm ^lustre@2.12.8 ^rdma-core@28.0 ^slurm@21.08.8 ^ucx@1.10.1 is unsatisfiable, conflicts are:
+#  Unsatisfied conditional variants cannot be set
+#  condition_requirement(2924,"version_satisfies","openmpi","1.7.3:1")
+#  no version satisfies the given constraints
+#  root("openmpi")
+#  variant_set("openmpi","sqlite3","False")
+#  version_satisfies("openmpi","4.1.3")
+
 declare -xr INTEL_LICENSE_FILE='40000@elprado.sdsc.edu:40200@elprado.sdsc.edu'
 declare -xr SPACK_PACKAGE='openmpi@4.1.3'
 declare -xr SPACK_COMPILER='intel@19.1.3.304'
-declare -xr SPACK_VARIANTS='~atomics ~cuda ~cxx ~cxx_exceptions ~gpfs ~internal-hwloc ~java +legacylaunchers +lustre ~memchecker +pmi +pmix ~singularity ~sqlite3 +static +vt +wrapper-rpath'
+declare -xr SPACK_VARIANTS='~atomics ~cuda ~cxx ~cxx_exceptions ~gpfs ~internal-hwloc ~java +legacylaunchers +lustre ~memchecker +pmi +pmix ~singularity +static +vt +wrapper-rpath'
 declare -xr SPACK_DEPENDENCIES='^ucx@1.10.1 ^lustre@2.12.8 ^slurm@21.08.8 ^rdma-core@28.0'
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
@@ -61,13 +70,13 @@ spack config get repos
 spack config get upstreams
 
 echo "${SPACK_SPEC}"
-spack --show-cores=minimized spec --long --namespaces --types openmpi@4.1.3 % intel@19.1.3.304 ~atomics ~cuda ~cxx ~cxx_exceptions ~gpfs ~internal-hwloc ~java +legacylaunchers +lustre ~memchecker +pmi +pmix ~singularity ~sqlite3 +static +vt +wrapper-rpath schedulers=slurm fabrics=ucx ^ucx@1.10.1 ^lustre@2.12.8 ^slurm@21.08.8 ^rdma-core@28.0
+spack spec --long --namespaces --types openmpi@4.1.3 % intel@19.1.3.304 ~atomics ~cuda ~cxx ~cxx_exceptions ~gpfs ~internal-hwloc ~java +legacylaunchers +lustre ~memchecker +pmi +pmix ~singularity +static +vt +wrapper-rpath schedulers=slurm fabrics=ucx ^ucx@1.10.1 ^lustre@2.12.8 ^slurm@21.08.8 ^rdma-core@28.0
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack concretization failed.'
   exit 1
 fi
 
-time -p spack --show-cores=minimized install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all openmpi@4.1.3 % intel@19.1.3.304 ~atomics ~cuda ~cxx ~cxx_exceptions ~gpfs ~internal-hwloc ~java +legacylaunchers +lustre ~memchecker +pmi +pmix ~singularity ~sqlite3 +static +vt +wrapper-rpath schedulers=slurm fabrics=ucx ^ucx@1.10.1 ^lustre@2.12.8 ^slurm@21.08.8 ^rdma-core@28.0
+time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all openmpi@4.1.3 % intel@19.1.3.304 ~atomics ~cuda ~cxx ~cxx_exceptions ~gpfs ~internal-hwloc ~java +legacylaunchers +lustre ~memchecker +pmi +pmix ~singularity +static +vt +wrapper-rpath schedulers=slurm fabrics=ucx ^ucx@1.10.1 ^lustre@2.12.8 ^slurm@21.08.8 ^rdma-core@28.0
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
   exit 1
