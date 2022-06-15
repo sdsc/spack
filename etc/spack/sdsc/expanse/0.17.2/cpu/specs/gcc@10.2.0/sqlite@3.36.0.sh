@@ -36,7 +36,7 @@ module list
 
 declare -xr SPACK_PACKAGE='sqlite@3.36.0'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS='+column_metadata +fts +functions +rtree'
+declare -xr SPACK_VARIANTS='+column_metadata +fts ~functions ~rtree'
 declare -xr SPACK_DEPENDENCIES=''
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
