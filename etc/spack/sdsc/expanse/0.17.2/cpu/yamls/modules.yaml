@@ -9,9 +9,9 @@ modules:
         - mpi
       hash_length: 0
       blacklist_implicits: true
-      naming_scheme: '{name}/{version}'
+      naming_scheme: '{name}/{version}/{hash:7}'
       projections:
-        all: '{name}/{version}'
+        all: '{name}/{version}/{hash:7}'
       adol-c:
         suffixes:
           '+openmp': omp
