@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=papi@6.0.0.1
+#SBATCH --job-name=amdfftw@3.1
 #SBATCH --account=use300
 #SBATCH --partition=shared
 #SBATCH --nodes=1
@@ -34,15 +34,15 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-declare -xr SPACK_PACKAGE='papi@6.0.0.1'
+declare -xr SPACK_PACKAGE='amdfftw@3.1'
 declare -xr SPACK_COMPILER='aocc@3.2.0'
-declare -xr SPACK_VARIANTS='~cuda ~example ~infiniband ~lmsensors ~nvml ~powercap ~rapl ~rocm ~rocm_smi ~sde +shared ~static_tools'
+declare -xr SPACK_VARIANTS='~amd-app-opt ~amd-fast-planner ~amd-mpi-vader-limit ~amd-top-n-planner ~amd-trans ~debug ~mpi +openmp +shared ~static ~threads'
 declare -xr SPACK_DEPENDENCIES=''
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
 
-spack config get compilers
+spack config get compilers  
 spack config get config  
 spack config get mirrors
 spack config get modules
@@ -64,6 +64,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'cgal@5.0.3.sh'
+#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'hdf5@1.10.7.sh'
 
 sleep 60

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=papi@6.0.0.1
+#SBATCH --job-name=amdlibflame@3.1-omp
 #SBATCH --account=use300
 #SBATCH --partition=shared
 #SBATCH --nodes=1
@@ -34,15 +34,29 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-declare -xr SPACK_PACKAGE='papi@6.0.0.1'
+#==> Error: amdlibflame@3.1%aocc@3.2.0~debug+ilp64+lapack2flame+shared+static threads=openmp is unsatisfiable, conflicts are:
+#  A conflict was triggered
+#  condition(28)
+#  condition(33)
+#  condition(34)
+#  conflict("amdlibflame",33,34)
+#  root("amdlibflame")
+#  variant_condition(28,"amdlibflame","threads")
+#  variant_set("amdlibflame","threads","openmp")
+#
+#Input spec
+#--------------------------------
+#amdlibflame@3.1%aocc@3.2.0~debug+ilp64+lapack2flame+shared+static threads=openmp
+
+declare -xr SPACK_PACKAGE='amdlibflame@3.1'
 declare -xr SPACK_COMPILER='aocc@3.2.0'
-declare -xr SPACK_VARIANTS='~cuda ~example ~infiniband ~lmsensors ~nvml ~powercap ~rapl ~rocm ~rocm_smi ~sde +shared ~static_tools'
-declare -xr SPACK_DEPENDENCIES=''
+declare -xr SPACK_VARIANTS='~debug +ilp64 +lapack2flame +shared +static' #threads=none'
+declare -xr SPACK_DEPENDENCIES="^amdblis@3.1/$(spack find --format '{hash:7}' amdblis@3.1 % ${SPACK_COMPILER} +ilp64 threads=openmp)"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
 
-spack config get compilers
+spack config get compilers  
 spack config get config  
 spack config get mirrors
 spack config get modules
@@ -64,6 +78,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'cgal@5.0.3.sh'
+#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'gsl@2.7.sh'
 
 sleep 60
