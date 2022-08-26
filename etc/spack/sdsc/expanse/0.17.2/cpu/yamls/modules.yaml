@@ -45,3 +45,5 @@ modules:
           '^petsc +complex': cmplx
       ^python:
         autoload: 'direct'
+      ^ucx:
+        autoload: 'direct'
