@@ -86,7 +86,7 @@ declare -xr SPACK_PACKAGE='lammps@20210310'
 declare -xr SPACK_COMPILER='aocc@3.2.0'
 #declare -xr SPACK_VARIANTS='+asphere +body +class2 +colloid +compress +coreshell ~cuda +dipole ~exceptions ~ffmpeg +granular ~ipo +jpeg ~kim ~kokkos +kspace ~latte +lib +manybody +mc ~meam +misc +mliap +molecule +mpi +mpiio ~opencl +openmp +opt +peri +png +poems ~python +qeq +replica +rigid +shock +snap +spin +srd ~user-adios +user-atc +user-awpmd +user-bocs +user-cgsdk +user-colvars +user-diffraction +user-dpd +user-drude +user-eff +user-fep ~user-h5md +user-lb +user-manifold +user-meamc +user-mesodpd +user-mesont +user-mgpt +user-misc +user-mofff ~user-netcdf ~user-omp +user-phonon ~user-plumed +user-ptm +user-qtb +user-reaction +user-reaxc +user-sdpd +user-smd +user-smtbq +user-sph +user-tally +user-uef +user-yaff +voronoi'
 declare -xr SPACK_VARIANTS='~kim +asphere +class2 +kspace +manybody +molecule +mpiio +opt +replica +rigid +granular +openmp'
-declare -xr SPACK_DEPENDENCIES="^amdblis@3.1/$(spack find --format '{hash:7}' amdblis@3.1 % ${SPACK_COMPILER} +ilp64 threads=none) ^amdlibflame@3.1/$(spack find --format '{hash:7}' amdlibflame@3.1 % ${SPACK_COMPILER} +ilp64 threads=none) ^amdfftw@3.1/$(spack find --format '{hash:7}' amdfftw@3.1 % ${SPACK_COMPILER} ~mpi ~openmp) ^openmpi@4.1.3/$(spack find --format '{hash:7}' openmpi@4.1.3 % ${SPACK_COMPILER})"
+declare -xr SPACK_DEPENDENCIES="^amdblis@3.1/$(spack find --format '{hash:7}' amdblis@3.1 % ${SPACK_COMPILER} +ilp64 threads=none) ^amdlibflame@3.1/$(spack find --format '{hash:7}' amdlibflame@3.1 % ${SPACK_COMPILER} +ilp64 ^amdblis@3.1 threads=none) ^amdfftw@3.1/$(spack find --format '{hash:7}' amdfftw@3.1 % ${SPACK_COMPILER} ~mpi ~openmp) ^openmpi@4.1.3/$(spack find --format '{hash:7}' openmpi@4.1.3 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -113,6 +113,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'nwchem@7.0.2.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'nwchem@7.0.2.sh'
 
 sleep 60

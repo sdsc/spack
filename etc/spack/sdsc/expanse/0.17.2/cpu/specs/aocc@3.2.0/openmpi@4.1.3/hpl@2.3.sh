@@ -7,7 +7,7 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=16
 #SBATCH --mem=32G
-#SBATCH --time=00:30:00
+#SBATCH --time=48:00:00
 #SBATCH --output=%x.o%j.%N
 
 declare -xr LOCAL_TIME="$(date +'%Y%m%dT%H%M%S%z')"
@@ -33,6 +33,15 @@ module purge
 module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
+
+
+# unsatisfiable, conflicts are:
+#  hash("openmpi","ee2avubxupweey7yvuaubjjzzprlxc6f")
+#  imposed_constraint("chcywrgt5be6acklkxymrndpfctpkej6","hash","ncurses","tqezzwooo2opnqn2y45tjsozwlrmdnta")
+#  imposed_constraint("ee2avubxupweey7yvuaubjjzzprlxc6f","hash","ucx","chcywrgt5be6acklkxymrndpfctpkej6")
+#  imposed_constraint("tqezzwooo2opnqn2y45tjsozwlrmdnta","node","ncurses")
+#  imposed_constraint("tqezzwooo2opnqn2y45tjsozwlrmdnta","node_compiler_version","ncurses","gcc","8.5.0")
+#  node_compiler_version_set("ncurses","aocc","3.2.0")
 
 declare -xr SPACK_PACKAGE='hpl@2.3'
 declare -xr SPACK_COMPILER='aocc@3.2.0'

@@ -34,6 +34,17 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
+# ==> Error: InstallError: Unknown/unsupported compiler family
+#
+# /home/mkandes/cm/shared/apps/spack/0.17.2/cpu/var/spack/repos/builtin/packages/pdt/package.py:62, in configure:
+#         59        elif self.compiler.name == 'cce':
+#         60            options.append('-CC')
+#         61        else:
+#  >>     62            raise InstallError('Unknown/unsupported compiler family')
+#         63
+#         64        if '+pic' in spec:
+#         65            options.append('-useropt=' + self.compiler.cxx_pic_flag)
+
 declare -xr SPACK_PACKAGE='tau@2.30.2'
 declare -xr SPACK_COMPILER='aocc@3.2.0'
 declare -xr SPACK_VARIANTS='~adios2 +binutils ~comm ~craycnl ~cuda +elf +fortran ~gasnet +io ~level_zero +libdwarf +libunwind ~likwid +mpi ~ompt ~opari ~opencl ~openmp +otf2 +papi +pdt ~phase ~ppc64le ~profileparam +pthreads ~python ~rocm ~rocprofiler ~roctracer ~scorep ~shmem +sqlite ~x86_64'
@@ -64,6 +75,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'petsc@3.16.1.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'scotch@6.1.1.sh'
 
 sleep 60

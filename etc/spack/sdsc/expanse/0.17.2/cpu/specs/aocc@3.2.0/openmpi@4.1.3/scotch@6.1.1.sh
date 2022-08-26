@@ -67,6 +67,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'mumps@5.4.0.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'adios2@2.7.1.sh'
 
 sleep 60
