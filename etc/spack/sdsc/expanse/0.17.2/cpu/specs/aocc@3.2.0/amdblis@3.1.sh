@@ -2,12 +2,12 @@
 
 #SBATCH --job-name=amdblis@3.1
 #SBATCH --account=use300
-#SBATCH --partition=shared
+#SBATCH --partition=ind-shared
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=16
 #SBATCH --mem=32G
-#SBATCH --time=00:30:00
+#SBATCH --time=01:00:00
 #SBATCH --output=%x.o%j.%N
 
 declare -xr LOCAL_TIME="$(date +'%Y%m%dT%H%M%S%z')"
@@ -36,7 +36,7 @@ module list
 
 declare -xr SPACK_PACKAGE='amdblis@3.1'
 declare -xr SPACK_COMPILER='aocc@3.2.0'
-declare -xr SPACK_VARIANTS='+blas +cblas +ilp64 +shared +static threads=none'
+declare -xr SPACK_VARIANTS='+blas +cblas ~ilp64 +shared +static threads=none'
 declare -xr SPACK_DEPENDENCIES=''
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS}"
 

@@ -3,7 +3,7 @@
 
 #SBATCH --job-name=py-pyfftw@0.12.0
 #SBATCH --account=use300
-#SBATCH --partition=shared
+#SBATCH --partition=ind-shared
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=16
@@ -38,7 +38,7 @@ module list
 declare -xr SPACK_PACKAGE='py-pyfftw@0.12.0'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
 declare -xr SPACK_VARIANTS=''
-declare -xr SPACK_DEPENDENCIES="^py-numpy@1.19.2/$(spack find --format '{hash:7}' py-numpy@1.19.2 % ${SPACK_COMPILER}) ^openblas@0.3.10/$(spack find --format '{hash:7}' openblas@0.3.10 % ${SPACK_COMPILER} +ilp64 threads=none) ^fftw@3.3.8/$(spack find --format '{hash:7}' fftw@3.3.8 % ${SPACK_COMPILER} ~mpi ~openmp)"
+declare -xr SPACK_DEPENDENCIES="^py-numpy@1.19.2/$(spack find --format '{hash:7}' py-numpy@1.19.2 % ${SPACK_COMPILER}) ^openblas@0.3.10/$(spack find --format '{hash:7}' openblas@0.3.10 % ${SPACK_COMPILER} ~ilp64 threads=none) ^fftw@3.3.8/$(spack find --format '{hash:7}' fftw@3.3.8 % ${SPACK_COMPILER} ~mpi ~openmp)"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv

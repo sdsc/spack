@@ -39,7 +39,7 @@ module list
 # mumps requires scotch constrain a concrete spec scotch+esmumps~metis+mpi
 declare -xr SPACK_PACKAGE='scotch@6.1.1'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS='+compression +esmumps +int64 ~metis +mpi +shared'
+declare -xr SPACK_VARIANTS='+compression +esmumps ~int64 ~metis +mpi +shared'
 declare -xr SPACK_DEPENDENCIES="^openmpi@4.1.3/$(spack find --format '{hash:7}' openmpi@4.1.3 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 

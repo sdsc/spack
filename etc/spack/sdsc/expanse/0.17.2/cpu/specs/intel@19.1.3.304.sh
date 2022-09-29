@@ -2,7 +2,7 @@
 
 #SBATCH --job-name=intel@19.1.3.304
 #SBATCH --account=use300
-#SBATCH --partition=shared
+#SBATCH --partition=ind-shared
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=16
@@ -65,5 +65,3 @@ fi
 
 spack compiler add --scope site "$(spack location -i ${SPACK_PACKAGE})"
 spack module lmod refresh --delete-tree -y
-
-sleep 60

@@ -2,7 +2,7 @@
 
 #SBATCH --job-name=gdal@3.3.3
 #SBATCH --account=use300
-#SBATCH --partition=shared
+#SBATCH --partition=ind-shared
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=16
@@ -37,7 +37,7 @@ module list
 declare -xr SPACK_PACKAGE='gdal@3.3.3'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
 declare -xr SPACK_VARIANTS='~armadillo ~cfitsio ~crypto ~cryptopp ~curl ~expat +geos ~gif ~grib ~hdf4 +hdf5 ~java +jpeg ~kea ~libiconv ~libkml +liblzma +libtool +libz ~mdb +netcdf ~odbc ~opencl ~openjpeg ~pcre ~perl ~pg +png ~poppler +proj +python ~qhull ~sosi +sqlite3 ~xerces ~xml2'
-declare -xr SPACK_DEPENDENCIES="^geos@3.9.1/$(spack find --format '{hash:7}' geos@3.9.1 % ${SPACK_COMPILER}) ^openblas@0.3.18/$(spack find --format '{hash:7}' openblas@0.3.18 % ${SPACK_COMPILER} +ilp64 threads=none) ^netcdf-c@4.8.1/$(spack find --format '{hash:7}' netcdf-c@4.8.1 % ${SPACK_COMPILER} ~mpi) ^py-numpy@1.20.3/$(spack find --format '{hash:7}' py-numpy@1.20.3 % ${SPACK_COMPILER}) ^sqlite@3.36.0/$(spack find --format '{hash:7}' sqlite@3.36.0 % ${SPACK_COMPILER} ~functions ~rtree)"
+declare -xr SPACK_DEPENDENCIES="^geos@3.9.1/$(spack find --format '{hash:7}' geos@3.9.1 % ${SPACK_COMPILER}) ^openblas@0.3.18/$(spack find --format '{hash:7}' openblas@0.3.18 % ${SPACK_COMPILER} ~ilp64 threads=none) ^netcdf-c@4.8.1/$(spack find --format '{hash:7}' netcdf-c@4.8.1 % ${SPACK_COMPILER} ~mpi) ^py-numpy@1.20.3/$(spack find --format '{hash:7}' py-numpy@1.20.3 % ${SPACK_COMPILER}) ^sqlite@3.36.0/$(spack find --format '{hash:7}' sqlite@3.36.0 % ${SPACK_COMPILER} ~functions ~rtree)"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv

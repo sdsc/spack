@@ -36,8 +36,8 @@ module list
 
 declare -xr SPACK_PACKAGE='openfoam@2106'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS='~float32 +int64 ~kahip ~knl +metis +mgridgen +paraview +scotch +source ~spdp +vtk ~zoltan'
-declare -xr SPACK_DEPENDENCIES="^boost@1.77.0/$(spack find --format '{hash:7}' boost@1.77.0 % ${SPACK_COMPILER} ~mpi) ^cgal@4.13/$(spack find --format '{hash:7}' cgal@4.13 % ${SPACK_COMPILER}) ^fftw@3.3.10/$(spack find --format '{hash:7}' fftw@3.3.10 % ${SPACK_COMPILER} ~mpi ~openmp) ^metis@5.1.0/$(spack find --format '{hash:7}' metis@5.1.0 % ${SPACK_COMPILER} +int64 +real64) ^paraview@5.9.1/$(spack find --format '{hash:7}' paraview@5.9.1 % ${SPACK_COMPILER} +mpi ^openmpi@4.1.3) ^scotch@6.1.1/$(spack find --format '{hash:7}' scotch@6.1.1 % ${SPACK_COMPILER} +int64 +mpi ^openmpi@4.1.3)"
+declare -xr SPACK_VARIANTS='~float32 ~int64 ~kahip ~knl +metis +mgridgen +paraview +scotch +source ~spdp +vtk ~zoltan'
+declare -xr SPACK_DEPENDENCIES="^boost@1.77.0/$(spack find --format '{hash:7}' boost@1.77.0 % ${SPACK_COMPILER} ~mpi) ^cgal@4.13/$(spack find --format '{hash:7}' cgal@4.13 % ${SPACK_COMPILER}) ^fftw@3.3.10/$(spack find --format '{hash:7}' fftw@3.3.10 % ${SPACK_COMPILER} ~mpi ~openmp) ^metis@5.1.0/$(spack find --format '{hash:7}' metis@5.1.0 % ${SPACK_COMPILER} ~int64 ~real64) ^paraview@5.9.1/$(spack find --format '{hash:7}' paraview@5.9.1 % ${SPACK_COMPILER} +mpi ^openmpi@4.1.3) ^scotch@6.1.1/$(spack find --format '{hash:7}' scotch@6.1.1 % ${SPACK_COMPILER} ~int64 +mpi ^openmpi@4.1.3)"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv

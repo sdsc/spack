@@ -2,7 +2,7 @@
 
 #SBATCH --job-name=git-lfs@2.11.0
 #SBATCH --account=use300
-#SBATCH --partition=shared
+#SBATCH --partition=ind-shared
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=16
@@ -64,6 +64,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'subversion@1.14.0.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'gh@2.0.0.sh'
 
 sleep 60

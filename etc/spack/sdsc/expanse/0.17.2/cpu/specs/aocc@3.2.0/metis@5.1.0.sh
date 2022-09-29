@@ -2,7 +2,7 @@
 
 #SBATCH --job-name=metis@5.1.0
 #SBATCH --account=use300
-#SBATCH --partition=shared
+#SBATCH --partition=ind-shared
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=16
@@ -36,7 +36,7 @@ module list
 
 declare -xr SPACK_PACKAGE='metis@5.1.0'
 declare -xr SPACK_COMPILER='aocc@3.2.0'
-declare -xr SPACK_VARIANTS='~gdb +int64 +real64 +shared'
+declare -xr SPACK_VARIANTS='~gdb ~int64 ~real64 +shared'
 declare -xr SPACK_DEPENDENCIES=''
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 

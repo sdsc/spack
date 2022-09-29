@@ -2,7 +2,7 @@
 
 #SBATCH --job-name=amdlibflame@3.1
 #SBATCH --account=use300
-#SBATCH --partition=shared
+#SBATCH --partition=ind-shared
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=16
@@ -34,7 +34,7 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-#==> Error: amdlibflame@3.1%aocc@3.2.0~debug+ilp64+lapack2flame+shared+static threads=openmp is unsatisfiable, conflicts are:
+#==> Error: amdlibflame@3.1%aocc@3.2.0~debug~ilp64+lapack2flame+shared+static threads=openmp is unsatisfiable, conflicts are:
 #  A conflict was triggered
 #  condition(28)
 #  condition(33)
@@ -46,12 +46,12 @@ module list
 #
 #Input spec
 #--------------------------------
-#amdlibflame@3.1%aocc@3.2.0~debug+ilp64+lapack2flame+shared+static threads=openmp
+#amdlibflame@3.1%aocc@3.2.0~debug~ilp64+lapack2flame+shared+static threads=openmp
 
 declare -xr SPACK_PACKAGE='amdlibflame@3.1'
 declare -xr SPACK_COMPILER='aocc@3.2.0'
-declare -xr SPACK_VARIANTS='~debug +ilp64 +lapack2flame +shared +static' #threads=none'
-declare -xr SPACK_DEPENDENCIES="^amdblis@3.1/$(spack find --format '{hash:7}' amdblis@3.1 % ${SPACK_COMPILER} +ilp64 threads=none)"
+declare -xr SPACK_VARIANTS='~debug ~ilp64 +lapack2flame +shared +static' #threads=none'
+declare -xr SPACK_DEPENDENCIES="^amdblis@3.1/$(spack find --format '{hash:7}' amdblis@3.1 % ${SPACK_COMPILER} ~ilp64 threads=none)"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv

@@ -2,7 +2,7 @@
 
 #SBATCH --job-name=iq-tree@2.1.3
 #SBATCH --account=use300
-#SBATCH --partition=shared
+#SBATCH --partition=ind-shared
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=16
@@ -64,6 +64,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'trinity@2.12.0.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'trinity@2.12.0.sh'
 
 sleep 60

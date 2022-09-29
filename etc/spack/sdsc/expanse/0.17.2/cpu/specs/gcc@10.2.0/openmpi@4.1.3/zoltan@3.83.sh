@@ -36,7 +36,7 @@ module list
 
 declare -xr SPACK_PACKAGE='zoltan@3.83'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS='~debug +fortran +int64 +mpi +parmetis +shared'
+declare -xr SPACK_VARIANTS='~debug +fortran ~int64 +mpi +parmetis +shared'
 declare -xr SPACK_DEPENDENCIES="^parmetis@4.0.3/$(spack find --format '{hash:7}' parmetis@4.0.3 % ${SPACK_COMPILER} ^openmpi@4.1.3)"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 

@@ -55,7 +55,7 @@ module list
 declare -xr SPACK_PACKAGE='pexsi@0.10.2'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
 declare -xr SPACK_VARIANTS='+fortran'
-declare -xr SPACK_DEPENDENCIES="^parmetis@4.0.3/$(spack find --format '{hash:7}' parmetis@4.0.3 % ${SPACK_COMPILER} ^openmpi@4.1.3) ^superlu-dist@5.3.0/$(spack find --format '{hash:7}' superlu-dist@5.3.0 % ${SPACK_COMPILER} +int64 ^openmpi@4.1.3)"
+declare -xr SPACK_DEPENDENCIES="^parmetis@4.0.3/$(spack find --format '{hash:7}' parmetis@4.0.3 % ${SPACK_COMPILER} ^openmpi@4.1.3) ^superlu-dist@5.3.0/$(spack find --format '{hash:7}' superlu-dist@5.3.0 % ${SPACK_COMPILER} ~int64 ^openmpi@4.1.3)"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv

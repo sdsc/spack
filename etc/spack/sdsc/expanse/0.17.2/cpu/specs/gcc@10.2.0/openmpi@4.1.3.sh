@@ -2,7 +2,7 @@
 
 #SBATCH --job-name=openmpi@4.1.3
 #SBATCH --account=use300
-#SBATCH --partition=shared
+#SBATCH --partition=ind-shared
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=16
@@ -52,7 +52,6 @@ spack config get packages
 spack config get repos
 spack config get upstreams
 
-echo "${SPACK_SPEC}"
 spack spec --long --namespaces --types openmpi@4.1.3 % gcc@10.2.0 ~atomics~cuda~cxx~cxx_exceptions~gpfs~internal-hwloc~java+legacylaunchers+lustre~memchecker+pmi+pmix+romio~rsh~singularity+static+vt+wrapper-rpath cuda_arch=none fabrics=ucx schedulers=slurm ^lustre@2.12.8 ^slurm@21.08.8 ^rdma-core@28.0 "^ucx@1.10.1/$(spack find --format '{hash:7}' ucx@1.10.1 % gcc@8.5.0)"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack concretization failed.'
@@ -66,5 +65,3 @@ if [[ "${?}" -ne 0 ]]; then
 fi
 
 spack module lmod refresh --delete-tree -y
-
-sleep 60

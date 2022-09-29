@@ -2,7 +2,7 @@
 
 #SBATCH --job-name=openmpi@3.1.6
 #SBATCH --account=use300
-#SBATCH --partition=shared
+#SBATCH --partition=ind-shared
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=16
@@ -37,8 +37,7 @@ module list
 declare -xr SPACK_PACKAGE='openmpi@3.1.6'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
 declare -xr SPACK_VARIANTS='~atomics~cuda+cxx+cxx_exceptions~gpfs~internal-hwloc~java+legacylaunchers+lustre~memchecker+pmi+pmix+romio~rsh~singularity+static+vt+wrapper-rpath cuda_arch=none fabrics=verbs schedulers=slurm'
-declare -xr SPACK_DEPENDENCIES='^lustre@2.12.8 ^slurm@21.08.8 ^rdma-core@28.0 ^ucx@1.10.1'
-
+declare -xr SPACK_DEPENDENCIES='^lustre@2.12.8 ^slurm@21.08.8 ^rdma-core@28.0'
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -51,22 +50,16 @@ spack config get packages
 spack config get repos
 spack config get upstreams
 
-spack spec --long --namespaces --types openmpi@3.1.6 % gcc@10.2.0 ~atomics~cuda+cxx+cxx_exceptions~gpfs~internal-hwloc~java+legacylaunchers+lustre~memchecker+pmi+pmix+romio~rsh~singularity+static+vt+wrapper-rpath cuda_arch=none fabrics=verbs schedulers=slurm ^lustre@2.12.8 ^slurm@21.08.8 ^rdma-core@28.0 ^ucx@1.10.1
+spack spec --long --namespaces --types openmpi@3.1.6 % gcc@10.2.0 ~atomics~cuda+cxx+cxx_exceptions~gpfs~internal-hwloc~java+legacylaunchers+lustre~memchecker+pmi+pmix+romio~rsh~singularity+static+vt+wrapper-rpath cuda_arch=none fabrics=verbs schedulers=slurm ^lustre@2.12.8 ^slurm@21.08.8 ^rdma-core@28.0
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack concretization failed.'
   exit 1
 fi
 
-time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all openmpi@3.1.6 % gcc@10.2.0 ~atomics~cuda+cxx+cxx_exceptions~gpfs~internal-hwloc~java+legacylaunchers+lustre~memchecker+pmi+pmix+romio~rsh~singularity+static+vt+wrapper-rpath cuda_arch=none fabrics=verbs schedulers=slurm ^lustre@2.12.8 ^slurm@21.08.8 ^rdma-core@28.0 ^ucx@1.10.1
+time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all openmpi@3.1.6 % gcc@10.2.0 ~atomics~cuda+cxx+cxx_exceptions~gpfs~internal-hwloc~java+legacylaunchers+lustre~memchecker+pmi+pmix+romio~rsh~singularity+static+vt+wrapper-rpath cuda_arch=none fabrics=verbs schedulers=slurm ^lustre@2.12.8 ^slurm@21.08.8 ^rdma-core@28.0
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
   exit 1
 fi
 
 spack module lmod refresh --delete-tree -y
-
-cd "${SPACK_PACKAGE}"
-
-#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'sprng@5.0.sh'
-
-sleep 60

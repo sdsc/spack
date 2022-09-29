@@ -2,7 +2,7 @@
 
 #SBATCH --job-name=hypre@2.23.0
 #SBATCH --account=use300
-#SBATCH --partition=shared
+#SBATCH --partition=ind-shared
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=16
@@ -37,8 +37,8 @@ module list
 declare -xr INTEL_LICENSE_FILE='40000@elprado.sdsc.edu:40200@elprado.sdsc.edu'
 declare -xr SPACK_PACKAGE='hypre@2.23.0'
 declare -xr SPACK_COMPILER='intel@19.1.3.304'
-declare -xr SPACK_VARIANTS='~complex ~cuda ~debug +fortran +int64 ~internal-superlu ~mixedint ~mpi ~openmp +shared ~superlu-dist ~unified-memory'
-declare -xr SPACK_DEPENDENCIES="^openblas@0.3.18/$(spack find --format '{hash:7}' openblas@0.3.18 % ${SPACK_COMPILER} +ilp64 threads=none)"
+declare -xr SPACK_VARIANTS='~complex ~cuda ~debug +fortran ~int64 ~internal-superlu ~mixedint ~mpi ~openmp +shared ~superlu-dist ~unified-memory'
+declare -xr SPACK_DEPENDENCIES="^openblas@0.3.18/$(spack find --format '{hash:7}' openblas@0.3.18 % ${SPACK_COMPILER} ~ilp64 threads=none)"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv

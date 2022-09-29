@@ -2,7 +2,7 @@
 
 #SBATCH --job-name=openblas@0.3.18
 #SBATCH --account=use300
-#SBATCH --partition=shared
+#SBATCH --partition=ind-shared
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=16
@@ -37,7 +37,7 @@ module list
 declare -xr INTEL_LICENSE_FILE='40000@elprado.sdsc.edu:40200@elprado.sdsc.edu'
 declare -xr SPACK_PACKAGE='openblas@0.3.18'
 declare -xr SPACK_COMPILER='intel@19.1.3.304'
-declare -xr SPACK_VARIANTS='~bignuma ~consistent_fpcsr +ilp64 +locking +pic +shared threads=none'
+declare -xr SPACK_VARIANTS='~bignuma ~consistent_fpcsr ~ilp64 +locking +pic +shared threads=none'
 declare -xr SPACK_DEPENDENCIES=''
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS}"
 

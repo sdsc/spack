@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=gdal@2.4.4
+#SBATCH --job-name=gh@2.0.0
 #SBATCH --account=use300
-#SBATCH --partition=shared
+#SBATCH --partition=ind-shared
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=16
@@ -34,19 +34,10 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-# may no longer be able to build due to python 2 to 3 conversion lib 
-# issue; also  affects ncl@6.6.2 build since gdal@2.4.4 is required. 
-# note ncl@6.6.2 is no longer developed or maintained by NCAR
-#
-# 6709    error in GDAL setup command: use_2to3 is invalid.
-#     6710    make[2]: *** [GNUmakefile:73: build] Error 1
-#     6711    make[2]: Leaving directory '/tmp/mkandes/spack-stage/spack-stage-g
-#             dal-2.4.4-viigpdri5t6b6qdcmlj4wlijojopjyip/spack-src/swig/python'
-
-declare -xr SPACK_PACKAGE='gdal@2.4.4'
-declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS='~armadillo ~cfitsio ~crypto ~cryptopp ~curl ~expat +geos ~gif ~grib ~hdf4 +hdf5 ~java +jpeg ~kea ~libiconv ~libkml +liblzma +libtool +libz ~mdb +netcdf ~odbc ~opencl ~openjpeg ~pcre ~perl ~pg +png ~poppler +proj +python ~qhull ~sosi +sqlite3 ~xerces ~xml2'
-declare -xr SPACK_DEPENDENCIES="^geos@3.9.1/$(spack find --format '{hash:7}' geos@3.9.1 % ${SPACK_COMPILER}) ^openblas@0.3.18/$(spack find --format '{hash:7}' openblas@0.3.18 % ${SPACK_COMPILER} +ilp64 threads=none) ^netcdf-c@4.8.1/$(spack find --format '{hash:7}' netcdf-c@4.8.1 % ${SPACK_COMPILER} ~mpi) ^py-numpy@1.20.3/$(spack find --format '{hash:7}' py-numpy@1.20.3 % ${SPACK_COMPILER}) ^sqlite@3.36.0/$(spack find --format '{hash:7}' sqlite@3.36.0 % ${SPACK_COMPILER} +functions +rtree)"
+declare -xr SPACK_PACKAGE='gh@2.0.0'
+declare -xr SPACK_COMPILER='gcc@8.5.0'
+declare -xr SPACK_VARIANTS=''
+declare -xr SPACK_DEPENDENCIES=''
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -73,6 +64,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'ncl@6.6.2.sh'
+#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'subversion@1.14.0.sh'
 
 sleep 60
