@@ -513,3 +513,6 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+
+# Standard output files from SDSC's slurm-based spec build/install scripts
+*.exp-*
