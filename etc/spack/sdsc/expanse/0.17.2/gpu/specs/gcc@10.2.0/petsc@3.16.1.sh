@@ -9,7 +9,7 @@
 #SBATCH --cpus-per-task=10
 #SBATCH --mem=93G
 #SBATCH --gpus=1
-#SBATCH --time=00:30:00
+#SBATCH --time=48:00:00
 #SBATCH --output=%x.o%j.%N
 
 declare -xr LOCAL_TIME="$(date +'%Y%m%dT%H%M%S%z')"
@@ -36,6 +36,28 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
+# hash("python","uasyy5n4yauliglzcgk27zmfa3ltehdy")
+#  imposed_constraint("2c5fvipdd5evacdfivwheqdtijr5om5z","node_compiler_version","zlib","gcc","10.2.0")
+#  imposed_constraint("uasyy5n4yauliglzcgk27zmfa3ltehdy","hash","sqlite","uqy7ybgbejjeoveblo63sthenerqjmar")
+#  imposed_constraint("uqy7ybgbejjeoveblo63sthenerqjmar","depends_on","sqlite","zlib","link")
+#  imposed_constraint("uqy7ybgbejjeoveblo63sthenerqjmar","hash","zlib","2c5fvipdd5evacdfivwheqdtijr5om5z")
+#  imposed_constraint("uqy7ybgbejjeoveblo63sthenerqjmar","node","sqlite")
+#  node_compiler_version_set("zlib","gcc","8.5.0")
+
+# condition(3855)
+#  hash("python","uasyy5n4yauliglzcgk27zmfa3ltehdy")
+#  imposed_constraint("5jrknc3vlekiult4nuhol72zpiakyb7d","node","ncurses")
+#  imposed_constraint("uasyy5n4yauliglzcgk27zmfa3ltehdy","hash","sqlite","uqy7ybgbejjeoveblo63sthenerqjmar")
+#  imposed_constraint("uqy7ybgbejjeoveblo63sthenerqjmar","hash","ncurses","5jrknc3vlekiult4nuhol72zpiakyb7d")
+#  variant_condition(3855,"ncurses","abi")
+#  variant_set("ncurses","abi","5")
+
+# hash("python","vii2oxmukcdnaprxxdlsaydq7tjegc3j")
+#  imposed_constraint("5xho2djgxmtrybtbc7q5q2yi5juesbqu","node","xz")
+#  imposed_constraint("5xho2djgxmtrybtbc7q5q2yi5juesbqu","node_compiler_version","xz","gcc","10.2.0")
+#  imposed_constraint("vii2oxmukcdnaprxxdlsaydq7tjegc3j","hash","xz","5xho2djgxmtrybtbc7q5q2yi5juesbqu")
+#  node_compiler_version_set("xz","gcc","8.5.0")
+
 declare -xr SPACK_PACKAGE='petsc@3.16.1'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
 declare -xr SPACK_VARIANTS='~X ~batch ~cgns ~complex +cuda cuda_arch=70,80 ~debug +double ~exodusii ~fftw ~giflib ~hdf5 ~hpddm ~hwloc ~hypre ~int64 ~jpeg ~knl ~libpng ~libyaml ~memkind +metis ~mkl-pardiso ~mmg ~moab ~mpfr ~mpi ~mumps ~openmp ~p4est ~parmmg~ptscotch ~random123 ~rocm ~saws ~scalapack +shared ~strumpack ~suite-sparse ~superlu-dist ~tetgen ~trilinos ~valgrind'
@@ -52,13 +74,13 @@ spack config get packages
 spack config get repos
 spack config get upstreams
 
-spack spec --long --namespaces --types "${SPACK_SPEC}"
+spack --show-cores=minimized spec --long --namespaces --types petsc@3.16.1 % gcc@10.2.0 ~X ~batch ~cgns ~complex +cuda cuda_arch=70,80 ~debug +double ~exodusii ~fftw ~giflib ~hdf5 ~hpddm ~hwloc ~hypre ~int64 ~jpeg ~knl ~libpng ~libyaml ~memkind +metis ~mkl-pardiso ~mmg ~moab ~mpfr ~mpi ~mumps ~openmp ~p4est ~parmmg~ptscotch ~random123 ~rocm ~saws ~scalapack +shared ~strumpack ~suite-sparse ~superlu-dist ~tetgen ~trilinos ~valgrind "^cuda@11.2.2/$(spack find --format '{hash:7}' cuda@11.2.2 % gcc@8.5.0) ^python@3.8.12/$(spack find --format '{hash:7}' python@3.8.12 % ${SPACK_COMPILER}) ^openblas@0.3.18/$(spack find --format '{hash:7}' openblas@0.3.18 % ${SPACK_COMPILER} ~ilp64 threads=none) ^metis@5.1.0/$(spack find --format '{hash:7}' metis@5.1.0 % ${SPACK_COMPILER})"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack concretization failed.'
   exit 1
 fi
 
-time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all "${SPACK_SPEC}"
+time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all petsc@3.16.1 % gcc@10.2.0 ~X ~batch ~cgns ~complex +cuda cuda_arch=70,80 ~debug +double ~exodusii ~fftw ~giflib ~hdf5 ~hpddm ~hwloc ~hypre ~int64 ~jpeg ~knl ~libpng ~libyaml ~memkind +metis ~mkl-pardiso ~mmg ~moab ~mpfr ~mpi ~mumps ~openmp ~p4est ~parmmg~ptscotch ~random123 ~rocm ~saws ~scalapack +shared ~strumpack ~suite-sparse ~superlu-dist ~tetgen ~trilinos ~valgrind "^cuda@11.2.2/$(spack find --format '{hash:7}' cuda@11.2.2 % gcc@8.5.0) ^python@3.8.12/$(spack find --format '{hash:7}' python@3.8.12 % ${SPACK_COMPILER}) ^openblas@0.3.18/$(spack find --format '{hash:7}' openblas@0.3.18 % ${SPACK_COMPILER} ~ilp64 threads=none) ^metis@5.1.0/$(spack find --format '{hash:7}' metis@5.1.0 % ${SPACK_COMPILER})"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
   exit 1
@@ -66,6 +88,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'petsc@3.16.1-cmplx.sh'
+#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'petsc@3.16.1-cmplx.sh'
 
 sleep 60

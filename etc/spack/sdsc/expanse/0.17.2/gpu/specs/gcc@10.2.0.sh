@@ -71,6 +71,4 @@ fi
 spack compiler add --scope site "$(spack location -i ${SPACK_PACKAGE})"
 spack module lmod refresh --delete-tree -y
 
-#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'ucx@1.10.1.sh'
-
 sleep 60

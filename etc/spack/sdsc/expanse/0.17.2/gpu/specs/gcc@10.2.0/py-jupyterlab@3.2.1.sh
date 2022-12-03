@@ -11,6 +11,7 @@
 #SBATCH --gpus=1
 #SBATCH --time=01:00:00
 #SBATCH --output=%x.o%j.%N
+#SBATCH -x exp-15-58
 
 declare -xr LOCAL_TIME="$(date +'%Y%m%dT%H%M%S%z')"
 declare -xir UNIX_TIME="$(date +'%s')"
