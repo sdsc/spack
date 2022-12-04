@@ -35,7 +35,7 @@ cat "${SLURM_JOB_SCRIPT}"
 module purge
 module load "${SCHEDULER_MODULE}"
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
-spack clean --stage
+#spack clean --stage
 #module use "${SPACK_ROOT}/share/spack/lmod/linux-rocky8-x86_64/Core"
 #module load "${CUDA_MODULE}"
 module list
