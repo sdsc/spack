@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=cuda@11.2.2
+#SBATCH --job-name=cuda@11.3.1
 #SBATCH --account=use300
 #SBATCH --partition=ind-gpu-shared
 #SBATCH --nodes=1
@@ -35,8 +35,8 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-declare -xr SPACK_PACKAGE='cuda@11.2.2'
-declare -xr SPACK_COMPILER='gcc@8.5.0'
+declare -xr SPACK_PACKAGE='cuda@11.3.1'
+declare -xr SPACK_COMPILER='gcc@10.2.0'
 declare -xr SPACK_VARIANTS='~dev'
 declare -xr SPACK_DEPENDENCIES=''
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
@@ -65,6 +65,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'ucx@1.10.1.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'cmake@3.21.4.sh'
 
 sleep 60
