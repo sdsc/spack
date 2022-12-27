@@ -65,6 +65,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'cmake@3.21.4.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'cudnn@8.2.0.53-11.3.sh'
 
 sleep 60

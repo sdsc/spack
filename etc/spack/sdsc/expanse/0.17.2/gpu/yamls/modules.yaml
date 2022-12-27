@@ -23,6 +23,8 @@ modules:
           prepend_path:
             PATH: '/cm/local/apps/cuda/libs/current/bin'
             LD_LIBRARY_PATH: '/cm/local/apps/cuda/libs/current/lib64'
+          set:
+            CUDATOOLKIT_HOME: '/cm/local/apps/cuda'
       fftw:
         suffixes:
           '+openmp': omp
