@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=nvhpc@21.9
+#SBATCH --job-name=pgi@18.10
 #SBATCH --account=use300
 ##SBATCH --reservation=root_63
 #SBATCH --partition=ind-gpu-shared
@@ -37,9 +37,9 @@ module load "${SCHEDULER_MODULE}"
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 module list
 
-declare -xr SPACK_PACKAGE='nvhpc@21.9'
+declare -xr SPACK_PACKAGE='pgi@18.10'
 declare -xr SPACK_COMPILER='gcc@8.5.0'
-declare -xr SPACK_VARIANTS='+blas +lapack +mpi'
+declare -xr SPACK_VARIANTS='~amd ~java +mpi +network +nvidia ~single'
 declare -xr SPACK_DEPENDENCIES='' 
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 

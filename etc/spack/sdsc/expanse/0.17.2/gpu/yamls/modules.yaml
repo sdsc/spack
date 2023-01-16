@@ -38,6 +38,9 @@ modules:
         environment:
           set:
             INTEL_LICENSE_FILE: '40000@elprado.sdsc.edu:40200@elprado.sdsc.edu'
+      intel-mkl:
+        suffixes:
+          'threads=openmp': omp
       kokkos:
         suffixes:
           '+openmp': omp
@@ -47,6 +50,11 @@ modules:
       petsc:
         suffixes:
           '+complex': cmplx
+      pgi:
+        environment:
+          set:
+            PGROUPD_LICENSE_FILE: '40000@elprado.sdsc.edu:40200@elprado.sdsc.edu'
+            LM_LICENSE_FILE: '40000@elprado.sdsc.edu:40200@elprado.sdsc.edu'
       slepc:
         suffixes:
           '^petsc +complex': cmplx
