@@ -2,7 +2,7 @@
 
 #SBATCH --job-name=hpl@2.3-omp
 #SBATCH --account=use300
-#SBATCH --reservation=root_73
+##SBATCH --reservation=root_73
 #SBATCH --partition=ind-gpu-shared
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1

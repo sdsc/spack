@@ -2,7 +2,7 @@
 
 #SBATCH --job-name=py-netcdf4@1.5.3
 #SBATCH --account=use300
-#SBATCH --reservation=root_73
+##SBATCH --reservation=root_73
 #SBATCH --partition=ind-gpu-shared
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
@@ -66,6 +66,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'arpack-ng@3.7.0.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'arpack-ng@3.7.0.sh'
 
 sleep 60

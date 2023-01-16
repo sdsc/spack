@@ -40,7 +40,7 @@ declare -xr INTEL_LICENSE_FILE='40000@elprado.sdsc.edu:40200@elprado.sdsc.edu'
 declare -xr SPACK_PACKAGE='papi@6.0.0.1'
 declare -xr SPACK_COMPILER='intel@19.1.3.304'
 declare -xr SPACK_VARIANTS='+cuda ~example ~infiniband ~lmsensors ~nvml ~powercap ~rapl ~rocm ~rocm_smi ~sde +shared ~static_tools'
-declare -xr SPACK_DEPENDENCIES="^cuda@11.2.2/$(spack find --format '{hash:7}' cuda@11.2.2 % gcc@8.5.0)"
+declare -xr SPACK_DEPENDENCIES="^cuda@11.2.2/$(spack find --format '{hash:7}' cuda@11.2.2 % intel@19.1.3.304)"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -67,6 +67,6 @@ fi
 
 #spack module lmod refresh --delete-tree -y
 
-#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'valgrind@3.17.0.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'valgrind@3.17.0.sh'
 
 sleep 60

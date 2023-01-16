@@ -39,7 +39,7 @@ module list
 declare -xr INTEL_LICENSE_FILE='40000@elprado.sdsc.edu:40200@elprado.sdsc.edu'
 declare -xr SPACK_PACKAGE='openblas@0.3.18'
 declare -xr SPACK_COMPILER='intel@19.1.3.304'
-declare -xr SPACK_VARIANTS='~bignuma ~consistent_fpcsr ~ilp64 +locking +pic +shared threads=openmp'
+declare -xr SPACK_VARIANTS='~bignuma ~consistent_fpcsr ~ilp64 +locking +pic ~shared threads=openmp'
 declare -xr SPACK_DEPENDENCIES=''
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS}"
 

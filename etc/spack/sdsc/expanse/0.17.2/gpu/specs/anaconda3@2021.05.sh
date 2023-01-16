@@ -66,6 +66,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'cuda@11.2.2.sh'
+#sbatch --dependency="afterok:${SLURM_JOB_ID}" ''
 
 sleep 60

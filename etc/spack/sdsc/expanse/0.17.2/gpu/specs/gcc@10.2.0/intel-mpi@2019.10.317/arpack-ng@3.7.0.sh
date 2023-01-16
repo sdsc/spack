@@ -2,7 +2,7 @@
 
 #SBATCH --job-name=arpack-ng@3.7.0
 #SBATCH --account=use300
-#SBATCH --reservation=root_73
+##SBATCH --reservation=root_73
 #SBATCH --partition=ind-gpu-shared
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1

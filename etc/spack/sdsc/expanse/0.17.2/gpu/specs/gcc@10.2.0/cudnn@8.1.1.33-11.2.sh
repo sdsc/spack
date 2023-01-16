@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=cudnn@8.2.0.53-11.3
+#SBATCH --job-name=cudnn@8.1.1.33-11.2
 #SBATCH --account=use300
 #SBATCH --partition=ind-gpu-shared
 #SBATCH --nodes=1
@@ -35,10 +35,10 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-declare -xr SPACK_PACKAGE='cudnn@8.2.0.53-11.3'
+declare -xr SPACK_PACKAGE='cudnn@8.1.1.33-11.2'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
 declare -xr SPACK_VARIANTS=''
-declare -xr SPACK_DEPENDENCIES="^cuda@11.3.1/$(spack find --format '{hash:7}' cuda@11.3.1 % ${SPACK_COMPILER})"
+declare -xr SPACK_DEPENDENCIES="^cuda@11.2.2/$(spack find --format '{hash:7}' cuda@11.2.2 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -65,6 +65,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'nccl@2.9.9-1.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'nccl@2.8.4-1.sh'
 
 sleep 60

@@ -66,6 +66,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'eigen@3.4.0.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'graphviz@2.49.0.sh'
 
 sleep 60

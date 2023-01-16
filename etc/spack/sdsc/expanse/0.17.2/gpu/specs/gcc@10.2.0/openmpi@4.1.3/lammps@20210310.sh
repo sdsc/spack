@@ -27,7 +27,7 @@ declare -xr SLURM_JOB_MD5SUM="$(md5sum ${SLURM_JOB_SCRIPT})"
 declare -xr SCHEDULER_MODULE='slurm'
 declare -xr COMPILER_MODULE='gcc/10.2.0'
 declare -xr MPI_MODULE='openmpi/4.1.3'
-declare -xr CUDA_MODULE='cuda/11.3.1'
+declare -xr CUDA_MODULE='cuda/11.2.2'
 
 echo "${UNIX_TIME} ${SLURM_JOB_ID} ${SLURM_JOB_MD5SUM} ${SLURM_JOB_DEPENDENCY}" 
 echo ""
@@ -90,7 +90,7 @@ declare -xr CMAKE_LIBRARY_PATH="${CUDA_CUDA_LIBRARY}"
 #             kkos::Cuda > ,  ::Kokkos::Cuda> ::exec_range<void>  const") is not
 #              allowed
 
-# condition(2731)
+#  condition(2731)
 #  condition(2995)
 #  condition(5719)
 #  dependency_condition(2995,"lammps","python")
@@ -103,10 +103,44 @@ declare -xr CMAKE_LIBRARY_PATH="${CUDA_CUDA_LIBRARY}"
 #  variant_set("lammps","python","True")
 #  variant_set("python","optimizations","False")
 
+# 2 errors found in build log:
+#     53    -- Found CURL: /usr/lib64/libcurl.so (found version "7.61.1")
+#     54    -- Checking for module 'libzstd>=1.4'
+#     55    --   Found libzstd, version 1.4.4
+#     56    -- Looking for C++ include cmath
+#     57    -- Looking for C++ include cmath - found
+#     58    -- Checking external potential C_10_10.mesocnt from https://download
+#           .lammps.org/potentials
+#  >> 59    CMake Error at Modules/LAMMPSUtils.cmake:101 (file):
+#     60      file DOWNLOAD HASH mismatch
+#     61    
+#     62        for file: [/tmp/mkandes/spack-stage/spack-stage-lammps-20210310-
+#           oi3mpq35ufuhx6mnichykaxhdhdrfhf4/spack-build-oi3mpq3/C_10_10.mesocnt
+#           ]
+#     63          expected hash: [028de73ec828b7830d762702eda571c1]
+#     64            actual hash: [d41d8cd98f00b204e9800998ecf8427e]
+#     65                 status: [6;"Couldn't resolve host name"]
+#     66    
+#     67    Call Stack (most recent call first):
+#     68      CMakeLists.txt:428 (FetchPotentials)
+#     69    
+#     70    
+#     71    -- Checking external potential TABTP_10_10.mesont from https://downl
+#           oad.lammps.org/potentials
+#  >> 72    CMake Error at Modules/LAMMPSUtils.cmake:101 (file):
+#     73      file DOWNLOAD HASH mismatch
+#     74    
+#     75        for file: [/tmp/mkandes/spack-stage/spack-stage-lammps-20210310-
+#           oi3mpq35ufuhx6mnichykaxhdhdrfhf4/spack-build-oi3mpq3/TABTP_10_10.mes
+#           ont]
+#     76          expected hash: [744a739da49ad5e78492c1fc9fd9f8c1]
+#     77            actual hash: [d41d8cd98f00b204e9800998ecf8427e]
+#     78                 status: [6;"Couldn't resolve host name"]
+
 declare -xr SPACK_PACKAGE='lammps@20210310'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS='+asphere +body +class2 +colloid +compress +coreshell +cuda cuda_arch=70,80 +dipole ~exceptions +ffmpeg +granular ~ipo +jpeg +kim +kokkos +kspace ~latte +lib +manybody +mc ~meam +misc +mliap +molecule +mpi +mpiio ~opencl +openmp +opt +peri +png +poems +python +qeq +replica +rigid +shock +snap +spin +srd ~user-adios +user-atc +user-awpmd +user-bocs +user-cgsdk +user-colvars +user-diffraction +user-dpd +user-drude +user-eff +user-fep ~user-h5md +user-lb +user-manifold +user-meamc +user-mesodpd +user-mesont +user-mgpt +user-misc +user-mofff ~user-netcdf ~user-omp +user-phonon +user-plumed +user-ptm +user-qtb +user-reaction +user-reaxc +user-sdpd +user-smd +user-smtbq +user-sph +user-tally +user-uef +user-yaff +voronoi'
-declare -xr SPACK_DEPENDENCIES="^openblas@0.3.18/$(spack find --format '{hash:7}' openblas@0.3.18 % ${SPACK_COMPILER} ~ilp64 threads=none) ^fftw@3.3.10/$(spack find --format '{hash:7}' fftw@3.3.10 % ${SPACK_COMPILER} ~mpi ~openmp) ^kokkos@3.4.01/$(spack find --format '{hash:7}' kokkos@3.4.01 % ${SPACK_COMPILER} ^kokkos-nvcc-wrapper +mpi) ^ffmpeg@4.3.2/$(spack find --format '{hash:7}' ffmpeg@4.3.2 % ${SPACK_COMPILER}) ^plumed@2.6.3/$(spack find --format '{hash:7}' plumed@2.6.3 % ${SPACK_COMPILER} +mpi ^openmpi@4.1.3) ^python@3.8.12/$(spack find --format '{hash:7}' python@3.8.12 % ${SPACK_COMPILER})"
+declare -xr SPACK_VARIANTS='+asphere +body +class2 +colloid +compress +coreshell +cuda cuda_arch=70 +dipole ~exceptions +ffmpeg +granular ~ipo +jpeg +kim +kokkos +kspace ~latte +lib +manybody +mc ~meam +misc +mliap +molecule +mpi +mpiio ~opencl +openmp +opt +peri +png +poems +python +qeq +replica +rigid +shock +snap +spin +srd ~user-adios +user-atc +user-awpmd +user-bocs +user-cgsdk +user-colvars +user-diffraction +user-dpd +user-drude +user-eff +user-fep ~user-h5md +user-lb +user-manifold +user-meamc +user-mesodpd +user-mesont +user-mgpt +user-misc +user-mofff ~user-netcdf ~user-omp +user-phonon +user-plumed +user-ptm +user-qtb +user-reaction +user-reaxc +user-sdpd +user-smd +user-smtbq +user-sph +user-tally +user-uef +user-yaff +voronoi'
+declare -xr SPACK_DEPENDENCIES="^openblas@0.3.18/$(spack find --format '{hash:7}' openblas@0.3.18 % ${SPACK_COMPILER} ~ilp64 threads=none) ^fftw@3.3.10/$(spack find --format '{hash:7}' fftw@3.3.10 % ${SPACK_COMPILER} ~mpi ~openmp) ^kokkos@3.4.01/$(spack find --format '{hash:7}' kokkos@3.4.01 % ${SPACK_COMPILER} ^kokkos-nvcc-wrapper ~mpi) ^ffmpeg@4.3.2/$(spack find --format '{hash:7}' ffmpeg@4.3.2 % ${SPACK_COMPILER}) ^plumed@2.6.3/$(spack find --format '{hash:7}' plumed@2.6.3 % ${SPACK_COMPILER} +mpi ^openmpi@4.1.3) ^python@3.8.12/$(spack find --format '{hash:7}' python@3.8.12 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -119,13 +153,13 @@ spack config get packages
 spack config get repos
 spack config get upstreams
 
-spack --show-cores=minimized spec --long --namespaces --types lammps@20210310 % gcc@10.2.0 +asphere +body +class2 +colloid +compress +coreshell +cuda cuda_arch=70,80 +dipole ~exceptions +ffmpeg +granular ~ipo +jpeg +kim +kokkos +kspace ~latte +lib +manybody +mc ~meam +misc +mliap +molecule +mpi +mpiio ~opencl +openmp +opt +peri +png +poems +python +qeq +replica +rigid +shock +snap +spin +srd ~user-adios +user-atc +user-awpmd +user-bocs +user-cgsdk +user-colvars +user-diffraction +user-dpd +user-drude +user-eff +user-fep ~user-h5md +user-lb +user-manifold +user-meamc +user-mesodpd +user-mesont +user-mgpt +user-misc +user-mofff ~user-netcdf ~user-omp +user-phonon +user-plumed +user-ptm +user-qtb +user-reaction +user-reaxc +user-sdpd +user-smd +user-smtbq +user-sph +user-tally +user-uef +user-yaff +voronoi "^openblas@0.3.18/$(spack find --format '{hash:7}' openblas@0.3.18 % ${SPACK_COMPILER} ~ilp64 threads=none) ^fftw@3.3.10/$(spack find --format '{hash:7}' fftw@3.3.10 % ${SPACK_COMPILER} ~mpi ~openmp) ^kokkos@3.4.01/$(spack find --format '{hash:7}' kokkos@3.4.01 % ${SPACK_COMPILER} ^kokkos-nvcc-wrapper +mpi) ^ffmpeg@4.3.2/$(spack find --format '{hash:7}' ffmpeg@4.3.2 % ${SPACK_COMPILER}) ^plumed@2.6.3/$(spack find --format '{hash:7}' plumed@2.6.3 % ${SPACK_COMPILER} +mpi ^openmpi@4.1.3) ^python@3.8.12/$(spack find --format '{hash:7}' python@3.8.12 % ${SPACK_COMPILER})"
+spack --show-cores=minimized spec --long --namespaces --types lammps@20210310 % gcc@10.2.0 +asphere +body +class2 +colloid +compress +coreshell +cuda cuda_arch=70 +dipole ~exceptions +ffmpeg +granular ~ipo +jpeg +kim +kokkos +kspace ~latte +lib +manybody +mc ~meam +misc +mliap +molecule +mpi +mpiio ~opencl +openmp +opt +peri +png +poems +python +qeq +replica +rigid +shock +snap +spin +srd ~user-adios +user-atc +user-awpmd +user-bocs +user-cgsdk +user-colvars +user-diffraction +user-dpd +user-drude +user-eff +user-fep ~user-h5md +user-lb +user-manifold +user-meamc +user-mesodpd +user-mesont +user-mgpt +user-misc +user-mofff ~user-netcdf ~user-omp +user-phonon +user-plumed +user-ptm +user-qtb +user-reaction +user-reaxc +user-sdpd +user-smd +user-smtbq +user-sph +user-tally +user-uef +user-yaff +voronoi "^openblas@0.3.18/$(spack find --format '{hash:7}' openblas@0.3.18 % ${SPACK_COMPILER} ~ilp64 threads=none) ^fftw@3.3.10/$(spack find --format '{hash:7}' fftw@3.3.10 % ${SPACK_COMPILER} ~mpi ~openmp) ^kokkos@3.4.01/$(spack find --format '{hash:7}' kokkos@3.4.01 % ${SPACK_COMPILER} ^kokkos-nvcc-wrapper ~mpi) ^ffmpeg@4.3.2/$(spack find --format '{hash:7}' ffmpeg@4.3.2 % ${SPACK_COMPILER}) ^plumed@2.6.3/$(spack find --format '{hash:7}' plumed@2.6.3 % ${SPACK_COMPILER} +mpi ^openmpi@4.1.3) ^python@3.8.12/$(spack find --format '{hash:7}' python@3.8.12 % ${SPACK_COMPILER})"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack concretization failed.'
   exit 1
 fi
 
-time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all lammps@20210310 % gcc@10.2.0 +asphere +body +class2 +colloid +compress +coreshell +cuda cuda_arch=70,80 +dipole ~exceptions +ffmpeg +granular ~ipo +jpeg +kim +kokkos +kspace ~latte +lib +manybody +mc ~meam +misc +mliap +molecule +mpi +mpiio ~opencl +openmp +opt +peri +png +poems +python +qeq +replica +rigid +shock +snap +spin +srd ~user-adios +user-atc +user-awpmd +user-bocs +user-cgsdk +user-colvars +user-diffraction +user-dpd +user-drude +user-eff +user-fep ~user-h5md +user-lb +user-manifold +user-meamc +user-mesodpd +user-mesont +user-mgpt +user-misc +user-mofff ~user-netcdf ~user-omp +user-phonon +user-plumed +user-ptm +user-qtb +user-reaction +user-reaxc +user-sdpd +user-smd +user-smtbq +user-sph +user-tally +user-uef +user-yaff +voronoi "^openblas@0.3.18/$(spack find --format '{hash:7}' openblas@0.3.18 % ${SPACK_COMPILER} ~ilp64 threads=none) ^fftw@3.3.10/$(spack find --format '{hash:7}' fftw@3.3.10 % ${SPACK_COMPILER} ~mpi ~openmp) ^kokkos@3.4.01/$(spack find --format '{hash:7}' kokkos@3.4.01 % ${SPACK_COMPILER} ^kokkos-nvcc-wrapper +mpi) ^ffmpeg@4.3.2/$(spack find --format '{hash:7}' ffmpeg@4.3.2 % ${SPACK_COMPILER}) ^plumed@2.6.3/$(spack find --format '{hash:7}' plumed@2.6.3 % ${SPACK_COMPILER} +mpi ^openmpi@4.1.3) ^python@3.8.12/$(spack find --format '{hash:7}' python@3.8.12 % ${SPACK_COMPILER})"
+time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all lammps@20210310 % gcc@10.2.0 +asphere +body +class2 +colloid +compress +coreshell +cuda cuda_arch=70 +dipole ~exceptions +ffmpeg +granular ~ipo +jpeg +kim +kokkos +kspace ~latte +lib +manybody +mc ~meam +misc +mliap +molecule +mpi +mpiio ~opencl +openmp +opt +peri +png +poems +python +qeq +replica +rigid +shock +snap +spin +srd ~user-adios +user-atc +user-awpmd +user-bocs +user-cgsdk +user-colvars +user-diffraction +user-dpd +user-drude +user-eff +user-fep ~user-h5md +user-lb +user-manifold +user-meamc +user-mesodpd +user-mesont +user-mgpt +user-misc +user-mofff ~user-netcdf ~user-omp +user-phonon +user-plumed +user-ptm +user-qtb +user-reaction +user-reaxc +user-sdpd +user-smd +user-smtbq +user-sph +user-tally +user-uef +user-yaff +voronoi "^openblas@0.3.18/$(spack find --format '{hash:7}' openblas@0.3.18 % ${SPACK_COMPILER} ~ilp64 threads=none) ^fftw@3.3.10/$(spack find --format '{hash:7}' fftw@3.3.10 % ${SPACK_COMPILER} ~mpi ~openmp) ^ffmpeg@4.3.2/$(spack find --format '{hash:7}' ffmpeg@4.3.2 % ${SPACK_COMPILER}) ^kokkos@3.4.01/$(spack find --format '{hash:7}' kokkos@3.4.01 % ${SPACK_COMPILER} ^kokkos-nvcc-wrapper ~mpi) ^plumed@2.6.3/$(spack find --format '{hash:7}' plumed@2.6.3 % ${SPACK_COMPILER} +mpi ^openmpi@4.1.3) ^python@3.8.12/$(spack find --format '{hash:7}' python@3.8.12 % ${SPACK_COMPILER})"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
   exit 1
@@ -133,6 +167,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'nwchem@7.0.2.sh'
+#sbatch --dependency="afterok:${SLURM_JOB_ID}" ''
 
 sleep 60

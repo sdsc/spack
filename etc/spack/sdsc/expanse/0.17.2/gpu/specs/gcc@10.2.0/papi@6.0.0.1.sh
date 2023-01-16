@@ -39,7 +39,7 @@ module list
 declare -xr SPACK_PACKAGE='papi@6.0.0.1'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
 declare -xr SPACK_VARIANTS='+cuda ~example ~infiniband ~lmsensors ~nvml ~powercap ~rapl ~rocm ~rocm_smi ~sde +shared ~static_tools'
-declare -xr SPACK_DEPENDENCIES="^cuda@11.3.1/$(spack find --format '{hash:7}' cuda@11.3.1 % ${SPACK_COMPILER})"
+declare -xr SPACK_DEPENDENCIES="^cuda@11.2.2/$(spack find --format '{hash:7}' cuda@11.2.2 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv

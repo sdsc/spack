@@ -26,7 +26,7 @@ declare -xr SLURM_JOB_MD5SUM="$(md5sum ${SLURM_JOB_SCRIPT})"
 
 declare -xr SCHEDULER_MODULE='slurm'
 declare -xr COMPILER_MODULE='gcc/10.2.0'
-declare -xr CUDA_MODULE='cuda/11.3.1'
+declare -xr CUDA_MODULE='cuda/11.2.2'
 
 echo "${UNIX_TIME} ${SLURM_JOB_ID} ${SLURM_JOB_MD5SUM} ${SLURM_JOB_DEPENDENCY}" 
 echo ""
@@ -35,16 +35,15 @@ cat "${SLURM_JOB_SCRIPT}"
 
 module purge
 module load "${SCHEDULER_MODULE}"
+. "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
+module use "${SPACK_ROOT}/share/spack/lmod/linux-rocky8-x86_64/Core"
 module load "${COMPILER_MODULE}"
 module load "${CUDA_MODULE}"
 module list
-. "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
-
-declare -xr CUDATOOLKIT_HOME=/cm/local/apps/cuda
 
 declare -xr SPACK_PACKAGE='charmpp@6.10.2'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS='backend=mpi build-target=charm++ +cuda +omp ~papi pmi=none +production ~pthreads +shared +smp ~syncft ~tcp ~tracing'
+declare -xr SPACK_VARIANTS='backend=ucx build-target=charm++ +cuda ~omp ~papi pmi=pmix +production ~pthreads +shared +smp ~syncft ~tcp ~tracing'
 declare -xr SPACK_DEPENDENCIES="^openmpi@4.1.3/$(spack find --format '{hash:7}' openmpi@4.1.3 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
@@ -58,13 +57,13 @@ spack config get packages
 spack config get repos
 spack config get upstreams
 
-spack spec --long --namespaces --types charmpp@6.10.2 % gcc@10.2.0 backend=mpi build-target=charm++ +cuda +omp ~papi pmi=none +production ~pthreads +shared +smp ~syncft ~tcp ~tracing "${SPACK_DEPENDENCIES}"
+spack spec --long --namespaces --types charmpp@6.10.2 % gcc@10.2.0 backend=ucx build-target=charm++ +cuda ~omp ~papi pmi=pmix +production ~pthreads +shared +smp ~syncft ~tcp ~tracing "${SPACK_DEPENDENCIES}"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack concretization failed.'
   exit 1
 fi
 
-time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all charmpp@6.10.2 % gcc@10.2.0 backend=mpi build-target=charm++ +cuda +omp ~papi pmi=none +production ~pthreads +shared +smp ~syncft ~tcp ~tracing "${SPACK_DEPENDENCIES}"
+time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all charmpp@6.10.2 % gcc@10.2.0 backend=ucx build-target=charm++ +cuda ~omp ~papi pmi=pmix +production ~pthreads +shared +smp ~syncft ~tcp ~tracing "${SPACK_DEPENDENCIES}"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
   exit 1

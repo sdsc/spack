@@ -43,7 +43,7 @@ module list
 declare -xr SPACK_PACKAGE='ucx@1.10.1'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
 declare -xr SPACK_VARIANTS='~assertions ~cm +cma +cuda cuda_arch=70,80 +dc ~debug +dm +gdrcopy +ib-hw-tm ~java ~knem ~logging +mlx5-dv +optimizations ~parameter_checking +pic +rc ~rocm +thread_multiple +ud ~xpmem'
-declare -xr SPACK_DEPENDENCIES="^cuda@11.3.1/$(spack find --format '{hash:7}' cuda@11.3.1 % ${SPACK_COMPILER})"
+declare -xr SPACK_DEPENDENCIES="^cuda@11.2.2/$(spack find --format '{hash:7}' cuda@11.2.2 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -56,18 +56,20 @@ spack config get packages
 spack config get repos
 spack config get upstreams
 
-spack spec --long --namespaces --types ucx@1.10.1 % gcc@10.2.0 ~assertions ~cm +cma +cuda cuda_arch=70,80 +dc ~debug +dm +gdrcopy +ib-hw-tm ~java ~knem ~logging +mlx5-dv +optimizations ~parameter_checking +pic +rc ~rocm +thread_multiple +ud ~xpmem "^cuda@11.3.1/$(spack find --format '{hash:7}' cuda@11.3.1 % ${SPACK_COMPILER})"
+spack spec --long --namespaces --types ucx@1.10.1 % gcc@10.2.0 ~assertions ~cm +cma +cuda cuda_arch=70,80 +dc ~debug +dm +gdrcopy +ib-hw-tm ~java ~knem ~logging +mlx5-dv +optimizations ~parameter_checking +pic +rc ~rocm +thread_multiple +ud ~xpmem "^cuda@11.2.2/$(spack find --format '{hash:7}' cuda@11.2.2 % ${SPACK_COMPILER})"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack concretization failed.'
   exit 1
 fi
 
-time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all ucx@1.10.1 % gcc@10.2.0 ~assertions ~cm +cma +cuda cuda_arch=70,80 +dc ~debug +dm +gdrcopy +ib-hw-tm ~java ~knem ~logging +mlx5-dv +optimizations ~parameter_checking +pic +rc ~rocm +thread_multiple +ud ~xpmem "^cuda@11.3.1/$(spack find --format '{hash:7}' cuda@11.3.1 % ${SPACK_COMPILER})"
+time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all ucx@1.10.1 % gcc@10.2.0 ~assertions ~cm +cma +cuda cuda_arch=70,80 +dc ~debug +dm +gdrcopy +ib-hw-tm ~java ~knem ~logging +mlx5-dv +optimizations ~parameter_checking +pic +rc ~rocm +thread_multiple +ud ~xpmem "^cuda@11.2.2/$(spack find --format '{hash:7}' cuda@11.2.2 % ${SPACK_COMPILER})"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
   exit 1
 fi
 
 spack module lmod refresh --delete-tree -y
+
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'openmpi@4.1.3.sh'
 
 sleep 60

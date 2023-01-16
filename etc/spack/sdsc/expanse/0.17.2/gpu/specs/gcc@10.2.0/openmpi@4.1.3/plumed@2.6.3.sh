@@ -39,7 +39,7 @@ module list
 declare -xr SPACK_PACKAGE='plumed@2.6.3'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
 declare -xr SPACK_VARIANTS='arrayfire=cuda +gsl +mpi +shared'
-declare -xr SPACK_DEPENDENCIES="^openblas@0.3.18/$(spack find --format '{hash:7}' openblas@0.3.18 % ${SPACK_COMPILER} ~ilp64 threads=none) ^openmpi@4.1.3/$(spack find --format '{hash:7}' openmpi@4.1.3 % ${SPACK_COMPILER}) ^python@3.8.12/$(spack find --format '{hash:7}' python@3.8.12 % ${SPACK_COMPILER}) ^arrayfire@3.7.3/$(spack find --format '{hash:7}' arrayfire@3.7.3 % ${SPACK_COMPILER})"
+declare -xr SPACK_DEPENDENCIES="^openblas@0.3.18/$(spack find --format '{hash:7}' openblas@0.3.18 % ${SPACK_COMPILER} ~ilp64 threads=none) ^openmpi@4.1.3/$(spack find --format '{hash:7}' openmpi@4.1.3 % ${SPACK_COMPILER}) ^python@3.8.12/$(spack find --format '{hash:7}' python@3.8.12 % ${SPACK_COMPILER}) ^arrayfire@3.7.3/$(spack find --format '{hash:7}' arrayfire@3.7.3 % ${SPACK_COMPILER} +cuda cuda_arch=70,80)"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -52,13 +52,13 @@ spack config get packages
 spack config get repos
 spack config get upstreams
 
-spack spec --long --namespaces --types plumed@2.6.3 % gcc@10.2.0 arrayfire=cuda +gsl +mpi +shared "^openblas@0.3.18/$(spack find --format '{hash:7}' openblas@0.3.18 % ${SPACK_COMPILER} ~ilp64 threads=none) ^openmpi@4.1.3/$(spack find --format '{hash:7}' openmpi@4.1.3 % ${SPACK_COMPILER}) ^python@3.8.12/$(spack find --format '{hash:7}' python@3.8.12 % ${SPACK_COMPILER}) ^arrayfire@3.7.3/$(spack find --format '{hash:7}' arrayfire@3.7.3 % ${SPACK_COMPILER})" 
+spack spec --long --namespaces --types plumed@2.6.3 % gcc@10.2.0 arrayfire=cuda +gsl +mpi +shared "^openblas@0.3.18/$(spack find --format '{hash:7}' openblas@0.3.18 % ${SPACK_COMPILER} ~ilp64 threads=none) ^openmpi@4.1.3/$(spack find --format '{hash:7}' openmpi@4.1.3 % ${SPACK_COMPILER}) ^python@3.8.12/$(spack find --format '{hash:7}' python@3.8.12 % ${SPACK_COMPILER}) ^arrayfire@3.7.3/$(spack find --format '{hash:7}' arrayfire@3.7.3 % ${SPACK_COMPILER} +cuda cuda_arch=70,80)" 
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack concretization failed.'
   exit 1
 fi
 
-time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all plumed@2.6.3 % gcc@10.2.0 arrayfire=cuda +gsl +mpi +shared "^openblas@0.3.18/$(spack find --format '{hash:7}' openblas@0.3.18 % ${SPACK_COMPILER} ~ilp64 threads=none) ^openmpi@4.1.3/$(spack find --format '{hash:7}' openmpi@4.1.3 % ${SPACK_COMPILER}) ^python@3.8.12/$(spack find --format '{hash:7}' python@3.8.12 % ${SPACK_COMPILER}) ^arrayfire@3.7.3/$(spack find --format '{hash:7}' arrayfire@3.7.3 % ${SPACK_COMPILER})"
+time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all plumed@2.6.3 % gcc@10.2.0 arrayfire=cuda +gsl +mpi +shared "^openblas@0.3.18/$(spack find --format '{hash:7}' openblas@0.3.18 % ${SPACK_COMPILER} ~ilp64 threads=none) ^openmpi@4.1.3/$(spack find --format '{hash:7}' openmpi@4.1.3 % ${SPACK_COMPILER}) ^python@3.8.12/$(spack find --format '{hash:7}' python@3.8.12 % ${SPACK_COMPILER}) ^arrayfire@3.7.3/$(spack find --format '{hash:7}' arrayfire@3.7.3 % ${SPACK_COMPILER} +cuda cuda_arch=70,80)"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
   exit 1
@@ -66,6 +66,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'gromacs@2020.4.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'gromacs@2020.4.sh'
 
 sleep 60

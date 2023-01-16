@@ -2,7 +2,7 @@
 # real 1214.82
 
 #SBATCH --job-name=petsc@3.16.1
-#SBATCH --reservation=root_73
+##SBATCH --reservation=root_73
 #SBATCH --account=use300
 #SBATCH --partition=ind-gpu-shared
 #SBATCH --nodes=1

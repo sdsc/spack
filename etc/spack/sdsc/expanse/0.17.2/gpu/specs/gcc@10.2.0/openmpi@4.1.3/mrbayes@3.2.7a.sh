@@ -66,6 +66,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'raxml@8.2.12.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'relion@3.1.4.sh'
 
 sleep 60

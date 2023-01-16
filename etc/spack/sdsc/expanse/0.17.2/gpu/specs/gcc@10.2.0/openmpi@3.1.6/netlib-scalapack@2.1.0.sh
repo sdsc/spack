@@ -2,7 +2,7 @@
 
 #SBATCH --job-name=netlib-scalapack@2.1.0
 #SBATCH --account=use300
-#SBATCH --reservation=root_73
+##SBATCH --reservation=root_73
 #SBATCH --partition=ind-gpu-shared
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1

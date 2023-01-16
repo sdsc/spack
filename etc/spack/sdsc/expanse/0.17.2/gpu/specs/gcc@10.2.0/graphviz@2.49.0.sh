@@ -37,8 +37,8 @@ module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
 declare -xr SPACK_PACKAGE='graphviz@2.49.0'
-declare -xr SPACK_COMPILER='gcc@8.5.0'
-declare -xr SPACK_VARIANTS='~doc ~expat ~ghostscript ~gtkplus ~gts ~java ~libdg ~pangocairo ~poppler ~qt ~quartz ~x ~redirect'
+declare -xr SPACK_COMPILER='gcc@10.2.0'
+declare -xr SPACK_VARIANTS='~doc ~expat ~ghostscript ~gtkplus ~gts ~java ~libgd ~pangocairo ~poppler ~qt ~quartz ~x' 
 declare -xr SPACK_DEPENDENCIES=''
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
@@ -66,6 +66,6 @@ fi
 
 spack -d module lmod refresh --delete-tree -y
 
-#sbatch --dependency="afterok:${SLURM_JOB_ID}" ''
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'eigen@3.4.0.sh'
 
 sleep 60
