@@ -37,7 +37,7 @@ module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
 # ==> Error: openmpi@3.1.6%gcc@10.2.0~atomics+cuda+cxx+cxx_exceptions~gpfs~internal-hwloc~java+legacylaunchers+lustre~memchecker+pmi+pmix+romio~rsh~singularity+static+v
-#t+wrapper-rpath cuda_arch=70 fabrics=verbs schedulers=slurm ^cuda@10.2.89%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=nat
+#t+wrapper-rpath cuda_arch=70 fabrics=verbs schedulers=slurm ^cuda@11.2.2%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=nat
 #ive" ~dev arch=linux-rocky8-cascadelake ^libiconv@1.16%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  libs=shared,stat
 #ic arch=linux-rocky8-cascadelake ^libxml2@2.9.12%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~python arch=linux-rock
 #y8-cascadelake ^lustre@2.12.8 ^rdma-core@28.0 ^slurm@21.08.8 ^xz@5.2.5%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~
@@ -67,7 +67,7 @@ module list
 #  version_satisfies("cuda","10.1.243:","11.4.2")
 #  version_satisfies("cuda","10.1.243:","11.5.0")
 
-# ==> Error: openmpi@3.1.6%gcc@10.2.0~atomics+cuda+cxx+cxx_exceptions~gpfs~internal-hwloc~java+legacylaunchers+lustre~memchecker+pmi+pmix+romio~rsh~singularity+static+vt+wrapper-rpath cuda_arch=70 fabrics=verbs schedulers=slurm ^cuda@10.2.89%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native " ~dev arch=linux-rocky8-cascadelake ^libiconv@1.16%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  libs=shared,static arch=linux-rocky8-cascadelake ^libxml2@2.9.12%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~python arch=linux-rocky8-cascadelake ^lustre@2.12.8 ^rdma-core@28.0 ^slurm@21.08.8 ^xz@5.2.5%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~pic libs=shared,static arch=linux-rocky8-cascadelake ^zlib@1.2.11%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +optimize+pic+shared arch=linux-rocky8-cascadelake is unsatisfiable, conflicts are:
+# ==> Error: openmpi@3.1.6%gcc@10.2.0~atomics+cuda+cxx+cxx_exceptions~gpfs~internal-hwloc~java+legacylaunchers+lustre~memchecker+pmi+pmix+romio~rsh~singularity+static+vt+wrapper-rpath cuda_arch=70 fabrics=verbs schedulers=slurm ^cuda@11.2.2%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native " ~dev arch=linux-rocky8-cascadelake ^libiconv@1.16%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  libs=shared,static arch=linux-rocky8-cascadelake ^libxml2@2.9.12%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~python arch=linux-rocky8-cascadelake ^lustre@2.12.8 ^rdma-core@28.0 ^slurm@21.08.8 ^xz@5.2.5%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~pic libs=shared,static arch=linux-rocky8-cascadelake ^zlib@1.2.11%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +optimize+pic+shared arch=linux-rocky8-cascadelake is unsatisfiable, conflicts are:
 #
 #  A conflict was triggered
 #  condition(2922)
@@ -113,8 +113,8 @@ module list
 
 declare -xr SPACK_PACKAGE='openmpi@3.1.6'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS='~atomics +cuda cuda_arch=70 ~cxx ~cxx_exceptions ~gpfs ~internal-hwloc ~java +legacylaunchers +lustre ~memchecker +pmi +pmix +romio ~rsh ~singularity +static +vt +wrapper-rpath fabrics=verbs schedulers=slurm'
-declare -xr SPACK_DEPENDENCIES="^lustre@2.12.8 ^slurm@21.08.8 ^rdma-core@28.0 ^cuda@10.2.89/$(spack find --format '{hash:7}' cuda@10.2.89 % ${SPACK_COMPILER})"
+declare -xr SPACK_VARIANTS='~atomics +cuda cuda_arch=70,80 +cxx +cxx_exceptions ~gpfs ~internal-hwloc ~java +legacylaunchers +lustre ~memchecker +pmi +pmix +romio ~rsh ~singularity +static +vt +wrapper-rpath fabrics=verbs schedulers=slurm'
+declare -xr SPACK_DEPENDENCIES="^lustre@2.12.8 ^slurm@21.08.8 ^rdma-core@28.0 ^cuda@11.2.2/$(spack find --format '{hash:7}' cuda@11.2.2 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -127,13 +127,13 @@ spack config get packages
 spack config get repos
 spack config get upstreams
 
-spack --show-cores=minimized spec --long --namespaces --types openmpi@3.1.6 % gcc@10.2.0 ~atomics +cuda cuda_arch=70 ~cxx ~cxx_exceptions ~gpfs ~internal-hwloc ~java +legacylaunchers +lustre ~memchecker +pmi +pmix +romio ~rsh ~singularity +static +vt +wrapper-rpath fabrics=verbs schedulers=slurm "^lustre@2.12.8 ^slurm@21.08.8 ^rdma-core@28.0 ^cuda@10.2.89/$(spack find --format '{hash:7}' cuda@10.2.89 % ${SPACK_COMPILER})"
+spack spec --long --namespaces --types openmpi@3.1.6 % gcc@10.2.0 ~atomics +cuda cuda_arch=70,80 +cxx +cxx_exceptions ~gpfs ~internal-hwloc ~java +legacylaunchers +lustre ~memchecker +pmi +pmix +romio ~rsh ~singularity +static +vt +wrapper-rpath fabrics=verbs schedulers=slurm "^lustre@2.12.8 ^slurm@21.08.8 ^rdma-core@28.0 ^cuda@11.2.2/$(spack find --format '{hash:7}' cuda@11.2.2 % ${SPACK_COMPILER})"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack concretization failed.'
   exit 1
 fi
 
-time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all openmpi@3.1.6 % gcc@10.2.0 ~atomics +cuda cuda_arch=70 ~cxx ~cxx_exceptions ~gpfs ~internal-hwloc ~java +legacylaunchers +lustre ~memchecker +pmi +pmix +romio ~rsh ~singularity +static +vt +wrapper-rpath fabrics=verbs schedulers=slurm "^lustre@2.12.8 ^slurm@21.08.8 ^rdma-core@28.0 ^cuda@10.2.89/$(spack find --format '{hash:7}' cuda@10.2.89 % ${SPACK_COMPILER})" 
+time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all openmpi@3.1.6 % gcc@10.2.0 ~atomics +cuda cuda_arch=70,80 +cxx +cxx_exceptions ~gpfs ~internal-hwloc ~java +legacylaunchers +lustre ~memchecker +pmi +pmix +romio ~rsh ~singularity +static +vt +wrapper-rpath fabrics=verbs schedulers=slurm "^lustre@2.12.8 ^slurm@21.08.8 ^rdma-core@28.0 ^cuda@11.2.2/$(spack find --format '{hash:7}' cuda@11.2.2 % ${SPACK_COMPILER})"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
   exit 1
