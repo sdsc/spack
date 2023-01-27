@@ -17,7 +17,7 @@ declare -xir UNIX_TIME="$(date +'%s')"
 
 declare -xr SYSTEM_NAME='expanse'
 
-declare -xr SPACK_VERSION='0.17.2'
+declare -xr SPACK_VERSION='0.17.3'
 declare -xr SPACK_INSTANCE_NAME='gpu'
 declare -xr SPACK_INSTANCE_DIR="${HOME}/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}"
 
@@ -43,7 +43,7 @@ module list
 #  >> 701    collect2: error: ld returned 1 exit status
 #     702    make[1]: *** [Makefile:440: pytau_cuda.so] Error 1
 #     703    make[1]: *** Waiting for unfinished jobs....
-#     704    cd /home/mkandes/cm/shared/apps/spack/0.17.2/gpu/opt/spack/linux-ro
+#     704    cd /home/mkandes/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-ro
 #            cky8-cascadelake/gcc-10.2.0/tau-2.30.2-c64xr2mrq6ybwwnzunffebi3z7dg
 #            ytnk/x86_64/lib && /bin/ln -sf shared-papi-mpi-pthread-python-cupti
 #            -pdt bindings-papi-mpi-pthread-python-cupti-pdt

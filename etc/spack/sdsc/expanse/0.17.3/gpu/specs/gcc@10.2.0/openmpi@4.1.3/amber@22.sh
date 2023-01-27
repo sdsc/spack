@@ -17,7 +17,7 @@ declare -xir UNIX_TIME="$(date +'%s')"
 
 declare -xr SYSTEM_NAME='expanse'
 
-declare -xr SPACK_VERSION='0.17.2'
+declare -xr SPACK_VERSION='0.17.3'
 declare -xr SPACK_INSTANCE_NAME='gpu'
 declare -xr SPACK_INSTANCE_DIR="${HOME}/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}"
 
@@ -47,7 +47,7 @@ module list
 
 # 49387    [ 27%] Building CXX object AmberTools/src/cpptraj/src/CMakeFiles/
 #              cpptraj_common_obj.dir/Action_Box.cpp.o
-#  >> 49388    /home/mkandes/cm/shared/apps/spack/0.17.2/gpu/opt/spack/linux-roc
+#  >> 49388    /home/mkandes/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-roc
 #              ky8-cascadelake/gcc-10.2.0/cuda-11.2.2-blza2psofa3wr2zumqrnh4je2f
 #              7ze3mx/include/thrust/detail/allocator/allocator_traits.h(245): e
 #              rror: class "thrust::detail::device_delete_allocator" has no memb
@@ -58,7 +58,7 @@ module list
 #     49391    (402): here
 #     49392                instantiation of class "thrust::detail::allocator_sys
 #              tem<Alloc> [with Alloc=thrust::detail::device_delete_allocator]"
-#     49393    /home/mkandes/cm/shared/apps/spack/0.17.2/gpu/opt/spack/linux-roc
+#     49393    /home/mkandes/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-roc
 #              ky8-cascadelake/gcc-10.2.0/cuda-11.2.2-blza2psofa3wr2zumqrnh4je2f
 #              7ze3mx/include/thrust/detail/allocator/destroy_range.inl(137): he
 #              re

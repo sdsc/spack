@@ -17,7 +17,7 @@ declare -xir UNIX_TIME="$(date +'%s')"
 
 declare -xr SYSTEM_NAME='expanse'
 
-declare -xr SPACK_VERSION='0.17.2'
+declare -xr SPACK_VERSION='0.17.3'
 declare -xr SPACK_INSTANCE_NAME='gpu'
 declare -xr SPACK_INSTANCE_DIR="${HOME}/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}"
 
@@ -67,14 +67,14 @@ module list
 #  variant_set("sirius","openmp","True")
 
 # 5 errors found in build log:
-#     33    -- Found BLAS: /home/mkandes/cm/shared/apps/spack/0.17.2/cpu/opt/spa
+#     33    -- Found BLAS: /home/mkandes/cm/shared/apps/spack/0.17.3/cpu/opt/spa
 #           ck/linux-rocky8-zen2/gcc-10.2.0/openblas-0.3.18-fxzqxj3ljgy5sox5pq7e
 #           4sjtqrt75pqf/lib/libopenblas.so
-#     34    -- Found LAPACK: /home/mkandes/cm/shared/apps/spack/0.17.2/cpu/opt/s
+#     34    -- Found LAPACK: /home/mkandes/cm/shared/apps/spack/0.17.3/cpu/opt/s
 #           pack/linux-rocky8-zen2/gcc-10.2.0/openblas-0.3.18-fxzqxj3ljgy5sox5pq
 #           7e4sjtqrt75pqf/lib/libopenblas.so
 #     35    -- Checking for one of the modules 'scalapack'
-#     36    -- Found SCALAPACK: /home/mkandes/cm/shared/apps/spack/0.17.2/cpu/op
+#     36    -- Found SCALAPACK: /home/mkandes/cm/shared/apps/spack/0.17.3/cpu/op
 #           t/spack/linux-rocky8-zen2/gcc-10.2.0/netlib-scalapack-2.1.0-admhf4d4
 #           lfmax5zwdsr7ojywil2yp367/lib/libscalapack.so
 #     37    -- Could NOT find Doxygen (missing: DOXYGEN_EXECUTABLE)

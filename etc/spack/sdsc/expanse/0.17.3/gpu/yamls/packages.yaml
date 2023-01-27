@@ -64,3 +64,7 @@ packages:
       - spec: 'ghostscript@9.27 % gcc@10.2.0 arch=linux-rocky8-cascadelake'
         prefix: /usr
     buildable: false
+  vasp6:
+    permissions:
+      read: group
+      group: vasp-6
