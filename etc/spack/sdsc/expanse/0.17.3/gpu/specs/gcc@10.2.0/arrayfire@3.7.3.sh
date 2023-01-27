@@ -17,12 +17,12 @@ declare -xr LOCAL_TIME="$(date +'%Y%m%dT%H%M%S%z')"
 declare -xir UNIX_TIME="$(date +'%s')"
 
 declare -xr LOCAL_SCRATCH_DIR="/scratch/${USER}/job_${SLURM_JOB_ID}"
-declare -xr TMPDIR="${LOCAL_SCRATCH_DIR}"
+declare -xr TMPDIR="${LOCAL_SCRATCH_DIR}/spack-stage"
 declare -xt TMP="${TMPDIR}"
 
 declare -xr SYSTEM_NAME='expanse'
 
-declare -xr SPACK_VERSION='0.17.2'
+declare -xr SPACK_VERSION='0.17.3'
 declare -xr SPACK_INSTANCE_NAME='gpu'
 declare -xr SPACK_INSTANCE_DIR="${HOME}/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}"
 

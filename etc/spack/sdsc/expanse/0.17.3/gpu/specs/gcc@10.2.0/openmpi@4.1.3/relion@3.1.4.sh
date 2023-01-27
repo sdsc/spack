@@ -17,7 +17,7 @@ declare -xir UNIX_TIME="$(date +'%s')"
 
 declare -xr SYSTEM_NAME='expanse'
 
-declare -xr SPACK_VERSION='0.17.2'
+declare -xr SPACK_VERSION='0.17.3'
 declare -xr SPACK_INSTANCE_NAME='gpu'
 declare -xr SPACK_INSTANCE_DIR="${HOME}/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}"
 
@@ -46,7 +46,7 @@ module list
 # ==> No patches needed for gdk-pixbuf
 # ==> gdk-pixbuf: Executing phase: 'install'
 # ==> Error: ProcessError: Command exited with status 1:
-#    'meson' '..' '--prefix=/home/mkandes/cm/shared/apps/spack/0.17.2/gpu/opt/spack/linux-rocky8-cascadelake/gcc-10.2.0/gdk-pixbuf-2.42.2-zcyz4j5hnxenlkhbywsjgpdlt5naf4yv' '--libdir=/home/mkandes/cm/shared/apps/spack/0.17.2/gpu/opt/spack/linux-rocky8-cascadelake/gcc-10.2.0/gdk-pixbuf-2.42.2-zcyz4j5hnxenlkhbywsjgpdlt5naf4yv/lib' '-Dbuildtype=release' '-Dstrip=false' '-Ddefault_library=shared' '-Dx11=False' '-Dman=False'
+#    'meson' '..' '--prefix=/home/mkandes/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky8-cascadelake/gcc-10.2.0/gdk-pixbuf-2.42.2-zcyz4j5hnxenlkhbywsjgpdlt5naf4yv' '--libdir=/home/mkandes/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky8-cascadelake/gcc-10.2.0/gdk-pixbuf-2.42.2-zcyz4j5hnxenlkhbywsjgpdlt5naf4yv/lib' '-Dbuildtype=release' '-Dstrip=false' '-Ddefault_library=shared' '-Dx11=False' '-Dman=False'
 #
 # 1 error found in build log:
 #     3    The Meson build system

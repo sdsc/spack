@@ -17,7 +17,7 @@ declare -xir UNIX_TIME="$(date +'%s')"
 
 declare -xr SYSTEM_NAME='expanse'
 
-declare -xr SPACK_VERSION='0.17.2'
+declare -xr SPACK_VERSION='0.17.3'
 declare -xr SPACK_INSTANCE_NAME='gpu'
 declare -xr SPACK_INSTANCE_DIR="${HOME}/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}"
 
@@ -80,7 +80,7 @@ module list
 declare -xr CUDA_CUDA_LIBRARY='/cm/local/apps/cuda/libs/current/lib64'
 declare -xr CMAKE_LIBRARY_PATH="${CUDA_CUDA_LIBRARY}"
 
-# >> 6059    /home/mkandes/cm/shared/apps/spack/0.17.2/gpu/opt/spack/linux-rock
+# >> 6059    /home/mkandes/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rock
 #             y8-cascadelake/gcc-10.2.0/kokkos-3.4.01-hkmc634lei4z23r7tvrhaag3ho
 #             wgnixn/include/Cuda/Kokkos_Cuda_Parallel.hpp(464): error: calling 
 #             a __host__ function("LAMMPS_NS::MinKokkos::force_clear()::[lambda(

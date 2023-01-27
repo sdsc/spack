@@ -17,7 +17,7 @@ declare -xir UNIX_TIME="$(date +'%s')"
 
 declare -xr SYSTEM_NAME='expanse'
 
-declare -xr SPACK_VERSION='0.17.2'
+declare -xr SPACK_VERSION='0.17.3'
 declare -xr SPACK_INSTANCE_NAME='gpu'
 declare -xr SPACK_INSTANCE_DIR="${HOME}/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}"
 
@@ -37,7 +37,7 @@ module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
 # >> 16    Error: Cannot access MPI include directory /home/mkandes/cm/shared/a
-#           pps/spack/0.17.2/gpu/opt/spack/linux-rocky8-cascadelake/gcc-10.2.0/i
+#           pps/spack/0.17.3/gpu/opt/spack/linux-rocky8-cascadelake/gcc-10.2.0/i
 #           ntel-mpi-2019.10.317-jhyxn2gkqptkwz23tocb2darb4lfirxb/include
 
 declare -xr INTEL_LICENSE_FILE='40000@elprado.sdsc.edu:40200@elprado.sdsc.edu'

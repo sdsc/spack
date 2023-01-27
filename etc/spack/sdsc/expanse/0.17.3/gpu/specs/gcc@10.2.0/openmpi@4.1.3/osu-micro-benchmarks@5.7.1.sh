@@ -17,7 +17,7 @@ declare -xir UNIX_TIME="$(date +'%s')"
 
 declare -xr SYSTEM_NAME='expanse'
 
-declare -xr SPACK_VERSION='0.17.2'
+declare -xr SPACK_VERSION='0.17.3'
 declare -xr SPACK_INSTANCE_NAME='gpu'
 declare -xr SPACK_INSTANCE_DIR="${HOME}/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}"
 
@@ -48,7 +48,7 @@ module list
 #==> osu-micro-benchmarks: Executing phase: 'autoreconf'
 #==> osu-micro-benchmarks: Executing phase: 'configure'
 #==> Error: ProcessError: Command exited with status 1:
-#    '/tmp/mkandes/spack-stage/spack-stage-osu-micro-benchmarks-5.7.1-qrveszohcnipx7bn6kcflfty2d5hf6we/spack-src/configure' '--prefix=/home/mkandes/cm/shared/apps/spack/0.17.2/gpu/opt/spack/linux-rocky8-cascadelake/gcc-10.2.0/osu-micro-benchmarks-5.7.1-qrveszohcnipx7bn6kcflfty2d5hf6we' 'CC=/home/mkandes/cm/shared/apps/spack/0.17.2/gpu/opt/spack/linux-rocky8-cascadelake/gcc-10.2.0/openmpi-4.1.3-5lmvx2qm7zynusyafocgqddpjnv3qegm/bin/mpicc' 'CXX=/home/mkandes/cm/shared/apps/spack/0.17.2/gpu/opt/spack/linux-rocky8-cascadelake/gcc-10.2.0/openmpi-4.1.3-5lmvx2qm7zynusyafocgqddpjnv3qegm/bin/mpic++' '--enable-cuda' '--with-cuda=/home/mkandes/cm/shared/apps/spack/0.17.2/gpu/opt/spack/linux-rocky8-cascadelake/gcc-10.2.0/cuda-11.3.1-gonjgx5gtwrgpnixvmchcaozt6bv2ykl' 'LDFLAGS=-lrt'
+#    '/tmp/mkandes/spack-stage/spack-stage-osu-micro-benchmarks-5.7.1-qrveszohcnipx7bn6kcflfty2d5hf6we/spack-src/configure' '--prefix=/home/mkandes/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky8-cascadelake/gcc-10.2.0/osu-micro-benchmarks-5.7.1-qrveszohcnipx7bn6kcflfty2d5hf6we' 'CC=/home/mkandes/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky8-cascadelake/gcc-10.2.0/openmpi-4.1.3-5lmvx2qm7zynusyafocgqddpjnv3qegm/bin/mpicc' 'CXX=/home/mkandes/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky8-cascadelake/gcc-10.2.0/openmpi-4.1.3-5lmvx2qm7zynusyafocgqddpjnv3qegm/bin/mpic++' '--enable-cuda' '--with-cuda=/home/mkandes/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky8-cascadelake/gcc-10.2.0/cuda-11.3.1-gonjgx5gtwrgpnixvmchcaozt6bv2ykl' 'LDFLAGS=-lrt'
 #
 #1 error found in build log:
 #     106    checking for MPI_Get_accumulate... yes

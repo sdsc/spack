@@ -17,7 +17,7 @@ declare -xir UNIX_TIME="$(date +'%s')"
 
 declare -xr SYSTEM_NAME='expanse'
 
-declare -xr SPACK_VERSION='0.17.2'
+declare -xr SPACK_VERSION='0.17.3'
 declare -xr SPACK_INSTANCE_NAME='gpu'
 declare -xr SPACK_INSTANCE_DIR="${HOME}/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}"
 
@@ -540,7 +540,7 @@ module list
 #     2995    In file included from /tmp/mkandes/spack-stage/spack-stage-trilino
 #             s-13.0.1-n5xwn72sviueis4763daeewivkmraktt/spack-src/packages/ameso
 #             s/src/Amesos_Superludist.cpp:38:
-#     2996    /home/mkandes/cm/shared/apps/spack/0.17.2/cpu/opt/spack/linux-rock
+#     2996    /home/mkandes/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rock
 #             y8-zen2/gcc-10.2.0/superlu-dist-7.1.1-jqsri3xznegbq32rv4vnuloqdsci
 #             b3np/include/superlu_ddefs.h:354:28: note:   initializing argument
 #              8 of 'void dCreate_CompRowLoc_Matrix_dist(SuperMatrix*, int_t, in

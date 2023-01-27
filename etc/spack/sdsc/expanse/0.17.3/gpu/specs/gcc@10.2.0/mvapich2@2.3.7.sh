@@ -17,7 +17,7 @@ declare -xir UNIX_TIME="$(date +'%s')"
 
 declare -xr SYSTEM_NAME='expanse'
 
-declare -xr SPACK_VERSION='0.17.2'
+declare -xr SPACK_VERSION='0.17.3'
 declare -xr SPACK_INSTANCE_NAME='gpu'
 declare -xr SPACK_INSTANCE_DIR="${HOME}/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}"
 
@@ -46,7 +46,7 @@ module list
 # ==> mvapich2: Executing phase: 'autoreconf'
 # ==> mvapich2: Executing phase: 'configure'
 # ==> Error: ProcessError: Command exited with status 1:
-#    '/tmp/mkandes/spack-stage/spack-stage-mvapich2-2.3.7-pb6kofezb524r6bt3lang2riohvroyve/spack-src/configure' '--prefix=/home/mkandes/cm/shared/apps/spack/0.17.2/gpu/opt/spack/linux-rocky8-cascadelake/gcc-10.2.0/mvapich2-2.3.7-pb6kofezb524r6bt3lang2riohvroyve' '--enable-shared' '--enable-romio' '--disable-silent-rules' '--disable-new-dtags' '--enable-fortran=all' '--enable-threads=multiple' '--with-ch3-rank-bits=32' '--enable-wrapper-rpath=yes' '--disable-alloca' '--enable-fast=all' '--enable-cuda' '--with-cuda=/home/mkandes/cm/shared/apps/spack/0.17.2/gpu/opt/spack/linux-rocky8-cascadelake/gcc-10.2.0/cuda-11.3.1-gonjgx5gtwrgpnixvmchcaozt6bv2ykl' '--enable-registration-cache' '--with-pmi=pmi2' '--with-pm=slurm' '--with-slurm=/cm/shared/apps/slurm/21.08.8' '--with-device=ch3:mrail' '--with-rdma=gen2' '--disable-mcast' '--with-file-system=lustre'
+#    '/tmp/mkandes/spack-stage/spack-stage-mvapich2-2.3.7-pb6kofezb524r6bt3lang2riohvroyve/spack-src/configure' '--prefix=/home/mkandes/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky8-cascadelake/gcc-10.2.0/mvapich2-2.3.7-pb6kofezb524r6bt3lang2riohvroyve' '--enable-shared' '--enable-romio' '--disable-silent-rules' '--disable-new-dtags' '--enable-fortran=all' '--enable-threads=multiple' '--with-ch3-rank-bits=32' '--enable-wrapper-rpath=yes' '--disable-alloca' '--enable-fast=all' '--enable-cuda' '--with-cuda=/home/mkandes/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky8-cascadelake/gcc-10.2.0/cuda-11.3.1-gonjgx5gtwrgpnixvmchcaozt6bv2ykl' '--enable-registration-cache' '--with-pmi=pmi2' '--with-pm=slurm' '--with-slurm=/cm/shared/apps/slurm/21.08.8' '--with-device=ch3:mrail' '--with-rdma=gen2' '--disable-mcast' '--with-file-system=lustre'
 #
 # 2 errors found in build log:
 #     531    checking for inline... inline

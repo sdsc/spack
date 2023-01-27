@@ -17,7 +17,7 @@ declare -xir UNIX_TIME="$(date +'%s')"
 
 declare -xr SYSTEM_NAME='expanse'
 
-declare -xr SPACK_VERSION='0.17.2'
+declare -xr SPACK_VERSION='0.17.3'
 declare -xr SPACK_INSTANCE_NAME='gpu'
 declare -xr SPACK_INSTANCE_DIR="${HOME}/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}"
 
@@ -45,7 +45,7 @@ module list
 #  >> 6    /usr/bin/ld: cannot find -lcuda
 #  >> 7    collect2: error: ld returned 1 exit status
 #     8    Cannot build a stub file.
-#     9    Original error: command '/home/mkandes/cm/shared/apps/spack/0.17.2/gp
+#     9    Original error: command '/home/mkandes/cm/shared/apps/spack/0.17.3/gp
 #          u/lib/spack/env/gcc/g++' failed with exit status 1
 #     10   
 #     11   ************************************************************

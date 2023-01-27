@@ -17,7 +17,7 @@ declare -xir UNIX_TIME="$(date +'%s')"
 
 declare -xr SYSTEM_NAME='expanse'
 
-declare -xr SPACK_VERSION='0.17.2'
+declare -xr SPACK_VERSION='0.17.3'
 declare -xr SPACK_INSTANCE_NAME='gpu'
 declare -xr SPACK_INSTANCE_DIR="${HOME}/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}"
 
@@ -40,9 +40,9 @@ module list
 # 
 # NAMD_ARCH = linux-x86_64
 # CHARMARCH = mpi-linux-x86_64
-# CXX = /home/mkandes/cm/shared/apps/spack/0.17.2/gpu/opt/spack/linux-rocky8-skylake_avx512/gcc-8.5.0/gcc-10.2.0-i62tgsoexc6ya4h7urwhriiujk22nrnj/bin/g++ -std=c++11
+# CXX = /home/mkandes/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky8-skylake_avx512/gcc-8.5.0/gcc-10.2.0-i62tgsoexc6ya4h7urwhriiujk22nrnj/bin/g++ -std=c++11
 # CXXOPTS = -m64 -O3 -fexpensive-optimizations                                         -ffast-math -lpthread -march=cascadelake -mtune=cascadelake
-# CC = /home/mkandes/cm/shared/apps/spack/0.17.2/gpu/opt/spack/linux-rocky8-skylake_avx512/gcc-8.5.0/gcc-10.2.0-i62tgsoexc6ya4h7urwhriiujk22nrnj/bin/gcc
+# CC = /home/mkandes/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky8-skylake_avx512/gcc-8.5.0/gcc-10.2.0-i62tgsoexc6ya4h7urwhriiujk22nrnj/bin/gcc
 # COPTS = -m64 -O3 -fexpensive-optimizations                                         -ffast-math -lpthread -march=cascadelake -mtune=cascadelake
 #
 # ERROR: MPI-based Charm++ arch  is not compatible with CUDA NAMD.
@@ -55,9 +55,9 @@ module list
 #
 # NAMD_ARCH = linux-x86_64
 # CHARMARCH = ucx-linux-x86_64
-# CXX = /home/mkandes/cm/shared/apps/spack/0.17.2/gpu/opt/spack/linux-rocky8-skylake_avx512/gcc-8.5.0/gcc-10.2.0-i62tgsoexc6ya4h7urwhriiujk22nrnj/bin/g++ -std=c++11
+# CXX = /home/mkandes/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky8-skylake_avx512/gcc-8.5.0/gcc-10.2.0-i62tgsoexc6ya4h7urwhriiujk22nrnj/bin/g++ -std=c++11
 # CXXOPTS = -m64 -O3 -fexpensive-optimizations                                         -ffast-math -lpthread -march=cascadelake -mtune=cascadelake
-# CC = /home/mkandes/cm/shared/apps/spack/0.17.2/gpu/opt/spack/linux-rocky8-skylake_avx512/gcc-8.5.0/gcc-10.2.0-i62tgsoexc6ya4h7urwhriiujk22nrnj/bin/gcc
+# CC = /home/mkandes/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky8-skylake_avx512/gcc-8.5.0/gcc-10.2.0-i62tgsoexc6ya4h7urwhriiujk22nrnj/bin/gcc
 # COPTS = -m64 -O3 -fexpensive-optimizations                                         -ffast-math -lpthread -march=cascadelake -mtune=cascadelake
 #
 # ERROR: Non-SMP Charm++ arch  is not compatible with CUDA NAMD.

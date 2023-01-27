@@ -17,7 +17,7 @@ declare -xir UNIX_TIME="$(date +'%s')"
 
 declare -xr SYSTEM_NAME='expanse'
 
-declare -xr SPACK_VERSION='0.17.2'
+declare -xr SPACK_VERSION='0.17.3'
 declare -xr SPACK_INSTANCE_NAME='gpu'
 declare -xr SPACK_INSTANCE_DIR="${HOME}/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}"
 
@@ -124,8 +124,8 @@ module list
 #  version_satisfies("cp2k",":7","7.1")
 
 # ==> Error: ProcessError: Command exited with status 2:
-#    'make' '-j16' 'CC=/home/mkandes/cm/shared/apps/spack/0.17.2/cpu/lib/spack/env/gcc/gcc' 'CXX=/home/mkandes/cm/shared/apps/spack/0.17.2/cpu/lib/spack/env/gcc/g++'
-#'FC=/home/mkandes/cm/shared/apps/spack/0.17.2/cpu/lib/spack/env/gcc/gfortran' 'PREFIX=/home/mkandes/cm/shared/apps/spack/0.17.2/cpu/opt/spack/linux-rocky8-zen2/gcc-10.2.0/libxsmm-1.16.3-iui4fgda4daxdwqh3tvx52yw7u4ttliy' 'SYM=1'
+#    'make' '-j16' 'CC=/home/mkandes/cm/shared/apps/spack/0.17.3/cpu/lib/spack/env/gcc/gcc' 'CXX=/home/mkandes/cm/shared/apps/spack/0.17.3/cpu/lib/spack/env/gcc/g++'
+#'FC=/home/mkandes/cm/shared/apps/spack/0.17.3/cpu/lib/spack/env/gcc/gfortran' 'PREFIX=/home/mkandes/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky8-zen2/gcc-10.2.0/libxsmm-1.16.3-iui4fgda4daxdwqh3tvx52yw7u4ttliy' 'SYM=1'
 #2423 errors found in build log:
 #     101     ar: creating lib/libxsmmnoblas.a
 #     102     ar -rs lib/libxsmmgen.a obj/intel64/generator_spgemm_csc_bsparse.o
@@ -153,7 +153,7 @@ module list
 #             bj/intel64/generator_spgemm.o obj/intel64/libxsmm_cpuid_x86.o obj/
 #             intel64/libxsmm_generator.o obj/intel64/libxsmm_trace.o
 #     103     ar: creating lib/libxsmmgen.a
-#     104     /home/mkandes/cm/shared/apps/spack/0.17.2/cpu/lib/spack/env/gcc/gc
+#     104     /home/mkandes/cm/shared/apps/spack/0.17.3/cpu/lib/spack/env/gcc/gc
 #             c -dynamic -o bin/libxsmm_gemm_generator obj/intel64/libxsmm_gener
 #             ator_gemm_driver.o -L/tmp/mkandes/spack-stage/spack-stage-libxsmm-
 #             1.16.3-iui4fgda4daxdwqh3tvx52yw7u4ttliy/spack-src/lib/ -lxsmmgen \

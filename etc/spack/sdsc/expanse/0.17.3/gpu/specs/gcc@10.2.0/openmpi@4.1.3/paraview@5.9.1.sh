@@ -17,7 +17,7 @@ declare -xir UNIX_TIME="$(date +'%s')"
 
 declare -xr SYSTEM_NAME='expanse'
 
-declare -xr SPACK_VERSION='0.17.2'
+declare -xr SPACK_VERSION='0.17.3'
 declare -xr SPACK_INSTANCE_NAME='gpu'
 declare -xr SPACK_INSTANCE_DIR="${HOME}/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}"
 
@@ -40,7 +40,7 @@ module list
 #     182    --  conduit::float64 native type: double
 #     183    -- Detecting Fortran/C Interface
 #     184    -- Detecting Fortran/C Interface - Found GLOBAL and MODULE mangling
-#     185    -- Found Python3: /home/mkandes/cm/shared/apps/spack/0.17.2/cpu/opt
+#     185    -- Found Python3: /home/mkandes/cm/shared/apps/spack/0.17.3/cpu/opt
 #            /spack/linux-rocky8-zen2/gcc-10.2.0/python-3.8.12-dtdsuje4z5v7rqevi
 #            nukk4n37p3lxjcn/include/python3.8 (found version "3.8.12") found co
 #            mponents: Development Development.Module Development.Embed

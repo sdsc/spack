@@ -12,14 +12,11 @@ class Gaussian(Package,CudaPackage):
     """Gaussian  is a computer program for computational chemistry"""
 
     homepage = "http://www.gaussian.com/"
-#   url = "file://{0}/gaussian-16.C.01.tar.gz".format(os.getcwd())
-#   print('URL')
-#   print(url)
+
     manual_download = True
 
-    version('16.C.01', sha256='a75c81aceee257d62ac0e21e9c7797f776b0e31aab3fb7e9e15257cacd1e30a9',preferred=True)
-    version('16-C.01-cuda', sha256='41893d1d685ee9552050b60c3f26cb683d1c030aacf69acbb670e7934fca1f33')
-    version('16-C.01b', sha256='a75c81aceee257d62ac0e21e9c7797f776b0e31aab3fb7e9e15257cacd1e30a9')
+    version('16-C.02', sha256='6b96277bb7b25570827e71c1b4cfdf0efc3de54dbbd40a5a09f08f754a0e5738',preferred=True)
+    version('16-C.01', sha256='a75c81aceee257d62ac0e21e9c7797f776b0e31aab3fb7e9e15257cacd1e30a9')
     variant('cuda',default=False,description='compile for gpus')
     variant('binary',default=False,description='precompiled binaries')
     depends_on('cuda',when='+cuda')
@@ -27,9 +24,7 @@ class Gaussian(Package,CudaPackage):
     patch('bldg16.patch',when='~binary')
 
     def url_for_version(self, version):
-#       print("FILE")
-#       print("file://{0}/gaussian-{1}.tar.gz".format(os.getcwd(), version))
-        return "file://{0}/gaussian.{1}.tar.gz".format(os.getcwd(), version)
+        return "file://{0}/gaussian-{1}.tar.gz".format(os.getcwd(), version)
 
     def install(self, spec, prefix):
         mkdirp(prefix.g16)
@@ -83,7 +78,7 @@ class Gaussian(Package,CudaPackage):
             Executable('find')('.','-maxdepth','1','-type','f','-executable','-exec','chmod','0750','{}',';')
 
     @run_after('install')
-    @on_package_attributes(run_tests=True)
+    @on_package_attributes(run_tests=False)
 
     def test(self):
         def replacetestfilename(name):

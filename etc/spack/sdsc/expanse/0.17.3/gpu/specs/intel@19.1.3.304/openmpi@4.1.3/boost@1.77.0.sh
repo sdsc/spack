@@ -17,8 +17,8 @@ declare -xir UNIX_TIME="$(date +'%s')"
 
 declare -xr SYSTEM_NAME='expanse'
 
-declare -xr SPACK_VERSION='0.17.2'
-declare -xr SPACK_INSTANCE_NAME='cpu'
+declare -xr SPACK_VERSION='0.17.3'
+declare -xr SPACK_INSTANCE_NAME='gpu'
 declare -xr SPACK_INSTANCE_DIR="/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}"
 
 declare -xr SLURM_JOB_SCRIPT="$(scontrol show job ${SLURM_JOB_ID} | awk -F= '/Command=/{print $2}')"
@@ -68,7 +68,7 @@ module list
 #  /tmp/mkandes/spack-stage/spack-stage-boost-1.77.0-itjji23pwpspc4xcwqoci3ipyiaf4n3n/spack-build-out.txt
 #
 #==> Error: Terminating after first install failure: ProcessError: Command exited with status 1:
-#    './bootstrap.sh' '--prefix=/home/mkandes/cm/shared/apps/spack/0.17.2/cpu/opt/spack/linux-rocky8-zen2/intel-19.1.3.304/boost-1.77.0-itjji23pwpspc4xcwqoci3ipyiaf4n3n' '--with-toolset=intel-linux' '--with-libraries=math,serialization,date_time,mpi,iostreams,timer,exception,system,thread,log,chrono,filesystem,regex,random,graph,atomic,locale,test,wave,program_options,graph_parallel' '--without-icu'
+#    './bootstrap.sh' '--prefix=/home/mkandes/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky8-zen2/intel-19.1.3.304/boost-1.77.0-itjji23pwpspc4xcwqoci3ipyiaf4n3n' '--with-toolset=intel-linux' '--with-libraries=math,serialization,date_time,mpi,iostreams,timer,exception,system,thread,log,chrono,filesystem,regex,random,graph,atomic,locale,test,wave,program_options,graph_parallel' '--without-icu'
 
 declare -xr INTEL_LICENSE_FILE='40000@elprado.sdsc.edu:40200@elprado.sdsc.edu'
 declare -xr SPACK_PACKAGE='boost@1.77.0'

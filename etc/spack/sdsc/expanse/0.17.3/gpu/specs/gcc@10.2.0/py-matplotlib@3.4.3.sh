@@ -17,7 +17,7 @@ declare -xir UNIX_TIME="$(date +'%s')"
 
 declare -xr SYSTEM_NAME='expanse'
 
-declare -xr SPACK_VERSION='0.17.2'
+declare -xr SPACK_VERSION='0.17.3'
 declare -xr SPACK_INSTANCE_NAME='gpu'
 declare -xr SPACK_INSTANCE_DIR="${HOME}/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}"
 
@@ -39,7 +39,7 @@ module list
 
 # new problem on setting +latex
 # ==> Error: ProcessError: Command exited with status 1:
-#    '/home/mkandes/cm/shared/apps/spack/0.17.2/cpu/opt/spack/linux-rocky8-zen2/gcc-10.2.0/perl-5.32.0-aqkfsadolq2xm6uar2cjxlgordnxp3sm/bin/perl' './install-tl' '-scheme' 'small' '-repository' 'https://ctan.math.washington.edu/tex-archive/systems/texlive/tlnet/' '-portable' '-profile' '/tmp/tmp7qjdb59f'
+#    '/home/mkandes/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky8-zen2/gcc-10.2.0/perl-5.32.0-aqkfsadolq2xm6uar2cjxlgordnxp3sm/bin/perl' './install-tl' '-scheme' 'small' '-repository' 'https://ctan.math.washington.edu/tex-archive/systems/texlive/tlnet/' '-portable' '-profile' '/tmp/tmp7qjdb59f'
 #See build log for details:
 #  /tmp/mkandes/spack-stage/spack-stage-texlive-live-wy2hv3rayfzv4mhw22mhw26h3tzpdask/spack-build-out.txt
 declare -xr SPACK_PACKAGE='py-matplotlib@3.4.3'
