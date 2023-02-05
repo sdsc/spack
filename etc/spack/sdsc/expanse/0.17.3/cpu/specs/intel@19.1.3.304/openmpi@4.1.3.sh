@@ -14,11 +14,16 @@
 declare -xr LOCAL_TIME="$(date +'%Y%m%dT%H%M%S%z')"
 declare -xir UNIX_TIME="$(date +'%s')"
 
+declare -xr LOCAL_SCRATCH_DIR="/scratch/${USER}/job_${SLURM_JOB_ID}"
+declare -xr TMPDIR="${LOCAL_SCRATCH_DIR}/spack-stage"
+mkdir -p "${TMPDIR}"
+# -
 declare -xr SYSTEM_NAME='expanse'
 
-declare -xr SPACK_VERSION='0.17.2'
+declare -xr SPACK_VERSION='0.17.3'
 declare -xr SPACK_INSTANCE_NAME='cpu'
-declare -xr SPACK_INSTANCE_DIR="/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}"
+declare -xr SPACK_INSTANCE_VERSION='a'
+declare -xr SPACK_INSTANCE_DIR="/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}/${SPACK_INSTANCE_VERSION}"
 
 declare -xr SLURM_JOB_SCRIPT="$(scontrol show job ${SLURM_JOB_ID} | awk -F= '/Command=/{print $2}')"
 declare -xr SLURM_JOB_MD5SUM="$(md5sum ${SLURM_JOB_SCRIPT})"
@@ -57,7 +62,7 @@ declare -xr INTEL_LICENSE_FILE='40000@elprado.sdsc.edu:40200@elprado.sdsc.edu'
 declare -xr SPACK_PACKAGE='openmpi@4.1.3'
 declare -xr SPACK_COMPILER='intel@19.1.3.304'
 declare -xr SPACK_VARIANTS='~atomics~cuda~cxx~cxx_exceptions~gpfs~internal-hwloc~java+legacylaunchers+lustre~memchecker+pmi+pmix+romio~rsh~singularity+static+vt+wrapper-rpath cuda_arch=none fabrics=ucx schedulers=slurm'
-declare -xr SPACK_DEPENDENCIES="^lustre@2.12.8 ^slurm@21.08.8 ^rdma-core ^ucx@1.10.1/$(spack find --format '{hash:7}' ucx@1.10.1 % gcc@8.5.0)"
+declare -xr SPACK_DEPENDENCIES="^lustre@2.12.8 ^slurm@21.08.8 ^rdma-core ^ucx@1.10.1/$(spack find --format '{hash:7}' ucx@1.10.1 % intel@19.1.3.304)"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -71,16 +76,18 @@ spack config get repos
 spack config get upstreams
 
 echo "${SPACK_SPEC}"
-spack spec --long --namespaces --types openmpi@4.1.3 % intel@19.1.3.304 ~atomics~cuda~cxx~cxx_exceptions~gpfs~internal-hwloc~java+legacylaunchers+lustre~memchecker+pmi+pmix+romio~rsh~singularity+static+vt+wrapper-rpath cuda_arch='none' fabrics='ucx' schedulers='slurm' ^lustre@2.12.8 ^slurm@21.08.8 ^rdma-core "^ucx@1.10.1/$(spack find --format '{hash:7}' ucx@1.10.1 % gcc@8.5.0)"
+spack spec --long --namespaces --types openmpi@4.1.3 % intel@19.1.3.304 ~atomics~cuda~cxx~cxx_exceptions~gpfs~internal-hwloc~java+legacylaunchers+lustre~memchecker+pmi+pmix+romio~rsh~singularity+static+vt+wrapper-rpath cuda_arch='none' fabrics='ucx' schedulers='slurm' ^lustre@2.12.8 ^slurm@21.08.8 ^rdma-core "^ucx@1.10.1/$(spack find --format '{hash:7}' ucx@1.10.1 % intel@19.1.3.304)"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack concretization failed.'
   exit 1
 fi
 
-time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all openmpi@4.1.3 % intel@19.1.3.304 ~atomics~cuda~cxx~cxx_exceptions~gpfs~internal-hwloc~java+legacylaunchers+lustre~memchecker+pmi+pmix+romio~rsh~singularity+static+vt+wrapper-rpath cuda_arch='none' fabrics='ucx' schedulers='slurm' ^lustre@2.12.8 ^slurm@21.08.8 ^rdma-core "^ucx@1.10.1/$(spack find --format '{hash:7}' ucx@1.10.1 % gcc@8.5.0)"
+time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all openmpi@4.1.3 % intel@19.1.3.304 ~atomics~cuda~cxx~cxx_exceptions~gpfs~internal-hwloc~java+legacylaunchers+lustre~memchecker+pmi+pmix+romio~rsh~singularity+static+vt+wrapper-rpath cuda_arch='none' fabrics='ucx' schedulers='slurm' ^lustre@2.12.8 ^slurm@21.08.8 ^rdma-core "^ucx@1.10.1/$(spack find --format '{hash:7}' ucx@1.10.1 % intel@19.1.3.304)"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
   exit 1
 fi
 
-#spack module lmod refresh --delete-tree -y
+spack module lmod refresh --delete-tree -y
+
+sleep 60
