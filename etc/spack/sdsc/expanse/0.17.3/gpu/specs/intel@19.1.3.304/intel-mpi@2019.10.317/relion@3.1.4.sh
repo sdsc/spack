@@ -2,7 +2,7 @@
 
 #SBATCH --job-name=relion@3.1.4
 #SBATCH --account=use300
-##SBATCH --reservation=root_63
+#SBATCH --reservation=root_73
 #SBATCH --partition=ind-gpu-shared
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
@@ -15,11 +15,16 @@
 declare -xr LOCAL_TIME="$(date +'%Y%m%dT%H%M%S%z')"
 declare -xir UNIX_TIME="$(date +'%s')"
 
+declare -xr LOCAL_SCRATCH_DIR="/scratch/${USER}/job_${SLURM_JOB_ID}"
+declare -xr TMPDIR="${LOCAL_SCRATCH_DIR}/spack-stage"
+mkdir -p "${TMPDIR}"
+# -
 declare -xr SYSTEM_NAME='expanse'
 
 declare -xr SPACK_VERSION='0.17.3'
 declare -xr SPACK_INSTANCE_NAME='gpu'
-declare -xr SPACK_INSTANCE_DIR="${HOME}/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}"
+declare -xr SPACK_INSTANCE_VERSION='a'
+declare -xr SPACK_INSTANCE_DIR="/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}/${SPACK_INSTANCE_VERSION}"
 
 declare -xr SLURM_JOB_SCRIPT="$(scontrol show job ${SLURM_JOB_ID} | awk -F= '/Command=/{print $2}')"
 declare -xr SLURM_JOB_MD5SUM="$(md5sum ${SLURM_JOB_SCRIPT})"
@@ -66,6 +71,33 @@ module list
 # See build log for details:
 #  /tmp/mkandes/spack-stage/spack-stage-gdk-pixbuf-2.42.2-zcyz4j5hnxenlkhbywsjgpdlt5naf4yv/spack-build-out.txt
 
+# ==> Installing libtiff-4.3.0-6m7sngeiskxbqxcpbjsxtatwvjqy7a2h
+# ==> No binary for libtiff-4.3.0-6m7sngeiskxbqxcpbjsxtatwvjqy7a2h found: installing from source
+# ==> Warning: Expected user 527835 to own /scratch/spack_gpu, but it is owned by 0
+# ==> Fetching https://mirror.spack.io/_source-cache/archive/0e/0e46e5acb087ce7d1ac53cf4f56a09b221537fc86dfc5daaad1c2e89e1b37ac8.tar.gz
+# ==> Ran patch() for libtiff
+# ==> libtiff: Executing phase: 'autoreconf'
+# ==> libtiff: Executing phase: 'configure'
+# ==> Error: ProcessError: Command exited with status 77:
+#    '/scratch/spack_gpu/job_20387997/spack-stage/spack-stage/spack-stage-libtiff-4.3.0-6m7sngeiskxbqxcpbjsxtatwvjqy7a2h/spack-src/configure' '--prefix=/cm/shared/apps
+# /spack/0.17.3/gpu/a/opt/spack/linux-rocky8-cascadelake/intel-19.1.3.304/libtiff-4.3.0-6m7sngeiskxbqxcpbjsxtatwvjqy7a2h' '--disable-zlib' '--disable-libdeflate' '--disable-pixarlog' '--disable-jpeg' '--disable-old-jpeg' '--disable-jpeg12' '--disable-jbig' '--disable-lerc' '--disable-lzma' '--disable-zstd' '--disable-webp'
+#
+# 2 errors found in build log:
+#     13    checking whether GID '11491' is supported by ustar format... yes
+#     14    checking how to create a ustar tar archive... gnutar
+#     15    checking whether to enable maintainer-specific portions of Makefiles
+#           ... no
+#     16    checking whether make supports the include directive... yes (GNU sty
+#           le)
+#     17    checking for gcc... /cm/shared/apps/spack/0.17.3/gpu/a/lib/spack/env
+#           /intel/icc
+#     18    checking whether the C compiler works... no
+#  >> 19    configure: error: in `/scratch/spack_gpu/job_20387997/spack-stage/sp
+#           ack-stage/spack-stage-libtiff-4.3.0-6m7sngeiskxbqxcpbjsxtatwvjqy7a2h
+#           /spack-src':
+#  >> 20    configure: error: C compiler cannot create executables
+#     21    See `config.log' for more details
+
 declare -xr SPACK_PACKAGE='relion@3.1.4'
 declare -xr SPACK_COMPILER='intel@19.1.3.304'
 declare -xr SPACK_VARIANTS='+allow_ctf_in_sagd +cuda cuda_arch=70,80 +double ~double-gpu ~gui ~ipo ~mklfft'
@@ -94,7 +126,7 @@ if [[ "${?}" -ne 0 ]]; then
   exit 1
 fi
 
-spack module lmod refresh --delete-tree -y
+#spack module lmod refresh --delete-tree -y
 
 #sbatch --dependency="afterok:${SLURM_JOB_ID}" 'relion@4.0.0.sh'
 
