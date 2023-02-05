@@ -97,6 +97,15 @@ All other types of branches (see
 
 ### Access Control and Permissions
 
+Write access to the sdsc/spack repository is restricted to SDSC team 
+members who are responsible for managing and tracking issues, reviewing
+and merging pull requests, and maintaining the custom deployment 
+branches in the repository. All other SDSC team members who wish to 
+contribute to the sdsc/spack repository should submit their changes via
+pull requests from their own public fork of the sdsc/spack repository.
+
+
+
 etc/spack/repos.yaml
 var/spack/repos/sdsc/repo.yaml
 var/spack/repos/sdsc/packages
@@ -109,11 +118,108 @@ etc/spack/sdsc/expanse/0.17.3/cpu/yamls
 
 ## Deploying HPC Software via Spack
 
-### Deploying a Spack Instance
+### Deploying a New Spack Instance
 
-- start from existing deployment branch
+1. Login to the Spack user account designated for the ownership, 
+   deployment, and managment of the new instance. e.g., All production 
+   instances on Expanse targeted at and optimized for ...
+   ```
+   sudo -u spack_cpu ssh spack_cpu@login.expanse.sdsc.edu
+   ```
 
-### Managing Changes to a Spack Instance
+2. Start an interactive session on the reserved build node with write 
+   access to the /cm/shared filesystem.
+   ```
+   srun --partition=ind-shared --reservation=root_73  --account=use300 --nodes=1 --ntasks-per-node=1 --cpus-per-task=16 --mem=32G --time=48:00:00 --pty --wait=0 /bin/bash
+   ```
+
+3. Navigate to the Spack version directory.
+   ```
+   cd /cm/shared/apps/spack/0.17.3
+   ```
+
+4. Create a instance name directory and change to it.
+   ```
+   mkdir cpu
+   ```
+   and then change to it.
+   ```
+   cd cpu/
+   ```
+
+5. Clone the sdsc/spack GitHub repository and rename its top-level 
+   directory to the deployment version.
+   ```
+   git clone https://github.com/sdsc/spack.git a/
+   ```
+   And then change to the directory.
+   ```
+   cd a/
+   ```
+
+6. Check out the latest version of the deployment branch for the instance.
+   ```
+   git checkout sdsc-0.17.3
+   ```
+
+7. Navigate to the etc/spack directory.
+   ```
+   cd etc/spack
+   ```
+
+8. Copy the instance's initial configuration files to etc/spack.
+   ```
+   cp sdsc/expanse/0.17.3/cpu/yamls/\*.yaml ./
+   ```
+
+9. Navigate to the specs directory for the instance.
+   ```
+   cd sdsc/expanse/0.17.3/cpu/specs
+   ``` 
+
+10. Modify the core spec build scripts as necessary 
+    ```
+    sed -i 's/#SBATCH --reservation=root_63/#SBATCH --reservation=root_73/g' *.sh
+    ```
+    and then submit the spec build script at the start of the instance's core 
+    (non-compiler) package dependency chain to the scheduler.
+    ```
+    sbatch parallel@20210922.sh
+    ```
+11. After the core (non-compiler) packages are built and installed 
+    successfully, run the spec build script for the primary GCC
+    compiler for the instance.
+    ```
+    sbatch gcc@10.2.0.sh
+    ```
+12. Once the primary GCC compiler is installed, edit the `compilers.yaml` 
+    configuration file in etc/spack 
+    ```
+    vi "${SPACK_ROOT}/etc/spack/compilers.yaml"
+    ```
+    to include the default compiler build flags.
+    ```
+    flags:
+      cflags: -O2 -march=native
+      cxxflags: -O2 -march=native
+      fflags: -O2 -march=native
+    ```
+
+13. Once the GCC compiler 's Spack configuration is complete, run its 
+    package dependency chain.
+    ```
+    sbatch cmake@3.21.4.sh 
+    ```
+
+14. Follow map from here. adjust spec build scripts as necessary.
+
+Create a dependency chain map on how to deploy any instance tracked in 
+the repository. Place map in instance directory. e.g.
+```
+expanse/0.17.3/cpu
+```
+   
+### Managing Changes to an Existing Spack Instance
 
 - deploy change to configuration file
 - add new package to sdsc package repository
@@ -131,6 +237,41 @@ etc/spack/sdsc/expanse/0.17.3/cpu/yamls
 
 ### Protecting the sdsc/spack `develop` branch 
 
+As discussed in its Contribution Guide, the Spack project currently uses 
+the `develop` branch as its main development branch. This branch contains
+all of the latest contributions to the project from the Spack community
+and it is the branch on which tagged version releases of Spack are 
+currently made. Moreover, all pull requests submitted back upstream to 
+the Spack project are generally expected to start from and target the 
+develop branch. As such, NO COMMITS or MERGES should ever be made 
+directly to the develop branch of the sdsc/spack repository (or your own 
+public fork of the sdsc/spack repository). It is maintained as an exact
+mirror copy of the Spack project's upstream develop branch and nothing 
+else.
+
 ### Fetching changes and re-syncing the `develop` branch 
 
+When the develop branch of the sdsc/spack repository (or your own public
+fork of the sdsc/spack repository) needs to be re-synchronized with the 
+spack/spack upstream develop branch, you can fetch and merge all of the
+recent changes as follows:
+
+```
+git clone https://github.com/sdsc/spack.git
+cd spack
+git fetch origin
+git checkout develop
+git remote add upstream https://github.com/spack/spack.git
+git fetch --tags upstream
+git merge upstream/develop
+git push
+git push --tags
+```
+
 ### Creating a new deployment branch
+
+A new deployment branch should be created prior to upgrading to a new
+version of Spack. To create a new deployment branch, first fetch changes
+and resync the develop branch from the spack/spack upstream repository 
+as described above. Then create the new deployment branch from one of 
+the most recent tagged releases available.
