@@ -275,3 +275,19 @@ version of Spack. To create a new deployment branch, first fetch changes
 and resync the develop branch from the spack/spack upstream repository 
 as described above. Then create the new deployment branch from one of 
 the most recent tagged releases available.
+
+### Pulling files frome remote without overwriting local files
+
+```
+git stash
+```
+
+```
+git pull
+```
+
+```
+git stash pop
+```
+
+https://stackoverflow.com/questions/19216411/how-do-i-pull-files-from-remote-without-overwriting-local-files
