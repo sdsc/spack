@@ -69,7 +69,7 @@ if [[ "${?}" -ne 0 ]]; then
   exit 1
 fi
 
-#spack module lmod refresh --delete-tree -y
+spack module lmod refresh --delete-tree -y
 
 #sbatch --dependency="afterok:${SLURM_JOB_ID}" 'py-cupy@8.0.0.sh'
 sbatch --dependency="afterok:${SLURM_JOB_ID}" 'py-scipy@1.5.4.sh'

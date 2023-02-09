@@ -68,7 +68,7 @@ if [[ "${?}" -ne 0 ]]; then
   exit 1
 fi
 
-#spack module lmod refresh --delete-tree -y
+spack module lmod refresh --delete-tree -y
 
 #sbatch --dependency="afterok:${SLURM_JOB_ID}" 'zoltan@3.83.sh'
 sbatch --dependency="afterok:${SLURM_JOB_ID}" 'petsc@3.16.1.sh'

@@ -74,10 +74,13 @@ fi
 . "$(spack location -i ${SPACK_PACKAGE})/lmod/lmod/init/bash"
 spack -d module lmod refresh --delete-tree -y
 . "${SPACK_ROOT}/share/spack/setup-env.sh"
+spack clean --all
+spack reindex
+spack -d module lmod refresh --delete-tree -y
 module unuse "${SPACK_ROOT}/share/spack/modules/linux-centos8-zen"
 module unuse "${SPACK_ROOT}/share/spack/modules/linux-centos8-zen2"
 module use "${SPACK_ROOT}/share/spack/lmod/linux-centos8-x86_64/Core"
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'parallel@20210922.sh'
+#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'parallel@20210922.sh'
 
 sleep 60

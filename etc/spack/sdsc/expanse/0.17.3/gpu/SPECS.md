@@ -3,7 +3,7 @@
 | Core (gcc@8.5.0)           | gcc@10.2.0               | openmpi@4.1.3              | openmpi@3.1.6              | intel-mpi@2019.10.317      |
 | -------------------------- | ------------------------ | -------------------------- | -------------------------- | -------------------------- |
 | parallel@20210922          | cuda@11.2.2              | hpl@2.3                    | hpl@2.3                    | hpl@2.3                    |
-| pigz@2.6                   | cudnn@8.1.1.33-11.2      | hpl@2.3-omp                | hpl@2.3-omp                | hpl@2.3-omp                |
+| pigz@2.6                   | cudnn@8.1.1.33-11.2      | hpl@2.3\-omp               | hpl@2.3\-omp               | hpl@2.3\-omp                |
 | git@2.31.1                 | nccl@2.8.4-1             | osu-micro-benchmarks@5.7.1 | osu-micro-benchmarks@5.7.1 | osu-micro-benchmarks@5.7.1 |
 | git-lfs@2.11.0             | cmake@3.21.4             | netlib-scalapack@2.1.0     | sprng@5.0                  | netlib-scalapack@2.1.0     |
 | gh@2.0.0                   | perl@5.32.0              | fftw@3.3.10                | netlib-scalapack@2.1.0     | fftw@3.3.10                |
@@ -27,11 +27,11 @@
 |                            | graphviz@2.49.0          | scotch@6.1.1               | tau@2.30.2                 |                            |
 |                            | eigen@3.4.0              | mumps@5.4.0                |                            |                            |
 |                            | openblas@0.3.18          | adios2@2.7.1               |                            |                            |
-|                            | openblas@0.3.18-omp      | petsc@3.16.1               |                            |                            |
+|                            | openblas@0.3.18\-omp     | petsc@3.16.1               |                            |                            |
 |                            | netlib-lapack@3.9.1      | slepc@3.16.0               |                            |                            |
 |                            | intel-mkl@2020.4.304     | py-petsc4py@3.16.1         |                            |                            |
 |                            | magma@2.6.1              | py-slepc4py@3.16.0         |                            |                            |
-|                            | gsl@2.7                  | mrbayes@3.2.7a             |                            |                            |
+|                            | gsl@2.7                  | mrbayes\@3.2.7a            |                            |                            |
 |                            | fftw@3.3.10              | relion@3.1.4               |                            |                            |
 |                            | fftw@2.1.5               | relion@4.0.0               |                            |                            |
 |                            | hdf5@1.10.7              | plumed@2.6.3               |                            |                            |
@@ -79,33 +79,36 @@
 |                            | beast2@2.5.2             |                            |                            |                            |
 |                            | beast2@2.6.4             |                            |                            |                            |
 |                            | openmm@7.5.0             |                            |                            |                            |
-|                            | ------------------------ |--------------------------- | -------------------------- | -------------------------- |
-|                            | intel@19.1.3.304         | openmpi@4.1.3              | intel-mpi@2019.10.317      |                            |
-|                            | ------------------------ | -------------------------- | -------------------------- | -------------------------- |
-|                            | cuda@11.2.2              | hpl@2.3                    | hpl@2.3                    |                            |
-|                            | cudnn@8.1.1.33-11.2      | hpl@2.3-omp                | hpl@2.3-omp                |                            |
-|                            | nccl@2.8.4-1             | osu-micro-benchmarks@5.7.1 | osu-micro-benchmarks@5.7.1 |                            |
-|                            | cmake@3.21.4             | netlib-scalapack@2.1.0     | netlib-scalapack@2.1.0     |                            |
-|                            | eigen@3.4.0              | fftw@3.3.10                | fftw@3.3.10                |                            |
-|                            | netlib-lapack@3.9.1      | hdf5@1.10.7                | hdf5@1.10.7                |                            |
-|                            | intel-mkl@2020.4.304     | parmetis@4.0.3             | parmetis@4.0.3             |                            |
-|                            | intel-mkl@2020.4.304-omp | parallel-netcdf@1.12.2     | parallel-netcdf@1.12.2     |                            |
-|                            | magma@2.6.1              | ior@3.3.0                  | ior@3.3.0                  |                            |
-|                            | gsl@2.7                  | netcdf-c@4.8.1             | netcdf-c@4.8.1             |                            |
-|                            | fftw@3.3.10              | netcdf-cxx4@4.3.1          | netcdf-cxx4@4.3.1          |                            |
-|                            | hdf5@1.10.7              | netcdf-fortran@4.5.3       | netcdf-fortran@4.5.3       |                            |
-|                            | metis@5.1.0              | arpack-ng@3.7.0            | arpack-ng@3.7.0            |                            |
-|                            | netcdf-c@4.8.1           | superlu-dist@7.1.1         | boost@1.77.0               |                            |
-|                            | netcdf-cxx4@4.3.1        | hypre@2.23.0               | superlu-dist@7.1.1         |                            |
-|                            | netcdf-fortran@4.5.3     | valgrind@3.17.0            | hypre@2.23.0               |                            |
-|                            | arpack-ng@3.8.0          | mpip@3.5                   | valgrind@3.17.0            |                            |
-|                            | hypre@2.23.0             | tau@2.30.2                 | mpip@3.5                   |                            |
-|                            | suite-sparse@5.10.1      | petsc@3.16.1               | tau@2.30.2                 |                            |
-|                            | superlu@5.3.0            |                            |                            |                            |
-|                            | sprng@5.0                |                            |                            |                            |
-|                            | papi@6.0.0.1             |                            |                            |                            |
-|                            | valgrind@3.17.0          |                            |                            |                            |
-|                            | petsc@3.16.1             |                            |                            |                            |
-|                            | slepc@3.16.0             |                            |                            |                            |
-|                            | ------------------------ | -------------------------- | -------------------------- | -------------------------- |
-|                            | nvhpc@21.9               |                            |                            |                            |
+
+
+|                            | intel@19.1.3.304          | openmpi@4.1.3              | intel-mpi@2019.10.317      |                            |
+| -------------------------- | ------------------------- | -------------------------- | -------------------------- | -------------------------- |
+|                            | cuda@11.2.2               | hpl@2.3                    | hpl@2.3                    |                            |
+|                            | cudnn@8.1.1.33-11.2       | hpl@2.3\-omp               | hpl@2.3\-omp               |                            |
+|                            | nccl@2.8.4-1              | osu-micro-benchmarks@5.7.1 | osu-micro-benchmarks@5.7.1 |                            |
+|                            | cmake@3.21.4              | netlib-scalapack@2.1.0     | netlib-scalapack@2.1.0     |                            |
+|                            | eigen@3.4.0               | fftw@3.3.10                | fftw@3.3.10                |                            |
+|                            | netlib-lapack@3.9.1       | hdf5@1.10.7                | hdf5@1.10.7                |                            |
+|                            | intel-mkl@2020.4.304      | parmetis@4.0.3             | parmetis@4.0.3             |                            |
+|                            | intel-mkl@2020.4.304\-omp | parallel-netcdf@1.12.2     | parallel-netcdf@1.12.2     |                            |
+|                            | magma@2.6.1               | ior@3.3.0                  | ior@3.3.0                  |                            |
+|                            | gsl@2.7                   | netcdf-c@4.8.1             | netcdf-c@4.8.1             |                            |
+|                            | fftw@3.3.10               | netcdf-cxx4@4.3.1          | netcdf-cxx4@4.3.1          |                            |
+|                            | hdf5@1.10.7               | netcdf-fortran@4.5.3       | netcdf-fortran@4.5.3       |                            |
+|                            | metis@5.1.0               | arpack-ng@3.7.0            | arpack-ng@3.7.0            |                            |
+|                            | netcdf-c@4.8.1            | superlu-dist@7.1.1         | boost@1.77.0               |                            |
+|                            | netcdf-cxx4@4.3.1         | hypre@2.23.0               | superlu-dist@7.1.1         |                            |
+|                            | netcdf-fortran@4.5.3      | valgrind@3.17.0            | hypre@2.23.0               |                            |
+|                            | arpack-ng@3.8.0           | mpip@3.5                   | valgrind@3.17.0            |                            |
+|                            | hypre@2.23.0              | tau@2.30.2                 | mpip@3.5                   |                            |
+|                            | suite-sparse@5.10.1       | petsc@3.16.1               | tau@2.30.2                 |                            |
+|                            | superlu@5.3.0             |                            |                            |                            |
+|                            | sprng@5.0                 |                            |                            |                            |
+|                            | papi@6.0.0.1              |                            |                            |                            |
+|                            | valgrind@3.17.0           |                            |                            |                            |
+|                            | petsc@3.16.1              |                            |                            |                            |
+|                            | slepc@3.16.0              |                            |                            |                            |
+
+|                            | nvhpc@21.9                |                            |                            |                            |
+| -------------------------- | ------------------------- | -------------------------- | -------------------------- | -------------------------- |
+|                            |                           |                            |                            |                            |

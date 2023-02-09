@@ -62,6 +62,6 @@ spack spec --yaml "${SPACK_SPEC}"
 
 time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all "${SPACK_SPEC}"
 
-#spack module lmod refresh --delete-tree -y
+spack module lmod refresh --delete-tree -y
 
 #sbatch --dependency="afterok:${SLURM_JOB_ID}" 'r-tidyverse@1.2.1-complex.sh'
