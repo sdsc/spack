@@ -69,8 +69,7 @@ if [[ "${?}" -ne 0 ]]; then
   exit 1
 fi
 
-spack compiler add --scope site "$(spack location -i ${SPACK_PACKAGE})"
-##spack module lmod refresh --delete-tree -y
+spack module lmod refresh --delete-tree -y
 
 cd "${SPACK_PACKAGE}"
 

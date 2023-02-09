@@ -73,7 +73,7 @@ if [[ "${?}" -ne 0 ]]; then
   exit 1
 fi
 
-#spack module lmod refresh --delete-tree -y
+spack module lmod refresh --delete-tree -y
 
 #sbatch --dependency="afterok:${SLURM_JOB_ID}" 'quantum-espresso@6.4.1.sh'
 sbatch --dependency="afterok:${SLURM_JOB_ID}" 'paraview@5.9.1.sh'
