@@ -67,8 +67,8 @@
 | py-scikit-learn@1.0.1    | openfoam@2106              | 
 | py-matplotlib@3.4.3      | wrf@4.2                    | 
 | py-scikit-optimize@0.5.2 | wps@4.2                    |
-| py-statsmodels@0.12.2    |
-| py-seaborn@0.11.2        |
+| py-statsmodels@0.12.2    |                            |
+| py-seaborn@0.11.2        | amber@22                   |
 | py-dask@2021.6.2         |
 | py-jupyterlab@3.2.1      |
 | arpack-ng@3.8.0          |
