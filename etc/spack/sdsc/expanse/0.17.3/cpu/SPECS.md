@@ -70,7 +70,7 @@
 | py-scikit-optimize@0.5.2 | wps@4.2                    |
 | py-statsmodels@0.12.2    |                            |
 | py-seaborn@0.11.2        | amber@22                   |
-| py-dask@2021.6.2         |
+| py-dask@2021.6.2         | vasp6@6.2.1                |
 | py-jupyterlab@3.2.1      |
 | arpack-ng@3.8.0          |
 | boost@1.77.0             |
