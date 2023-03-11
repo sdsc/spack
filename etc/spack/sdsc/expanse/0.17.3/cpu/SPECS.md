@@ -15,6 +15,7 @@
 | sratoolkit@2.10.9          |
 | entrezdirect@10.7.20190114 |
 | anaconda3@2021.05          |
+| matlab@2022b               | 
 
 
 
