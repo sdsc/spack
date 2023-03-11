@@ -40,12 +40,10 @@ class Amber(Package,CudaPackage):
 
 
     version('22', sha256='3c887ccbad690fc76ff0b120a3448eae023c08e76582aac07900d4a9708ebd16')
-    version('20', sha256='a4c53639441c8cc85adee397933d07856cc4a723c82c6bea585cd76c197ead75')
 
     resources = [
       # [version amber, version ambertools , sha256sum]
         ('22', '22', '1571d4e0f7d45b2a71dce5999fa875aea8c90ee219eb218d7916bf30ea229121'),
-        ('20', '20', 'b1e1f8f277c54e88abc9f590e788bbb2f7a49bcff5e8d8a6eacfaf332a4890f9'),
     ]
 
     for ver, ambertools_ver, checksum in resources:
@@ -76,6 +74,7 @@ class Amber(Package,CudaPackage):
     depends_on('python')
     depends_on('mpi', when='+mpi')
     depends_on('cuda', when='+cuda')
+    depends_on('cmake')
 
 
     def install(self, spec, prefix):

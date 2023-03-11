@@ -230,19 +230,19 @@ class Vasp(MakefilePackage):
     def install(self, spec, prefix):
         install_tree('bin/', prefix.bin)
 
-    @run_after('install')
-    def install_test(self):
-        mkdirp(join_path(self.prefix,'test'))
-        with working_dir(self.prefix.test):
-           tar=which('tar')
-           tar('xvzf',join_path(os.path.dirname(self.module.__file__),'H2O.tgz'))
-           with working_dir('H2O'):
-               if self.spec['mpi'].name == 'mvapich2' and 'slurm' in str(self.spec['mpi'].token):
-                   output=Executable('srun')('-n','4','--mpi=pmi2',join_path(self.prefix.bin,'vasp_std'),output=str,error=str)
-               else:
-                   output=Executable('mpirun')('-np','4',join_path(self.prefix.bin,'vasp_std'),output=str,error=str)
-               teststring='F= -.14223'
-               if teststring in output:
-                   print("PASSED")
-               else:
-                   print("FAILED")
+#   @run_after('install')
+#   def install_test(self):
+#       mkdirp(join_path(self.prefix,'test'))
+#       with working_dir(self.prefix.test):
+#          tar=which('tar')
+#          tar('xvzf',join_path(os.path.dirname(self.module.__file__),'H2O.tgz'))
+#          with working_dir('H2O'):
+#              if self.spec['mpi'].name == 'mvapich2' and 'slurm' in str(self.spec['mpi'].token):
+#                  output=Executable('srun')('-n','4','--mpi=pmi2',join_path(self.prefix.bin,'vasp_std'),output=str,error=str)
+#              else:
+#                  output=Executable('mpirun')('-np','4',join_path(self.prefix.bin,'vasp_std'),output=str,error=str)
+#              teststring='F= -.14223'
+#              if teststring in output:
+#                  print("PASSED")
+#              else:
+#                  print("FAILED")

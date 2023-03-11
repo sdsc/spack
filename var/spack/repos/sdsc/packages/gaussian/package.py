@@ -15,13 +15,14 @@ class Gaussian(Package,CudaPackage):
 
     manual_download = True
 
-    version('16-C.02', sha256='6b96277bb7b25570827e71c1b4cfdf0efc3de54dbbd40a5a09f08f754a0e5738',preferred=True)
+    version('16-C.02', sha256='590e4e27521dd6a11bb80a3f30c5beba0f143bfdd9ddb4016580d9d2e2041d0a',preferred=True)
     version('16-C.01', sha256='a75c81aceee257d62ac0e21e9c7797f776b0e31aab3fb7e9e15257cacd1e30a9')
     variant('cuda',default=False,description='compile for gpus')
     variant('binary',default=False,description='precompiled binaries')
     depends_on('cuda',when='+cuda')
-    patch('gau-hname.patch',when='~binary')
-    patch('bldg16.patch',when='~binary')
+    patch('gau-hname.patch',level=1,when='~binary')
+    patch('bldg16.patch',level=1,when='~binary')
+    
 
     def url_for_version(self, version):
         return "file://{0}/gaussian-{1}.tar.gz".format(os.getcwd(), version)
@@ -74,11 +75,8 @@ class Gaussian(Package,CudaPackage):
     def exe_permissions(self):
         if '+cuda' in self.spec:
             Executable('chmod')('0750',join_path(prefix.g16,'getcpusets'))
-        with working_dir(self.prefix.g16):
-            Executable('find')('.','-maxdepth','1','-type','f','-executable','-exec','chmod','0750','{}',';')
 
     @run_after('install')
-    @on_package_attributes(run_tests=False)
 
     def test(self):
         def replacetestfilename(name):
@@ -91,23 +89,25 @@ class Gaussian(Package,CudaPackage):
             elif len(name) ==  4:
                 return(name)
         tests=['1', '28', '94', '155', '194', '296', '302']
+        fp=open('/tmp/gaussian.output','w')
         with working_dir(join_path(prefix.g16,'tests')): 
-            for test in tests:
-                testname=replacetestfilename(test)
-                Executable('rm')('-f',join_path('amd64','test'+testname+'.log'))
-                if '+cuda' in self.spec:
-                     with working_dir('com'):
-                         copy('test'+testname+'.com','test'+testname+'.tmp.com')                      
-                         Executable('getcpusets')('tmp')                      
-                         Executable('cat')('tmp.out','test'+testname+'.tmp.com','>','test'+testname+'.com')
-                Executable('./submit.csh')(test,test)
-                output=Executable('cat')(join_path('amd64','test'+testname+'.log'),output=str,error=str)
-                print("TEST " + test)
-                teststring='Normal termination'
-                if teststring in output:
-                    print('PASSED')
-                else:
-                    print('FAILED')
-                if '+cuda' in self.spec:
-                     with working_dir('com'):
-                         copy('test'+testname+'.tmp.com','test'+testname+'.com')
+            with open('/tmp/gaussian.output','w') as fp:
+                for test in tests:
+                    testname=replacetestfilename(test)
+                    Executable('rm')('-f',join_path('amd64','test'+testname+'.log'))
+                    if '+cuda' in self.spec:
+                         with working_dir('com'):
+                             copy('test'+testname+'.com','test'+testname+'.tmp.com')                      
+                             Executable('getcpusets')('tmp')                      
+                             Executable('cat')('tmp.out','test'+testname+'.tmp.com','>','test'+testname+'.com')
+                    Executable('./submit.csh')(test,test)
+                    output=Executable('cat')(join_path('amd64','test'+testname+'.log'),output=str,error=str)
+                    print("TEST " + test,file=fp)
+                    teststring='Normal termination'
+                    if teststring in output:
+                         print('PASSED',file=fp)
+                    else:
+                         print('FAILED',file=fp)
+                    if '+cuda' in self.spec:
+                         with working_dir('com'):
+                             copy('test'+testname+'.tmp.com','test'+testname+'.com')
