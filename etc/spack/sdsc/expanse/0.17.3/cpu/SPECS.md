@@ -18,9 +18,9 @@
 
 
 
-| gcc@10.2.0               | openmpi@4.1.3              | openmpi@3.1.6              | intel-mpi@2019.10.317      | mvapich2@2.3.7             |
-| ------------------------ | -------------------------- | -------------------------- | -------------------------- | -------------------------- |
-| cmake@3.21.4             | hpl@2.3                    | hpl@2.3                    | hpl@2.3                    | hpl@2.3                    |
+| gcc@10.2.0               | openmpi@4.1.3              | openmpi@3.1.6              | intel-mpi@2019.10.317      | mvapich2@2.3.7             | openmpi@4.1.1 |
+| ------------------------ | -------------------------- | -------------------------- | -------------------------- | -------------------------- | ------------- |
+| cmake@3.21.4             | hpl@2.3                    | hpl@2.3                    | hpl@2.3                    | hpl@2.3                    | orca@5.0.4    |
 | perl@5.32.0              | hpl@2.3-omp                | hpl@2.3-omp                | hpl@2.3-omp                | hpl@2.3-omp                |
 | tcl@8.6.11               | osu-micro-benchmarks@5.7.1 | osu-micro-benchmarks@5.7.1 | osu-micro-benchmarks@5.7.1 | osu-micro-benchmarks@5.7.1 |
 | tcl@8.5.9                | netlib-scalapack@2.1.0     | netlib-scalapack@2.1.0     | netlib-scalapack@2.1.0     | netlib-scalapack@2.1.0     |
