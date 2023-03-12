@@ -43,8 +43,8 @@
 | eigen@3.4.0              | valgrind@3.17.0            | valgrind@3.17.0            | valgrind@3.17.0            | valgrind@3.17.0            |
 | openblas@0.3.18          | mpip@3.5                   | mpip@3.5                   | mpip@3.5                   | mpip@3.5                   |
 | openblas@0.3.18-omp      | tau@2.30.2                 | tau@2.30.2                 | tau@2.30.2                 | tau@2.30.2                 |
-| netlib-lapack@3.9.1      | scotch@6.1.1               | sprng@5.0
-| intel-mkl@2020.4.304     | mumps@5.4.0                | 
+| netlib-lapack@3.9.1      | scotch@6.1.1               | sprng@5.0                  |                            |                            |
+| intel-mkl@2020.4.304     | mumps@5.4.0                |                            |                            | qchem@6.0                  |
 | gsl@2.7                  | adios2@2.7.1               |
 | fftw@3.3.10              | petsc@3.16.1               |
 | fftw@2.1.5               | petsc@3.16.1-cmplx         |
@@ -197,3 +197,5 @@
 |                          | openfoam@2106              |
 |                          | wrf@4.2                    |
 |                          | wps@4.2                    |
+|                          |                            |
+|                          | vasp6@6.2.1                |
