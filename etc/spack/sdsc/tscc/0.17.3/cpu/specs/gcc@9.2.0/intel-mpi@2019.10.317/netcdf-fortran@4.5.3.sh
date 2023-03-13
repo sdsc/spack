@@ -64,6 +64,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'py-mpi4py@3.1.2.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'plumed@2.6.3.sh'
 
 sleep 60

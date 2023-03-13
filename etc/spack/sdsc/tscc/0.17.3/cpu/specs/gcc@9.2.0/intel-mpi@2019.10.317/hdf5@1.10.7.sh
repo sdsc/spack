@@ -64,6 +64,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'parmetis@4.0.3.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'parallel-netcdf@1.12.2.sh'
 
 sleep 60
