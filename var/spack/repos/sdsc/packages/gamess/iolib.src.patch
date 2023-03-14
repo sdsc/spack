@@ -1,0 +1,20 @@
+--- gamess-2019.06/source/iolib.src	2019-08-04 10:27:44.000000000 -0700
++++ patch-files/iolib.src	2019-09-06 10:20:18.696763371 -0700
+@@ -1480,7 +1480,7 @@
+ C
+       IOUT = 0
+ C
+-      IF ((FNAME.EQ.'INPUT')   .OR. (FNAME.EQ.'OUTPUT')  .OR.
++      IF ((FNAME.EQ.'NEWINPUT')   .OR. (FNAME.EQ.'OUTPUT')  .OR.
+      *    (FNAME.EQ.'PUNCH')   .OR. (FNAME.EQ.'RESTART') .OR.
+      *    (FNAME.EQ.'TRAJECT') .OR. (FNAME.EQ.'MAKEFP')  .OR.
+      *       (.NOT.DSKWRK)     .OR.     (NPROC.EQ.1)) THEN
+@@ -3683,7 +3683,7 @@
+          CALL GMS_GETENV('ERICFMT',ENVBUF(2))
+          CALL GMS_GETENV('EXTBAS', ENVBUF(3))
+          CALL GMS_GETENV('TRAJECT',ENVBUF(4))
+-         CALL GMS_GETENV('INPUT',  ENVBUF(IR))
++         CALL GMS_GETENV('NEWINPUT',  ENVBUF(IR))
+          CALL GMS_GETENV('OUTPUT', ENVBUF(IW))
+          CALL GMS_GETENV('PUNCH',  ENVBUF(IP))
+          CALL GMS_GETENV('AOINTS', ENVBUF(IJK))
