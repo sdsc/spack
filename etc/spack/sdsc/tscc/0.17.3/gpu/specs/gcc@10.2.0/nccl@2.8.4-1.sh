@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 #SBATCH --job-name=nccl@2.8.4-1
-#SBATCH --account=use300
-#SBATCH --partition=ind-gpu-shared
+#SBATCH --account=sdsc
+#SBATCH --partition=hotel
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=10
