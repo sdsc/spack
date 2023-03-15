@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=arpack-ng@3.8.0
-#SBATCH --account=sdsc
-#SBATCH --partition=hotel
+#SBATCH --job-name=openblas@0.3.17
+#SBATCH --account=use300
+##SBATCH --reservation=root_73
+#SBATCH --partition=ind-gpu-shared
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=10
@@ -35,11 +36,12 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-declare -xr SPACK_PACKAGE='arpack-ng@3.8.0'
-declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS='~mpi +shared'
-declare -xr SPACK_DEPENDENCIES="^openblas@0.3.17/$(spack find --format '{hash:7}' openblas@0.3.17 % ${SPACK_COMPILER} ~ilp64 threads=none)"
-declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
+declare -xr INTEL_LICENSE_FILE='40000@elprado.sdsc.edu:40200@elprado.sdsc.edu'
+declare -xr SPACK_PACKAGE='openblas@0.3.17'
+declare -xr SPACK_COMPILER='intel@19.1.1.217'
+declare -xr SPACK_VARIANTS='~bignuma ~consistent_fpcsr ~ilp64 +locking +pic ~shared threads=none'
+declare -xr SPACK_DEPENDENCIES=''
+declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS}"
 
 printenv
 
@@ -63,8 +65,8 @@ if [[ "${?}" -ne 0 ]]; then
   exit 1
 fi
 
-spack module lmod refresh --delete-tree -y
+#spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'boost@1.77.0.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'openblas@0.3.17-omp.sh'
 
 sleep 60
