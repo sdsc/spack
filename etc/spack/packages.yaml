@@ -73,3 +73,7 @@ packages:
     permissions:
       read: group
       group: jpg
+  vasp6:
+    permissions:
+      read: group
+      group: vasp-6
