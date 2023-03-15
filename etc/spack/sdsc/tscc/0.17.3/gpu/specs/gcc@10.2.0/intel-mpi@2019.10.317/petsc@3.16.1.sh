@@ -2,9 +2,8 @@
 # real 1214.82
 
 #SBATCH --job-name=petsc@3.16.1
-##SBATCH --reservation=root_73
-#SBATCH --account=use300
-#SBATCH --partition=ind-gpu-shared
+#SBATCH --account=sdsc
+#SBATCH --partition=hotel
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=10

@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=intel@19.1.3.304
-#SBATCH --account=use300
-##SBATCH --reservation=root_63
-#SBATCH --partition=ind-gpu-shared
+#SBATCH --job-name=intel@19.1.1.217
+#SBATCH --account=sdsc
+#SBATCH --partition=hotel
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=10
@@ -37,7 +36,7 @@ module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
 declare -xr INTEL_LICENSE_FILE='40000@elprado.sdsc.edu:40200@elprado.sdsc.edu'
-declare -xr SPACK_PACKAGE='intel@19.1.3.304'
+declare -xr SPACK_PACKAGE='intel@19.1.1.217'
 declare -xr SPACK_COMPILER='gcc@8.5.0'
 declare -xr SPACK_VARIANTS='+rpath'
 declare -xr SPACK_DEPENDENCIES=''

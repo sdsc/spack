@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 
 #SBATCH --job-name=paraview@5.9.1
-#SBATCH --account=use300
-##SBATCH --reservation=root_63
+#SBATCH --account=sdsc
 #SBATCH --partition=gpu
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
