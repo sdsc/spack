@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=tau@2.30.2
+#SBATCH --job-name=mpip@3.5
 #SBATCH --account=sdsc
 #SBATCH --partition=hotel
 #SBATCH --nodes=1
@@ -35,14 +35,17 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-# >> 16    Error: Cannot access MPI include directory /home/mkandes/cm/shared/a
-#           pps/spack/0.17.3/gpu/opt/spack/linux-rocky8-cascadelake/gcc-10.2.0/i
-#           ntel-mpi-2019.10.317-jhyxn2gkqptkwz23tocb2darb4lfirxb/include
-
-declare -xr SPACK_PACKAGE='tau@2.30.2'
+# checking libunwind.h usability... no
+#checking libunwind.h presence... no
+#checking for libunwind.h... no
+#
+#  mpiP on x86_64 platforms requires libunwind.
+#  Please install libunwind and, if necessary, configure mpiP with 
+#  appropriate CFLAGS and LDFLAGS settings.
+declare -xr SPACK_PACKAGE='mpip@3.5'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS='~adios2 +binutils ~comm ~craycnl +cuda +elf +fortran ~gasnet +io ~level_zero +libdwarf +libunwind ~likwid +mpi ~ompt ~opari ~opencl ~openmp +otf2 +papi +pdt ~phase ~ppc64le ~profileparam +pthreads +python ~rocm ~rocprofiler ~roctracer ~scorep ~shmem +sqlite ~x86_64'
-declare -xr SPACK_DEPENDENCIES="^intel-mpi@2019.10.317/$(spack find --format '{hash:7}' intel-mpi@2019.10.317 % ${SPACK_COMPILER}) ^papi@6.0.0.1/$(spack find --format '{hash:7}' papi@6.0.0.1 % ${SPACK_COMPILER}) ^python@3.8.12/$(spack find --format '{hash:7}' python@3.8.12 % ${SPACK_COMPILER})"
+declare -xr SPACK_VARIANTS='~add_shared_target ~bfd ~demangling +libunwind +mpi_io +mpi_nbc +mpi_rma ~setjmp'
+declare -xr SPACK_DEPENDENCIES="^mvapich2@2.3.7/$(spack find --format '{hash:7}' mvapich2@2.3.7 % ${SPACK_COMPILER}) ^python@3.8.12/$(spack find --format '{hash:7}' python@3.8.12 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -69,6 +72,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'charmpp@6.10.2.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'tau@2.30.2.sh'
 
 sleep 60

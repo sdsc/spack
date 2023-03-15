@@ -26,7 +26,7 @@ declare -xr SLURM_JOB_MD5SUM="$(md5sum ${SLURM_JOB_SCRIPT})"
 declare -xr SCHEDULER_MODULE='slurm'
 declare -xr COMPILER_MODULE='gcc/10.2.0'
 declare -xr CUDA_MODULE='cuda/11.2.2'
-declare -xr MPI_MODULE='openmpi/4.1.3'
+declare -xr MPI_MODULE='intel-mpi@2019.10.317'
 
 echo "${UNIX_TIME} ${SLURM_JOB_ID} ${SLURM_JOB_MD5SUM} ${SLURM_JOB_DEPENDENCY}" 
 echo ""
@@ -69,7 +69,7 @@ module load "${MPI_MODULE}"
 declare -xr SPACK_PACKAGE='vasp6@6.2.1'
 declare -xr SPACK_COMPILER="gcc@10.2.0"
 declare -xr SPACK_VARIANTS="ldflags='-L/cm/local/apps/cuda/libs/current/lib64' +cuda ~openmp +scalapack +shmem ~vaspsol"
-declare -xr SPACK_DEPENDENCIES="^fftw@3.3.10/$(spack find --format '{hash:7}' fftw@3.3.10 % ${SPACK_COMPILER} ~mpi ~openmp) ^openmpi@4.1.3/$(spack find --format '{hash:7}' openmpi@4.1.3 % ${SPACK_COMPILER}) ^netlib-scalapack@2.1.0/$(spack find --format '{hash:7}' netlib-scalapack@2.1.0 % ${SPACK_COMPILER} ^openmpi@4.1.3)"
+declare -xr SPACK_DEPENDENCIES="^intel-mpi@2019.10.317/$(spack find --format '{hash:7}' intel-mpi@2019.10.317 % ${SPACK_COMPILER}) ^intel-mkl@2020.4.304 % ${SPACK_COMPILER}"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -97,6 +97,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-#sbatch --dependency="afterok:${SLURM_JOB_ID}" ''
+sbatch --dependency="afterok:${SLURM_JOB_ID}" ''
 
 sleep 60
