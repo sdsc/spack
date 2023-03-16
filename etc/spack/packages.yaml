@@ -1,9 +1,9 @@
 packages:
   lustre:
     externals:
-      - spec: 'lustre@2.12.8 % gcc@8.5.0 arch=linux-rocky8-skylake_avx512'
+      - spec: 'lustre@2.12.8 % gcc@11.2.0 arch=linux-rocky8-skylake_avx512'
         prefix: /usr
-      - spec: 'lustre@2.12.8 % gcc@10.2.0 arch=linux-rocky8-cascadelake'
+      - spec: 'lustre@2.12.8 % gcc@11.2.0 arch=linux-rocky8-cascadelake'
         prefix: /usr
       - spec: 'lustre@2.12.8 % intel@19.1.1.217 arch=linux-rocky8-cascadelake'
         prefix: /usr
@@ -12,7 +12,7 @@ packages:
     buildable: false
   texlive:
     externals:
-      - spec: 'texlive@live % gcc@8.5.0 arch=linux-rocky8-skylake_avx512'
+      - spec: 'texlive@live % gcc@11.2.0 arch=linux-rocky8-skylake_avx512'
         prefix: /usr
       - spec: 'texive@live % gcc@10.2.0 arch=linux-rocky8-cascadelake'
         prefix: /usr
@@ -21,7 +21,7 @@ packages:
     buildable: false
   openssl:
     externals:
-      - spec: 'openssl@1.1.1k % gcc@8.5.0 arch=linux-rocky8-skylake_avx512'
+      - spec: 'openssl@1.1.1k % gcc@11.2.0 arch=linux-rocky8-skylake_avx512'
         prefix: /usr
       - spec: 'openssl@1.1.1k % gcc@10.2.0 arch=linux-rocky8-cascadelake'
         prefix: /usr
@@ -31,7 +31,7 @@ packages:
     buildable: false
   rdma-core:
     externals:
-      - spec: 'rdma-core@28.0 % gcc@8.5.0 arch=linux-rocky8-skylake_avx512'
+      - spec: 'rdma-core@28.0 % gcc@11.2.0 arch=linux-rocky8-skylake_avx512'
         prefix: /usr
       - spec: 'rdma-core@28.0 % gcc@10.2.0 arch=linux-rocky8-cascadelake'
         prefix: /usr
@@ -41,7 +41,7 @@ packages:
     buildable: false
   hcoll:
     externals:
-      - spec: 'hcoll@4.4.2968 % gcc@8.5.0 arch=linux-rocky8-skylake_avx512'
+      - spec: 'hcoll@4.4.2968 % gcc@11.2.0 arch=linux-rocky8-skylake_avx512'
         prefix: /opt/mellanox/hcoll
       - spec: 'hcoll@4.4.2968 % gcc@10.2.0 arch=linux-rocky8-cascadelake'
         prefix: /opt/mellanox/hcoll
@@ -51,7 +51,7 @@ packages:
     buildable: false
   slurm:
     externals:
-      - spec: 'slurm@22.05.7 % gcc@8.5.0 arch=n'
+      - spec: 'slurm@22.05.7 % gcc@11.2.0 arch=n'
         prefix: /cm/shared/apps/slurm/21.08.8
       - spec: 'slurm@22.05.7 % gcc@10.2.0 arch=linux-rocky8-cascadelake'
         prefix: /cm/shared/apps/slurm/21.08.8
