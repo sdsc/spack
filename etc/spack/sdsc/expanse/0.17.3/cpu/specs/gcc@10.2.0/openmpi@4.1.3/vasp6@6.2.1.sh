@@ -130,6 +130,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-#sbatch --dependency="afterok:${SLURM_JOB_ID}" ''
+#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'gamess@2021.09.sh'
 
 sleep 60
