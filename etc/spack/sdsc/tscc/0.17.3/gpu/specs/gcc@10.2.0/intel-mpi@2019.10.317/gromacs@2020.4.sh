@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=netcdf-c@4.8.1
+#SBATCH --job-name=gromacs@2020.4
 #SBATCH --account=sdsc
 #SBATCH --partition=hotel
 #SBATCH --nodes=1
@@ -35,15 +35,15 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-declare -xr SPACK_PACKAGE='netcdf-c@4.8.1'
+declare -xr SPACK_PACKAGE='gromacs@2020.4'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS='~dap ~fsync ~hdf4 ~jna +mpi +parallel-netcdf +pic +shared'
-declare -xr SPACK_DEPENDENCIES="^hdf5@1.10.7/$(spack find --format '{hash:7}' hdf5@1.10.7 % ${SPACK_COMPILER} +mpi ^intel-mpi@2019.10.317) ^parallel-netcdf@1.12.2/$(spack find --format '{hash:7}' parallel-netcdf@1.12.2 % ${SPACK_COMPILER} ^intel-mpi@2019.10.317)"
+declare -xr SPACK_VARIANTS='+blas +cuda ~cycle_subcounters ~double +hwloc ~ipo +lapack ~mdrun_only +mpi ~nosuffix ~opencl +openmp +plumed ~relaxed_double_precision +shared ~sycl'
+declare -xr SPACK_DEPENDENCIES="^intel-mkl@2020.4.304/$(spack find --format '{hash:7}' intel-mkl@2020.4.304 % ${SPACK_COMPILER} ~ilp64 threads=none) ^plumed@2.6.3/$(spack find --format '{hash:7}' plumed@2.6.3 % ${SPACK_COMPILER} +mpi ^intel-mpi@2019.10.317) ^cuda@11.2.2/$(spack find --format '{hash:7}' cuda@11.2.2 % ${SPACK_COMPILER}) ^cmake@3.21.4/$(spack find --format '{hash:7}' cmake@3.21.4 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
 
-spack config get compilers  
+spack config get compilers
 spack config get config  
 spack config get mirrors
 spack config get modules
@@ -57,7 +57,7 @@ if [[ "${?}" -ne 0 ]]; then
   exit 1
 fi
 
-time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all "${SPACK_SPEC}"
+time -p spack install -v --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all "${SPACK_SPEC}"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
   exit 1
@@ -65,6 +65,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'netcdf-cxx4@4.3.1.sh'
+#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'charmpp@6.10.2.sh'
 
 sleep 60
