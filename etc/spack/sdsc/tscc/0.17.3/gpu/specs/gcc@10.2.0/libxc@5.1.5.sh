@@ -14,7 +14,7 @@
 declare -xr LOCAL_TIME="$(date +'%Y%m%dT%H%M%S%z')"
 declare -xir UNIX_TIME="$(date +'%s')"
 
-declare -xr SYSTEM_NAME='expanse'
+declare -xr SYSTEM_NAME='tscc'
 
 declare -xr SPACK_VERSION='0.17.3'
 declare -xr SPACK_INSTANCE_NAME='gpu'
@@ -48,7 +48,7 @@ module list
 
 declare -xr SPACK_PACKAGE='libxc@5.1.5'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS='+cuda cuda_arch=70,80 ~shared'
+declare -xr SPACK_VARIANTS='+cuda cuda_arch=60,80 ~shared'
 declare -xr SPACK_DEPENDENCIES="^cuda@11.2.2/$(spack find --format '{hash:7}' cuda@11.2.2 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
@@ -62,13 +62,13 @@ spack config get packages
 spack config get repos
 spack config get upstreams
 
-spack spec --long --namespaces --types libxc@5.1.5 % gcc@10.2.0 +cuda cuda_arch=70,80 ~shared "^cuda@11.2.2/$(spack find --format '{hash:7}' cuda@11.2.2 % ${SPACK_COMPILER})"
+spack spec --long --namespaces --types libxc@5.1.5 % gcc@10.2.0 +cuda cuda_arch=60,80 ~shared "^cuda@11.2.2/$(spack find --format '{hash:7}' cuda@11.2.2 % ${SPACK_COMPILER})"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack concretization failed.'
   exit 1
 fi
 
-time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all libxc@5.1.5 % gcc@10.2.0 +cuda cuda_arch=70,80 ~shared "^cuda@11.2.2/$(spack find --format '{hash:7}' cuda@11.2.2 % ${SPACK_COMPILER})"
+time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all libxc@5.1.5 % gcc@10.2.0 +cuda cuda_arch=60,80 ~shared "^cuda@11.2.2/$(spack find --format '{hash:7}' cuda@11.2.2 % ${SPACK_COMPILER})"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
   exit 1

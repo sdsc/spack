@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 
 #SBATCH --job-name=namd@2.14
-#SBATCH --account=sdsc
-#SBATCH --partition=hotel
+#SBATCH --account=use300
+##SBATCH --reservation=root_63
+#SBATCH --partition=ind-gpu-shared
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=10

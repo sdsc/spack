@@ -14,7 +14,7 @@
 declare -xr LOCAL_TIME="$(date +'%Y%m%dT%H%M%S%z')"
 declare -xir UNIX_TIME="$(date +'%s')"
 
-declare -xr SYSTEM_NAME='expanse'
+declare -xr SYSTEM_NAME='tscc'
 
 declare -xr SPACK_VERSION='0.17.3'
 declare -xr SPACK_INSTANCE_NAME='gpu'
@@ -25,7 +25,7 @@ declare -xr SLURM_JOB_MD5SUM="$(md5sum ${SLURM_JOB_SCRIPT})"
 
 declare -xr SCHEDULER_MODULE='slurm'
 declare -xr COMPILER_MODULE='gcc/10.2.0'
-declare -xr CUDA_MODULE='cuda/11.3.1'
+declare -xr CUDA_MODULE='cuda/11.2.2'
 
 echo "${UNIX_TIME} ${SLURM_JOB_ID} ${SLURM_JOB_MD5SUM} ${SLURM_JOB_DEPENDENCY}" 
 echo ""
@@ -60,7 +60,7 @@ module list
 declare -xr SPACK_PACKAGE='mvapich2@2.3.7'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
 declare -xr SPACK_VARIANTS='~alloca ch3_rank_bits=32 +cuda ~debug file_systems=lustre process_managers=slurm +regcache threads=multiple +wrapperrpath'
-declare -xr SPACK_DEPENDENCIES="^slurm@21.08.8 ^rdma-core@28.0 ^cuda@11.2.2/$(spack find --format '{hash:7}' cuda@11.2.2 % ${SPACK_COMPILER})"
+declare -xr SPACK_DEPENDENCIES="^slurm@22.05.8 ^rdma-core@28.0 ^cuda@11.2.2/$(spack find --format '{hash:7}' cuda@11.2.2 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -73,14 +73,14 @@ spack config get packages
 spack config get repos
 spack config get upstreams
 
-spack spec --long --namespaces --types mvapich2@2.3.7 % gcc@10.2.0 ~alloca ch3_rank_bits=32 +cuda ~debug file_systems=lustre process_managers=slurm +regcache threads=multiple +wrapperrpath "^slurm@21.08.8 ^rdma-core@28.0 ^cuda@11.2.2/$(spack find --format '{hash:7}' cuda@11.2.2 % ${SPACK_COMPILER})"
+spack spec --long --namespaces --types mvapich2@2.3.7 % gcc@10.2.0 ~alloca ch3_rank_bits=32 +cuda ~debug file_systems=lustre process_managers=slurm +regcache threads=multiple +wrapperrpath "^slurm@22.05.8 ^rdma-core@28.0 ^cuda@11.2.2/$(spack find --format '{hash:7}' cuda@11.2.2 % ${SPACK_COMPILER})"
 
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack concretization failed.'
   exit 1
 fi
 
-time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all mvapich2@2.3.7 % gcc@10.2.0 ~alloca ch3_rank_bits=32 +cuda ~debug file_systems=lustre process_managers=slurm +regcache threads=multiple +wrapperrpath "^slurm@21.08.8 ^rdma-core@28.0 ^cuda@11.2.2/$(spack find --format '{hash:7}' cuda@11.2.2 % ${SPACK_COMPILER})"
+time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all mvapich2@2.3.7 % gcc@10.2.0 ~alloca ch3_rank_bits=32 +cuda ~debug file_systems=lustre process_managers=slurm +regcache threads=multiple +wrapperrpath "^slurm@22.05.8 ^rdma-core@28.0 ^cuda@11.2.2/$(spack find --format '{hash:7}' cuda@11.2.2 % ${SPACK_COMPILER})"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
   exit 1
