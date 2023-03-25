@@ -14,7 +14,7 @@
 declare -xr LOCAL_TIME="$(date +'%Y%m%dT%H%M%S%z')"
 declare -xir UNIX_TIME="$(date +'%s')"
 
-declare -xr SYSTEM_NAME='expanse'
+declare -xr SYSTEM_NAME='tscc'
 
 declare -xr SPACK_VERSION='0.17.3'
 declare -xr SPACK_INSTANCE_NAME='gpu'
@@ -40,9 +40,9 @@ module load "${SCHEDULER_MODULE}"
 module list
 
 declare -xr SPACK_PACKAGE='gcc@10.2.0'
-declare -xr SPACK_COMPILER='gcc@8.5.0'
+declare -xr SPACK_COMPILER='gcc@11.2.0'
 declare -xr SPACK_VARIANTS='~binutils ~bootstrap ~graphite ~nvptx ~piclibs ~strip'
-declare -xr SPACK_DEPENDENCIES='' #"^cuda@10.2.89/$(spack find --format '{hash:7}' cuda@10.2.89 % gcc@8.5.0)"
+declare -xr SPACK_DEPENDENCIES='' #"^cuda@10.2.89/$(spack find --format '{hash:7}' cuda@10.2.89 % gcc@11.2.0)"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -56,6 +56,7 @@ spack config get repos
 spack config get upstreams
 
 spack spec --long --namespaces --types "${SPACK_SPEC}"
+
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack concretization failed.'
   exit 1
