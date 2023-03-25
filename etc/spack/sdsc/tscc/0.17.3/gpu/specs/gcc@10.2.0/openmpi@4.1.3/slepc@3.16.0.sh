@@ -14,7 +14,7 @@
 declare -xr LOCAL_TIME="$(date +'%Y%m%dT%H%M%S%z')"
 declare -xir UNIX_TIME="$(date +'%s')"
 
-declare -xr SYSTEM_NAME='expanse'
+declare -xr SYSTEM_NAME='tscc'
 
 declare -xr SPACK_VERSION='0.17.3'
 declare -xr SPACK_INSTANCE_NAME='gpu'
@@ -38,7 +38,7 @@ module list
 # Error: Package slepc does not depend on arpack-ng
 declare -xr SPACK_PACKAGE='slepc@3.16.0'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS='~arpack ~blopex +cuda cuda_arch=70,80 ~rocm'
+declare -xr SPACK_VARIANTS='~arpack ~blopex +cuda cuda_arch=60 ~rocm'
 declare -xr SPACK_DEPENDENCIES="^petsc@3.16.1/$(spack find --format '{hash:7}' petsc@3.16.1 % ${SPACK_COMPILER} ~complex +mpi ^openmpi@4.1.3) ^python@3.8.12/$(spack find --format '{hash:7}' python@3.8.12 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
@@ -52,13 +52,13 @@ spack config get packages
 spack config get repos
 spack config get upstreams
 
-spack spec --long --namespaces --types slepc@3.16.0 % gcc@10.2.0 ~arpack ~blopex +cuda cuda_arch=70,80 ~rocm "^petsc@3.16.1/$(spack find --format '{hash:7}' petsc@3.16.1 % ${SPACK_COMPILER} ~complex +mpi ^openmpi@4.1.3) ^python@3.8.12/$(spack find --format '{hash:7}' python@3.8.12 % ${SPACK_COMPILER})"
+spack spec --long --namespaces --types slepc@3.16.0 % gcc@10.2.0 ~arpack ~blopex +cuda cuda_arch=60 ~rocm "^petsc@3.16.1/$(spack find --format '{hash:7}' petsc@3.16.1 % ${SPACK_COMPILER} ~complex +mpi ^openmpi@4.1.3) ^python@3.8.12/$(spack find --format '{hash:7}' python@3.8.12 % ${SPACK_COMPILER})"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack concretization failed.'
   exit 1
 fi
 
-time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all slepc@3.16.0 % gcc@10.2.0 ~arpack ~blopex +cuda cuda_arch=70,80 ~rocm "^petsc@3.16.1/$(spack find --format '{hash:7}' petsc@3.16.1 % ${SPACK_COMPILER} ~complex +mpi ^openmpi@4.1.3) ^python@3.8.12/$(spack find --format '{hash:7}' python@3.8.12 % ${SPACK_COMPILER})"
+time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all slepc@3.16.0 % gcc@10.2.0 ~arpack ~blopex +cuda cuda_arch=60 ~rocm "^petsc@3.16.1/$(spack find --format '{hash:7}' petsc@3.16.1 % ${SPACK_COMPILER} ~complex +mpi ^openmpi@4.1.3) ^python@3.8.12/$(spack find --format '{hash:7}' python@3.8.12 % ${SPACK_COMPILER})"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
   exit 1
