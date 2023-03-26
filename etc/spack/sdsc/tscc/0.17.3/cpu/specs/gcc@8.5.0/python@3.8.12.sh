@@ -35,7 +35,7 @@ module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
 declare -xr SPACK_PACKAGE='python@3.8.12'
-declare -xr SPACK_COMPILER='gcc@8.5.0'
+declare -xr SPACK_COMPILER='gcc@11.2.0'
 # set ~libxml2 due to https://github.com/spack/spack/issues/13637
 declare -xr SPACK_VARIANTS='+bz2 +ctypes +dbm ~debug +libxml2 +lzma ~nis +optimizations +pic +pyexpat +pythoncmd +readline +shared +sqlite3 +ssl ~tix ~tkinter ~ucs4 +uuid +zlib'
 declare -xr SPACK_DEPENDENCIES="^sqlite@3.36.0/$(spack find --format '{hash:7}' sqlite@3.36.0 % ${SPACK_COMPILER} ~functions ~rtree)"

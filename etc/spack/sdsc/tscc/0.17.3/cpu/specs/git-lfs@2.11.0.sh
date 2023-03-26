@@ -35,7 +35,7 @@ module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
 declare -xr SPACK_PACKAGE='git-lfs@2.11.0'
-declare -xr SPACK_COMPILER='gcc@8.5.0'
+declare -xr SPACK_COMPILER='gcc@11.2.0'
 declare -xr SPACK_VARIANTS=''
 declare -xr SPACK_DEPENDENCIES=''
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"

@@ -39,7 +39,7 @@ module list
 # https://developer.amd.com/spack/hpc-applications-openmpi/
 
 declare -xr SPACK_PACKAGE='ucx@1.10.1'
-declare -xr SPACK_COMPILER='gcc@8.5.0'
+declare -xr SPACK_COMPILER='gcc@11.2.0'
 declare -xr SPACK_VARIANTS='~assertions ~cm +cma ~cuda +dc ~debug +dm ~gdrcopy +ib-hw-tm ~java ~knem ~logging +mlx5-dv +optimizations ~parameter_checking +pic +rc ~rocm +thread_multiple +ud ~xpmem'
 declare -xr SPACK_DEPENDENCIES=''
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"

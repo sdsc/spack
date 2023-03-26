@@ -36,7 +36,7 @@ module list
 
 declare -xr INTEL_LICENSE_FILE='40000@elprado.sdsc.edu:40200@elprado.sdsc.edu'
 declare -xr SPACK_PACKAGE='intel@19.1.1.217'
-declare -xr SPACK_COMPILER='gcc@8.5.0'
+declare -xr SPACK_COMPILER='gcc@11.2.0'
 declare -xr SPACK_VARIANTS='+rpath'
 declare -xr SPACK_DEPENDENCIES=''
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
