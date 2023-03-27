@@ -113,6 +113,7 @@ class Tau(Package):
     depends_on('rocprofiler-dev', when='+rocprofiler')
     depends_on('roctracer-dev', when='+roctracer')
     depends_on('hsa-rocr-dev', when='+rocm')
+    depends_on('boost', when='+cuda')
 
     # Elf only required from 2.28.1 on
     conflicts('+elf', when='@:2.28.0')
@@ -169,6 +170,9 @@ class Tau(Package):
 
     def install(self, spec, prefix):
         # TAU isn't happy with directories that have '@' in the path.  Sigh.
+        if '+cuda' in spec:
+            with working_dir(join_path('src','Profile')):
+                filter_file('BOOST_LIB       = -lboost_python','BOOST_LIB       = -L%s -lboost_python38' % spec['boost'].prefix.lib,'Makefile.skel')
         change_sed_delimiter('@', ';', 'configure')
         change_sed_delimiter('@', ';', 'utils/FixMakefile')
         change_sed_delimiter('@', ';', 'utils/FixMakefile.sed.default')
