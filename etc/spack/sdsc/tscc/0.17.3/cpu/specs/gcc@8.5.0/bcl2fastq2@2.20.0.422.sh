@@ -36,7 +36,7 @@ module list
 
 
 declare -xr SPACK_PACKAGE='bcl2fastq@2.20.0.422'
-declare -xr SPACK_COMPILER='gcc@8.5.0'
+declare -xr SPACK_COMPILER='gcc@11.2.0'
 declare -xr SPACK_VARIANTS=''
 declare -xr SPACK_DEPENDENCIES="^boost@1.54.0/$(spack find --format '{hash:7}' boost@1.54.0 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
