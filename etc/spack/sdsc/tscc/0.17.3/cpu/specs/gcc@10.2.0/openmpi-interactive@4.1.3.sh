@@ -23,7 +23,7 @@ module list
 declare -xr SPACK_PACKAGE='openmpi@4.1.3'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
 declare -xr SPACK_VARIANTS='~atomics~cuda~cxx~cxx_exceptions~gpfs~internal-hwloc~java+legacylaunchers+lustre~memchecker+pmi+pmix+romio~rsh~singularity+static+vt+wrapper-rpath cuda_arch=none fabrics=ucx schedulers=slurm'
-declare -xr SPACK_DEPENDENCIES="^lustre@2.15.1 ^slurm@21.08.8 ^rdma-core@28.0 ^ucx@1.10.1/$(spack find --format '{hash:7}' ucx@1.10.1 % gcc@8.5.0)"
+declare -xr SPACK_DEPENDENCIES="^lustre@2.15.1 ^slurm@21.08.8 ^rdma-core@28.0 ^ucx@1.10.1/$(spack find --format '{hash:7}' ucx@1.10.1 % gcc@11.2.0)"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -36,13 +36,13 @@ spack config get packages
 spack config get repos
 spack config get upstreams
 
-spack spec --long --namespaces --types openmpi@4.1.3 % gcc@10.2.0 ~atomics~cuda~cxx~cxx_exceptions~gpfs~internal-hwloc~java+legacylaunchers+lustre~memchecker+pmi+pmix+romio~rsh~singularity+static+vt+wrapper-rpath cuda_arch=none fabrics=ucx schedulers=slurm ^lustre@2.15.1 ^slurm@21.08.8 ^rdma-core@28.0 "^ucx@1.10.1/$(spack find --format '{hash:7}' ucx@1.10.1 % gcc@8.5.0)"
+spack spec --long --namespaces --types openmpi@4.1.3 % gcc@10.2.0 ~atomics~cuda~cxx~cxx_exceptions~gpfs~internal-hwloc~java+legacylaunchers+lustre~memchecker+pmi+pmix+romio~rsh~singularity+static+vt+wrapper-rpath cuda_arch=none fabrics=ucx schedulers=slurm ^lustre@2.15.1 ^slurm@21.08.8 ^rdma-core@28.0 "^ucx@1.10.1/$(spack find --format '{hash:7}' ucx@1.10.1 % gcc@11.2.0)"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack concretization failed.'
   exit 1
 fi
 
-time -p spack install --jobs 8 --fail-fast --yes-to-all openmpi@4.1.3 % gcc@10.2.0 ~atomics~cuda~cxx~cxx_exceptions~gpfs~internal-hwloc~java+legacylaunchers+lustre~memchecker+pmi+pmix+romio~rsh~singularity+static+vt+wrapper-rpath cuda_arch=none fabrics=ucx schedulers=slurm ^lustre@2.15.1 ^slurm@21.08.8 ^rdma-core@28.0 "^ucx@1.10.1/$(spack find --format '{hash:7}' ucx@1.10.1 % gcc@8.5.0)"
+time -p spack install --jobs 8 --fail-fast --yes-to-all openmpi@4.1.3 % gcc@10.2.0 ~atomics~cuda~cxx~cxx_exceptions~gpfs~internal-hwloc~java+legacylaunchers+lustre~memchecker+pmi+pmix+romio~rsh~singularity+static+vt+wrapper-rpath cuda_arch=none fabrics=ucx schedulers=slurm ^lustre@2.15.1 ^slurm@21.08.8 ^rdma-core@28.0 "^ucx@1.10.1/$(spack find --format '{hash:7}' ucx@1.10.1 % gcc@11.2.0)"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
   exit 1
