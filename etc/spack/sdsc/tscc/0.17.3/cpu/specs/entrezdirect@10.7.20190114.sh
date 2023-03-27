@@ -13,11 +13,11 @@
 declare -xr LOCAL_TIME="$(date +'%Y%m%dT%H%M%S%z')"
 declare -xir UNIX_TIME="$(date +'%s')"
 
-declare -xr SYSTEM_NAME='expanse'
+declare -xr SYSTEM_NAME='tscc'
 
 declare -xr SPACK_VERSION='0.17.3'
 declare -xr SPACK_INSTANCE_NAME='cpu'
-declare -xr SPACK_INSTANCE_DIR="$(HOME)/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}"
+declare -xr SPACK_INSTANCE_DIR="${HOME}/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}"
 
 declare -xr SLURM_JOB_SCRIPT="$(scontrol show job ${SLURM_JOB_ID} | awk -F= '/Command=/{print $2}')"
 declare -xr SLURM_JOB_MD5SUM="$(md5sum ${SLURM_JOB_SCRIPT})"
@@ -37,7 +37,7 @@ module list
 declare -xr SPACK_PACKAGE='entrezdirect@10.7.20190114'
 declare -xr SPACK_COMPILER='gcc@11.2.0'
 declare -xr SPACK_VARIANTS=''
-declare -xr SPACK_DEPENDENCIES=''
+declare -xr SPACK_DEPENDENCIES="^perl@5.32.0/$(spack find --format '{hash:7}' perl@5.32.0 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
