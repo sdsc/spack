@@ -14,7 +14,7 @@
 declare -xr LOCAL_TIME="$(date +'%Y%m%dT%H%M%S%z')"
 declare -xir UNIX_TIME="$(date +'%s')"
 
-declare -xr SYSTEM_NAME='expanse'
+declare -xr SYSTEM_NAME='tscc'
 
 declare -xr SPACK_VERSION='0.17.3'
 declare -xr SPACK_INSTANCE_NAME='gpu'
@@ -79,9 +79,9 @@ module list
 
 declare -xr PGROUPD_LICENSE_FILE='40000@elprado.sdsc.edu:40200@elprado.sdsc.edu'
 declare -xr LM_LICENSE_FILE='40000@elprado.sdsc.edu:40200@elprado.sdsc.edu'
-declare -xr SPACK_PACKAGE='gaussian@16-C.01' # 16-C.02 supports cuda_arch=80
+declare -xr SPACK_PACKAGE='gaussian@16-C.01' # 16-C.02 supports cuda_arch=60
 declare -xr SPACK_COMPILER='pgi@18.10'
-declare -xr SPACK_VARIANTS='~binary +cuda cuda_arch=70'
+declare -xr SPACK_VARIANTS='~binary +cuda cuda_arch=60'
 declare -xr SPACK_DEPENDENCIES="^cuda@10.0.130/$(spack find --format '{hash:7}' cuda@10.0.130 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
@@ -95,13 +95,13 @@ spack config get packages
 spack config get repos
 spack config get upstreams
 
-spack spec --long --namespaces --types gaussian@16-C.01 % pgi@18.10 ~binary +cuda cuda_arch=70 "${SPACK_DEPENDENCIES}"
+spack spec --long --namespaces --types gaussian@16-C.01 % pgi@18.10 ~binary +cuda cuda_arch=60 "${SPACK_DEPENDENCIES}"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack concretization failed.'
   exit 1
 fi
 
-time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all gaussian@16-C.01 % pgi@18.10 ~binary +cuda cuda_arch=70 "${SPACK_DEPENDENCIES}"
+time -p spack install --keep-prefix -v --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all gaussian@16-C.01 % pgi@18.10 ~binary +cuda cuda_arch=60 "${SPACK_DEPENDENCIES}"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
   exit 1
