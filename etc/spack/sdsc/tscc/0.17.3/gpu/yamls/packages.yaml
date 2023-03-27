@@ -30,9 +30,9 @@ packages:
     buildable: false
   rdma-core:
     externals:
-      - spec: 'rdma-core@28.0 % gcc@10.2.0 arch=linux-rocky9-broadwell'
+      - spec: 'rdma-core@41.0 % gcc@10.2.0 arch=linux-rocky9-broadwell'
         prefix: /usr
-      - spec: 'rdma-core@28.0 % intel@19.1.1.217 arch=linux-rocky9-broadwell'
+      - spec: 'rdma-core@41.0 % intel@19.1.1.217 arch=linux-rocky9-broadwell'
         prefix: /usr
         prefix: /usr
     buildable: false
