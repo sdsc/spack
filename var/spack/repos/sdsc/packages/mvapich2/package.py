@@ -330,6 +330,8 @@ class Mvapich2(AutotoolsPackage):
         # mvapich2 configure fails when F90 and F90FLAGS are set
         env.unset('F90')
         env.unset('F90FLAGS')
+        if '+cuda' in self.spec:
+             env.set('LDFLAGS','-L'+ join_path(self.spec['cuda'].prefix.targets,'x86_64-linux','lib','stubs'))
 
     def setup_run_environment(self, env):
         if 'process_managers=slurm' in self.spec:
