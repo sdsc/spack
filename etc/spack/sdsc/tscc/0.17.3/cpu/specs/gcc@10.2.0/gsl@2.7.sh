@@ -13,11 +13,11 @@
 declare -xr LOCAL_TIME="$(date +'%Y%m%dT%H%M%S%z')"
 declare -xir UNIX_TIME="$(date +'%s')"
 
-declare -xr SYSTEM_NAME='expanse'
+declare -xr SYSTEM_NAME='tscc'
 
 declare -xr SPACK_VERSION='0.17.3'
 declare -xr SPACK_INSTANCE_NAME='cpu'
-declare -xr SPACK_INSTANCE_DIR="$(HOME)/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}"
+declare -xr SPACK_INSTANCE_DIR="${HOME}/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}"
 
 declare -xr SLURM_JOB_SCRIPT="$(scontrol show job ${SLURM_JOB_ID} | awk -F= '/Command=/{print $2}')"
 declare -xr SLURM_JOB_MD5SUM="$(md5sum ${SLURM_JOB_SCRIPT})"
@@ -56,7 +56,7 @@ if [[ "${?}" -ne 0 ]]; then
   exit 1
 fi
 
-time -p spack install -test=root --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all "${SPACK_SPEC}"
+time -p spack install -v --test=root --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all "${SPACK_SPEC}"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
   exit 1

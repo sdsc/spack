@@ -4,11 +4,11 @@
 declare -xr LOCAL_TIME="$(date +'%Y%m%dT%H%M%S%z')"
 declare -xir UNIX_TIME="$(date +'%s')"
 
-declare -xr SYSTEM_NAME='expanse'
+declare -xr SYSTEM_NAME='tscc'
 
 declare -xr SPACK_VERSION='0.17.3'
 declare -xr SPACK_INSTANCE_NAME='cpu'
-declare -xr SPACK_INSTANCE_DIR="$(HOME)/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}"
+declare -xr SPACK_INSTANCE_DIR="${HOME}/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}"
 
 
 
