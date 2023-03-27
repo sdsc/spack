@@ -15,6 +15,7 @@ class Gaussian(Package,CudaPackage):
 
     manual_download = True
 
+    version('16-C.02b', sha256='df1e4e9c5429637e13c88659ae3ccb1c9cfdc344045ff26c3ab86a1077bf93c8')
     version('16-C.02', sha256='590e4e27521dd6a11bb80a3f30c5beba0f143bfdd9ddb4016580d9d2e2041d0a',preferred=True)
     version('16-C.01', sha256='a75c81aceee257d62ac0e21e9c7797f776b0e31aab3fb7e9e15257cacd1e30a9')
     variant('cuda',default=False,description='compile for gpus')
@@ -55,9 +56,9 @@ class Gaussian(Package,CudaPackage):
     def setup_run_environment(self, env):
         env.set('g16root', self.prefix)
         env.set('GAUSSIANHOME', self.prefix)
-        env.set('GAUSS_EXEDIR', join_path(self.prefix,'g16'))
+        env.set('GAUSS_EXEDIR', join_path(self.prefix.g16))
         env.prepend_path('PATH', join_path(self.prefix,'g16'))
-        env.set('G16_BASIS', join_path(self.prefix,'g16','basis'))
+        env.set('G16_BASIS', join_path(self.prefix.g16,'basis'))
 
     def setup_build_environment(self, env):
         env.set('PGROUPD_LICENSE_FILE','40000@elprado.sdsc.edu:40200@elprado.sdsc.edu')
@@ -67,9 +68,10 @@ class Gaussian(Package,CudaPackage):
         env.prepend_path('LD_LIBRARY_PATH','/usr/lib64')
         env.set('g16root', self.prefix)
         env.set('GAUSSIANHOME', self.prefix)
-        env.set('GAUSS_EXEDIR', join_path(self.prefix,'g16'))
-        env.prepend_path('PATH', join_path(self.prefix,'g16'))
-        env.set('G16_BASIS', join_path(self.prefix,'g16','basis'))
+        env.set('GAUSS_EXEDIR', self.prefix.g16)
+        env.prepend_path('PATH', self.prefix.g16)
+        env.prepend_path('PATH', join_path(self.prefix.g16,'bsd'))
+        env.set('G16_BASIS', join_path(self.prefix.g16,'basis'))
 
     @run_after('install')
     def exe_permissions(self):
