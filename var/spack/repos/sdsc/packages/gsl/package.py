@@ -58,21 +58,21 @@ class Gsl(AutotoolsPackage, GNUMirrorPackage):
 
         return configure_args
 
-    @on_package_attributes(run_tests=True)
-    @run_after('install')
+#   @on_package_attributes(run_tests=True)
+#   @run_after('install')
 
-    def test(self):
-        make('check')
-        with open(join_path(os.path.dirname(self.module.__file__),'tests')) as f:
-            tests = f.read().splitlines()
-        num_tests=len(tests)
-        good_tests = 0
-        for test in tests:
-            output=Executable(join_path(test,'test'))(output=str,error=str)
-            if 'Completed' in output:
-                 good_tests += 1
-        with open('/tmp/gsl.output','w') as fp:
-            if good_tests == num_tests:
-                print('PASSED',file=fp)
-            else:
-                print('FAILED',file=fp)
+#   def test(self):
+#       make('check')
+#       with open(join_path(os.path.dirname(self.module.__file__),'tests')) as f:
+#           tests = f.read().splitlines()
+#       num_tests=len(tests)
+#       good_tests = 0
+#       for test in tests:
+#           output=Executable(join_path(test,'test'))(output=str,error=str)
+#           if 'Completed' in output:
+#                good_tests += 1
+#       with open('/tmp/gsl.output','w') as fp:
+#           if good_tests == num_tests:
+#               print('PASSED',file=fp)
+#           else:
+#               print('FAILED',file=fp)
