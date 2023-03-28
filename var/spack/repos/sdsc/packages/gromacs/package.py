@@ -6,7 +6,7 @@
 import os
 
 
-class Gromacs(CMakePackage):
+class Gromacs(CMakePackage,CudaPackage):
     """GROMACS (GROningen MAchine for Chemical Simulations) is a molecular
     dynamics package primarily designed for simulations of proteins, lipids
     and nucleic acids. It was originally developed in the Biophysical
@@ -220,10 +220,15 @@ class Gromacs(CMakePackage):
                 filter_file(r'-gencode;arch=compute_20,code=sm_21;?', '',
                             'cmake/gmxManageNvccConfig.cmake')
 
+    def setup_build_environment(self, env):
+        if '+cuda' in self.spec and self.compiler.name == 'intel':
+            env.set('NVCC_PREPEND_FLAGS','-Xcompiler "-gcc-name=/home/jpg/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-8.5.0-mf5bqu2cwyzoxa5c7btqbbdxng3whbmf/bin/gcc"')
     def cmake_args(self):
 
         options = []
 
+        if self.compiler.name == 'intel':
+            options.append('-DCMAKE_CXX_FLAGS=-gcc-name=/home/jpg/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-8.5.0-mf5bqu2cwyzoxa5c7btqbbdxng3whbmf/bin/gcc')
         if '+mpi' in self.spec:
             options.append('-DGMX_MPI:BOOL=ON')
             if self.version < Version('2020'):
