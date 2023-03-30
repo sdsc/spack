@@ -265,6 +265,10 @@ class Ncl(Package):
                                      'lib', 'hlu')
             copy(join_path(triangle_src, 'triangle.h'), triangle_dst)
             copy(join_path(triangle_src, 'triangle.c'), triangle_dst)
+    def setup_build_environment(self, env):
+        env.set('PGROUPD_LICENSE_FILE','40000@elprado.sdsc.edu:40200@elprado.sdsc.edu')
+
+
 
     @staticmethod
     def delete_files(*filenames):
