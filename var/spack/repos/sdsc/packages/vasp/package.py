@@ -20,11 +20,7 @@ class Vasp(MakefilePackage):
     url      = "file://{0}/vasp.5.4.4.pl2.tgz".format(os.getcwd())
     manual_download = True
 
-    version('6.2.1', sha256='d25e2f477d83cb20fce6a2a56dcee5dccf86d045dd7f76d3ae19af8343156a13')
-    version('6.2.0', sha256='49e7ba351bd634bc5f5f67a8ef1e38e64e772857a1c02f602828898a84197e25')
-    version('6.1.1', sha256='e37a4dfad09d3ad0410833bcd55af6b599179a085299026992c2d8e319bf6927')
-    version('5.4.4.pl2', sha256='98f75fd75399a23d76d060a6155f4416b340a1704f256a00146f89024035bc8e')
-    version('5.4.4', sha256='5bd2449462386f01e575f9adf629c08cb03a13142806ffb6a71309ca4431cfb3')
+    version('6.4.0', sha256='34399c61694babbc23b5b8823d5d3634d7cd5ad0a622af4c108e2843ed344af8')
 
     resource(name='vaspsol',
              git='https://github.com/henniggroup/VASPsol.git',
@@ -109,14 +105,18 @@ class Vasp(MakefilePackage):
         else:
             if '+openmp' in spec:
                 make_include = join_path('arch',
-                                         'makefile.include.linux_{0}_omp'.
+                                         'makefile.include.{0}_omp'.
                                          format(spec.compiler.name))
             else:
                 make_include = join_path('arch',
-                                         'makefile.include.linux_' +
-                                         spec.compiler.name)
-
+                                         'makefile.include.' + spec.compiler.name)
+         
+            
         os.rename(make_include, 'makefile.include')
+
+        if '%intel' in spec:
+            filter_file('qmkl','mkl','makefile.include')
+            filter_file('OBJECTS_LIB = linpack_double.o','OBJECTS_LIB = linpack_double.o getshmem.o','makefile.include')
 
         # This bunch of 'filter_file()' is to make these options settable
         # as environment variables
