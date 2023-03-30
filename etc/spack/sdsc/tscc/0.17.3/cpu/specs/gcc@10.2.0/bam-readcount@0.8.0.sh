@@ -2,11 +2,10 @@
 
 #SBATCH --job-name=bam-readcount@0.8.0
 #SBATCH --account=sdsc
-#SBATCH --partition=hotel
+#SBATCH --partition=def1
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=16
-#SBATCH --mem=32G
+#SBATCH --cpus-per-task=8
 #SBATCH --time=01:00:00
 #SBATCH --output=%x.o%j.%N
 

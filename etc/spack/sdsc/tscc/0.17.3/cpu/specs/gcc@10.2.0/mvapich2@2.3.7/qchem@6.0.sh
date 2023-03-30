@@ -2,17 +2,17 @@
 
 #SBATCH --job-name=qchem@6.2.1
 #SBATCH --account=sdsc
-#SBATCH --partition=hotel
+#SBATCH --partition=defq
 #SBATCH --nodes=1
-#SBATCH --ntasks-per-node=4
-#SBATCH --mem=32G
+#SBATCH --ntasks-per-node=1
+#SBATCH --cpus-per-task=8
 #SBATCH --time=00:30:00
 #SBATCH --output=%x.o%j.%N
 
 declare -xr LOCAL_TIME="$(date +'%Y%m%dT%H%M%S%z')"
 declare -xir UNIX_TIME="$(date +'%s')"
 
-declare -xr SYSTEM_NAME='tscc'
+declare -xr SYSTEM_NAME='expanse'
 
 declare -xr SPACK_VERSION='0.17.3'
 declare -xr SPACK_INSTANCE_NAME='cpu'
@@ -55,14 +55,10 @@ if [[ "${?}" -ne 0 ]]; then
   exit 1
 fi
 
-time -p spack install -v --test=root --jobs "${SLURM_TASKS_PER_NODE}" --fail-fast --yes-to-all "${SPACK_SPEC}"
+time -p spack install -v --test=root --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all "${SPACK_SPEC}"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
   exit 1
 fi
 
 spack module lmod refresh --delete-tree -y
-
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'lammps@20210310.sh'
-
-sleep  60
