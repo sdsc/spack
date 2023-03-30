@@ -3,11 +3,10 @@
 
 #SBATCH --job-name=py-dask@2021.6.2
 #SBATCH --account=sdsc
-#SBATCH --partition=hotel
+#SBATCH --partition=defq
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=16
-#SBATCH --mem=32G
+#SBATCH --cpus-per-task=8
 #SBATCH --time=00:30:00
 #SBATCH --output=%x.o%j.%N
 

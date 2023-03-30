@@ -2,11 +2,10 @@
 
 #SBATCH --job-name=bamtools@2.5.1
 #SBATCH --account=sdsc
-#SBATCH --partition=hotel
+#SBATCH --partition=defq
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=16
-#SBATCH --mem=32G
+#SBATCH --cpus-per-task=8
 #SBATCH --time=48:00:00
 #SBATCH --output=%x.o%j.%N
 
@@ -72,6 +71,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'samtools@1.13.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" ''
 
 #sleep 60

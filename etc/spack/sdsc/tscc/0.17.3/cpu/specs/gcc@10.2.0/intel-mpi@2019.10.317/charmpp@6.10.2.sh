@@ -2,11 +2,10 @@
 
 #SBATCH --job-name=charmpp@6.10.2
 #SBATCH --account=sdsc
-#SBATCH --partition=hotel
+#SBATCH --partition=defq
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=16
-#SBATCH --mem=32G
+#SBATCH --cpus-per-task=8
 #SBATCH --time=01:00:00
 #SBATCH --output=%x.o%j.%N
 
@@ -37,7 +36,7 @@ module list
 declare -xr SPACK_PACKAGE='charmpp@6.10.2'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
 declare -xr SPACK_VARIANTS='backend=mpi build-target=charm++ ~cuda +omp ~papi pmi=none +production ~pthreads +shared +smp ~syncft ~tcp ~tracing'
-declare -xr SPACK_DEPENDENCIES="^intel-mpi@2019.10.317/$(spack find --format '{hash:7}' intel-mpi@2019.10.317 % ${SPACK_COMPILER})"
+declare -xr SPACK_DEPENDENCIES="^intel-mpi@2019.10.317/$(spack find --format '{hash:7}' intel-mpi@2019.10.317 % ${SPACK_COMPILER}) ^python@3.8.12/$(spack find --format '{hash:7}' python@3.8.12 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
