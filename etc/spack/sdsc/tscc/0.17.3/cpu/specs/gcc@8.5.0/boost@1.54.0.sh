@@ -65,4 +65,4 @@ spack module lmod refresh --delete-tree -y
 
 sbatch --dependency="afterok:${SLURM_JOB_ID}" 'bcl2fastq2@20.0.422'
 
-sleep 60
+sleep 20

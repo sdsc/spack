@@ -36,7 +36,7 @@ module list
 declare -xr SPACK_PACKAGE='hdf5@1.10.7'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
 declare -xr SPACK_VARIANTS='+cxx +fortran +hl ~ipo ~java ~mpi +shared +szip ~threadsafe +tools'
-declare -xr SPACK_DEPENDENCIES=''
+declare -xr SPACK_DEPENDENCIES="^ncurses@6.2/$(spack find --format '{hash:7}' ncurses@6.2 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -65,4 +65,4 @@ spack module lmod refresh --delete-tree -y
 
 sbatch --dependency="afterok:${SLURM_JOB_ID}" 'metis@5.1.0.sh'
 
-sleep 60
+sleep 20

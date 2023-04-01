@@ -65,4 +65,4 @@ spack module lmod refresh --delete-tree -y
 
 sbatch --dependency="afterok:${SLURM_JOB_ID}" 'openblas@0.3.17-omp.sh'
 
-sleep 60
+sleep 20

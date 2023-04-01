@@ -64,6 +64,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'ocaml@4.13.1'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'ocaml@4.13.1.sh'
 
-sleep 60
+sleep 20

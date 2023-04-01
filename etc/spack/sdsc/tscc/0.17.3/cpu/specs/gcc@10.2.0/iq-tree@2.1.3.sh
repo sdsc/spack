@@ -63,6 +63,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'trinity@2.15.1.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'hisat2@2.2.0''
 
-sleep 60
+sleep 20

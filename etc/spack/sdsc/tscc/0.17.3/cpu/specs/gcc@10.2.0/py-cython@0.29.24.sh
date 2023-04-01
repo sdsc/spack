@@ -6,7 +6,6 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=8
-#SBATCH --mem=16G
 #SBATCH --time=01:00:00
 #SBATCH --output=%x.o%j.%N
 
@@ -66,4 +65,4 @@ spack module lmod refresh --delete-tree -y
 
 sbatch --dependency="afterok:${SLURM_JOB_ID}" 'gdb@11.1.sh'
 
-sleep 60
+sleep 20

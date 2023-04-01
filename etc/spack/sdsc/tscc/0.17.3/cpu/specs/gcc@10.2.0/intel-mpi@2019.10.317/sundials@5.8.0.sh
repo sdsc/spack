@@ -35,7 +35,7 @@ module list
 
 declare -xr SPACK_PACKAGE='sundials@5.8.0'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare-xrSPACK_VARIANTS="precision=double~int64+mpi~openmp~pthread~raja~sycl~hypre~lapack~klu~petsc~superlu-mt~superlu-dist~trilinos+shared+static~fcmix~f2003+examples+examples-install+generic-math~monitoring"
+declare-xr SPACK_VARIANTS="precision=double~int64+mpi~openmp~pthread~raja~sycl~hypre~lapack~klu~petsc~superlu-mt~superlu-dist~trilinos+shared+static~fcmix~f2003+examples+examples-install+generic-math~monitoring"
 declare -xr SPACK_DEPENDENCIES="^intel-mpi@2019.10.317"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
@@ -65,4 +65,4 @@ spack module lmod refresh --delete-tree -y
 
 sbatch --dependency="afterok:${SLURM_JOB_ID}" ''
 
-sleep 60
+sleep 20

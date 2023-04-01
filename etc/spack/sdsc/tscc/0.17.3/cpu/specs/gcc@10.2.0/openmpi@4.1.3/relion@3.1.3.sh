@@ -64,6 +64,6 @@ fi
 spack module lmod refresh --delete-tree -y
 
 #sbatch --dependency="afterok:${SLURM_JOB_ID}" 'plumed@2.6.3.sh'
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'paraview@5.9.1.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'sundials@5.8.0.sh'
 
-sleep 60
+sleep 20

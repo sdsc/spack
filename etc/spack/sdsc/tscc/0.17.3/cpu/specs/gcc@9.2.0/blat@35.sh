@@ -63,4 +63,4 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-#sleep 60
+#sleep 20

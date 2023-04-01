@@ -65,4 +65,4 @@ spack module lmod refresh --delete-tree -y
 
 sbatch --dependency="afterok:${SLURM_JOB_ID}" 'raxml@8.2.12.sh'
 
-sleep 60
+sleep 20

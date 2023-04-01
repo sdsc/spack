@@ -262,4 +262,4 @@ spack module lmod refresh --delete-tree -y
 
 sbatch --dependency="afterok:${SLURM_JOB_ID}" 'slepc@3.16.0.sh'
 
-sleep 60
+sleep 20

@@ -65,4 +65,4 @@ spack module lmod refresh --delete-tree -y
 
 sbatch --dependency="afterok:${SLURM_JOB_ID}" 'gromacs@2020.4.sh'
 
-sleep 60
+sleep 20

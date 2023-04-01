@@ -89,4 +89,4 @@ spack module lmod refresh --delete-tree -y
 
 sbatch --dependency="afterok:${SLURM_JOB_ID}" 'openfoam@2106.sh'
 
-sleep 60
+sleep 20

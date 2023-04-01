@@ -64,6 +64,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'py-bx-python@0.8.8'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'py-bx-python@0.8.8.sh'
 
-#sleep 60
+#sleep 20

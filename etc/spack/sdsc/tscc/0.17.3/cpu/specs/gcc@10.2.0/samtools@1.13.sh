@@ -73,4 +73,4 @@ spack module lmod refresh --delete-tree -y
 
 sbatch --dependency="afterok:${SLURM_JOB_ID}" 'bedtools2@2.30.0.sh'
 
-sleep 60
+sleep 20
