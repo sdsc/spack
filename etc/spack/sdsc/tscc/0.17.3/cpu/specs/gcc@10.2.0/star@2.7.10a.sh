@@ -65,4 +65,4 @@ spack module lmod refresh --delete-tree -y
 
 sbatch --dependency="afterok:${SLURM_JOB_ID}" 'stringtie@1.3.4d.sh'
 
-sleep 60
+sleep 20

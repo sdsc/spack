@@ -64,6 +64,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'stata@16.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'tmux@3.2a'
 
-sleep 60
+sleep 20

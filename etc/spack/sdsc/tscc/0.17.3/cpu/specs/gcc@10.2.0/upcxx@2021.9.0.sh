@@ -66,4 +66,4 @@ spack module lmod refresh --delete-tree -y
 
 sbatch --dependency="afterok:${SLURM_JOB_ID}" 'vcftools@0.1.14.sh'
 
-sleep 60
+sleep 20

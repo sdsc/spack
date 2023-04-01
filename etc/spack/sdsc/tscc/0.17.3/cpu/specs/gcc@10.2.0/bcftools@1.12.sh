@@ -73,4 +73,4 @@ spack module lmod refresh --delete-tree -y
 
 sbatch --dependency="afterok:${SLURM_JOB_ID}" 'samtools@1.13.sh'
 
-sleep 60
+sleep 20

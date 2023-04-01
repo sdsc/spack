@@ -63,6 +63,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'gdal@3.3.3.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'proj@8.1.0'
 
-sleep 60
+sleep 20

@@ -67,4 +67,4 @@ spack module lmod refresh --delete-tree -y
 
 sbatch --dependency="afterok:${SLURM_JOB_ID}" 'amdblis@2.2-omp.sh'
 
-sleep 60
+sleep 20

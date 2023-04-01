@@ -69,4 +69,4 @@ cd "${SPACK_PACKAGE}"
 
 sbatch --dependency="afterok:${SLURM_JOB_ID}" 'gsl@2.7.sh'
 
-sleep 60
+sleep 20

@@ -63,6 +63,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'netlib-lapack@3.9.1.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'openblas-ilp64@0.3.17.sh'
 
-sleep 60
+sleep 20

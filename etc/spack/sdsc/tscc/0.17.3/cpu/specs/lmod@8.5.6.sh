@@ -70,4 +70,4 @@ module use "${SPACK_ROOT}/share/spack/lmod/linux-centos8-x86_64/Core"
 
 sbatch --dependency="afterok:${SLURM_JOB_ID}" 'parallel@20210922.sh'
 
-sleep 60
+sleep 20

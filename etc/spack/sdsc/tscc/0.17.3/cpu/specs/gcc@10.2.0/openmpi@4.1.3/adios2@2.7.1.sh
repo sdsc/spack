@@ -5,7 +5,7 @@
 #SBATCH --partition=defq
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=32
+#SBATCH --cpus-per-task=8
 #SBATCH --time=00:30:00
 #SBATCH --output=%x.o%j.%N
 
@@ -67,4 +67,4 @@ spack module lmod refresh --delete-tree -y
 sbatch --dependency="afterok:${SLURM_JOB_ID}" 'petsc@3.16.1.sh'
 
 
-sleep 60
+sleep 20
