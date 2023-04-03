@@ -6,9 +6,8 @@
 #SBATCH --partition=ind-gpu-shared
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=10
-#SBATCH --mem=93G
-#SBATCH --gpus=1
+#SBATCH --cpus-per-task=8
+#SBATCH -w gpu1
 #SBATCH --time=00:30:00
 #SBATCH --output=%x.o%j.%N
 
