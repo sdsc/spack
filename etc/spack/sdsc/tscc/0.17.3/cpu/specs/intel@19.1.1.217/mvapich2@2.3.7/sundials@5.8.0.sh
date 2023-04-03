@@ -38,6 +38,7 @@ declare -xr SPACK_COMPILER='intel@19.1.1.217'
 declare-xrSPACK_VARIANTS="precision=double~int64+mpi~openmp~pthread~raja~sycl~hypre~lapack~klu~petsc~superlu-mt~superlu-dist~trilinos+shared+static~fcmix~f2003+examples+examples-install+generic-math~monitoring"
 declare -xr SPACK_DEPENDENCIES="^mvapich2@2.3.7/$(spack find --format '{hash:7}' mvapich2@2.3.7 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
+echo ${SPACK_SPEC} > spec.$$
 
 printenv
 
@@ -49,13 +50,14 @@ spack config get packages
 spack config get repos
 spack config get upstreams
 
-spack spec --long --namespaces --types "${SPACK_SPEC}"
+spack spec --long --namespaces --types `cat spec.$$`
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack concretization failed.'
   exit 1
 fi
 
-time -p spack install -v  --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all "${SPACK_SPEC}"
+time -p spack install -v  --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all `cat spec.$$`
+rm spec.$$
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
   exit 1

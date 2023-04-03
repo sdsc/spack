@@ -38,7 +38,7 @@ declare -xr SPACK_PACKAGE='hdf5@1.10.7'
 declare -xr SPACK_COMPILER='intel@19.1.1.217'
 declare -xr SPACK_VARIANTS='+cxx +fortran +hl ~ipo +java +mpi +shared ~szip ~threadsafe +tools'
 declare -xr SPACK_DEPENDENCIES="^intel-mpi@2019.10.317/$(spack find --format '{hash:7}' intel-mpi@2019.10.317 % ${SPACK_COMPILER})"
-declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} arch='linux-rocky9-skylake_avx512' ${SPACK_DEPENDENCIES}"
+declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
 
