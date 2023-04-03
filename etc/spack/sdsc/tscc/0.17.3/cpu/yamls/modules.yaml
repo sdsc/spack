@@ -4,10 +4,10 @@ modules:
       - lmod
     lmod:
       core_compilers:
-        - 'gcc@8.5.0'
+        - 'gcc@11.2.0'
       hierarchy:
         - mpi
-      hash_length: 0
+      hash_length: 7
       blacklist_implicits: true
       naming_scheme: '{name}/{version}'
       projections:
