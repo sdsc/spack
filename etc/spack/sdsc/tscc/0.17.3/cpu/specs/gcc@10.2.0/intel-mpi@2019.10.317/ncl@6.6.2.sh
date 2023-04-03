@@ -56,6 +56,8 @@ if [[ "${?}" -ne 0 ]]; then
   exit 1
 fi
 
+export FC=gfortran
+export F90=gfortran
 time -p spack install -v  --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all "${SPACK_SPEC}"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'

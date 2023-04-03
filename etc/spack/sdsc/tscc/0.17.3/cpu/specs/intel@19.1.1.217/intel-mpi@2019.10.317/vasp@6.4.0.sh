@@ -27,16 +27,18 @@ echo ""
 
 cat "${SLURM_JOB_SCRIPT}"
 
-module purge
-module load "${SCHEDULER_MODULE}"
-module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
 declare -xr SPACK_PACKAGE='vasp@6.4.0'
 declare -xr SPACK_COMPILER='intel@19.1.1.217'
 declare -xr SPACK_VARIANTS='~cuda ~openmp +scalapack'
-declare -xr SPACK_DEPENDENCIES="^intel-mpi@2019.10.317/$(spack find --format '{hash:7}' intel-mpi@2019.10.317 % ${SPACK_COMPILER}) ^intel-mkl@2020.4.304 % ${SPACK_COMPILER} arch=linux-rocky9-broadwell"
+declare -xr SPACK_DEPENDENCIES="^intel-mpi@2019.10.317/$(spack find --format '{hash:7}' intel-mpi@2019.10.317 % ${SPACK_COMPILER}) ^intel-mkl@2020.4.304/$(spack find --format '{hash:7}' intel-mkl@2020.4.304 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
+
+module purge
+module load "${SCHEDULER_MODULE}"
+module load "${SPACK_COMPILER}"
+module list
 
 printenv
 
