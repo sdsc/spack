@@ -42,6 +42,10 @@ class Gsl(AutotoolsPackage, GNUMirrorPackage):
     depends_on('libtool',  type='build', when='+external-cblas')
     depends_on('blas', when='+external-cblas')
 
+    def setup_build_environment(self, env):
+        if '%intel' in self.spec:
+            env.set('CFLAGS','-fp-model=strict')
+
     @property
     def force_autoreconf(self):
         # The external cblas patch touches configure
