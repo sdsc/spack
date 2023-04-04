@@ -177,6 +177,7 @@
 | gsl@2.7                  | parmetis@4.0.3             |
 | fftw@3.3.10              | parallel-netcdf@1.12.2     |
 | amdfftw@3.1              | ior@3.3.0                  |
+| amdfftw@3.1-omp          |                            |
 | hdf5@1.10.7              | netcdf-c@4.8.1             |
 | metis@5.1.0              | netcdf-cxx4@4.3.1          |
 | netcdf-c@4.8.1           | netcdf-fortran@4.5.3       |
@@ -193,7 +194,8 @@
 | cgal@5.0.3               | charmpp@6.10.2             |
 | cgal@4.13                | namd@2.14                  |
 |                          | lammps@20210310            |
-|                          | nwchem@7.0.2               | 
+|                          | nwchem@7.0.2               |
+|                          | cp2k@7.1                   |
 |                          | openfoam@2106              |
 |                          | wrf@4.2                    |
 |                          | wps@4.2                    |
