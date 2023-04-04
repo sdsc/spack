@@ -8,7 +8,7 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=16
 #SBATCH --mem=32G
-#SBATCH --time=00:30:00
+#SBATCH --time=01:00:00
 #SBATCH --output=%x.o%j.%N
 
 declare -xr LOCAL_TIME="$(date +'%Y%m%dT%H%M%S%z')"
@@ -167,10 +167,38 @@ module list
 #  >> 107     /tmp/ccybASOd.s:93414: Error: no such instruction: `vcvtne2ps2bf16
 #              %zmm4,%zmm12,%zmm13'
 
+# ==> Installing libint-2.6.0-tbkfguhunpozck4q2q6veqr7czj4ymnw
+# ==> No binary for libint-2.6.0-tbkfguhunpozck4q2q6veqr7czj4ymnw found: installing from source
+# ==> Warning: Expected user 527834 to own /scratch/spack_cpu, but it is owned by 0
+# ==> Using cached archive: /cm/shared/apps/spack/0.17.3/cpu/a/var/spack/cache/_source-cache/archive/4a/4ae47e8f0b5632c3d2a956469a7920896708e9f0e396ec10071b8181e4c8d9fa.tar.gz
+# ==> Ran patch() for libint
+# ==> libint: Executing phase: 'autoreconf'
+# ==> libint: Executing phase: 'configure'
+# ==> libint: Executing phase: 'build'
+# ==> libint: Executing phase: 'install'
+# ==> Error: ProcessError: Command exited with status 2:
+#     'make' '-j16' 'install'
+#
+# 3 errors found in build log:
+#      11302    grep '^#' ../include/libint2_types.h | grep -v '#include' > fortr
+#              an_incldefs.h
+#     11303    FC libint_f.o
+#     11304    ../include/libint2/util/generated/libint2_params.h:29:0:
+#     11305    
+#     11306       29 | #    if __has_include(<libint2_params.h>)
+#     11307          |
+#  >> 11308    Error: missing '(' before "__has_include" operand
+#  >> 11309    ../include/libint2/util/generated/libint2_params.h:29:0: Error: o
+#              perator "__has_include" requires a header-name
+#  >> 11310    make[1]: *** [../MakeSuffixRules:12: libint_f.o] Error 1
+
+# # Example: For building CP2K 7.1 with ELPA 2019, AOCC 3.2.0 and AOCL 3.1
+#$ spack -d install -v -j 16 cp2k@7.1+elpa %aocc@3.2.0 target=zen3 ^amdfftw@3.1 ^amdscalapack@3.1 ^amdblis@3.1 ^amdlibflame@3.1 ^libint@2.6.0 ^libxsmm@1.15 ^libxc@4.2.3 ^elpa@2019.11.001+openmp ^openmpi@4.1.1+cxx fabrics=auto
+
 declare -xr SPACK_PACKAGE='cp2k@7.1'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
 declare -xr SPACK_VARIANTS='~cosma ~cuda ~cuda_blas ~cuda_fft ~elpa +libint ~libvori +libxc +mpi ~openmp ~pexsi +plumed ~sirius ~spglib'
-declare -xr SPACK_DEPENDENCIES="^boost@1.77.0/$(spack find --format '{hash:7}' boost@1.77.0 % ${SPACK_COMPILER} ~mpi +python) ^fftw@3.3.10/$(spack find --format '{hash:7}' fftw@3.3.10 % ${SPACK_COMPILER} ~mpi ~openmp) ^netlib-scalapack@2.1.0/$(spack find --format '{hash:7}' netlib-scalapack@2.1.0 % ${SPACK_COMPILER} ^openmpi@4.1.3) ^plumed@2.6.3/$(spack find --format '{hash:7}' plumed@2.6.3 % ${SPACK_COMPILER})"
+declare -xr SPACK_DEPENDENCIES="^boost@1.77.0/$(spack find --format '{hash:7}' boost@1.77.0 % ${SPACK_COMPILER} ~mpi +python) ^fftw@3.3.10/$(spack find --format '{hash:7}' fftw@3.3.10 % ${SPACK_COMPILER} ~mpi ~openmp) ^netlib-scalapack@2.1.0/$(spack find --format '{hash:7}' netlib-scalapack@2.1.0 % ${SPACK_COMPILER} ^openmpi@4.1.3) ^plumed@2.6.3/$(spack find --format '{hash:7}' plumed@2.6.3 % ${SPACK_COMPILER}) ^libxc@4.3.4/$(spack find --format '{hash:7}' libxc@4.3.4 % ${SPACK_COMPILER}) ^libxsmm@1.16.3/$(spack find --format '{hash:7}' libxsmm@1.16.3 % gcc@8.5.0)"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -197,6 +225,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'quantum-espresso@7.0.sh'
+#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'quantum-espresso@7.0.sh'
 
 sleep 60
