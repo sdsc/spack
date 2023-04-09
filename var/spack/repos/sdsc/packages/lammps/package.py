@@ -5,6 +5,7 @@
 import datetime as dt
 
 from spack import *
+import os
 
 
 class Lammps(CMakePackage, CudaPackage):
@@ -21,6 +22,7 @@ class Lammps(CMakePackage, CudaPackage):
     tags = ['ecp', 'ecp-apps']
 
     version('master', branch='master')
+#   version('20210311', sha256='d1b4b3860f4bd6aed53e09956cfcf3ce3c3866b83e681898ee945a02bebe1fd9',url='file://{0}/lammps-11Mar2021.tar.gz'.format(os.getcwd()))
     version('20210310', sha256='25708378dbeccf794bc5045aceb84380bf4a3ca03fc8e5d150a26ca88d371474')
     version('20201029', sha256='759705e16c1fedd6aa6e07d028cc0c78d73c76b76736668420946a74050c3726')
     version('20200721', sha256='845bfeddb7b667799a1a5dbc166b397d714c3d2720316604a979d3465b4190a9')
@@ -126,6 +128,7 @@ class Lammps(CMakePackage, CudaPackage):
     depends_on('adios2', when='+user-adios')
     depends_on('plumed', when='+user-plumed')
     depends_on('eigen@3:', when='+user-smd')
+    depends_on('curl')
 
     conflicts('+cuda', when='+opencl')
     conflicts('+body', when='+poems@:20180628')
@@ -241,15 +244,25 @@ class Lammps(CMakePackage, CudaPackage):
             args.append('-DEIGEN3_INCLUDE_DIR={0}'.format(
                 self.spec['eigen'].prefix.include))
 
+
         return args
 
     def setup_run_environment(self, env):
         env.set('LAMMPS_POTENTIALS',
                 self.prefix.share.lammps.potentials)
 
+    @run_before('cmake')
+
+    def add_potential_files(self):
+        copy(join_path(os.path.dirname(self.module.__file__),'C_10_10.mesocnt'),'potentials')
+        copy(join_path(os.path.dirname(self.module.__file__),'TABTP_10_10.mesont'),'potentials')
+
     @run_before('build')
 
     def remove_libs(self):
         with working_dir(join_path('..','spack-build-'+self.spec.dag_hash(7))):
              filter_file('OpenMP_pthread_LIBRARY:FILEPATH=/lib64/libpthread.a','OpenMP_pthread_LIBRARY:FILEPATH=/usr/lib64/libpthread.so.0','CMakeCache.txt')
+             filter_file('MPI_pthread_LIBRARY:FILEPATH=/lib64/libpthread.a','MPI_pthread_LIBRARY:FILEPATH=/usr/lib64/libpthread.so.0','CMakeCache.txt')
+             filter_file('MPI_dl_LIBRARY:FILEPATH=/lib64/libdl.a','MPI_dl_LIBRARY:FILEPATH=/usr/lib64/libdl.so.2','CMakeCache.txt')
              filter_file('CUDA_rt_LIBRARY:FILEPATH=/usr/lib64/librt.a','CUDA_rt_LIBRARY:FILEPATH=/usr/lib64/librt.so.1','CMakeCache.txt')
+             filter_file('MPI_rt_LIBRARY:FILEPATH=/lib64/librt.a','MPI_rt_LIBRARY:FILEPATH=/usr/lib64/librt.so.1','CMakeCache.txt')
