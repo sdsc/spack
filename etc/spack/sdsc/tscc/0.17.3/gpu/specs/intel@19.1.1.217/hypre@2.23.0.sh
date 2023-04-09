@@ -68,4 +68,4 @@ fi
 
 sbatch --dependency="afterok:${SLURM_JOB_ID}" 'suite-sparse@5.10.1.sh'
 
-sleep 60
+sleep 20

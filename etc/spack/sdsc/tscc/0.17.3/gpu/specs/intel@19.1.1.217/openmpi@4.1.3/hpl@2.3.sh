@@ -67,4 +67,4 @@ fi
 
 sbatch --dependency="afterok:${SLURM_JOB_ID}" 'hpl@2.3-omp.sh'
 
-sleep 60
+sleep 20

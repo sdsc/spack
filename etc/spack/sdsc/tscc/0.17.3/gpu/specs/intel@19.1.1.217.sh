@@ -5,6 +5,7 @@
 #SBATCH --partition=defq
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
+#SBATCH -w gpu1
 #SBATCH --cpus-per-task=8
 #SBATCH --time=00:30:00
 #SBATCH --output=%x.o%j.%N

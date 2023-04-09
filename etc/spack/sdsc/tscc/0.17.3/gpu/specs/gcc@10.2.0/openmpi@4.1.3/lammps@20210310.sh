@@ -24,7 +24,7 @@ declare -xr SLURM_JOB_MD5SUM="$(md5sum ${SLURM_JOB_SCRIPT})"
 
 declare -xr SCHEDULER_MODULE='slurm'
 declare -xr COMPILER_MODULE='gcc/10.2.0'
-declare -xr MPI_MODULE='openmpi/4.1.3'
+declare -xr MPI_MODULE='intel-mpi@2019.10.317'
 declare -xr CUDA_MODULE='cuda/11.2.2'
 
 echo "${UNIX_TIME} ${SLURM_JOB_ID} ${SLURM_JOB_MD5SUM} ${SLURM_JOB_DEPENDENCY}" 
@@ -153,8 +153,9 @@ declare -xr CMAKE_LIBRARY_PATH="${CUDA_CUDA_LIBRARY}"
 declare -xr SPACK_PACKAGE='lammps@20210310'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
 declare -xr SPACK_VARIANTS='+asphere +body +class2 +colloid +compress +coreshell +cuda cuda_arch=60 +dipole ~exceptions +ffmpeg +granular ~ipo +jpeg +kim +kokkos +kspace ~latte +lib +manybody +mc ~meam +misc +mliap +molecule +mpi +mpiio ~opencl +openmp +opt +peri +png +poems +python +qeq +replica +rigid +shock +snap +spin +srd ~user-adios +user-atc +user-awpmd +user-bocs +user-cgsdk +user-colvars +user-diffraction +user-dpd +user-drude +user-eff +user-fep ~user-h5md +user-lb +user-manifold +user-meamc +user-mesodpd +user-mesont +user-mgpt +user-misc +user-mofff ~user-netcdf ~user-omp +user-phonon +user-plumed +user-ptm +user-qtb +user-reaction +user-reaxc +user-sdpd +user-smd +user-smtbq +user-sph +user-tally +user-uef +user-yaff +voronoi'
-declare -xr SPACK_DEPENDENCIES="^openblas@0.3.17/$(spack find --format '{hash:7}' openblas@0.3.17 % ${SPACK_COMPILER} ~ilp64 threads=none) ^fftw@3.3.10/$(spack find --format '{hash:7}' fftw@3.3.10 % ${SPACK_COMPILER} ~mpi ~openmp) ^kokkos@3.4.01/$(spack find --format '{hash:7}' kokkos@3.4.01 % ${SPACK_COMPILER} ^kokkos-nvcc-wrapper ~mpi) ^ffmpeg@4.3.2/$(spack find --format '{hash:7}' ffmpeg@4.3.2 % ${SPACK_COMPILER}) ^plumed@2.6.3/$(spack find --format '{hash:7}' plumed@2.6.3 % ${SPACK_COMPILER} +mpi ^openmpi@4.1.3) ^python@3.8.12/$(spack find --format '{hash:7}' python@3.8.12 % ${SPACK_COMPILER})"
+declare -xr SPACK_DEPENDENCIES="^openblas@0.3.17/$(spack find --format '{hash:7}' openblas@0.3.17 % ${SPACK_COMPILER} ~ilp64 threads=none)^fftw@3.3.10/$(spack find --format '{hash:7}' fftw@3.3.10 % ${SPACK_COMPILER} ~mpi ~openmp)  ^kokkos@3.4.01/$(spack find --format '{hash:7}' kokkos@3.4.01 % ${SPACK_COMPILER} ^kokkos-nvcc-wrapper +mpi ^intel-mpi) ^ffmpeg@4.3.2/$(spack find --format '{hash:7}' ffmpeg@4.3.2 % ${SPACK_COMPILER}) ^plumed@2.6.3/$(spack find --format '{hash:7}' plumed@2.6.3 % ${SPACK_COMPILER} +mpi ^intel-mpi@2019.10.317) ^python@3.8.12/$(spack find --format '{hash:7}' python@3.8.12 % ${SPACK_COMPILER}) ^cmake@3.21.4/$(spack find --format '{hash:7}' cmake@3.21.4 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
+echo ${SPACK_SPEC} > spec.$$
 
 printenv
 
@@ -166,13 +167,17 @@ spack config get packages
 spack config get repos
 spack config get upstreams
 
-spack spec --long --namespaces --types lammps@20210310 % gcc@10.2.0 +asphere +body +class2 +colloid +compress +coreshell +cuda cuda_arch=60 +dipole ~exceptions +ffmpeg +granular ~ipo +jpeg +kim +kokkos +kspace ~latte +lib +manybody +mc ~meam +misc +mliap +molecule +mpi +mpiio ~opencl +openmp +opt +peri +png +poems +python +qeq +replica +rigid +shock +snap +spin +srd ~user-adios +user-atc +user-awpmd +user-bocs +user-cgsdk +user-colvars +user-diffraction +user-dpd +user-drude +user-eff +user-fep ~user-h5md +user-lb +user-manifold +user-meamc +user-mesodpd +user-mesont +user-mgpt +user-misc +user-mofff ~user-netcdf ~user-omp +user-phonon +user-plumed +user-ptm +user-qtb +user-reaction +user-reaxc +user-sdpd +user-smd +user-smtbq +user-sph +user-tally +user-uef +user-yaff +voronoi "^openblas@0.3.17/$(spack find --format '{hash:7}' openblas@0.3.17 % ${SPACK_COMPILER} ~ilp64 threads=none) ^fftw@3.3.10/$(spack find --format '{hash:7}' fftw@3.3.10 % ${SPACK_COMPILER} ~mpi ~openmp) ^kokkos@3.4.01/$(spack find --format '{hash:7}' kokkos@3.4.01 % ${SPACK_COMPILER} ^kokkos-nvcc-wrapper +mpi) ^ffmpeg@4.3.2/$(spack find --format '{hash:7}' ffmpeg@4.3.2 % ${SPACK_COMPILER}) ^plumed@2.6.3/$(spack find --format '{hash:7}' plumed@2.6.3 % ${SPACK_COMPILER} +mpi ^openmpi@4.1.3) ^python@3.8.12/$(spack find --format '{hash:7}' python@3.8.12 % ${SPACK_COMPILER})"
+spack spec --long --namespaces --types `cat spec.$$`
+
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack concretization failed.'
   exit 1
 fi
 
-time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all lammps@20210310 % gcc@10.2.0 +asphere +body +class2 +colloid +compress +coreshell +cuda cuda_arch=60 +dipole ~exceptions +ffmpeg +granular ~ipo +jpeg +kim +kokkos +kspace ~latte +lib +manybody +mc ~meam +misc +mliap +molecule +mpi +mpiio ~opencl +openmp +opt +peri +png +poems +python +qeq +replica +rigid +shock +snap +spin +srd ~user-adios +user-atc +user-awpmd +user-bocs +user-cgsdk +user-colvars +user-diffraction +user-dpd +user-drude +user-eff +user-fep ~user-h5md +user-lb +user-manifold +user-meamc +user-mesodpd +user-mesont +user-mgpt +user-misc +user-mofff ~user-netcdf ~user-omp +user-phonon +user-plumed +user-ptm +user-qtb +user-reaction +user-reaxc +user-sdpd +user-smd +user-smtbq +user-sph +user-tally +user-uef +user-yaff +voronoi "^openblas@0.3.17/$(spack find --format '{hash:7}' openblas@0.3.17 % ${SPACK_COMPILER} ~ilp64 threads=none) ^fftw@3.3.10/$(spack find --format '{hash:7}' fftw@3.3.10 % ${SPACK_COMPILER} ~mpi ~openmp) ^ffmpeg@4.3.2/$(spack find --format '{hash:7}' ffmpeg@4.3.2 % ${SPACK_COMPILER}) ^kokkos@3.4.01/$(spack find --format '{hash:7}' kokkos@3.4.01 % ${SPACK_COMPILER} ^kokkos-nvcc-wrapper +mpi) ^plumed@2.6.3/$(spack find --format '{hash:7}' plumed@2.6.3 % ${SPACK_COMPILER} +mpi ^openmpi@4.1.3) ^python@3.8.12/$(spack find --format '{hash:7}' python@3.8.12 % ${SPACK_COMPILER})"
+time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all `cat spec.$$`
+
+rm spec.$$
+
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
   exit 1
@@ -180,6 +185,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-#sbatch --dependency="afterok:${SLURM_JOB_ID}" ''
+sbatch --dependency="afterok:${SLURM_JOB_ID}" ''
 
-sleep 60
+sleep 20

@@ -37,7 +37,7 @@ module list
 declare -xr SPACK_PACKAGE='cgal@5.0.3'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
 declare -xr SPACK_VARIANTS='~core ~demos +eigen ~imageio ~ipo +shared'
-declare -xr SPACK_DEPENDENCIES="^boost@1.77.0/$(spack find --format '{hash:7}' boost@1.77.0 % ${SPACK_COMPILER} ~mpi) ^eigen@3.4.0/$(spack find --format '{hash:7}' eigen@3.4.0 % ${SPACK_COMPILER})"
+declare -xr SPACK_DEPENDENCIES="^boost@1.77.0/$(spack find --format '{hash:7}' boost@1.77.0 % ${SPACK_COMPILER} ~mpi) ^eigen@3.4.0/$(spack find --format '{hash:7}' eigen@3.4.0 % ${SPACK_COMPILER}) ^cmake@3.21.4/$(spack find --format '{hash:7}' cmake@3.21.4 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -66,4 +66,4 @@ spack module lmod refresh --delete-tree -y
 
 sbatch --dependency="afterok:${SLURM_JOB_ID}" 'arrayfire@3.7.3.sh'
 
-sleep 60
+sleep 20

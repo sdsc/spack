@@ -35,7 +35,7 @@ module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
 declare -xr SPACK_PACKAGE='boost@1.77.0'
-declare -xr SPACK_COMPILER='gcc@10.2.0'
+declare -xr SPACK_COMPILER='gcc@9.2.0'
 declare -xr SPACK_VARIANTS='+atomic +chrono ~clanglibcpp ~container ~context ~coroutine +date_time ~debug +exception ~fiber +filesystem +graph ~icu +iostreams +locale +log +math ~mpi +multithreaded +numpy +pic +program_options +python +random +regex +serialization +shared +signals ~singlethreaded +system ~taggedlayout +test +thread +timer ~versionedlayout +wave'
 declare -xr SPACK_DEPENDENCIES="^py-numpy@1.20.3/$(spack find --format '{hash:7}' py-numpy@1.20.3 % ${SPACK_COMPILER}) ^openblas@0.3.17/$(spack find --format '{hash:7}' openblas@0.3.17 % ${SPACK_COMPILER} ~ilp64 threads=none)"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
@@ -64,6 +64,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'py-pycuda@2020.1.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'fftw@3.3.10.sh'
 
-sleep 60
+sleep 20

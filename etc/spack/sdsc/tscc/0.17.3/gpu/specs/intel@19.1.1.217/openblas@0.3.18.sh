@@ -68,4 +68,4 @@ fi
 
 sbatch --dependency="afterok:${SLURM_JOB_ID}" 'openblas@0.3.18-omp.sh'
 
-sleep 60
+sleep 20

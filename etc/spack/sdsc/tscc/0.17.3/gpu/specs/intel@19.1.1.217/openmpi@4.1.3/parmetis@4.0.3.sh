@@ -67,4 +67,4 @@ fi
 
 sbatch --dependency="afterok:${SLURM_JOB_ID}" 'parallel-netcdf@1.12.2.sh'
 
-sleep 60
+sleep 20

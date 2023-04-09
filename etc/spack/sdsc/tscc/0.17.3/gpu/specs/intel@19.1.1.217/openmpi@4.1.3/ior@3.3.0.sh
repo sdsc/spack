@@ -67,4 +67,4 @@ fi
 
 sbatch --dependency="afterok:${SLURM_JOB_ID}" 'netcdf-c@4.8.1.sh'
 
-sleep 60
+sleep 20

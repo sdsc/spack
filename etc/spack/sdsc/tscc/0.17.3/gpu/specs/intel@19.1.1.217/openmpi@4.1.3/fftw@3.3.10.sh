@@ -67,4 +67,4 @@ fi
 
 sbatch --dependency="afterok:${SLURM_JOB_ID}" 'hdf5@1.10.7.sh'
 
-sleep 60
+sleep 20

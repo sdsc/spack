@@ -66,4 +66,4 @@ spack module lmod refresh --delete-tree -y
 
 sbatch --dependency="afterok:${SLURM_JOB_ID}" 'py-pycuda@2020.1.sh'
 
-sleep 60
+sleep 20

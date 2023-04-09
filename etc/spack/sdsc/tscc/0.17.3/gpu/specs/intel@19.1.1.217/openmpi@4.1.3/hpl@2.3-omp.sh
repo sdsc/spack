@@ -67,4 +67,4 @@ fi
 
 sbatch --dependency="afterok:${SLURM_JOB_ID}" 'osu-micro-benchmarks@5.7.1.sh'
 
-sleep 60
+sleep 20

@@ -105,4 +105,4 @@ spack module lmod refresh --delete-tree -y
 
 sbatch --dependency="afterok:${SLURM_JOB_ID}" 'ninja@1.10.2.sh'
 
-sleep 60
+sleep 20

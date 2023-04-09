@@ -9,7 +9,6 @@
 #SBATCH -w gpu1
 #SBATCH --time=01:00:00
 #SBATCH --output=%x.o%j.%N
-#SBATCH -x exp-15-58
 
 declare -xr LOCAL_TIME="$(date +'%Y%m%dT%H%M%S%z')"
 declare -xir UNIX_TIME="$(date +'%s')"
@@ -48,7 +47,7 @@ module list
 declare -xr SPACK_PACKAGE='arrayfire@3.7.3'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
 declare -xr SPACK_VARIANTS='+cuda cuda_arch=60,80 ~forge ~ipo ~opencl'
-declare -xr SPACK_DEPENDENCIES="^cuda@11.2.2/$(spack find --format '{hash:7}' cuda@11.2.2 % gcc@10.2.0) ^openblas@0.3.17/$(spack find --format '{hash:7}' openblas@0.3.17 % ${SPACK_COMPILER} ~ilp64 threads=none) ^fftw@3.3.10/$(spack find --format '{hash:7}' fftw@3.3.10 % ${SPACK_COMPILER} ~mpi ~openmp) ^boost@1.77.0/$(spack find --format '{hash:7}' boost@1.77.0 % ${SPACK_COMPILER} ~mpi)"
+declare -xr SPACK_DEPENDENCIES="^cuda@11.2.2/$(spack find --format '{hash:7}' cuda@11.2.2 % gcc@10.2.0) ^openblas@0.3.17/$(spack find --format '{hash:7}' openblas@0.3.17 % ${SPACK_COMPILER} ~ilp64 threads=none) ^fftw@3.3.10/$(spack find --format '{hash:7}' fftw@3.3.10 % ${SPACK_COMPILER} ~mpi ~openmp) ^boost@1.77.0/$(spack find --format '{hash:7}' boost@1.77.0 % ${SPACK_COMPILER} ~mpi)  ^cmake@3.21.4/$(spack find --format '{hash:7}' cmake@3.21.4 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -77,4 +76,4 @@ spack module lmod refresh --delete-tree -y
 
 sbatch --dependency="afterok:${SLURM_JOB_ID}" 'libxc@5.1.5.sh'
 
-sleep 60
+sleep 20

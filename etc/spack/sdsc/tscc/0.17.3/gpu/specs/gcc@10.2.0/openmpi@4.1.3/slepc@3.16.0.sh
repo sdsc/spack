@@ -67,4 +67,4 @@ spack module lmod refresh --delete-tree -y
 
 sbatch --dependency="afterok:${SLURM_JOB_ID}" 'py-petsc4py@3.16.1.sh'
 
-sleep 60
+sleep 20
