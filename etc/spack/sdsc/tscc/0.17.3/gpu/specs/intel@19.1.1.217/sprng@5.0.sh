@@ -68,4 +68,4 @@ fi
 
 sbatch --dependency="afterok:${SLURM_JOB_ID}" 'papi@6.0.0.1.sh'
 
-sleep 60
+sleep 20

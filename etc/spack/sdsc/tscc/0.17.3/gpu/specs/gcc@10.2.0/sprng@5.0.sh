@@ -66,4 +66,4 @@ spack module lmod refresh --delete-tree -y
 
 sbatch --dependency="afterok:${SLURM_JOB_ID}" 'libmatheval@1.1.11.sh'
 
-sleep 60
+sleep 20

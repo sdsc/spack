@@ -75,4 +75,4 @@ spack module lmod refresh --delete-tree -y
 
 sbatch --dependency="afterok:${SLURM_JOB_ID}" 'tau@2.30.2.sh'
 
-sleep 60
+sleep 20

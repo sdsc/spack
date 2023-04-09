@@ -69,4 +69,4 @@ fi
 spack compiler add --scope site "$(spack location -i ${SPACK_PACKAGE})"
 spack module lmod refresh --delete-tree -y
 
-sleep 60
+sleep 20

@@ -68,4 +68,4 @@ fi
 
 sbatch --dependency="afterok:${SLURM_JOB_ID}" 'superlu@5.3.0.sh'
 
-sleep 60
+sleep 20

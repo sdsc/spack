@@ -68,4 +68,4 @@ fi
 
 sbatch --dependency="afterok:${SLURM_JOB_ID}" 'fftw@3.3.10.sh'
 
-sleep 60
+sleep 20

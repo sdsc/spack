@@ -264,4 +264,4 @@ fi
 
 sbatch --dependency="afterok:${SLURM_JOB_ID}" 'petsc@3.16.1-cmplx.sh'
 
-sleep 60
+sleep 20

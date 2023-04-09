@@ -69,4 +69,4 @@ fi
 
 sbatch --dependency="afterok:${SLURM_JOB_ID}" ''
 
-sleep 60
+sleep 20

@@ -35,7 +35,7 @@ module list
 
 declare -xr SPACK_PACKAGE='sundials@5.8.0'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare-xrSPACK_VARIANTS="precision=double+cuda~int64+mpi~openmp~pthread~raja~sycl~hypre~lapack~klu~petsc~superlu-mt~superlu-dist~trilinos+shared+static~fcmix~f2003+examples+examples-install+generic-math~monitoring cuda-arch=70"
+declare-xr SPACK_VARIANTS="precision=double+cuda~int64+mpi~openmp~pthread~raja~sycl~hypre~lapack~klu~petsc~superlu-mt~superlu-dist~trilinos+shared+static~fcmix~f2003+examples+examples-install+generic-math~monitoring cuda-arch=70"
 declare -xr SPACK_DEPENDENCIES="^mvapich2@2.3.7/$(spack find --format '{hash:7}' mvapich2@2.3.7 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 

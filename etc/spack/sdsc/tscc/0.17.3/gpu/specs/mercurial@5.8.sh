@@ -66,4 +66,4 @@ spack module lmod refresh --delete-tree -y
 
 sbatch --dependency="afterok:${SLURM_JOB_ID}" 'aria2@1.35.0.sh'
 
-sleep 60
+sleep 20

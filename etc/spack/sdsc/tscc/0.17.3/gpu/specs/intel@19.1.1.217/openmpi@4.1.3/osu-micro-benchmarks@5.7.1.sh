@@ -67,4 +67,4 @@ fi
 
 sbatch --dependency="afterok:${SLURM_JOB_ID}" 'netlib-scalapack@2.1.0.sh'
 
-sleep 60
+sleep 20

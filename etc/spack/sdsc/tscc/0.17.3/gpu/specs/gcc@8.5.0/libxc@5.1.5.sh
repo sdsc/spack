@@ -77,4 +77,4 @@ spack module lmod refresh --delete-tree -y
 
 sbatch --dependency="afterok:${SLURM_JOB_ID}" 'libbeagle@3.1.2.sh'
 
-sleep 60
+sleep 20
