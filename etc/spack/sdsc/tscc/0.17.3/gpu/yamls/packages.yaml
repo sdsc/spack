@@ -18,6 +18,8 @@ packages:
     externals:
       - spec: 'texive@live % gcc@10.2.0 arch=linux-rocky9-broadwell'
         prefix: /usr
+      - spec: 'texive@live % gcc@9.2.0 arch=linux-rocky9-broadwell'
+        prefix: /usr
       - spec: 'texlive@live % intel@19.1.1.217 arch=linux-rocky9-broadwell'
         prefix: /usr
     buildable: false
@@ -35,12 +37,16 @@ packages:
     externals:
       - spec: 'openssl@1.1.1k % gcc@10.2.0 arch=linux-rocky9-broadwell'
         prefix: /usr
+      - spec: 'openssl@1.1.1k % gcc@9.2.0 arch=linux-rocky9-broadwell'
+        prefix: /usr
       - spec: 'openssl@1.1.1k % intel@19.1.1.217 arch=linux-rocky9-broadwell'
         prefix: /usr
     buildable: false
   rdma-core:
     externals:
       - spec: 'rdma-core@28.0 % gcc@10.2.0 arch=linux-rocky9-broadwell'
+        prefix: /usr
+      - spec: 'rdma-core@28.0 % gcc@9.2.0 arch=linux-rocky9-broadwell'
         prefix: /usr
       - spec: 'rdma-core@28.0 % intel@19.1.1.217 arch=linux-rocky9-broadwell'
         prefix: /usr
@@ -49,6 +55,8 @@ packages:
   hcoll:
     externals:
       - spec: 'hcoll@4.4.2968 % gcc@10.2.0 arch=linux-rocky9-broadwell'
+        prefix: /opt/mellanox/hcoll
+      - spec: 'hcoll@4.4.2968 % gcc@9.2.0 arch=linux-rocky9-broadwell'
         prefix: /opt/mellanox/hcoll
       - spec: 'hcoll@4.4.2968 % intel@19.1.1.217 arch=linux-rocky9-broadwell'
         prefix: /opt/mellanox/hcoll
@@ -62,12 +70,18 @@ packages:
         prefix: /cm/shared/apps/slurm/22.05.8
       - spec: 'slurm@22.05.8 % gcc@10.2.0 arch=linux-rocky9-broadwell'
         prefix: /cm/shared/apps/slurm/22.05.8
+      - spec: 'slurm@22.05.8 % gcc@9.2.0 arch=linux-rocky9-broadwell'
+        prefix: /cm/shared/apps/slurm/22.05.8
       - spec: 'slurm@22.05.8 % intel@19.1.1.217 arch=linux-rocky9-broadwell'
         prefix: /cm/shared/apps/slurm/22.05.8
     buildable: false
   librsvg:
     externals:
       - spec: 'librsvg@2.42.7 % gcc@10.2.0 arch=linux-rocky9-broadwell'
+        prefix: /usr
+      - spec: 'librsvg@2.42.7 % gcc@9.2.0 arch=linux-rocky9-broadwell'
+        prefix: /usr
+      - spec: 'librsvg@2.42.7 %  intel@19.1.1.217 arch=linux-rocky9-broadwell'
         prefix: /usr
     buildable: false
   ghostscript:
