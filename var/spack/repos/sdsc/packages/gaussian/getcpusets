@@ -1,9 +1,7 @@
 #!/bin/bash
 pid=$1
 gpus=`echo $CUDA_VISIBLE_DEVICES|sed 's/,/ /g'`
-userid=`id -u $USER`
-cpuset=`cat /sys/fs/cgroup/cpuset/slurm/uid_$userid/job_$SLURM_JOBID/cpuset.cpus|sed 's/,/ /g'` 
-maxcpus=$SLURM_NTASKS_PER_NODE
+cpuset=cpuset=`echo ${SLURM_GTIDS}|sed 's/,/ /g'`
 for cpu in $cpuset; do
   if [[ "$cpu" =~  "-" ]];then
      range=`echo $cpu|sed 's/-/ /'`
