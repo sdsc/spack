@@ -12,10 +12,11 @@ modules:
       naming_scheme: '{name}/{version}/{hash}'
       projections:
         all: '{name}/{version}/{hash}'
-      suffixes:
-        '+openmp': omp
-        'threads=openmp': omp
-        '+ipl64': i64
+      all:
+        suffixes:
+          '+openmp': omp
+          'threads=openmp': omp
+          '+ipl64': i64
       intel:
         environment:
           set:
