@@ -2,8 +2,8 @@
 
 #SBATCH --job-name=openfoam@2106
 #SBATCH --account=use300
-#SBATCH --reservation=root_73
-#SBATCH --partition=ind-shared
+##SBATCH --reservation=root_73
+#SBATCH --partition=shared
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=16
@@ -22,8 +22,8 @@ declare -xr SYSTEM_NAME='expanse'
 
 declare -xr SPACK_VERSION='0.17.3'
 declare -xr SPACK_INSTANCE_NAME='cpu'
-declare -xr SPACK_INSTANCE_VERSION='a'
-declare -xr SPACK_INSTANCE_DIR="/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}/${SPACK_INSTANCE_VERSION}"
+declare -xr SPACK_INSTANCE_VERSION='b'
+declare -xr SPACK_INSTANCE_DIR="${HOME}/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}/${SPACK_INSTANCE_VERSION}"
 
 declare -xr SLURM_JOB_SCRIPT="$(scontrol show job ${SLURM_JOB_ID} | awk -F= '/Command=/{print $2}')"
 declare -xr SLURM_JOB_MD5SUM="$(md5sum ${SLURM_JOB_SCRIPT})"
@@ -39,6 +39,17 @@ module purge
 module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
+
+# >> 11774    /usr/lib64/libOpenGL.so: undefined reference to `_glapi_tls_Curre
+#              nt'
+#  >> 11775    collect2: error: ld returned 1 exit status
+#  >> 11776    make[2]: *** [Rendering/OpenGL2/CMakeFiles/vtkProbeOpenGLVersion.
+#              dir/build.make:116: bin/vtkProbeOpenGLVersion-9.0] Error 1
+#     11777    make[2]: Leaving directory '/scratch/mkandes/job_358/spack-stage/
+#              spack-stage/spack-stage-vtk-9.0.3-ic6r6nysowcyrt4kaf5sie55675bex3
+#              x/spack-build-ic6r6ny'
+#  >> 11778    make[1]: *** [CMakeFiles/Makefile2:8018: Rendering/OpenGL2/CMakeF
+#              iles/vtkProbeOpenGLVersion.dir/all] Error 2
 
 declare -xr SPACK_PACKAGE='openfoam@2106'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
