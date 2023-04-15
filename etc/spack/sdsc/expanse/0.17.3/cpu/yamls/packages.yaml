@@ -1,4 +1,9 @@
 packages:
+  lmod:
+    externals:
+      - spec: 'lmod@8.2.4'
+        prefix: /usr
+    buildable: false
   lustre:
     externals:
       - spec: 'lustre@2.15.2'
