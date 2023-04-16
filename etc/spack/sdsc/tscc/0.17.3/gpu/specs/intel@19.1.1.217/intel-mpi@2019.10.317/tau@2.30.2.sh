@@ -29,8 +29,11 @@ echo ""
 
 cat "${SLURM_JOB_SCRIPT}"
 
+declare -xr COMPILER_MODULE='intel/19.1.1.217'
 module purge
 module load "${SCHEDULER_MODULE}"
+module load ${SPACK_INSTANCE_NAME}
+module load ${COMPILER_MODULE}
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
@@ -69,6 +72,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'vasp6@6.2.1.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" ''
 
 sleep 20

@@ -29,9 +29,6 @@ echo ""
 
 cat "${SLURM_JOB_SCRIPT}"
 
-module purge
-module load "${SCHEDULER_MODULE}"
-module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
 declare -xr INTEL_LICENSE_FILE='40000@elprado.sdsc.edu:40200@elprado.sdsc.edu'
@@ -40,6 +37,14 @@ declare -xr SPACK_COMPILER='intel@19.1.1.217'
 declare -xr SPACK_VARIANTS='~dap ~fsync ~hdf4 ~jna +mpi +parallel-netcdf +pic +shared'
 declare -xr SPACK_DEPENDENCIES="^hdf5@1.10.7/$(spack find --format '{hash:7}' hdf5@1.10.7 % ${SPACK_COMPILER} +mpi ^intel-mpi@2019.10.317) ^parallel-netcdf@1.12.2/$(spack find --format '{hash:7}' parallel-netcdf@1.12.2 % ${SPACK_COMPILER} ^intel-mpi@2019.10.317)"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
+
+declare -xr COMPILER_MODULE='intel/19.1.1.217'
+
+module purge
+module load "${SCHEDULER_MODULE}"
+module load ${SPACK_INSTANCE_NAME}
+module load ${COMPILER_MODULE}
+module list
 
 printenv
 

@@ -17,7 +17,7 @@ declare -xr SYSTEM_NAME='tscc'
 
 declare -xr SPACK_VERSION='0.17.3'
 declare -xr SPACK_INSTANCE_NAME='gpu'
-declare -xr SPACK_INSTANCE_DIR="/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}"
+declare -xr SPACK_INSTANCE_DIR="/home/jpg/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}"
 
 declare -xr SLURM_JOB_SCRIPT="$(scontrol show job ${SLURM_JOB_ID} | awk -F= '/Command=/{print $2}')"
 declare -xr SLURM_JOB_MD5SUM="$(md5sum ${SLURM_JOB_SCRIPT})"
@@ -29,8 +29,11 @@ echo ""
 
 cat "${SLURM_JOB_SCRIPT}"
 
+declare -xr COMPILER_MODULE='intel/19.1.1.217'
 module purge
 module load "${SCHEDULER_MODULE}"
+module load ${SPACK_INSTANCE_NAME}
+module load ${COMPILER_MODULE}
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 

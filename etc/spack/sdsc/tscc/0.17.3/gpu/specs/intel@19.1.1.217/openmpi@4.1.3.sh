@@ -3,7 +3,7 @@
 #SBATCH --job-name=openmpi@4.1.3
 #SBATCH --account=use300
 ##SBATCH --reservation=root_73
-#SBATCH --partition=ind-gpu-shared
+#SBATCH --partition=defq
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=8
@@ -29,9 +29,12 @@ echo "${UNIX_TIME} ${SLURM_JOB_ID} ${SLURM_JOB_MD5SUM} ${SLURM_JOB_DEPENDENCY}"
 echo ""
 
 cat "${SLURM_JOB_SCRIPT}"
+declare -xr COMPILER_MODULE='intel/19.1.1.217'
 
 module purge
 module load "${SCHEDULER_MODULE}"
+module load ${SPACK_INSTANCE_NAME}
+module load ${COMPILER_MODULE}
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
@@ -39,8 +42,9 @@ declare -xr INTEL_LICENSE_FILE='40000@elprado.sdsc.edu:40200@elprado.sdsc.edu'
 declare -xr SPACK_PACKAGE='openmpi@4.1.3'
 declare -xr SPACK_COMPILER='intel@19.1.1.217'
 declare -xr SPACK_VARIANTS='~atomics +cuda cuda_arch=70,80 ~cxx ~cxx_exceptions ~gpfs ~internal-hwloc ~java +legacylaunchers +lustre ~memchecker +pmi +pmix +romio ~rsh ~singularity +static +vt +wrapper-rpath fabrics=ucx schedulers=slurm'
-declare -xr SPACK_DEPENDENCIES="^lustre@2.12.8 ^slurm@21.08.8 ^ucx@1.10.1/$(spack find --format '{hash:7}' ucx@1.10.1 % intel@19.1.1.217)"
+declare -xr SPACK_DEPENDENCIES="^lustre@2.15.2 ^slurm@22.05.8 ^ucx@1.10.1/$(spack find --format '{hash:7}' ucx@1.10.1 % intel@19.1.1.217)"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
+echo ${SPACK_SPEC}  > spec.$$
 
 printenv
 
@@ -52,14 +56,19 @@ spack config get packages
 spack config get repos
 spack config get upstreams
 
-echo "${SPACK_SPEC}"
-spack --show-cores=minimized spec --long --namespaces --types openmpi@4.1.3 % intel@19.1.1.217 ~atomics +cuda cuda_arch=70,80 ~cxx ~cxx_exceptions ~gpfs ~internal-hwloc ~java +legacylaunchers +lustre ~memchecker +pmi +pmix +romio ~rsh ~singularity +static +vt +wrapper-rpath fabrics=ucx schedulers=slurm "^lustre@2.12.8 ^slurm@21.08.8 ^ucx@1.10.1/$(spack find --format '{hash:7}' ucx@1.10.1 % intel@19.1.3.304)"
+#spack --show-cores=minimized spec --long --namespaces --types openmpi@4.1.3 % intel@19.1.1.217 ~atomics +cuda cuda_arch=70,80 ~cxx ~cxx_exceptions ~gpfs ~internal-hwloc ~java +legacylaunchers +lustre ~memchecker +pmi +pmix +romio ~rsh ~singularity +static +vt +wrapper-rpath fabrics=ucx schedulers=slurm "^lustre@2.15.2 ^slurm@22.05.8 ^ucx@1.10.1/$(spack find --format '{hash:7}' ucx@1.10.1 % intel@19.1.1.217)"
+
+spack spec --long --namespaces --types `cat spec.$$`
+
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack concretization failed.'
   exit 1
 fi
 
-time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all openmpi@4.1.3 % intel@19.1.1.217 ~atomics +cuda cuda_arch=70,80 ~cxx ~cxx_exceptions ~gpfs ~internal-hwloc ~java +legacylaunchers +lustre ~memchecker +pmi +pmix +romio ~rsh ~singularity +static +vt +wrapper-rpath fabrics=ucx schedulers=slurm "^lustre@2.12.8 ^slurm@21.08.8 ^ucx@1.10.1/$(spack find --format '{hash:7}' ucx@1.10.1 % intel@19.1.3.304)" 
+time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all `cat spec.$$`
+
+rm spec.$$
+
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
   exit 1

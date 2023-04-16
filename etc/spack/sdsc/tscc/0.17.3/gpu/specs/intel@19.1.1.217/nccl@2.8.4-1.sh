@@ -2,7 +2,7 @@
 
 #SBATCH --job-name=nccl@2.8.4-1
 #SBATCH --account=use300
-#SBATCH --partition=ind-gpu-shared
+#SBATCH --partition=defq
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=8
@@ -28,9 +28,12 @@ echo "${UNIX_TIME} ${SLURM_JOB_ID} ${SLURM_JOB_MD5SUM} ${SLURM_JOB_DEPENDENCY}"
 echo ""
 
 cat "${SLURM_JOB_SCRIPT}"
+declare -xr COMPILER_MODULE='intel/19.1.1.217'
 
 module purge
 module load "${SCHEDULER_MODULE}"
+module load ${SPACK_INSTANCE_NAME}
+module load ${COMPILER_MODULE}
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
@@ -56,7 +59,8 @@ if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack concretization failed.'
   exit 1
 fi
-
+gccpath=$(spack find --format '{prefix}' gcc@10.2.0)/bin
+export PATH=${gccpath}:${PATH}
 time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all nccl@2.8.4-1 % intel@19.1.1.217 +cuda cuda_arch=70,80 "^cuda@11.2.2/$(spack find --format '{hash:7}' cuda@11.2.2 % ${SPACK_COMPILER})"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
