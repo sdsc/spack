@@ -23,7 +23,7 @@ declare -xr SLURM_JOB_SCRIPT="$(scontrol show job ${SLURM_JOB_ID} | awk -F= '/Co
 declare -xr SLURM_JOB_MD5SUM="$(md5sum ${SLURM_JOB_SCRIPT})"
 
 declare -xr SCHEDULER_MODULE='slurm'
-declare -xr COMPILER_MODULE='intel/19.1.3.304'
+declare -xr COMPILER_MODULE='intel/19.1.1.217'
 declare -xr MPI_MODULE='intel-mpi/2019.10.317'
 declare -xr CUDA_MODULE='cuda/11.2.2'
 
@@ -32,10 +32,13 @@ echo ""
 
 cat "${SLURM_JOB_SCRIPT}"
 
+declare -xr COMPILER_MODULE='intel/19.1.1.217'
+
 module purge
 module load "${SCHEDULER_MODULE}"
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 module use "${SPACK_ROOT}/share/spack/lmod/linux-rocky8-x86_64/Core"
+module load ${SPACK_INSTANCE_NAME}
 module load "${COMPILER_MODULE}"
 module load "${MPI_MODULE}"
 module load "${CUDA_MODULE}"

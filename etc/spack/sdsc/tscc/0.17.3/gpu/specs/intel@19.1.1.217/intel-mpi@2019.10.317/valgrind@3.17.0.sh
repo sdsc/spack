@@ -29,8 +29,11 @@ echo ""
 
 cat "${SLURM_JOB_SCRIPT}"
 
+declare -xr COMPILER_MODULE='intel/19.1.1.217'
 module purge
 module load "${SCHEDULER_MODULE}"
+module load ${SPACK_INSTANCE_NAME}
+module load ${COMPILER_MODULE}
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
@@ -38,7 +41,7 @@ declare -xr INTEL_LICENSE_FILE='40000@elprado.sdsc.edu:40200@elprado.sdsc.edu'
 declare -xr SPACK_PACKAGE='valgrind@3.17.0'
 declare -xr SPACK_COMPILER='intel@19.1.1.217'
 declare -xr SPACK_VARIANTS='~boost +mpi +only64bit +ubsan'
-declare -xr SPACK_DEPENDENCIES='' #"^boost@1.77.0/$(spack find --format '{hash:7}' boost@1.77.0 % ${SPACK_COMPILER} +mpi ^intel-mpi@2019.10.317)"
+declare -xr SPACK_DEPENDENCIES="^intel-mpi@2019.10.317/$(spack find --format '{hash:7}' intel-mpi@2019.10.317 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv

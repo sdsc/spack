@@ -41,6 +41,15 @@ declare -xr SPACK_VARIANTS='+cxx +fortran +hl ~ipo +java +mpi +shared ~szip ~thr
 declare -xr SPACK_DEPENDENCIES="^intel-mpi@2019.10.317/$(spack find --format '{hash:7}' intel-mpi@2019.10.317 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
+declare -xr COMPILER_MODULE='intel/19.1.1.217'
+
+module purge
+module load "${SCHEDULER_MODULE}"
+module load ${SPACK_INSTANCE_NAME}
+module load ${COMPILER_MODULE}
+module list
+. "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
+
 printenv
 
 spack config get compilers  

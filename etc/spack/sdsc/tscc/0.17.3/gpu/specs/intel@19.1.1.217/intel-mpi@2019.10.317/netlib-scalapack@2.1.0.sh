@@ -29,8 +29,12 @@ echo ""
 
 cat "${SLURM_JOB_SCRIPT}"
 
+declare -xr COMPILER_MODULE='intel/19.1.1.217'
+
 module purge
 module load "${SCHEDULER_MODULE}"
+module load ${SPACK_INSTANCE_NAME}
+module load ${COMPILER_MODULE}
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
@@ -56,6 +60,8 @@ if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack concretization failed.'
   exit 1
 fi
+
+export LD_LIBRARY_PATH="$(spack find --format '{prefix}' ${SPACK_COMPILER})/compilers_and_libraries/linux/lib/intel64:${LD_LIBRARY_PATH}"
 
 time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all "${SPACK_SPEC}"
 if [[ "${?}" -ne 0 ]]; then

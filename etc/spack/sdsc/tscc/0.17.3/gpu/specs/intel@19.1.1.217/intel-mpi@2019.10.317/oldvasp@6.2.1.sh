@@ -32,11 +32,14 @@ echo ""
 
 cat "${SLURM_JOB_SCRIPT}"
 
+declare -xr COMPILER_MODULE='intel/19.1.1.217'
+
 module purge
 module load "${SCHEDULER_MODULE}"
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 module use "${SPACK_ROOT}/share/spack/lmod/linux-rocky8-x86_64/Core"
-module load "${COMPILER_MODULE}"
+module load ${SPACK_INSTANCE_NAME}
+module load ${COMPILER_MODULE}
 module load "${CUDA_MODULE}"
 module load "${MPI_MODULE}"
 
