@@ -1,0 +1,1 @@
+sed -i '/#SBATCH --mem=32G/d' $1
