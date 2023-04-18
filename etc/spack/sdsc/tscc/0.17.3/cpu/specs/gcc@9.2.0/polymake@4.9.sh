@@ -57,6 +57,8 @@ if [[ "${?}" -ne 0 ]]; then
   exit 1
 fi
 
+ncurses_lib=$(spack find --format '{prefix}' ncurses@6.2 % ${SPACK_COMPILER})/lib
+export LD_LIBRARY_PATH=$ncurses_lib:$LD_LIBRARY_PATH
 time -p spack install -v  --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all "${SPACK_SPEC}"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
