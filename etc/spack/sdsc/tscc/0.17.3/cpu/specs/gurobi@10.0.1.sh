@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=polymake@4.9
+#SBATCH --job-name=gurobi@10.0.1
 #SBATCH --account=sdsc
 #SBATCH --partition=defq
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=8
-#SBATCH --time=01:00:00
+#SBATCH --time=00:30:00
 #SBATCH --output=%x.o%j.%N
 
 declare -xr LOCAL_TIME="$(date +'%Y%m%dT%H%M%S%z')"
@@ -34,11 +34,10 @@ module load $SPACK_INSTANCE_NAME
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-
-declare -xr SPACK_PACKAGE='polymake@4.9'
-declare -xr SPACK_COMPILER='gcc@9.2.0'
+declare -xr SPACK_PACKAGE='gurobi@10.0.1'
+declare -xr SPACK_COMPILER='gcc@11.2.0'
 declare -xr SPACK_VARIANTS=''
-declare -xr SPACK_DEPENDENCIES="^boost@1.77.0/$(spack find --format '{hash:7}' boost@1.77.0 % ${SPACK_COMPILER} ~mpi) ^ncurses@6.2/$(spack find --format '{hash:7}' ncurses@6.2 % ${SPACK_COMPILER})"
+declare -xr SPACK_DEPENDENCIES=''
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -57,9 +56,7 @@ if [[ "${?}" -ne 0 ]]; then
   exit 1
 fi
 
-ncurses_lib=$(spack find --format '{prefix}' ncurses@6.2 % ${SPACK_COMPILER})/lib
-export LD_LIBRARY_PATH=$ncurses_lib:$LD_LIBRARY_PATH
-time -p spack install -v  --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all "${SPACK_SPEC}"
+time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all "${SPACK_SPEC}"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
   exit 1
@@ -67,6 +64,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'racon@1.4.3'
+#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'gh@2.0.0.sh'
 
-sleep 20
+#sleep 20
