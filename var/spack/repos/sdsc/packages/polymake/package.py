@@ -47,3 +47,8 @@ class Polymake(Package):
                   "--without-java") 
         make()
         make("install")
+
+    def setup_run_environment(self, env):
+        env.prepend_path('PERL5LIB', join_path(self.spec['perl-json'].prefix,'lib','perl5'))
+        env.prepend_path('PERL5LIB', join_path(self.spec['perl-termreadkey'].prefix,'lib','perl5','x86_64-linux-thread-multi'))
+        env.prepend_path('PERL5LIB', join_path(self.spec['perl-term-readline-gnu'].prefix,'lib','perl5','x86_64-linux-thread-multi'))
