@@ -28,8 +28,12 @@ echo ""
 
 cat "${SLURM_JOB_SCRIPT}"
 
+COMPILER_MODULE='gcc/10.2.0'
+
 module purge
 module load "${SCHEDULER_MODULE}"
+module load $SPACK_INSTANCE_NAME
+module load $COMPILER_MODULE
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
