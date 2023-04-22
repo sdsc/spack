@@ -1,0 +1,947 @@
+slurmstepd: error: Unable to create TMPDIR [/scratch/spack_cpu/job_21694059]: Permission denied
+slurmstepd: error: Setting TMPDIR to /tmp
+1681585805 21694065 1b119e0696245368d258be51b4542854  /cm/shared/apps/spack/0.17.3/cpu/b/etc/spack/sdsc/expanse/0.17.3/cpu/specs/entrezdirect@10.7.20190114.sh afterok:21694059
+
+#!/usr/bin/env bash
+
+#SBATCH --job-name=entrezdirect@10.7.20190114
+#SBATCH --account=use300
+#SBATCH --reservation=rocky8u7_testing
+#SBATCH --partition=ind-shared
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=1
+#SBATCH --cpus-per-task=16
+#SBATCH --mem=32G
+#SBATCH --time=00:30:00
+#SBATCH --output=%x.o%j.%N
+
+declare -xr LOCAL_TIME="$(date +'%Y%m%dT%H%M%S%z')"
+declare -xir UNIX_TIME="$(date +'%s')"
+
+declare -xr LOCAL_SCRATCH_DIR="/scratch/${USER}/job_${SLURM_JOB_ID}"
+declare -xr TMPDIR="${LOCAL_SCRATCH_DIR}"
+
+declare -xr SYSTEM_NAME='expanse'
+
+declare -xr SPACK_VERSION='0.17.3'
+declare -xr SPACK_INSTANCE_NAME='cpu'
+declare -xr SPACK_INSTANCE_VERSION='b'
+declare -xr SPACK_INSTANCE_DIR="/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}/${SPACK_INSTANCE_VERSION}"
+
+declare -xr SLURM_JOB_SCRIPT="$(scontrol show job ${SLURM_JOB_ID} | awk -F= '/Command=/{print $2}')"
+declare -xr SLURM_JOB_MD5SUM="$(md5sum ${SLURM_JOB_SCRIPT})"
+
+declare -xr SCHEDULER_MODULE='slurm'
+
+echo "${UNIX_TIME} ${SLURM_JOB_ID} ${SLURM_JOB_MD5SUM} ${SLURM_JOB_DEPENDENCY}" 
+echo ""
+
+cat "${SLURM_JOB_SCRIPT}"
+
+module purge
+module load "${SCHEDULER_MODULE}"
+module list
+. "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
+
+declare -xr SPACK_PACKAGE='entrezdirect@10.7.20190114'
+declare -xr SPACK_COMPILER='gcc@8.5.0'
+declare -xr SPACK_VARIANTS=''
+declare -xr SPACK_DEPENDENCIES=''
+declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
+
+printenv
+
+spack config get compilers  
+spack config get config  
+spack config get mirrors
+spack config get modules
+spack config get packages
+spack config get repos
+spack config get upstreams
+
+time -p spack spec --long --namespaces --types "${SPACK_SPEC}"
+if [[ "${?}" -ne 0 ]]; then
+  echo 'ERROR: spack concretization failed.'
+  exit 1
+fi
+
+time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all "${SPACK_SPEC}"
+if [[ "${?}" -ne 0 ]]; then
+  echo 'ERROR: spack install failed.'
+  exit 1
+fi
+
+#spack module lmod refresh --delete-tree -y
+
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'anaconda3@2021.05.sh'
+
+sleep 30
+
+Currently Loaded Modules:
+  1) slurm/expanse/21.08.8
+
+ 
+
+LD_LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:/cm/shared/apps/slurm/current/lib64
+LS_COLORS=rs=0:di=38;5;33:ln=38;5;51:mh=00:pi=40;38;5;11:so=38;5;13:do=38;5;5:bd=48;5;232;38;5;11:cd=48;5;232;38;5;3:or=48;5;232;38;5;9:mi=01;05;37;41:su=48;5;196;38;5;15:sg=48;5;11;38;5;16:ca=48;5;196;38;5;226:tw=48;5;10;38;5;16:ow=48;5;10;38;5;21:st=48;5;21;38;5;15:ex=38;5;40:*.tar=38;5;9:*.tgz=38;5;9:*.arc=38;5;9:*.arj=38;5;9:*.taz=38;5;9:*.lha=38;5;9:*.lz4=38;5;9:*.lzh=38;5;9:*.lzma=38;5;9:*.tlz=38;5;9:*.txz=38;5;9:*.tzo=38;5;9:*.t7z=38;5;9:*.zip=38;5;9:*.z=38;5;9:*.dz=38;5;9:*.gz=38;5;9:*.lrz=38;5;9:*.lz=38;5;9:*.lzo=38;5;9:*.xz=38;5;9:*.zst=38;5;9:*.tzst=38;5;9:*.bz2=38;5;9:*.bz=38;5;9:*.tbz=38;5;9:*.tbz2=38;5;9:*.tz=38;5;9:*.deb=38;5;9:*.rpm=38;5;9:*.jar=38;5;9:*.war=38;5;9:*.ear=38;5;9:*.sar=38;5;9:*.rar=38;5;9:*.alz=38;5;9:*.ace=38;5;9:*.zoo=38;5;9:*.cpio=38;5;9:*.7z=38;5;9:*.rz=38;5;9:*.cab=38;5;9:*.wim=38;5;9:*.swm=38;5;9:*.dwm=38;5;9:*.esd=38;5;9:*.jpg=38;5;13:*.jpeg=38;5;13:*.mjpg=38;5;13:*.mjpeg=38;5;13:*.gif=38;5;13:*.bmp=38;5;13:*.pbm=38;5;13:*.pgm=38;5;13:*.ppm=38;5;13:*.tga=38;5;13:*.xbm=38;5;13:*.xpm=38;5;13:*.tif=38;5;13:*.tiff=38;5;13:*.png=38;5;13:*.svg=38;5;13:*.svgz=38;5;13:*.mng=38;5;13:*.pcx=38;5;13:*.mov=38;5;13:*.mpg=38;5;13:*.mpeg=38;5;13:*.m2v=38;5;13:*.mkv=38;5;13:*.webm=38;5;13:*.ogm=38;5;13:*.mp4=38;5;13:*.m4v=38;5;13:*.mp4v=38;5;13:*.vob=38;5;13:*.qt=38;5;13:*.nuv=38;5;13:*.wmv=38;5;13:*.asf=38;5;13:*.rm=38;5;13:*.rmvb=38;5;13:*.flc=38;5;13:*.avi=38;5;13:*.fli=38;5;13:*.flv=38;5;13:*.gl=38;5;13:*.dl=38;5;13:*.xcf=38;5;13:*.xwd=38;5;13:*.yuv=38;5;13:*.cgm=38;5;13:*.emf=38;5;13:*.ogv=38;5;13:*.ogx=38;5;13:*.aac=38;5;45:*.au=38;5;45:*.flac=38;5;45:*.m4a=38;5;45:*.mid=38;5;45:*.midi=38;5;45:*.mka=38;5;45:*.mp3=38;5;45:*.mpc=38;5;45:*.ogg=38;5;45:*.ra=38;5;45:*.wav=38;5;45:*.oga=38;5;45:*.opus=38;5;45:*.spx=38;5;45:*.xspf=38;5;45:
+SRUN_DEBUG=3
+SLURM_STEP_ID=0
+LOCAL_SCRATCH_DIR=/scratch/spack_cpu/job_21694065
+SLURM_NODEID=0
+SLURM_TASK_PID=1041873
+__LMOD_REF_COUNT_PATH=/cm/shared/apps/slurm/current/sbin:1;/cm/shared/apps/slurm/current/bin:1;/cm/shared/apps/spack/0.17.3/cpu/b/bin:1;/home/spack_cpu/.local/bin:2;/home/spack_cpu/bin:2;/usr/local/bin:1;/usr/bin:1;/usr/local/sbin:1;/usr/sbin:1
+_ModuleTable002_=aWxlcyIsIi9ldGMvbW9kdWxlZmlsZXMiLCIvdXNyL3NoYXJlL21vZHVsZWZpbGVzIiwiL3Vzci9zaGFyZS9Nb2R1bGVzL21vZHVsZWZpbGVzIiwiL2NtL3NoYXJlZC9tb2R1bGVmaWxlcyIsfSxbInN5c3RlbUJhc2VNUEFUSCJdPSIvY20vbG9jYWwvbW9kdWxlZmlsZXM6L2NtL3NoYXJlZC9hcHBzL2FjY2Vzcy9tb2R1bGVmaWxlczovY20vc2hhcmVkL2FwcHMveHNlZGUvbW9kdWxlZmlsZXM6L2NtL3NoYXJlZC9tb2R1bGVmaWxlczovZXRjL21vZHVsZWZpbGVzOi91c3Ivc2hhcmUvbW9kdWxlZmlsZXM6L3Vzci9zaGFyZS9Nb2R1bGVzL21vZHVsZWZpbGVzIix9
+SSH_CONNECTION=198.202.100.13 61274 198.202.100.13 22
+SPACK_PYTHON=/usr/bin/python3
+SLURM_PRIO_PROCESS=0
+SLURM_CPU_BIND_VERBOSE=quiet
+LANG=en_US.UTF-8
+SLURM_SUBMIT_DIR=/cm/shared/apps/spack/0.17.3/cpu/b/etc/spack/sdsc/expanse/0.17.3/cpu/specs
+HISTCONTROL=ignoredups
+HOSTNAME=exp-15-56
+LMOD_SYSTEM_DEFAULT_MODULES=DefaultModules
+SLURM_JOB_DEPENDENCY=afterok:21694059
+OLDPWD=/cm/shared/apps/spack/0.17.3/cpu/b/etc/spack/sdsc/expanse/0.17.3/cpu
+__LMOD_REF_COUNT__LMFILES_=/cm/local/modulefiles/slurm/expanse/21.08.8:1
+SLURM_CPUS_PER_TASK=16
+SLURM_STEPID=0
+SLURM_SRUN_COMM_HOST=10.21.0.19
+SPACK_DEPENDENCIES=
+SLURM_DISTRIBUTION=cyclic
+ENVIRONMENT=BATCH
+SPACK_VERSION=0.17.3
+SLURM_PROCID=0
+SPACK_INSTANCE_VERSION=b
+SLURM_JOB_GID=11491
+SPACK_VARIANTS=
+SPACK_INSTANCE_DIR=/cm/shared/apps/spack/0.17.3/cpu/b
+__LMOD_REF_COUNT_LD_LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:1;/cm/shared/apps/slurm/current/lib64:1
+SLURM_CPU_BIND=quiet,mask_cpu:0x0000000000000000000000000000FFFF
+SLURM_JOB_SCRIPT=/cm/shared/apps/spack/0.17.3/cpu/b/etc/spack/sdsc/expanse/0.17.3/cpu/specs/entrezdirect@10.7.20190114.sh
+SLURMD_NODENAME=exp-15-56
+SLURM_TASKS_PER_NODE=1
+S_COLORS=auto
+which_declare=declare -f
+SPACK_COMPILER=gcc@8.5.0
+SLURM_JOB_RESERVATION=rocky8u7_testing
+XDG_SESSION_ID=31726
+USER=spack_cpu
+SLURM_NNODES=1
+SLURM_LAUNCH_NODE_IPADDR=10.21.0.19
+SLURM_STEP_TASKS_PER_NODE=1
+SLURM_NTASKS_PER_NODE=1
+__LMOD_REF_COUNT_MODULEPATH=/cm/local/modulefiles:1;/cm/shared/apps/access/modulefiles:1;/cm/shared/apps/xsede/modulefiles:1;/etc/modulefiles:1;/usr/share/modulefiles:1;/usr/share/Modules/modulefiles:1;/cm/shared/modulefiles:1
+__LMOD_REF_COUNT_LOADEDMODULES=slurm/expanse/21.08.8:1
+PWD=/cm/shared/apps/spack/0.17.3/cpu/b/etc/spack/sdsc/expanse/0.17.3/cpu/specs
+ENABLE_LMOD=1
+SLURM_JOB_NODELIST=exp-15-56
+HOME=/home/spack_cpu
+SLURM_CLUSTER_NAME=expanse
+LMOD_COLORIZE=yes
+LOCAL_TIME=20230415T121005-0700
+SLURM_NODELIST=exp-15-56
+SSH_CLIENT=198.202.100.13 61274 22
+LMOD_VERSION=8.2.4
+CPATH=/cm/shared/apps/slurm/current/include
+SLURM_NTASKS=1
+LMOD_SETTARG_CMD=:
+SLURM_JOB_CPUS_PER_NODE=16
+BASH_ENV=/usr/share/lmod/lmod/init/bash
+SLURM_TOPOLOGY_ADDR=exp-15-56
+SLURM_WORKING_CLUSTER=expanse:mgr1:6817:9472:109
+SLURM_JOB_MD5SUM=1b119e0696245368d258be51b4542854  /cm/shared/apps/spack/0.17.3/cpu/b/etc/spack/sdsc/expanse/0.17.3/cpu/specs/entrezdirect@10.7.20190114.sh
+SPACK_PACKAGE=entrezdirect@10.7.20190114
+__LMOD_REF_COUNT_LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:1;/cm/shared/apps/slurm/current/lib64:1
+SLURM_STEP_NODELIST=exp-15-56
+SLURM_JOB_NAME=entrezdirect@10.7.20190114
+SLURM_SRUN_COMM_PORT=43597
+TMPDIR=/scratch/spack_cpu/job_21694065
+LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:/cm/shared/apps/slurm/current/lib64
+LMOD_sys=Linux
+SLURM_JOBID=21694065
+SYSTEM_NAME=expanse
+_ModuleTable001_=X01vZHVsZVRhYmxlXz17WyJNVHZlcnNpb24iXT0zLFsiY19yZWJ1aWxkVGltZSJdPWZhbHNlLFsiY19zaG9ydFRpbWUiXT1mYWxzZSxkZXB0aFQ9e30sZmFtaWx5PXt9LG1UPXtzbHVybT17WyJmbiJdPSIvY20vbG9jYWwvbW9kdWxlZmlsZXMvc2x1cm0vZXhwYW5zZS8yMS4wOC44IixbImZ1bGxOYW1lIl09InNsdXJtL2V4cGFuc2UvMjEuMDguOCIsWyJsb2FkT3JkZXIiXT0xLHByb3BUPXt9LFsic3RhY2tEZXB0aCJdPTAsWyJzdGF0dXMiXT0iYWN0aXZlIixbInVzZXJOYW1lIl09InNsdXJtIix9LH0sbXBhdGhBPXsiL2NtL2xvY2FsL21vZHVsZWZpbGVzIiwiL2NtL3NoYXJlZC9hcHBzL2FjY2Vzcy9tb2R1bGVmaWxlcyIsIi9jbS9zaGFyZWQvYXBwcy94c2VkZS9tb2R1bGVm
+SLURM_CONF=/cm/shared/apps/slurm/var/etc/expanse/slurm.conf
+LOADEDMODULES=slurm/expanse/21.08.8
+__LMOD_REF_COUNT_MANPATH=/cm/shared/apps/slurm/current/man:3;/usr/share/lmod/lmod/share/man:1;/usr/local/share/man:2;/usr/share/man:2;/cm/local/apps/environment-modules/current/share/man:2
+_ModuleTable003_=dXJtPXtbImZuIl09Ii9jbS9sb2NhbC9tb2R1bGVmaWxlcy9zbHVybS9leHBhbnNlLzIxLjA4LjgiLFsiZnVsbE5hbWUiXT0ic2x1cm0vZXhwYW5zZS8yMS4wOC44IixbImxvYWRPcmRlciJdPTMscHJvcFQ9e30sWyJzdGFja0RlcHRoIl09MixbInN0YXR1cyJdPSJhY3RpdmUiLFsidXNlck5hbWUiXT0ic2x1cm0iLH0sfSxtcGF0aEE9eyIvY20vc2hhcmVkL2FwcHMvc3BhY2svY3B1L2xtb2QvbGludXgtY2VudG9zOC14ODZfNjQvQ29yZSIsIi9jbS9sb2NhbC9tb2R1bGVmaWxlcyIsIi9jbS9zaGFyZWQvYXBwcy9hY2Nlc3MvbW9kdWxlZmlsZXMiLCIvY20vc2hhcmVkL2FwcHMveHNlZGUvbW9kdWxlZmlsZXMiLCIvZXRjL21vZHVsZWZpbGVzIiwiL3Vzci9zaGFyZS9tb2R1bGVm
+SLURM_NODE_ALIASES=(null)
+LMOD_ROOT=/usr/share/lmod
+SLURM_JOB_QOS=ind-shared-normal
+SLURM_TOPOLOGY_ADDR_PATTERN=node
+SSH_TTY=/dev/pts/267
+MAIL=/var/spool/mail/spack_cpu
+SLURM_CPUS_ON_NODE=16
+LMOD_arch=x86_64
+SLURM_JOB_NUM_NODES=1
+__Init_Default_Modules=1
+CMD_WLM_CLUSTER_NAME=expanse
+SLURM_MEM_PER_NODE=32768
+SPACK_ROOT=/cm/shared/apps/spack/0.17.3/cpu/b
+TERM=xterm-256color
+SHELL=/bin/bash
+_ModuleTable_Sz_=2
+SLURM_JOB_UID=527834
+__LMOD_REF_COUNT_CPATH=/cm/shared/apps/slurm/current/include:1
+SLURM_JOB_PARTITION=ind-shared
+SLURM_PTY_WIN_ROW=24
+SLURM_CPU_BIND_LIST=0x0000000000000000000000000000FFFF
+SPACK_INSTANCE_NAME=cpu
+SLURM_JOB_USER=spack_cpu
+SLURM_PTY_WIN_COL=80
+SLURM_NPROCS=1
+SHLVL=13
+SLURM_SUBMIT_HOST=exp-15-56
+UNIX_TIME=1681585805
+SLURM_JOB_ACCOUNT=use300
+MANPATH=/cm/shared/apps/slurm/current/man:/usr/share/lmod/lmod/share/man:/usr/local/share/man:/usr/share/man:/cm/local/apps/environment-modules/current/share/man
+SPACK_LD_LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:/cm/shared/apps/slurm/current/lib64
+LMOD_PREPEND_BLOCK=normal
+SLURM_STEP_LAUNCHER_PORT=43597
+MODULEPATH=/cm/local/modulefiles:/cm/shared/apps/access/modulefiles:/cm/shared/apps/xsede/modulefiles:/etc/modulefiles:/usr/share/modulefiles:/usr/share/Modules/modulefiles:/cm/shared/modulefiles
+SLURM_PTY_PORT=40017
+SLURM_GTIDS=0
+LOGNAME=spack_cpu
+DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/527834/bus
+XDG_RUNTIME_DIR=/run/user/527834
+MODULEPATH_ROOT=/usr/share/modulefiles
+PATH=/cm/shared/apps/slurm/current/sbin:/cm/shared/apps/slurm/current/bin:/cm/shared/apps/spack/0.17.3/cpu/b/bin:/home/spack_cpu/.local/bin:/home/spack_cpu/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin
+SLURM_JOB_ID=21694065
+_LMFILES_=/cm/local/modulefiles/slurm/expanse/21.08.8
+SLURM_CPU_BIND_TYPE=mask_cpu:
+DEBUGINFOD_URLS=https://debuginfod.centos.org/ 
+SLURM_STEP_NUM_TASKS=1
+SCHEDULER_MODULE=slurm
+MODULESHOME=/usr/share/lmod/lmod
+LMOD_SETTARG_FULL_SUPPORT=no
+HISTSIZE=-1
+LMOD_PKG=/usr/share/lmod/lmod
+SLURM_STEP_NUM_NODES=1
+SPACK_SPEC=entrezdirect@10.7.20190114 % gcc@8.5.0  
+LMOD_CMD=/usr/share/lmod/lmod/libexec/lmod
+SLURM_LOCALID=0
+LESSOPEN=||/usr/bin/lesspipe.sh %s
+LMOD_FULL_SETTARG_SUPPORT=no
+LMOD_DIR=/usr/share/lmod/lmod/libexec
+BASH_FUNC_which%%=() {  ( alias;
+ eval ${which_declare} ) | /usr/bin/which --tty-only --read-alias --read-functions --show-tilde --show-dot $@
+}
+BASH_FUNC_module%%=() {  eval $($LMOD_CMD bash "$@") && eval $(${LMOD_SETTARG_CMD:-:} -s sh)
+}
+BASH_FUNC_spack%%=() {  : this is a shell function from: /cm/shared/apps/spack/0.17.3/cpu/b/share/spack/setup-env.sh;
+ : the real spack script is here: /cm/shared/apps/spack/0.17.3/cpu/b/bin/spack;
+ _spack_shell_wrapper "$@";
+ return $?
+}
+BASH_FUNC__spack_shell_wrapper%%=() {  for var in LD_LIBRARY_PATH DYLD_LIBRARY_PATH DYLD_FALLBACK_LIBRARY_PATH;
+ do
+ eval "if [ -n \"\${${var}-}\" ]; then export SPACK_$var=\${${var}}; fi";
+ done;
+ if [ -n "${ZSH_VERSION:-}" ]; then
+ emulate -L sh;
+ fi;
+ _sp_flags="";
+ while [ ! -z ${1+x} ] && [ "${1#-}" != "${1}" ]; do
+ _sp_flags="$_sp_flags $1";
+ shift;
+ done;
+ if [ -n "$_sp_flags" ] && [ "${_sp_flags#*h}" != "${_sp_flags}" ] || [ "${_sp_flags#*V}" != "${_sp_flags}" ]; then
+ command spack $_sp_flags "$@";
+ return;
+ fi;
+ _sp_subcommand="";
+ if [ ! -z ${1+x} ]; then
+ _sp_subcommand="$1";
+ shift;
+ fi;
+ case $_sp_subcommand in 
+ "cd")
+ _sp_arg="";
+ if [ -n "$1" ]; then
+ _sp_arg="$1";
+ shift;
+ fi;
+ if [ "$_sp_arg" = "-h" ] || [ "$_sp_arg" = "--help" ]; then
+ command spack cd -h;
+ else
+ LOC="$(spack location $_sp_arg "$@")";
+ if [ -d "$LOC" ]; then
+ cd "$LOC";
+ else
+ return 1;
+ fi;
+ fi;
+ return
+ ;;
+ "env")
+ _sp_arg="";
+ if [ -n "$1" ]; then
+ _sp_arg="$1";
+ shift;
+ fi;
+ if [ "$_sp_arg" = "-h" ] || [ "$_sp_arg" = "--help" ]; then
+ command spack env -h;
+ else
+ case $_sp_arg in 
+ activate)
+ _a=" $@";
+ if [ -z ${1+x} ] || [ "${_a#* --sh}" != "$_a" ] || [ "${_a#* --csh}" != "$_a" ] || [ "${_a#* -h}" != "$_a" ] || [ "${_a#* --help}" != "$_a" ]; then
+ command spack env activate "$@";
+ else
+ stdout="$(command spack $_sp_flags env activate --sh "$@")" || return;
+ eval "$stdout";
+ fi
+ ;;
+ deactivate)
+ _a=" $@";
+ if [ "${_a#* --sh}" != "$_a" ] || [ "${_a#* --csh}" != "$_a" ]; then
+ command spack env deactivate "$@";
+ else
+ if [ -n "$*" ]; then
+ command spack env deactivate -h;
+ else
+ stdout="$(command spack $_sp_flags env deactivate --sh)" || return;
+ eval "$stdout";
+ fi;
+ fi
+ ;;
+ *)
+ command spack env $_sp_arg "$@"
+ ;;
+ esac;
+ fi;
+ return
+ ;;
+ "load" | "unload")
+ _a=" $@";
+ if [ "${_a#* --sh}" != "$_a" ] || [ "${_a#* --csh}" != "$_a" ] || [ "${_a#* -h}" != "$_a" ] || [ "${_a#* --list}" != "$_a" ] || [ "${_a#* --help}" != "$_a" ]; then
+ command spack $_sp_flags $_sp_subcommand "$@";
+ else
+ stdout="$(command spack $_sp_flags $_sp_subcommand --sh "$@")" || return;
+ eval "$stdout";
+ fi
+ ;;
+ *)
+ command spack $_sp_flags $_sp_subcommand "$@"
+ ;;
+ esac
+}
+BASH_FUNC_ml%%=() {  eval $($LMOD_DIR/ml_cmd "$@")
+}
+_=/usr/bin/printenv
+compilers:
+- compiler:
+    spec: gcc@8.5.0
+    paths:
+      cc: /usr/bin/gcc
+      cxx: /usr/bin/g++
+      f77: /usr/bin/gfortran
+      fc: /usr/bin/gfortran
+    flags:
+      cflags: -O2 -march=native
+      cxxflags: -O2 -march=native
+      fflags: -O2 -march=native
+    operating_system: rocky8
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+config:
+  install_tree:
+    root: $spack/opt/spack
+    projections:
+      all: ${ARCHITECTURE}/${COMPILERNAME}-${COMPILERVER}/${PACKAGE}-${VERSION}-${HASH}
+  template_dirs:
+  - $spack/share/spack/templates
+
+  # Temporary locations Spack can try to use for builds.
+  #
+  # Recommended options are given below.
+  #
+  # Builds can be faster in temporary directories on some (e.g., HPC) systems.
+  # Specifying `$tempdir` will ensure use of the default temporary directory
+  # (i.e., ``$TMP` or ``$TMPDIR``).
+  #
+  # Another option that prevents conflicts and potential permission issues is
+  # to specify `$user_cache_path/stage`, which ensures each user builds in their
+  # home directory.
+  #
+  # A more traditional path uses the value of `$spack/var/spack/stage`, which
+  # builds directly inside Spack's instance without staging them in a
+  # temporary space.  Problems with specifying a path inside a Spack instance
+  # are that it precludes its use as a system package and its ability to be
+  # pip installable.
+  #
+  # In any case, if the username is not already in the path, Spack will append
+  # the value of `$user` in an attempt to avoid potential conflicts between
+  # users in shared temporary spaces.
+  #
+  # The build stage can be purged with `spack clean --stage` and
+  # `spack clean -a`, so it is important that the specified directory uniquely
+  # identifies Spack staging to avoid accidentally wiping out non-Spack work.
+  build_stage:
+  - $tempdir/$user/spack-stage
+  - $user_cache_path/stage
+  # - $spack/var/spack/stage
+
+  # Directory in which to run tests and store test results.
+  # Tests will be stored in directories named by date/time and package
+  # name/hash.
+  test_stage: $user_cache_path/test
+  source_cache: $spack/var/spack/cache
+  misc_cache: $user_cache_path/cache
+  connect_timeout: 10
+  verify_ssl: true
+  suppress_gpg_warnings: false
+  install_missing_compilers: false
+  checksum: true
+  deprecated: false
+  dirty: false
+  build_language: C
+  locks: true
+  url_fetch_method: urllib
+  ccache: false
+  concretizer: clingo
+  db_lock_timeout: 3
+  package_lock_timeout: null
+  shared_linking: rpath
+  allow_sgid: true
+  terminal_title: false
+  debug: false
+  build_jobs: 16
+mirrors:
+  spack-public: https://mirror.spack.io
+modules:
+  default:
+    'enable:':
+    - lmod
+    lmod:
+      core_compilers:
+      - gcc@8.5.0
+      hierarchy:
+      - mpi
+      hash_length: 0
+      blacklist_implicits: true
+      naming_scheme: '{name}/{version}/{hash:7}'
+      projections:
+        all: '{name}/{version}/{hash:7}'
+      adol-c:
+        suffixes:
+          +openmp: omp
+      amdblis:
+        suffixes:
+          threads=openmp: omp
+      fftw:
+        suffixes:
+          +openmp: omp
+      hpl:
+        suffixes:
+          +openmp: omp
+      hypre:
+        suffixes:
+          +openmp: omp
+      intel:
+        environment:
+          set:
+            INTEL_LICENSE_FILE: 40000@elprado.sdsc.edu:40200@elprado.sdsc.edu
+      kokkos:
+        suffixes:
+          +openmp: omp
+      openblas:
+        suffixes:
+          threads=openmp: omp
+          +ilp64: i64
+      petsc:
+        suffixes:
+          +complex: cmplx
+      slepc:
+        suffixes:
+          ^petsc +complex: cmplx
+      ^python:
+        autoload: direct
+      ^ucx:
+        autoload: direct
+  prefix_inspections:
+    lib:
+    - LD_LIBRARY_PATH
+    lib64:
+    - LD_LIBRARY_PATH
+    bin:
+    - PATH
+    man:
+    - MANPATH
+    share/man:
+    - MANPATH
+    share/aclocal:
+    - ACLOCAL_PATH
+    lib/pkgconfig:
+    - PKG_CONFIG_PATH
+    lib64/pkgconfig:
+    - PKG_CONFIG_PATH
+    share/pkgconfig:
+    - PKG_CONFIG_PATH
+    ? ''
+    : - CMAKE_PREFIX_PATH
+
+  # These are configurations for the module set named "default"
+packages:
+  lustre:
+    externals:
+    - spec: lustre@2.15.2
+      prefix: /usr
+    buildable: false
+  openssl:
+    externals:
+    - spec: openssl@1.1.1k
+      prefix: /usr
+    buildable: false
+  rdma-core:
+    externals:
+    - spec: rdma-core@43.0
+      prefix: /usr
+    buildable: false
+  slurm:
+    externals:
+    - spec: slurm@21.08.8
+      prefix: /cm/shared/apps/slurm/21.08.8
+    buildable: false
+  librsvg:
+    externals:
+    - spec: librsvg@2.42.7
+      prefix: /usr
+    buildable: false
+  ghostscript:
+    externals:
+    - spec: ghostscript@9.27
+      prefix: /usr
+    buildable: false
+  gaussian:
+    permissions:
+      read: group
+      group: gaussian
+  vasp6:
+    permissions:
+      read: group
+      group: vasp-6
+  all:
+    compiler: [gcc, intel, pgi, clang, xl, nag, fj, aocc]
+    providers:
+      awk: [gawk]
+      blas: [openblas, amdblis]
+      D: [ldc]
+      daal: [intel-daal]
+      elf: [elfutils]
+      fftw-api: [fftw, amdfftw]
+      flame: [libflame, amdlibflame]
+      fuse: [libfuse]
+      gl: [mesa+opengl, mesa18, opengl]
+      glu: [mesa-glu, openglu]
+      glx: [mesa+glx, mesa18+glx, opengl]
+      golang: [gcc]
+      iconv: [libiconv]
+      ipp: [intel-ipp]
+      java: [openjdk, jdk, ibm-java]
+      jpeg: [libjpeg-turbo, libjpeg]
+      lapack: [openblas, amdlibflame]
+      lua-lang: [lua, lua-luajit]
+      mariadb-client: [mariadb-c-client, mariadb]
+      mkl: [intel-mkl]
+      mpe: [mpe2]
+      mpi: [openmpi, mpich]
+      mysql-client: [mysql, mariadb-c-client]
+      opencl: [pocl]
+      onedal: [intel-oneapi-dal]
+      osmesa: [mesa+osmesa, mesa18+osmesa]
+      pbs: [openpbs, torque]
+      pil: [py-pillow]
+      pkgconfig: [pkgconf, pkg-config]
+      rpc: [libtirpc]
+      scalapack: [netlib-scalapack, amdscalapack]
+      sycl: [hipsycl]
+      szip: [libaec, libszip]
+      tbb: [intel-tbb]
+      unwind: [libunwind]
+      uuid: [util-linux-uuid, libuuid]
+      xxd: [xxd-standalone, vim]
+      yacc: [bison, byacc]
+      ziglang: [zig]
+    permissions:
+      read: world
+      write: user
+repos:
+- $spack/var/spack/repos/sdsc
+- $spack/var/spack/repos/builtin
+upstreams: {}
+==> Warning: using "openssl@1.1.1k" which is a deprecated version
+Input spec
+--------------------------------
+[    ]  .entrezdirect@10.7.20190114%gcc@8.5.0
+
+Concretized
+--------------------------------
+6pkkpx2  [    ]  builtin.entrezdirect@10.7.20190114%gcc@8.5.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen
+onqgauy  [b r ]      ^sdsc.perl@5.32.0%gcc@8.5.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +cpanm+shared+threads arch=linux-rocky8-zen
+dk6ivvc  [bl  ]          ^builtin.berkeley-db@18.1.40%gcc@8.5.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +cxx~docs+stl patches=b231fcc4d5cff05e5c3a4814f6a5af0e9a966428dc2176540d2c05aff41de522 arch=linux-rocky8-zen
+eixztsx  [bl  ]          ^builtin.bzip2@1.0.8%gcc@8.5.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~debug~pic+shared arch=linux-rocky8-zen
+jgot3zt  [b   ]              ^builtin.diffutils@3.8%gcc@8.5.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen
+yderrdc  [bl  ]                  ^builtin.libiconv@1.16%gcc@8.5.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  libs=shared,static arch=linux-rocky8-zen
+7vthrro  [bl  ]          ^sdsc.gdbm@1.19%gcc@8.5.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen
+crxysww  [bl  ]              ^builtin.readline@8.1%gcc@8.5.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen
+tqezzwo  [bl  ]                  ^builtin.ncurses@6.2%gcc@8.5.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~symlinks+termlib abi=none arch=linux-rocky8-zen
+fwt4tis  [b   ]                      ^builtin.pkgconf@1.8.0%gcc@8.5.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen
+bmchsim  [bl  ]          ^builtin.zlib@1.2.11%gcc@8.5.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +optimize+pic+shared arch=linux-rocky8-zen
+lstykdj  [b r ]      ^builtin.perl-html-parser@3.72%gcc@8.5.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen
+22tb53n  [b r ]          ^builtin.perl-html-tagset@3.20%gcc@8.5.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen
+a5fvgf6  [b r ]      ^builtin.perl-http-message@6.13%gcc@8.5.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen
+lnmhq2l  [b r ]          ^builtin.perl-encode-locale@1.05%gcc@8.5.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen
+bj7ujwe  [b r ]          ^builtin.perl-http-date@6.02%gcc@8.5.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen
+5b7jltd  [b r ]          ^builtin.perl-io-html@1.001%gcc@8.5.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen
+n7n3bf2  [b r ]          ^builtin.perl-lwp-mediatypes@6.02%gcc@8.5.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen
+ocilsxe  [b r ]          ^builtin.perl-try-tiny@0.28%gcc@8.5.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen
+lqq3cte  [b r ]          ^builtin.perl-uri@1.72%gcc@8.5.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen
+q6qhucl  [b   ]              ^builtin.perl-test-needs@0.002005%gcc@8.5.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen
+7awxaxx  [b r ]      ^builtin.perl-libwww-perl@6.33%gcc@8.5.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen
+uv7qvpg  [b r ]          ^builtin.perl-file-listing@6.04%gcc@8.5.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen
+pxpp2cu  [b r ]          ^builtin.perl-http-cookies@6.04%gcc@8.5.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen
+hkvjvel  [b r ]          ^builtin.perl-http-daemon@6.01%gcc@8.5.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen
+jxxsp42  [b   ]              ^builtin.perl-module-build-tiny@0.039%gcc@8.5.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen
+ibp3ykx  [b r ]                  ^builtin.perl-extutils-config@0.008%gcc@8.5.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen
+t6rtuqx  [b r ]                  ^builtin.perl-extutils-helpers@0.026%gcc@8.5.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen
+omvtiqk  [b r ]                  ^builtin.perl-extutils-installpaths@0.012%gcc@8.5.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen
+vyjn6xi  [b   ]                  ^builtin.perl-module-build@0.4224%gcc@8.5.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen
+6le3wlh  [b r ]          ^builtin.perl-http-negotiate@6.01%gcc@8.5.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen
+h5iqhsg  [b r ]          ^builtin.perl-net-http@6.17%gcc@8.5.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen
+qsy5cta  [b r ]          ^builtin.perl-www-robotrules@6.02%gcc@8.5.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen
+ng3ihiw  [  r ]      ^builtin.perl-lwp-protocol-https@6.04%gcc@8.5.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen
+qj25lb7  [b r ]          ^builtin.perl-io-socket-ssl@2.052%gcc@8.5.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen
+ldohwcv  [b r ]              ^builtin.perl-net-ssleay@1.85%gcc@8.5.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen
+tmkd4h5  [bl  ]                  ^builtin.openssl@1.1.1k%gcc@8.5.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~docs certs=system arch=linux-rocky8-zen
+u2jxdlu  [b r ]          ^builtin.perl-mozilla-ca@20160104%gcc@8.5.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen
+dafpj6g  [b r ]          ^builtin.perl-test-requiresinternet@0.05%gcc@8.5.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen
+phctdn2  [  r ]      ^builtin.perl-xml-simple@2.24%gcc@8.5.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen
+mrri3cd  [b r ]          ^builtin.perl-xml-parser@2.44%gcc@8.5.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen
+6qidgui  [bl  ]              ^builtin.expat@2.4.1%gcc@8.5.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +libbsd arch=linux-rocky8-zen
+fyc464g  [bl  ]                  ^builtin.libbsd@0.11.3%gcc@8.5.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen
+3dddctb  [bl  ]                      ^builtin.libmd@1.0.3%gcc@8.5.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen
+
+real 1.45
+user 0.77
+sys 0.14
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen/gcc-8.5.0/berkeley-db-18.1.40-dk6ivvcdy6sq2ukkiqzg3oc3sfdmd2xn
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen/gcc-8.5.0/libiconv-1.16-yderrdc4lsgjejs532627rl5nwrwzmde
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen/gcc-8.5.0/pkgconf-1.8.0-fwt4tisehgfyygmnh7qhb754ehlyq5sl
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen/gcc-8.5.0/zlib-1.2.11-bmchsimapzrndjqxvin7wptdiiwoxdqq
+[+] /usr (external openssl-1.1.1k-tmkd4h5o4cyf3lch6qmq3gx7vwh5m45o)
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen/gcc-8.5.0/libmd-1.0.3-3dddctbagxpkojz6cgcu54qjjbgdjuzo
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen/gcc-8.5.0/diffutils-3.8-jgot3ztqojijkgnwjwk6ux2dacnedtws
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen/gcc-8.5.0/ncurses-6.2-tqezzwooo2opnqn2y45tjsozwlrmdnta
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen/gcc-8.5.0/libbsd-0.11.3-fyc464ggn3ll44p42ndrtcak7df4gs3o
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen/gcc-8.5.0/bzip2-1.0.8-eixztsxepw3tt37rkvb2pixk6fghgqpn
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen/gcc-8.5.0/readline-8.1-crxysww56qszze5dhko33udncl5z5tif
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen/gcc-8.5.0/expat-2.4.1-6qidguin5s7lkgveikpkcusvc5qinvfd
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen/gcc-8.5.0/gdbm-1.19-7vthrronwkqaeob53irfndjaziczgdrz
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen/gcc-8.5.0/perl-5.32.0-onqgauyhbnajd2pqsqxvgbmthpp7mghp
+==> Installing perl-net-ssleay-1.85-ldohwcv5yx7nsncb6kbqxgcl7n4jodl5
+==> No binary for perl-net-ssleay-1.85-ldohwcv5yx7nsncb6kbqxgcl7n4jodl5 found: installing from source
+==> Warning: using "openssl@1.1.1k" which is a deprecated version
+==> Warning: Expected user 527834 to own /scratch/spack_cpu, but it is owned by 0
+==> Fetching https://mirror.spack.io/_source-cache/archive/9d/9d8188b9fb1cae3bd791979c20554925d5e94a138d00414f1a6814549927b0c8.tar.gz
+==> No patches needed for perl-net-ssleay
+==> perl-net-ssleay: Executing phase: 'configure'
+==> perl-net-ssleay: Executing phase: 'build'
+==> perl-net-ssleay: Executing phase: 'install'
+==> perl-net-ssleay: Successfully installed perl-net-ssleay-1.85-ldohwcv5yx7nsncb6kbqxgcl7n4jodl5
+  Fetch: 0.57s.  Build: 7.96s.  Total: 8.53s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen/gcc-8.5.0/perl-net-ssleay-1.85-ldohwcv5yx7nsncb6kbqxgcl7n4jodl5
+==> Installing perl-module-build-0.4224-vyjn6xixv2oe5khwnntrzqwvyd4xrw35
+==> No binary for perl-module-build-0.4224-vyjn6xixv2oe5khwnntrzqwvyd4xrw35 found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/a6/a6ca15d78244a7b50fdbf27f85c85f4035aa799ce7dd018a0d98b358ef7bc782.tar.gz
+==> No patches needed for perl-module-build
+==> perl-module-build: Executing phase: 'configure'
+==> perl-module-build: Executing phase: 'build'
+==> perl-module-build: Executing phase: 'install'
+==> perl-module-build: Successfully installed perl-module-build-0.4224-vyjn6xixv2oe5khwnntrzqwvyd4xrw35
+  Fetch: 0.53s.  Build: 0.82s.  Total: 1.35s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen/gcc-8.5.0/perl-module-build-0.4224-vyjn6xixv2oe5khwnntrzqwvyd4xrw35
+==> Installing perl-encode-locale-1.05-lnmhq2laca4tumjkg7k6ihljp2o2imog
+==> No binary for perl-encode-locale-1.05-lnmhq2laca4tumjkg7k6ihljp2o2imog found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/17/176fa02771f542a4efb1dbc2a4c928e8f4391bf4078473bd6040d8f11adb0ec1.tar.gz
+==> No patches needed for perl-encode-locale
+==> perl-encode-locale: Executing phase: 'configure'
+==> perl-encode-locale: Executing phase: 'build'
+==> perl-encode-locale: Executing phase: 'install'
+==> perl-encode-locale: Successfully installed perl-encode-locale-1.05-lnmhq2laca4tumjkg7k6ihljp2o2imog
+  Fetch: 0.30s.  Build: 0.42s.  Total: 0.72s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen/gcc-8.5.0/perl-encode-locale-1.05-lnmhq2laca4tumjkg7k6ihljp2o2imog
+==> Installing perl-try-tiny-0.28-ocilsxepfe2t6ql2zrehyszhxzoghqap
+==> No binary for perl-try-tiny-0.28-ocilsxepfe2t6ql2zrehyszhxzoghqap found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/f1/f1d166be8aa19942c4504c9111dade7aacb981bc5b3a2a5c5f6019646db8c146.tar.gz
+==> No patches needed for perl-try-tiny
+==> perl-try-tiny: Executing phase: 'configure'
+==> perl-try-tiny: Executing phase: 'build'
+==> perl-try-tiny: Executing phase: 'install'
+==> perl-try-tiny: Successfully installed perl-try-tiny-0.28-ocilsxepfe2t6ql2zrehyszhxzoghqap
+  Fetch: 0.37s.  Build: 0.50s.  Total: 0.87s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen/gcc-8.5.0/perl-try-tiny-0.28-ocilsxepfe2t6ql2zrehyszhxzoghqap
+==> Installing perl-lwp-mediatypes-6.02-n7n3bf2yu6b6ate2je3ttw4wqzobobmx
+==> No binary for perl-lwp-mediatypes-6.02-n7n3bf2yu6b6ate2je3ttw4wqzobobmx found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/18/18790b0cc5f0a51468495c3847b16738f785a2d460403595001e0b932e5db676.tar.gz
+==> No patches needed for perl-lwp-mediatypes
+==> perl-lwp-mediatypes: Executing phase: 'configure'
+==> perl-lwp-mediatypes: Executing phase: 'build'
+==> perl-lwp-mediatypes: Executing phase: 'install'
+==> perl-lwp-mediatypes: Successfully installed perl-lwp-mediatypes-6.02-n7n3bf2yu6b6ate2je3ttw4wqzobobmx
+  Fetch: 0.24s.  Build: 0.41s.  Total: 0.66s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen/gcc-8.5.0/perl-lwp-mediatypes-6.02-n7n3bf2yu6b6ate2je3ttw4wqzobobmx
+==> Installing perl-mozilla-ca-20160104-u2jxdlurjcv4sdcbzap6hxt6vdl5qfpn
+==> No binary for perl-mozilla-ca-20160104-u2jxdlurjcv4sdcbzap6hxt6vdl5qfpn found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/27/27a7069a243162b65ada4194ff9d21b6ebc304af723eb5d3972fb74c11b03f2a.tar.gz
+==> No patches needed for perl-mozilla-ca
+==> perl-mozilla-ca: Executing phase: 'configure'
+==> perl-mozilla-ca: Executing phase: 'build'
+==> perl-mozilla-ca: Executing phase: 'install'
+==> perl-mozilla-ca: Successfully installed perl-mozilla-ca-20160104-u2jxdlurjcv4sdcbzap6hxt6vdl5qfpn
+  Fetch: 0.52s.  Build: 0.42s.  Total: 0.94s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen/gcc-8.5.0/perl-mozilla-ca-20160104-u2jxdlurjcv4sdcbzap6hxt6vdl5qfpn
+==> Installing perl-io-html-1.001-5b7jltdwhvqfergjc7vysypjjobishk6
+==> No binary for perl-io-html-1.001-5b7jltdwhvqfergjc7vysypjjobishk6 found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/ea/ea78d2d743794adc028bc9589538eb867174b4e165d7d8b5f63486e6b828e7e0.tar.gz
+==> No patches needed for perl-io-html
+==> perl-io-html: Executing phase: 'configure'
+==> perl-io-html: Executing phase: 'build'
+==> perl-io-html: Executing phase: 'install'
+==> perl-io-html: Successfully installed perl-io-html-1.001-5b7jltdwhvqfergjc7vysypjjobishk6
+  Fetch: 0.35s.  Build: 0.43s.  Total: 0.78s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen/gcc-8.5.0/perl-io-html-1.001-5b7jltdwhvqfergjc7vysypjjobishk6
+==> Installing perl-test-needs-0.002005-q6qhuclsofziblimx5jvcd63zgwruj4g
+==> No binary for perl-test-needs-0.002005-q6qhuclsofziblimx5jvcd63zgwruj4g found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/5a/5a4f33983586edacdbe00a3b429a9834190140190dab28d0f873c394eb7df399.tar.gz
+==> No patches needed for perl-test-needs
+==> perl-test-needs: Executing phase: 'configure'
+==> perl-test-needs: Executing phase: 'build'
+==> perl-test-needs: Executing phase: 'install'
+==> perl-test-needs: Successfully installed perl-test-needs-0.002005-q6qhuclsofziblimx5jvcd63zgwruj4g
+  Fetch: 0.28s.  Build: 0.42s.  Total: 0.70s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen/gcc-8.5.0/perl-test-needs-0.002005-q6qhuclsofziblimx5jvcd63zgwruj4g
+==> Installing perl-extutils-config-0.008-ibp3ykxsgdkkivglkfrbygy7ft6oees2
+==> No binary for perl-extutils-config-0.008-ibp3ykxsgdkkivglkfrbygy7ft6oees2 found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/ae/ae5104f634650dce8a79b7ed13fb59d67a39c213a6776cfdaa3ee749e62f1a8c.tar.gz
+==> No patches needed for perl-extutils-config
+==> perl-extutils-config: Executing phase: 'configure'
+==> perl-extutils-config: Executing phase: 'build'
+==> perl-extutils-config: Executing phase: 'install'
+==> perl-extutils-config: Successfully installed perl-extutils-config-0.008-ibp3ykxsgdkkivglkfrbygy7ft6oees2
+  Fetch: 0.26s.  Build: 0.42s.  Total: 0.68s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen/gcc-8.5.0/perl-extutils-config-0.008-ibp3ykxsgdkkivglkfrbygy7ft6oees2
+==> Installing perl-html-tagset-3.20-22tb53n2zicqae3nhl3o5vqibtsild4b
+==> No binary for perl-html-tagset-3.20-22tb53n2zicqae3nhl3o5vqibtsild4b found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/ad/adb17dac9e36cd011f5243881c9739417fd102fce760f8de4e9be4c7131108e2.tar.gz
+==> No patches needed for perl-html-tagset
+==> perl-html-tagset: Executing phase: 'configure'
+==> perl-html-tagset: Executing phase: 'build'
+==> perl-html-tagset: Executing phase: 'install'
+==> perl-html-tagset: Successfully installed perl-html-tagset-3.20-22tb53n2zicqae3nhl3o5vqibtsild4b
+  Fetch: 0.21s.  Build: 0.42s.  Total: 0.63s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen/gcc-8.5.0/perl-html-tagset-3.20-22tb53n2zicqae3nhl3o5vqibtsild4b
+==> Installing perl-extutils-helpers-0.026-t6rtuqxcxzp6zwwuwyhpn7ej3csaqexh
+==> No binary for perl-extutils-helpers-0.026-t6rtuqxcxzp6zwwuwyhpn7ej3csaqexh found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/de/de901b6790a4557cf4ec908149e035783b125bf115eb9640feb1bc1c24c33416.tar.gz
+==> No patches needed for perl-extutils-helpers
+==> perl-extutils-helpers: Executing phase: 'configure'
+==> perl-extutils-helpers: Executing phase: 'build'
+==> perl-extutils-helpers: Executing phase: 'install'
+==> perl-extutils-helpers: Successfully installed perl-extutils-helpers-0.026-t6rtuqxcxzp6zwwuwyhpn7ej3csaqexh
+  Fetch: 0.25s.  Build: 0.44s.  Total: 0.70s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen/gcc-8.5.0/perl-extutils-helpers-0.026-t6rtuqxcxzp6zwwuwyhpn7ej3csaqexh
+==> Installing perl-test-requiresinternet-0.05-dafpj6gviwzvhydo3uow27uofolliy7v
+==> No binary for perl-test-requiresinternet-0.05-dafpj6gviwzvhydo3uow27uofolliy7v found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/bb/bba7b32a1cc0d58ce2ec20b200a7347c69631641e8cae8ff4567ad24ef1e833e.tar.gz
+==> No patches needed for perl-test-requiresinternet
+==> perl-test-requiresinternet: Executing phase: 'configure'
+==> perl-test-requiresinternet: Executing phase: 'build'
+==> perl-test-requiresinternet: Executing phase: 'install'
+==> perl-test-requiresinternet: Successfully installed perl-test-requiresinternet-0.05-dafpj6gviwzvhydo3uow27uofolliy7v
+  Fetch: 0.29s.  Build: 0.41s.  Total: 0.71s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen/gcc-8.5.0/perl-test-requiresinternet-0.05-dafpj6gviwzvhydo3uow27uofolliy7v
+==> Installing perl-http-date-6.02-bj7ujwezvlblnnp42mo2n4lgndldbt2c
+==> No binary for perl-http-date-6.02-bj7ujwezvlblnnp42mo2n4lgndldbt2c found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/e8/e8b9941da0f9f0c9c01068401a5e81341f0e3707d1c754f8e11f42a7e629e333.tar.gz
+==> No patches needed for perl-http-date
+==> perl-http-date: Executing phase: 'configure'
+==> perl-http-date: Executing phase: 'build'
+==> perl-http-date: Executing phase: 'install'
+==> perl-http-date: Successfully installed perl-http-date-6.02-bj7ujwezvlblnnp42mo2n4lgndldbt2c
+  Fetch: 0.29s.  Build: 0.42s.  Total: 0.71s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen/gcc-8.5.0/perl-http-date-6.02-bj7ujwezvlblnnp42mo2n4lgndldbt2c
+==> Installing perl-io-socket-ssl-2.052-qj25lb7ervhrsel3g4ophs5zicyppk5a
+==> No binary for perl-io-socket-ssl-2.052-qj25lb7ervhrsel3g4ophs5zicyppk5a found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/e4/e4897a9b17cb18a3c44aa683980d52cef534cdfcb8063d6877c879bfa2f26673.tar.gz
+==> No patches needed for perl-io-socket-ssl
+==> perl-io-socket-ssl: Executing phase: 'configure'
+==> perl-io-socket-ssl: Executing phase: 'build'
+==> perl-io-socket-ssl: Executing phase: 'install'
+==> perl-io-socket-ssl: Successfully installed perl-io-socket-ssl-2.052-qj25lb7ervhrsel3g4ophs5zicyppk5a
+  Fetch: 0.48s.  Build: 0.59s.  Total: 1.07s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen/gcc-8.5.0/perl-io-socket-ssl-2.052-qj25lb7ervhrsel3g4ophs5zicyppk5a
+==> Installing perl-uri-1.72-lqq3ctebdb6ccjiwexrqgd3nki5uiffb
+==> No binary for perl-uri-1.72-lqq3ctebdb6ccjiwexrqgd3nki5uiffb found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/35/35f14431d4b300de4be1163b0b5332de2d7fbda4f05ff1ed198a8e9330d40a32.tar.gz
+==> No patches needed for perl-uri
+==> perl-uri: Executing phase: 'configure'
+==> perl-uri: Executing phase: 'build'
+==> perl-uri: Executing phase: 'install'
+==> perl-uri: Successfully installed perl-uri-1.72-lqq3ctebdb6ccjiwexrqgd3nki5uiffb
+  Fetch: 0.33s.  Build: 0.62s.  Total: 0.95s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen/gcc-8.5.0/perl-uri-1.72-lqq3ctebdb6ccjiwexrqgd3nki5uiffb
+==> Installing perl-extutils-installpaths-0.012-omvtiqkxflsxp5ose3utcmvbf4ftdxps
+==> No binary for perl-extutils-installpaths-0.012-omvtiqkxflsxp5ose3utcmvbf4ftdxps found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/84/84735e3037bab1fdffa3c2508567ad412a785c91599db3c12593a50a1dd434ed.tar.gz
+==> No patches needed for perl-extutils-installpaths
+==> perl-extutils-installpaths: Executing phase: 'configure'
+==> perl-extutils-installpaths: Executing phase: 'build'
+==> perl-extutils-installpaths: Executing phase: 'install'
+==> perl-extutils-installpaths: Successfully installed perl-extutils-installpaths-0.012-omvtiqkxflsxp5ose3utcmvbf4ftdxps
+  Fetch: 0.35s.  Build: 0.44s.  Total: 0.79s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen/gcc-8.5.0/perl-extutils-installpaths-0.012-omvtiqkxflsxp5ose3utcmvbf4ftdxps
+==> Installing perl-html-parser-3.72-lstykdjwftjbujkrm4wo4cchb264bmwn
+==> No binary for perl-html-parser-3.72-lstykdjwftjbujkrm4wo4cchb264bmwn found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/ec/ec28c7e1d9e67c45eca197077f7cdc41ead1bb4c538c7f02a3296a4bb92f608b.tar.gz
+==> No patches needed for perl-html-parser
+==> perl-html-parser: Executing phase: 'configure'
+==> perl-html-parser: Executing phase: 'build'
+==> perl-html-parser: Executing phase: 'install'
+==> perl-html-parser: Successfully installed perl-html-parser-3.72-lstykdjwftjbujkrm4wo4cchb264bmwn
+  Fetch: 0.49s.  Build: 1.33s.  Total: 1.82s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen/gcc-8.5.0/perl-html-parser-3.72-lstykdjwftjbujkrm4wo4cchb264bmwn
+==> Installing perl-file-listing-6.04-uv7qvpgw5opwmxk5zvguqemrpnqc3jcd
+==> No binary for perl-file-listing-6.04-uv7qvpgw5opwmxk5zvguqemrpnqc3jcd found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/1e/1e0050fcd6789a2179ec0db282bf1e90fb92be35d1171588bd9c47d52d959cf5.tar.gz
+==> No patches needed for perl-file-listing
+==> perl-file-listing: Executing phase: 'configure'
+==> perl-file-listing: Executing phase: 'build'
+==> perl-file-listing: Executing phase: 'install'
+==> perl-file-listing: Successfully installed perl-file-listing-6.04-uv7qvpgw5opwmxk5zvguqemrpnqc3jcd
+  Fetch: 0.40s.  Build: 0.43s.  Total: 0.83s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen/gcc-8.5.0/perl-file-listing-6.04-uv7qvpgw5opwmxk5zvguqemrpnqc3jcd
+==> Installing perl-net-http-6.17-h5iqhsgue4ztwhtva427xdtqwtyvuwga
+==> No binary for perl-net-http-6.17-h5iqhsgue4ztwhtva427xdtqwtyvuwga found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/1e/1e8624b1618dc6f7f605f5545643ebb9b833930f4d7485d4124aa2f2f26d1611.tar.gz
+==> No patches needed for perl-net-http
+==> perl-net-http: Executing phase: 'configure'
+==> perl-net-http: Executing phase: 'build'
+==> perl-net-http: Executing phase: 'install'
+==> perl-net-http: Successfully installed perl-net-http-6.17-h5iqhsgue4ztwhtva427xdtqwtyvuwga
+  Fetch: 0.41s.  Build: 0.49s.  Total: 0.90s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen/gcc-8.5.0/perl-net-http-6.17-h5iqhsgue4ztwhtva427xdtqwtyvuwga
+==> Installing perl-http-message-6.13-a5fvgf6kz6j7v7bk2qodg34yec4t7r7g
+==> No binary for perl-http-message-6.13-a5fvgf6kz6j7v7bk2qodg34yec4t7r7g found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/f2/f25f38428de851e5661e72f124476494852eb30812358b07f1c3a289f6f5eded.tar.gz
+==> No patches needed for perl-http-message
+==> perl-http-message: Executing phase: 'configure'
+==> perl-http-message: Executing phase: 'build'
+==> perl-http-message: Executing phase: 'install'
+==> perl-http-message: Successfully installed perl-http-message-6.13-a5fvgf6kz6j7v7bk2qodg34yec4t7r7g
+  Fetch: 0.45s.  Build: 0.66s.  Total: 1.11s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen/gcc-8.5.0/perl-http-message-6.13-a5fvgf6kz6j7v7bk2qodg34yec4t7r7g
+==> Installing perl-www-robotrules-6.02-qsy5ctat2pewdvb2rmogjixmzotyrnes
+==> No binary for perl-www-robotrules-6.02-qsy5ctat2pewdvb2rmogjixmzotyrnes found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/46/46b502e7a288d559429891eeb5d979461dd3ecc6a5c491ead85d165b6e03a51e.tar.gz
+==> No patches needed for perl-www-robotrules
+==> perl-www-robotrules: Executing phase: 'configure'
+==> perl-www-robotrules: Executing phase: 'build'
+==> perl-www-robotrules: Executing phase: 'install'
+==> perl-www-robotrules: Successfully installed perl-www-robotrules-6.02-qsy5ctat2pewdvb2rmogjixmzotyrnes
+  Fetch: 0.35s.  Build: 0.44s.  Total: 0.80s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen/gcc-8.5.0/perl-www-robotrules-6.02-qsy5ctat2pewdvb2rmogjixmzotyrnes
+==> Installing perl-module-build-tiny-0.039-jxxsp42mhbzvgaddqrsxzabhyjn7734x
+==> No binary for perl-module-build-tiny-0.039-jxxsp42mhbzvgaddqrsxzabhyjn7734x found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/7d/7d580ff6ace0cbe555bf36b86dc8ea232581530cbeaaea09bccb57b55797f11c.tar.gz
+==> No patches needed for perl-module-build-tiny
+==> perl-module-build-tiny: Executing phase: 'configure'
+==> perl-module-build-tiny: Executing phase: 'build'
+==> perl-module-build-tiny: Executing phase: 'install'
+==> perl-module-build-tiny: Successfully installed perl-module-build-tiny-0.039-jxxsp42mhbzvgaddqrsxzabhyjn7734x
+  Fetch: 0.44s.  Build: 0.36s.  Total: 0.79s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen/gcc-8.5.0/perl-module-build-tiny-0.039-jxxsp42mhbzvgaddqrsxzabhyjn7734x
+==> Installing perl-http-negotiate-6.01-6le3wlhn5xzl4jnumzahedy4kdo5otdg
+==> No binary for perl-http-negotiate-6.01-6le3wlhn5xzl4jnumzahedy4kdo5otdg found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/1c/1c729c1ea63100e878405cda7d66f9adfd3ed4f1d6cacaca0ee9152df728e016.tar.gz
+==> No patches needed for perl-http-negotiate
+==> perl-http-negotiate: Executing phase: 'configure'
+==> perl-http-negotiate: Executing phase: 'build'
+==> perl-http-negotiate: Executing phase: 'install'
+==> perl-http-negotiate: Successfully installed perl-http-negotiate-6.01-6le3wlhn5xzl4jnumzahedy4kdo5otdg
+  Fetch: 0.18s.  Build: 0.52s.  Total: 0.70s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen/gcc-8.5.0/perl-http-negotiate-6.01-6le3wlhn5xzl4jnumzahedy4kdo5otdg
+==> Installing perl-http-cookies-6.04-pxpp2cuz7zqmxnfkrrtipzpgxh2d5iqw
+==> No binary for perl-http-cookies-6.04-pxpp2cuz7zqmxnfkrrtipzpgxh2d5iqw found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/0c/0cc7f079079dcad8293fea36875ef58dd1bfd75ce1a6c244cd73ed9523eb13d4.tar.gz
+==> No patches needed for perl-http-cookies
+==> perl-http-cookies: Executing phase: 'configure'
+==> perl-http-cookies: Executing phase: 'build'
+==> perl-http-cookies: Executing phase: 'install'
+==> perl-http-cookies: Successfully installed perl-http-cookies-6.04-pxpp2cuz7zqmxnfkrrtipzpgxh2d5iqw
+  Fetch: 0.37s.  Build: 0.56s.  Total: 0.93s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen/gcc-8.5.0/perl-http-cookies-6.04-pxpp2cuz7zqmxnfkrrtipzpgxh2d5iqw
+==> Installing perl-http-daemon-6.01-hkvjvelylrxs3ivkcwtsk6f3pnbjjjvg
+==> No binary for perl-http-daemon-6.01-hkvjvelylrxs3ivkcwtsk6f3pnbjjjvg found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/43/43fd867742701a3f9fcc7bd59838ab72c6490c0ebaf66901068ec6997514adc2.tar.gz
+==> No patches needed for perl-http-daemon
+==> perl-http-daemon: Executing phase: 'configure'
+==> perl-http-daemon: Executing phase: 'build'
+==> perl-http-daemon: Executing phase: 'install'
+==> perl-http-daemon: Successfully installed perl-http-daemon-6.01-hkvjvelylrxs3ivkcwtsk6f3pnbjjjvg
+  Fetch: 0.40s.  Build: 0.59s.  Total: 0.99s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen/gcc-8.5.0/perl-http-daemon-6.01-hkvjvelylrxs3ivkcwtsk6f3pnbjjjvg
+==> Installing perl-libwww-perl-6.33-7awxaxxwlpfifbldppl3n4bb7nb7znwg
+==> No binary for perl-libwww-perl-6.33-7awxaxxwlpfifbldppl3n4bb7nb7znwg found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/97/97417386f11f007ae129fe155b82fd8969473ce396a971a664c8ae6850c69b99.tar.gz
+==> No patches needed for perl-libwww-perl
+==> perl-libwww-perl: Executing phase: 'configure'
+==> perl-libwww-perl: Executing phase: 'build'
+==> perl-libwww-perl: Executing phase: 'install'
+==> perl-libwww-perl: Successfully installed perl-libwww-perl-6.33-7awxaxxwlpfifbldppl3n4bb7nb7znwg
+  Fetch: 0.50s.  Build: 1.27s.  Total: 1.77s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen/gcc-8.5.0/perl-libwww-perl-6.33-7awxaxxwlpfifbldppl3n4bb7nb7znwg
+==> Installing perl-lwp-protocol-https-6.04-ng3ihiwmgjha3bmftp4fhp2mxqbh26jl
+==> No binary for perl-lwp-protocol-https-6.04-ng3ihiwmgjha3bmftp4fhp2mxqbh26jl found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/1e/1ef67750ee363525cf729b59afde805ac4dc80eaf8d36ca01082a4d78a7af629.tar.gz
+==> No patches needed for perl-lwp-protocol-https
+==> perl-lwp-protocol-https: Executing phase: 'configure'
+==> perl-lwp-protocol-https: Executing phase: 'build'
+==> perl-lwp-protocol-https: Executing phase: 'install'
+==> perl-lwp-protocol-https: Successfully installed perl-lwp-protocol-https-6.04-ng3ihiwmgjha3bmftp4fhp2mxqbh26jl
+  Fetch: 0.28s.  Build: 0.74s.  Total: 1.02s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen/gcc-8.5.0/perl-lwp-protocol-https-6.04-ng3ihiwmgjha3bmftp4fhp2mxqbh26jl
+==> Installing perl-xml-parser-2.44-mrri3cd3unqpsytcfp4u35mru36lzjhn
+==> No binary for perl-xml-parser-2.44-mrri3cd3unqpsytcfp4u35mru36lzjhn found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/1a/1ae9d07ee9c35326b3d9aad56eae71a6730a73a116b9fe9e8a4758b7cc033216.tar.gz
+==> No patches needed for perl-xml-parser
+==> perl-xml-parser: Executing phase: 'configure'
+==> perl-xml-parser: Executing phase: 'build'
+==> perl-xml-parser: Executing phase: 'install'
+==> perl-xml-parser: Successfully installed perl-xml-parser-2.44-mrri3cd3unqpsytcfp4u35mru36lzjhn
+  Fetch: 0.50s.  Build: 2.47s.  Total: 2.97s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen/gcc-8.5.0/perl-xml-parser-2.44-mrri3cd3unqpsytcfp4u35mru36lzjhn
+==> Installing perl-xml-simple-2.24-phctdn27qrpj2crglleuamno4aupvjmp
+==> No binary for perl-xml-simple-2.24-phctdn27qrpj2crglleuamno4aupvjmp found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/9a/9a14819fd17c75fbb90adcec0446ceab356cab0ccaff870f2e1659205dc2424f.tar.gz
+==> No patches needed for perl-xml-simple
+==> perl-xml-simple: Executing phase: 'configure'
+==> perl-xml-simple: Executing phase: 'build'
+==> perl-xml-simple: Executing phase: 'install'
+==> perl-xml-simple: Successfully installed perl-xml-simple-2.24-phctdn27qrpj2crglleuamno4aupvjmp
+  Fetch: 0.45s.  Build: 0.77s.  Total: 1.22s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen/gcc-8.5.0/perl-xml-simple-2.24-phctdn27qrpj2crglleuamno4aupvjmp
+==> Installing entrezdirect-10.7.20190114-6pkkpx2ql4s4gvzf3frwa7u5rnczkojb
+==> No binary for entrezdirect-10.7.20190114-6pkkpx2ql4s4gvzf3frwa7u5rnczkojb found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/41/4152749e6a3aac71a64e9367527428714ed16cf1fb6c7eff1298cca9ef144c0d.tar.gz
+==> No patches needed for entrezdirect
+==> entrezdirect: Executing phase: 'install'
+==> entrezdirect: Successfully installed entrezdirect-10.7.20190114-6pkkpx2ql4s4gvzf3frwa7u5rnczkojb
+  Fetch: 0.44s.  Build: 0.15s.  Total: 0.59s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen/gcc-8.5.0/entrezdirect-10.7.20190114-6pkkpx2ql4s4gvzf3frwa7u5rnczkojb
+real 61.99
+user 35.25
+sys 27.75
+Submitted batch job 21694095
