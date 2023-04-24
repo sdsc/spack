@@ -3,30 +3,17 @@
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
 
-# ----------------------------------------------------------------------------
-# If you submit this package back to Spack as a pull request,
-# please first remove this boilerplate and all FIXME comments.
-#
-# This is a template package file for Spack.  We've put "FIXME"
-# next to all the things you'll want to change. Once you've handled
-# them, you can save this file and test your package like this:
-#
-#     spack install gurobi
-#
-# You can edit this file again by typing:
-#
-#     spack edit gurobi
-#
-# See the Spack documentation for more information on packaging.
-# ----------------------------------------------------------------------------
 
 from spack import *
 import os
+import re
 
 
 class Gurobi(Package):
 
     """gurobi The Gurobi Optimizer is a state-of-the-art solver for mathematical programming"""
+
+    homepage = "http://www.gurobi.com/"
 
     version('10.0.1', sha256='a0b551156df2c94107b3428cae278716a0a6c913f63ac132573852b9725b6c59')
 
@@ -40,7 +27,8 @@ class Gurobi(Package):
 
 
     def url_for_version(self, version):
-        return "file://{0}/gurobi{1}_linux64.tar.gz".format(os.getcwd(), version)
+        substring=re.sub('\.\d+$','',str(version))
+        return "https://packages.gurobi.com/{0}/gurobi{1}_linux64.tar.gz".format(substring,version)
 
 
     def setup_run_environment(self, env):
