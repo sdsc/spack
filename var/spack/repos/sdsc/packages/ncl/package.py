@@ -161,7 +161,7 @@ class Ncl(Package):
                 '#define HdfDefines\n',
                 '#define CppCommand \'/usr/bin/env cpp -traditional\'\n',
                 '#define CCompiler cc\n',
-                '#define FCompiler fc\n',
+                '#define FCompiler ftn\n',
                 ('#define CtoFLibraries ' + ' '.join(c2f_flags) + '\n'
                  if len(c2f_flags) > 0
                  else ''),
