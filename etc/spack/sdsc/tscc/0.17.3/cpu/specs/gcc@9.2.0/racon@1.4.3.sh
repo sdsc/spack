@@ -2,9 +2,10 @@
 
 #SBATCH --job-name=racon@1.4.3
 #SBATCH --account=sdsc
-#SBATCH --partition=defq
+#SBATCH --partition=hotel
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
+#SBATCH --exclude=gpu1
 #SBATCH --cpus-per-task=8
 #SBATCH --time=01:00:00
 #SBATCH --output=%x.o%j.%N
@@ -64,6 +65,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'gsl@2.7.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" ''
 
 sleep 20

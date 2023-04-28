@@ -2,9 +2,10 @@
 
 #SBATCH --job-name=petsc@3.16.1-cmplx
 #SBATCH --account=sdsc
-#SBATCH --partition=defq
+#SBATCH --partition=hotel
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
+#SBATCH --exclude gpu1
 #SBATCH --cpus-per-task=8
 #SBATCH --time=00:30:00
 #SBATCH --output=%x.o%j.%N
