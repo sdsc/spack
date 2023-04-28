@@ -223,6 +223,7 @@ class Gromacs(CMakePackage,CudaPackage):
     def setup_build_environment(self, env):
         if '+cuda' in self.spec and self.compiler.name == 'intel':
             env.set('NVCC_PREPEND_FLAGS','-Xcompiler "-gcc-name=/home/jpg/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-8.5.0-mf5bqu2cwyzoxa5c7btqbbdxng3whbmf/bin/gcc"')
+
     def cmake_args(self):
 
         options = []
