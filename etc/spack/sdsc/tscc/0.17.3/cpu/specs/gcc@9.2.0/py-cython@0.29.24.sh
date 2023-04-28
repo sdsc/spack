@@ -2,11 +2,10 @@
 
 #SBATCH --job-name=py-cython@0.29.24
 #SBATCH --account=sdsc
-#SBATCH --partition=defq
+#SBATCH --partition=hotel
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=8
-#SBATCH --mem=16G
 #SBATCH --time=01:00:00
 #SBATCH --output=%x.o%j.%N
 

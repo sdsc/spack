@@ -2,9 +2,10 @@
 
 #SBATCH --job-name=tau@2.30.2
 #SBATCH --account=sdsc
-#SBATCH --partition=defq
+#SBATCH --partition=hotel
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
+#SBATCH --exclude=gpu1
 #SBATCH --cpus-per-task=8
 #SBATCH --time=00:30:00
 #SBATCH --output=%x.o%j.%N
@@ -27,9 +28,12 @@ echo "${UNIX_TIME} ${SLURM_JOB_ID} ${SLURM_JOB_MD5SUM} ${SLURM_JOB_DEPENDENCY}"
 echo ""
 
 cat "${SLURM_JOB_SCRIPT}"
+export COMPILER_MODULE=intel/19.1.1.217
 
 module purge
+module load $SPACK_INSTANCE_NAME
 module load "${SCHEDULER_MODULE}"
+module load  $COMPILER_MODULE
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
@@ -69,7 +73,9 @@ if [[ "${?}" -ne 0 ]]; then
   exit 1
 fi
 
-time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all "${SPACK_SPEC}"
+export CFLAGS=-gcc-name=/home/jpg/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-8.5.0-w6lov36mdw33cg7qm7ekuusp2bbmt6lu/bin/gcc
+export CXXFLAGS=-gcc-name=/home/jpg/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-8.5.0-w6lov36mdw33cg7qm7ekuusp2bbmt6lu/bin/gcc
+time -p spack install -v --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all "${SPACK_SPEC}"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
   exit 1

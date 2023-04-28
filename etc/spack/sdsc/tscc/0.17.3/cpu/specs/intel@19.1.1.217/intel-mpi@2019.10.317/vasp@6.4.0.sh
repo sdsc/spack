@@ -2,7 +2,7 @@
 
 #SBATCH --job-name=vasp@6.4.0
 #SBATCH --account=sdsc
-#SBATCH --partition=defq
+#SBATCH --partition=hotel
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=8
 #SBATCH --time=02:00:00

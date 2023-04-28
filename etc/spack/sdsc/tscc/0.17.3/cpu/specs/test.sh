@@ -2,7 +2,7 @@
 
 #SBATCH --job-name=gh@2.0.0
 #SBATCH --account=sdsc
-#SBATCH --partition=defq
+#SBATCH --partition=hotel
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=8

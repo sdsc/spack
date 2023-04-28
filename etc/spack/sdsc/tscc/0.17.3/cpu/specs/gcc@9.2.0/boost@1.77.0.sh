@@ -2,7 +2,7 @@
 
 #SBATCH --job-name=boost@1.77.0
 #SBATCH --account=sdsc
-#SBATCH --partition=defq
+#SBATCH --partition=hotel
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=8
@@ -63,6 +63,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'adol-c@2.7.2.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'libsvm@323.sh'
 
 sleep 20

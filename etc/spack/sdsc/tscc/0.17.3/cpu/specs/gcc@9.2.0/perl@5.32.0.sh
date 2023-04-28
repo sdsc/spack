@@ -2,7 +2,7 @@
 
 #SBATCH --job-name=perl@5.32.0
 #SBATCH --account=sdsc
-#SBATCH --partition=defq
+#SBATCH --partition=hotel
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=8
@@ -63,6 +63,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'python@3.8.12'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'sqlite@3.36.0.sh'
 
 sleep 20

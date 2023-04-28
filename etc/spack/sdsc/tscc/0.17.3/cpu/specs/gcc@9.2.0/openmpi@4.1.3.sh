@@ -2,7 +2,7 @@
 
 #SBATCH --job-name=openmpi@4.1.3
 #SBATCH --account=sdsc
-#SBATCH --partition=defq
+#SBATCH --partition=hotel
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=8
@@ -30,6 +30,7 @@ cat "${SLURM_JOB_SCRIPT}"
 
 module purge
 module load "${SCHEDULER_MODULE}"
+module load ${SPACK_INSTANCE_NAME}
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 

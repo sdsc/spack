@@ -2,7 +2,7 @@
 
 #SBATCH --job-name=iq-tree@2.1.3
 #SBATCH --account=sdsc
-#SBATCH --partition=defq
+#SBATCH --partition=hotel
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=8

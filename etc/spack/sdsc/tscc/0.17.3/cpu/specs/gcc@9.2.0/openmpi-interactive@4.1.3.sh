@@ -21,7 +21,7 @@ module list
 # the +thread_multiple variant may no longer be working correctly; must 
 # leave explicit setting out or run into unsat conditions
 declare -xr SPACK_PACKAGE='openmpi@4.1.3'
-declare -xr SPACK_COMPILER='gcc@10.2.0'
+declare -xr SPACK_COMPILER='gcc@9.2.0'
 declare -xr SPACK_VARIANTS='~atomics~cuda~cxx~cxx_exceptions~gpfs~internal-hwloc~java+legacylaunchers+lustre~memchecker+pmi+pmix+romio~rsh~singularity+static+vt+wrapper-rpath cuda_arch=none fabrics=ucx schedulers=slurm'
 declare -xr SPACK_DEPENDENCIES="^lustre@2.15.2 ^slurm@22.05.8 ^rdma-core@41.0 ^ucx@1.10.1/$(spack find --format '{hash:7}' ucx@1.10.1 % gcc@11.2.0)"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
