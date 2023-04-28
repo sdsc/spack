@@ -2,7 +2,7 @@
 
 #SBATCH --job-name=cudnn@8.1.1.33-11.2
 #SBATCH --account=sdsc
-#SBATCH --partition=defq
+#SBATCH --partition=hotel-gpu
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=8

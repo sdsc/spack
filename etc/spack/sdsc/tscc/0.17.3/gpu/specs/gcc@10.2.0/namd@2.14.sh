@@ -3,7 +3,7 @@
 #SBATCH --job-name=namd@2.14
 #SBATCH --account=use300
 ##SBATCH --reservation=root_63
-#SBATCH --partition=defq
+#SBATCH --partition=hotel-gpu
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=8

@@ -3,7 +3,7 @@
 #SBATCH --job-name=magma@2.6.1
 #SBATCH --account=use300
 ##SBATCH --reservation=root_63
-#SBATCH --partition=defq
+#SBATCH --partition=hotel-gpu
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=8

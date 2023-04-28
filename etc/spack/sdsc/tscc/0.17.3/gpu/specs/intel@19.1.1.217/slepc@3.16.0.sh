@@ -3,7 +3,7 @@
 #SBATCH --job-name=slepc@3.16.0
 #SBATCH --account=use300
 ##SBATCH --reservation=root_73
-#SBATCH --partition=defq
+#SBATCH --partition=hotel-gpu
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=8
