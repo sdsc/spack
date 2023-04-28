@@ -2,7 +2,7 @@
 
 #SBATCH --job-name=magma@2.6.1
 #SBATCH --account=sdsc
-#SBATCH --partition=defq
+#SBATCH --partition=hotel-gpu
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=8

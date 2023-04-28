@@ -2,7 +2,7 @@
 
 #SBATCH --job-name=namd@2.14
 #SBATCH --account=sdsc
-#SBATCH --partition=defq
+#SBATCH --partition=hotel-gpu
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=8
@@ -93,6 +93,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'amber@22.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'plumed@2.6.3'
 
 sleep 20

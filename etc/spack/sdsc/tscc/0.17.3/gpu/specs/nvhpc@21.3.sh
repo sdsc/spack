@@ -2,7 +2,7 @@
 
 #SBATCH --job-name=nvhpc@21.3
 #SBATCH --account=sdsc
-#SBATCH --partition=defq
+#SBATCH --partition=hotel-gpu
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH -w gpu1
