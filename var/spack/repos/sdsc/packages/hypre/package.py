@@ -200,6 +200,8 @@ class Hypre(AutotoolsPackage, CudaPackage):
             if '+fortran' in spec:
                 env.set('F77', spec['mpi'].mpif77)
 
+        if self.compiler.name == 'intel':
+            env.append_flags('LDFLAGS', '-lifcore')
         if '+cuda' in spec:
             env.set('CUDA_HOME', spec['cuda'].prefix)
             env.set('CUDA_PATH', spec['cuda'].prefix)

@@ -42,7 +42,7 @@ module list
 declare -xr INTEL_LICENSE_FILE='40000@elprado.sdsc.edu:40200@elprado.sdsc.edu'
 declare -xr SPACK_PACKAGE='slepc@3.16.0'
 declare -xr SPACK_COMPILER='intel@19.1.1.217'
-declare -xr SPACK_VARIANTS='~arpack ~blopex ~cuda ~rocm'
+declare -xr SPACK_VARIANTS='~arpack ~blopex +cuda ~rocm'
 declare -xr SPACK_DEPENDENCIES="^petsc@3.16.1/$(spack find --format '{hash:7}' petsc@3.16.1 % ${SPACK_COMPILER} ~mpi ~complex)"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
