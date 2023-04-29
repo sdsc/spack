@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=openjdk@1.8.0_265-b01
+#SBATCH --job-name=cuda@10.2.89
 #SBATCH --account=sdsc
 #SBATCH --partition=hotel-gpu
 #SBATCH --nodes=1
@@ -22,7 +22,7 @@ declare -xr SPACK_INSTANCE_DIR="${HOME}/cm/shared/apps/spack/${SPACK_VERSION}/${
 declare -xr SLURM_JOB_SCRIPT="$(scontrol show job ${SLURM_JOB_ID} | awk -F= '/Command=/{print $2}')"
 declare -xr SLURM_JOB_MD5SUM="$(md5sum ${SLURM_JOB_SCRIPT})"
 
-declare -xr SCHEDULER_MODULE='slurm'
+declare -xr SCHEDULER_MODULE='slurm/22.05.7'
 
 echo "${UNIX_TIME} ${SLURM_JOB_ID} ${SLURM_JOB_MD5SUM} ${SLURM_JOB_DEPENDENCY}" 
 echo ""
@@ -34,10 +34,9 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-# required by gatk@4.2.2.0
-declare -xr SPACK_PACKAGE='openjdk@1.8.0_265-b01'
-declare -xr SPACK_COMPILER='gcc@8.5.0'
-declare -xr SPACK_VARIANTS=''
+declare -xr SPACK_PACKAGE='cuda@10.2.89'
+declare -xr SPACK_COMPILER='gcc@9.2.0'
+declare -xr SPACK_VARIANTS='~dev'
 declare -xr SPACK_DEPENDENCIES=''
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
@@ -65,6 +64,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'openblas@0.3.17.sh'
+#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'cudnn@8.1.1.33-11.2.sh'
 
 sleep 20

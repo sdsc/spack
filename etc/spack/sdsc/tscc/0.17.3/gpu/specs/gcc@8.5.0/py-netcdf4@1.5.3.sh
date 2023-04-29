@@ -64,6 +64,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'py-scikit-learn@1.0.1.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'boost@1.77.0.sh'
 
 sleep 20
