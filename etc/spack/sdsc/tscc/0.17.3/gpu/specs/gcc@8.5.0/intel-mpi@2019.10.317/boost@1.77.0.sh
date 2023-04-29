@@ -64,6 +64,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'superlu-dist@7.1.1.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'amber@22.sh'
 
 sleep 20

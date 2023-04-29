@@ -64,6 +64,6 @@ fi
 
 spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'tcl@8.6.11.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'sqlite@3.36.0.sh'
 
 sleep 20
