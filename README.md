@@ -4,7 +4,7 @@ This guide documents the Spack-based software deployment process in use by the C
 
 ## Table of Contents
 
-- [Definitions and Terminology](https://github.com/sdsc/spack#definitions-and-terminolog)
+- [Definitions and Terminology](https://github.com/sdsc/spack#definitions-and-terminology)
 - [DEPLOYMENT.md](DEPLOYMENT.md)
 - [CONTRIBUTING.md](CONTRIBUTING.md)
 
