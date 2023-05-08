@@ -7,7 +7,7 @@ This guide documents the Spack-based software deployment process in use by the C
 - [DEPLOYMENT.md](DEPLOYMENT.md)
 - [CONTRIBUTING.md](CONTRIBUTING.md)
 
-### Definitions and Terminology
+## Definitions and Terminology
 
 - A Spack ***instance*** is a unique, stand-alone installation of a 
   specific version of `spack` that includes custom Spack configuration 
