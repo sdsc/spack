@@ -42,8 +42,8 @@ they run and manage in collaboration with the HPC Systems Group at SDSC.
 - A Spack package ***dependency chain*** is an explicitly-defined ordered 
   set of Spack specs that share a common (core) compiler and/or MPI library,
   may depend on one another (or share other software dependencies), and 
-  should be installed one after another, one at a time, as prescribed by 
-  their dependencies.
+  should be installed serially one after another, one at a time, as 
+  prescribed by their dependencies.
 - A Spack ***deployment branch*** is a *trunk*-like branch for a specific 
   version of `spack` that tracks all of the Spack configuration files, 
   Spack packages, and Spack specs used to deploy a Spack instance (or a
