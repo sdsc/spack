@@ -1,5 +1,5 @@
 #
-# A license is required to use package 'gurobi'.
+# A license is required to use package 'arm-forge'.
 #
 # * If your system is already properly configured for such a license, save this
 #   file UNCHANGED. The system may be configured if:
@@ -8,7 +8,10 @@
 #    - One of the following environment variable(s) is set for you, possibly via
 #      a module file:
 #
-#	LM_LICENSE_FILE
+#	ALLINEA_LICENSE_DIR
+#	ALLINEA_LICENCE_DIR
+#	ALLINEA_LICENSE_FILE
+#	ALLINEA_LICENCE_FILE
 #
 # * Otherwise, depending on the license you have, enter AT THE BEGINNING of
 #   this file:
@@ -19,11 +22,11 @@
 #   After installation, the following symlink(s) will be added to point to
 #   this Spack-global file (relative to the installation prefix).
 #
-#	licenses/network.lic
+#	licences/Licence
 #
 # * For further information on licensing, see:
 #
-#	https://www.gurobi.com/academia/academic-program-and-licenses
+#	https://developer.arm.com/tools-and-software/server-and-hpc/help/help-and-tutorials/system-administration/licensing/arm-licence-server
 #
 # Recap:
 # - You may not need to modify this file at all.
