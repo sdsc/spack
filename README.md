@@ -11,7 +11,7 @@ they run and manage in collaboration with the HPC Systems Group at SDSC.
 ## Table of Contents
 
 - [Definitions and Terminology](https://github.com/sdsc/spack#definitions-and-terminology)
-- [Principles](https://github.com/sdsc/spack#principles)
+- [Guidelines](https://github.com/sdsc/spack#guidelines)
 - [GitHub Repository](https://github.com/sdsc/spack#github-repository)
 - [Contribute]
 
@@ -50,11 +50,15 @@ they run and manage in collaboration with the HPC Systems Group at SDSC.
   Spack packages, and Spack specs used to deploy a Spack instance (or a
   set of instances).
 
-## Principles
+## Guidelines
 
-The principles listed here are intented to guide the development of the
-conventions, policies, and procedures, 
-conventions, and policies
+The guidelines listed below are intented to provide a foundation for the 
+conventions, policies, and procedures developed by SDSC to manage its 
+Spack instances and the software deployment process. While they are not 
+definitive and may change over time, when possible, they should be adhered
+to, unless special circumstances apply. 
+
+
 - https://spack.readthedocs.io/en/latest/contribution_guide.html
 - https://spack.readthedocs.io/en/latest/packaging_guide.html
 - https://spack.readthedocs.io/en/latest/developer_guide.html
