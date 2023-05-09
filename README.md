@@ -3,8 +3,8 @@
 This guide documents the Spack-based software deployment process in use 
 by the CyberInfrastructure Services and Solutions (CISS) Group and the 
 High-Performance Computing (HPC) User Services Group at the San Diego 
-Supercomputer Center (SDSC). All of the definitions, procedures, 
-conventions, and policies defined within the guide are intended to help
+Supercomputer Center (SDSC). All of the definitions, conventions, 
+policies and procedures outlined within the guide are intended to help
 build, maintain, and deploy custom Spack instances on the HPC systems
 they run and manage in collaboration with the HPC Systems Group at SDSC. 
 
@@ -52,7 +52,9 @@ they run and manage in collaboration with the HPC Systems Group at SDSC.
 
 ## Principles
 
-The principles listed below are intended to ...
+The principles listed here are intented to guide the development of the
+conventions, policies, and procedures, 
+conventions, and policies
 - https://spack.readthedocs.io/en/latest/contribution_guide.html
 - https://spack.readthedocs.io/en/latest/packaging_guide.html
 - https://spack.readthedocs.io/en/latest/developer_guide.html
