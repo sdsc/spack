@@ -23,11 +23,11 @@ they run and manage in collaboration with the HPC Systems Group at SDSC.
   files, Spack packages, and a collection of software applications, 
   libraries, and utilities built and installed by Spack.
 - A Spack ***package*** is a set of instructions that defines how a 
-  specific piece of software is compiled and/or installed by Spack. A 
-  Spack package specifies where to find and how to retrieve its 
-  software's source code, its required (and/or optional) software 
-  dependencies, its compile-time options, any patches to apply, etc. A 
-  Spack package is primarily defined by it *package.py* file.
+  specific piece of software is compiled and/or installed by Spack. It
+  specifies where to find and how to retrieve its software's source code, 
+  its required (and/or optional) software dependencies, its compile-time 
+  options, any patches to apply, etc. A Spack package is primarily defined 
+  by it *package.py* file.
 - A Spack ***spec*** is a string descriptor that specifies a particular 
   build configuration of a Spack package. The full syntax of a spec 
   may include the package name, its version, the compiler it should be 
