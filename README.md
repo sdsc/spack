@@ -11,6 +11,7 @@ they run and manage in collaboration with the HPC Systems Group at SDSC.
 ## Table of Contents
 
 - [Definitions and Terminology](https://github.com/sdsc/spack#definitions-and-terminology)
+- [Principles](
 - [DEPLOYMENT.md](DEPLOYMENT.md)
 - [CONTRIBUTING.md](CONTRIBUTING.md)
 
@@ -18,8 +19,8 @@ they run and manage in collaboration with the HPC Systems Group at SDSC.
 
 - A Spack ***instance*** is a unique, stand-alone installation of a 
   specific version of `spack` that includes custom Spack configuration 
-  files, Spack packages, and a collection of Spack-installed software 
-  applications, libraries, and utilities.
+  files, Spack packages, and a collection of software applications, 
+  libraries, and utilities built and installed by Spack.
 - A Spack ***package*** is a set of instructions that defines how a 
   specific piece of software is compiled and/or installed by Spack. For 
   example, a Spack package specifies where to find and how to retrieve 
@@ -47,4 +48,54 @@ they run and manage in collaboration with the HPC Systems Group at SDSC.
 - A Spack ***deployment branch*** is a *trunk*-like branch for a specific 
   version of `spack` that tracks all of the Spack configuration files, 
   Spack packages, and Spack specs used to deploy a Spack instance (or a
-  set of instances). 
+  set of instances).
+
+## Principles
+
+The principles listed below are intended to ...
+- https://spack.readthedocs.io/en/latest/contribution_guide.html
+- https://spack.readthedocs.io/en/latest/packaging_guide.html
+- https://spack.readthedocs.io/en/latest/developer_guide.html
+
+## GitHub Repository
+
+The [sdsc/spack](https://github.com/sdsc/spack) project is a custom fork 
+of the Spack project's main GitHub repository, which is referred to in 
+this guide as the [spack/spack](https://github.com/spack/spack) repo. 
+The primary aim of the sdsc/spack repo is to manage and track all 
+changes made to the custom Spack instances deployed by SDSC on its HPC 
+systems.
+
+### Deployment Branches
+
+The sdsc/spack repo and its use in practice are fundamentally structured
+around the concept of *deployment branches*. A deployment branch is a
+*trunk*-like branch created from an unmodifed, official release version
+of `spack` and is named accordingly, unless special circumstances 
+require that an intermediate commit be used. For example, the 
+`sdsc-0.17.3` deployment branch was created by checking out the 
+[v0.17.3](https://github.com/spack/spack/releases/tag/v0.17.3) release
+
+Once a version of Spack is selected and checked out, only a few minor 
+changes and/or additions are made to the Spack release in order to 
+initialize a deployment branch within the sdsc/spack repo. These 
+modifications are as follows:
+
+- The official version of the Spack `README.md` file is removed and 
+  replaced with the latest version of this document --- the *SDSC HPC 
+  Software Deployment Guide*.
+- The latest version of the sdsc/spack `CONTRIBUTING.md` file is also
+  included to provide information on how one may contribute to the 
+  sdsc/spack project and its deployment branches.
+- A Spack package repository --- `var/spack/repos/sdsc` --- created to 
+  store all custom Spack packages created and/or maintained by SDSC, 
+  including all of SDSC's custom modifications to Spack's existing 
+  `builtin` packages.
+- A Spack instance repository --- `etc/spack/sdsc` --- is created
+  to  ...
+
+
+All other types of branches (see
+  [CONTRIBUTING.md](CONTRIBUTING.md)) should start from a deployment
+  branch.
+
