@@ -13,6 +13,7 @@ they run and manage in collaboration with the HPC Systems Group at SDSC.
 - [Definitions and Terminology](https://github.com/sdsc/spack#definitions-and-terminology)
 - [Principles](https://github.com/sdsc/spack#principles)
 - [GitHub Repository](https://github.com/sdsc/spack#github-repository)
+- [Contribute]
 
 ## Definitions and Terminology
 
@@ -94,4 +95,26 @@ modifications are as follows:
 All other types of branches (see
   [CONTRIBUTING.md](CONTRIBUTING.md)) should start from a deployment
   branch.
+  
+### Package Repository
+
+### Instance Repositories
+
+### Access Control and Permissions
+
+Write access to the sdsc/spack repository is restricted to SDSC team 
+members who are responsible for managing and tracking issues, reviewing
+and merging pull requests, and maintaining the custom deployment 
+branches in the repository. All other SDSC team members who wish to 
+contribute to the sdsc/spack repository should submit their changes via
+pull requests from their own public fork of the sdsc/spack repository.
+
+
+
+etc/spack/repos.yaml
+var/spack/repos/sdsc/repo.yaml
+var/spack/repos/sdsc/packages
+
+etc/spack/sdsc/expanse/0.17.3/cpu/specs
+etc/spack/sdsc/expanse/0.17.3/cpu/yamls
 
