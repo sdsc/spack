@@ -58,12 +58,9 @@ The principles listed below are intended to ...
 
 ## GitHub Repository
 
-The [sdsc/spack](https://github.com/sdsc/spack) project is a custom fork 
-of the Spack project's main GitHub repository, which is referred to in 
-this guide as the [spack/spack](https://github.com/spack/spack) repo. 
-The primary aim of the sdsc/spack repo is to manage and track all 
-changes made to the custom Spack instances deployed by SDSC on its HPC 
-systems.
+The [sdsc/spack](https://github.com/sdsc/spack) GitHub repository is a 
+custom fork of the Spack project's main [spack/spack](https://github.com/spack/spack)
+GitHub repository.
 
 ### Deployment Branches
 
