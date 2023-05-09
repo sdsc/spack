@@ -54,10 +54,10 @@ they run and manage in collaboration with the HPC Systems Group at SDSC.
 
 The guidelines listed below are intended to provide a foundation for the
 conventions, policies, and procedures established by SDSC to manage its 
-Spack instances and the software deployment process. While none are 
-definitive and many may change over time, when possible they should be 
-adhered to, unless special circumstances apply. 
-
+Spack instances and the software deployment process on its HPC system. 
+While none of the guidelines are definitive and many may change over time,
+they should, however, be adhered to whenever possible, unless special 
+circumstances apply. 
 
 - https://spack.readthedocs.io/en/latest/contribution_guide.html
 - https://spack.readthedocs.io/en/latest/packaging_guide.html
