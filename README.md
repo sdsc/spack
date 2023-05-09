@@ -12,7 +12,7 @@ they run and manage in collaboration with the HPC Systems Group at SDSC.
 
 - [Definitions and Terminology](https://github.com/sdsc/spack#definitions-and-terminology)
 - [Guidelines](https://github.com/sdsc/spack#guidelines)
-- [About the Repository](https://github.com/sdsc/spack#about-the-repository)
+- [About the GitHub Repository](https://github.com/sdsc/spack#about-the-github-repository)
 - [Contribute]
 
 ## Definitions and Terminology
@@ -52,18 +52,18 @@ they run and manage in collaboration with the HPC Systems Group at SDSC.
 
 ## Guidelines
 
-The guidelines listed below are intented to provide a foundation for the 
-conventions, policies, and procedures developed by SDSC to manage its 
-Spack instances and the software deployment process. While they are not 
-definitive and may change over time, when possible, they should be adhered
-to, unless special circumstances apply. 
+The guidelines listed below are intended to provide a foundation for the
+conventions, policies, and procedures established by SDSC to manage its 
+Spack instances and the software deployment process. While none are 
+definitive and many may change over time, when possible they should be 
+adhered to, unless special circumstances apply. 
 
 
 - https://spack.readthedocs.io/en/latest/contribution_guide.html
 - https://spack.readthedocs.io/en/latest/packaging_guide.html
 - https://spack.readthedocs.io/en/latest/developer_guide.html
 
-## GitHub Repository
+## About the GitHub Repository
 
 The [sdsc/spack](https://github.com/sdsc/spack) GitHub repository is a 
 custom fork of the Spack project's main [spack/spack](https://github.com/spack/spack)
