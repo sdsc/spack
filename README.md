@@ -61,7 +61,7 @@ they should, however, be adhered to whenever possible, unless special
 circumstances apply.
 
 - Any Spack instance deployed into production should originate from a 
-  deployment branch within the sdsc/spack GitHub repository.
+  deployment branch within the sdsc/spack repository.
 - Any change to Spack instance in production should originate as a 
   pull request submitted to  
 
