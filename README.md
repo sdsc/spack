@@ -11,7 +11,7 @@ they run and manage in collaboration with the HPC Systems Group at SDSC.
 ## Table of Contents
 
 - [Definitions and Terminology](https://github.com/sdsc/spack#definitions-and-terminology)
-- [Principles]()
+- [Principles](https://github.com/sdsc/spack#principles)
 - GitHub Repository
 - [DEPLOYMENT.md](DEPLOYMENT.md)
 - [CONTRIBUTING.md](CONTRIBUTING.md)
