@@ -12,7 +12,7 @@ they run and manage in collaboration with the HPC Systems Group at SDSC.
 
 - [Definitions and Terminology](https://github.com/sdsc/spack#definitions-and-terminology)
 - [Guidelines](https://github.com/sdsc/spack#guidelines)
-- [GitHub Repository](https://github.com/sdsc/spack#github-repository)
+- [About the Repository](https://github.com/sdsc/spack#about-the-repository)
 - [Contribute]
 
 ## Definitions and Terminology
