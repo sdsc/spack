@@ -6,7 +6,8 @@ High-Performance Computing (HPC) User Services Group at the San Diego
 Supercomputer Center (SDSC). All of the definitions, conventions, 
 policies and procedures outlined within the guide are intended to help
 build, maintain, and deploy custom Spack instances on the HPC systems
-they run and manage in collaboration with the HPC Systems Group at SDSC. 
+they run and manage on behalf of end users in collaboration with the 
+HPC Systems Group at SDSC. 
 
 ## Table of Contents
 
