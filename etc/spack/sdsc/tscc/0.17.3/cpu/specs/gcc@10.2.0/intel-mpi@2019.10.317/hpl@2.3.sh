@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #SBATCH --job-name=hpl@2.3
-#SBATCH --account=sdsc
+#SBATCH --account=sys200
 #SBATCH --partition=hotel
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
