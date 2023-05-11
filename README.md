@@ -63,9 +63,9 @@ circumstances apply.
 
 - Any Spack instance deployed into production should originate from a 
   deployment branch within the sdsc/spack repository.
-- Any change to a Spack instance already in production should originate
-  as a pull request submitted to one of the deployment brances within 
-  the sdsc/spack repository from the submitter's own fork of the project.
+- Any change that must be made to a Spack instance already in production
+  should originate as a pull request submitted to one of the deployment 
+  brances within the sdsc/spack repository.
 - 
 
 - https://spack.readthedocs.io/en/latest/contribution_guide.html
