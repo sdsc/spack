@@ -21,7 +21,12 @@ before you click on the *Create fork* button.
 `
 ### Issues 
 
-Each issue should be label by
+In general, any change to an existing production instance should begin with the creation of a GitHub issue.
+
+
+
+---
+
 
 https://github.com/atom/atom/blob/master/CONTRIBUTING.md#reporting-bugs
 
