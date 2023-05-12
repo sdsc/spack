@@ -28,28 +28,8 @@ In general, any change to an existing production instance should begin with the 
 - https://github.com/sdsc/spack/issues/74
 - https://github.com/sdsc/spack/issues/75
 
-
-
----
-
-
-https://github.com/atom/atom/blob/master/CONTRIBUTING.md#reporting-bugs
-
-- name of the deployment branch: `"sdsc-${SPACK_VERSION}"`
-- type of change: DOC, CONFIG, PACKAGE, or SPEC
-- 
-
-SDSC - sdsc-0.17.3 - DOC - README - 
-
-SDSC: CONFIG - tscc/0.17.3/cpu - Set read-only group permissions on
- VASP6 in packages.yaml 
-
-ACI-1XXXXX: PACKAGE - sdsc-0.17.3 - Update GROMACS 
-
-ZEN-2XXXX: SPEC - expanse/0.17.3/gpu - Deploy 
-
-
 ### Pull Requests
+
 
 ## Style Guides
 
@@ -73,3 +53,18 @@ formatting principles).
 - https://google.github.io/styleguide/shellguide.html
 
 ## Miscellaneous Notes
+
+https://github.com/atom/atom/blob/master/CONTRIBUTING.md#reporting-bugs
+
+- name of the deployment branch: `"sdsc-${SPACK_VERSION}"`
+- type of change: DOC, CONFIG, PACKAGE, or SPEC
+- 
+
+SDSC - sdsc-0.17.3 - DOC - README - 
+
+SDSC: CONFIG - tscc/0.17.3/cpu - Set read-only group permissions on
+ VASP6 in packages.yaml 
+
+ACI-1XXXXX: PACKAGE - sdsc-0.17.3 - Update GROMACS 
+
+ZEN-2XXXX: SPEC - expanse/0.17.3/gpu - Deploy 
