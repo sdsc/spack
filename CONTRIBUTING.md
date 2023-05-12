@@ -4,8 +4,8 @@ This document outlines how to contribute to the sdsc/spack project.
 
 ## Table of Contents
 
-- [Getting Started](https://github.com/sdsc/spack#definitions-and-terminology)
-- [Style Guides](https://github.com/sdsc/spack#general-guidelines)
+- [Getting Started](https://github.com/sdsc/spack/CONTRIBUTING.md#getting-started)
+- [Style Guides](https://github.com/sdsc/spack/CONTRIBUTING.md#style-guides)
 - [Miscellaneous Notes]
 
 ## Getting Started
