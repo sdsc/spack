@@ -6,7 +6,7 @@ This document outlines how to contribute to the sdsc/spack project.
 
 - [Getting Started](https://github.com/sdsc/spack/CONTRIBUTING.md#getting-started)
 - [Style Guides](https://github.com/sdsc/spack/CONTRIBUTING.md#style-guides)
-- [Miscellaneous Notes]
+- [Miscellaneous Notes](https://github.com/sdsc/spack/CONTRIBUTING.md#miscellaneous-notes)
 
 ## Getting Started
 
@@ -61,3 +61,5 @@ formatting principles).
 ### Spack Specs
 
 - https://google.github.io/styleguide/shellguide.html
+
+## Miscellaneous Notes
