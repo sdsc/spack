@@ -6,11 +6,6 @@ This document outlines how to contribute to the sdsc/spack project.
 
 If you would like to contribute to the sdsc/spack project, please begin by creating a fork of the project in your personal GitHub account. If you have an existing GitHub account already associated with the SDSC GitHub organization, please use this account to create your fork.
 
-## Making Changes
-
-
-
-
 
 
 ### Discussions
