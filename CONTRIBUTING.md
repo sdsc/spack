@@ -2,6 +2,12 @@
 
 This document outlines how to contribute to the sdsc/spack project.
 
+## Table of Contents
+
+- [Getting Started](https://github.com/sdsc/spack#definitions-and-terminology)
+- [Style Guides](https://github.com/sdsc/spack#general-guidelines)
+- [Miscellaneous Notes]
+
 ## Getting Started
 
 To contribute your change(s) to the sdsc/spack project, please begin by creating a fork of the project in your personal GitHub account. If you have an existing GitHub account that is already associated with the [SDSC GitHub organization](https://github.com/sdsc), please use this account to create your fork. We recommend forking a complete copy the repository. e.g., uncheck the box
@@ -35,7 +41,7 @@ ZEN-2XXXX: SPEC - expanse/0.17.3/gpu - Deploy
 
 ### Pull Requests
 
-## Style Guidelines
+## Style Guides
 
 ### Spack Configuration Files
 
