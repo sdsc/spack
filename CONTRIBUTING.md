@@ -4,12 +4,12 @@ This document outlines how to contribute to the sdsc/spack project.
 
 ## Getting Started
 
-If you would like to contribute to the sdsc/spack project, please begin by creating a fork of the project in your personal GitHub account. If you have an existing GitHub account already associated with the SDSC GitHub organization, please use this account to create your fork.
+To contribute your change(s) to the sdsc/spack project, please begin by creating a fork of the project in your personal GitHub account. If you have an existing GitHub account that is already associated with the [SDSC GitHub organization](https://github.com/sdsc), please use this account to create your fork. We recommend forking a complete copy the repository. e.g., uncheck the box that says [ ] **Copy the `sdsc-0.17.3` branch only** before you click on the *Create fork* button. 
 
 ### Discussions
 
 [GitHub discussions](https://github.com/sdsc/spack/discussions) are enabled on the sdsc/spack project. At this time, we are using them to track meeting agendas and notes of the Spack Working Group at SDSC. However, we may consider using them in the future to document other annoucements, questions and answers, and discusions that are not well-catagorized as either an ***Issue*** or a ***Pull Request*** as discribed in more detail below. 
-
+`
 ### Issues 
 
 Each issue should be label by
