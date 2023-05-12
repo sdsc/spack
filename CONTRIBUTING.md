@@ -17,7 +17,7 @@ before you click on the *Create fork* button.
 
 ### Discussions
 
-[GitHub Discussions](https://github.com/sdsc/spack/discussions) are enabled on the sdsc/spack project. At this time, we are using them to track meeting agendas and notes of the Spack Working Group at SDSC. However, we may consider using them in the future to document other annoucements, questions and answers, and discusions that are not well-catagorized as either an ***Issue*** or a ***Pull Request*** as discribed in more detail below. 
+[GitHub Discussions](https://github.com/sdsc/spack/discussions) are enabled on the sdsc/spack project. At this time, we are using them to track meeting agendas and notes of the Spack Working Group at SDSC. However, we may consider using them in the future to document other annoucements, questions and answers, and discusions that are not well-catagorized as either an [Issue](##issues) or a ***Pull Request*** as described in more detail below. 
 `
 ### Issues 
 
