@@ -10,18 +10,18 @@ This document outlines how to contribute to the sdsc/spack project.
 
 ## Getting Started
 
-To contribute your change(s) to the sdsc/spack project, please begin by creating a fork of the project in your personal GitHub account. If you have an existing GitHub account that is already associated with the [SDSC GitHub organization](https://github.com/sdsc), please use this account to create your fork. We recommend forking a complete copy the repository. e.g., uncheck the box
+To contribute your change(s), please begin by creating a fork of the project in your personal GitHub account. If you have an existing GitHub account that is already associated with the [SDSC GitHub organization](https://github.com/sdsc), please use this account to create your fork. We recommend forking a complete copy the repository. e.g., uncheck the box
 - [ ] **Copy the `sdsc-0.17.3` branch only**
 
 before you click on the *Create fork* button. 
 
 ### Discussions
 
-[GitHub discussions](https://github.com/sdsc/spack/discussions) are enabled on the sdsc/spack project. At this time, we are using them to track meeting agendas and notes of the Spack Working Group at SDSC. However, we may consider using them in the future to document other annoucements, questions and answers, and discusions that are not well-catagorized as either an ***Issue*** or a ***Pull Request*** as discribed in more detail below. 
+[GitHub Discussions](https://github.com/sdsc/spack/discussions) are enabled on the sdsc/spack project. At this time, we are using them to track meeting agendas and notes of the Spack Working Group at SDSC. However, we may consider using them in the future to document other annoucements, questions and answers, and discusions that are not well-catagorized as either an ***Issue*** or a ***Pull Request*** as discribed in more detail below. 
 `
 ### Issues 
 
-In general, any change to an existing production instance should begin with the creation of a GitHub issue.
+In general, any change to an existing production instance should begin with the creation of a GitHub issue that documents how the change request arised, how it was implemented, the pull requests used to resolve it, and any other commits that document the change. e.g., The issue might arise from an NSF ACCESS (ATS) ticket, an SDSC Zendesk (ZEN) ticket, or an internal team discussiion (SDSC). For example, the following is an example GitHub Issue to modify the `modules.yaml` file.
 
 
 
