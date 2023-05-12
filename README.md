@@ -11,11 +11,11 @@ HPC Systems Group at SDSC.
 
 ## Table of Contents
 
-- [Definitions and Terminology](https://github.com/sdsc/spack#definitions-and-terminology)
-- [General Guidelines](https://github.com/sdsc/spack#general-guidelines)
-- [About the GitHub Repository](https://github.com/sdsc/spack#about-the-github-repository)
+- [Definitions and Terminology](#definitions-and-terminology)
+- [General Guidelines](#general-guidelines)
+- [About the GitHub Repository](#about-the-github-repository)
 - [How to Contribute](CONTRIBUTING.md)
-- [Miscellaneous Notes]
+- [Miscellaneous Notes](#miscellaneous-notes)
 
 ## Definitions and Terminology
 
@@ -133,3 +133,4 @@ var/spack/repos/sdsc/packages
 etc/spack/sdsc/expanse/0.17.3/cpu/specs
 etc/spack/sdsc/expanse/0.17.3/cpu/yamls
 
+## Miscellaneous Notes
