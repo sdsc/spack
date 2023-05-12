@@ -30,7 +30,7 @@ In general, any change to an existing production instance should begin with the 
 
 ### Pull Requests
 
-Once an Issue is created. You can begin working on a pull request to resolve it. Before you make any changes to your fork of the sdsc/spack project, you should resync the target deployment branch that that the pull request will be submitted to and eventually merged. This resyncing process can be done in two ways. The simplest is to use the *Sync fork* feature in GitHub. 
+Once an Issue is created. You can begin working on a pull request to resolve it. Before you make any changes to your fork of the sdsc/spack project, you should resync the target deployment branch that the pull request will be submitted to and is intended to eventually merged. This resyncing process can be done in two ways. The simplest is to use the *Sync fork* feature in GitHub. The other way on the command-line, where you will fetch changes and re-sync the deployment branch branch from sdsc/spack upstream.
 
 ## Style Guides
 
