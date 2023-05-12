@@ -14,8 +14,8 @@ HPC Systems Group at SDSC.
 - [Definitions and Terminology](https://github.com/sdsc/spack#definitions-and-terminology)
 - [General Guidelines](https://github.com/sdsc/spack#general-guidelines)
 - [About the GitHub Repository](https://github.com/sdsc/spack#about-the-github-repository)
-- [How to Contribute to the Repository]
-- [How to Manage the Repository]
+- [How to Contribute]
+- [Miscellaneous Notes]
 
 ## Definitions and Terminology
 
