@@ -25,6 +25,9 @@ All GitHub Issues should be created within the sdsc/spack repository.
 
 In general, any change to an existing production instance should begin with the creation of a GitHub Issue that documents how the change request arised, how it was implemented, the pull requests used to resolve it, and any other commits that document the change. e.g., The issue might arise from an NSF ACCESS (ATS) ticket, an SDSC Zendesk (ZEN) ticket, or an internal team discussiion (SDSC). For example, the following example GitHub Issue is to modify the `modules.yaml` files for both the newely deployed `expanse/0.17.3/cpu/b` and `expanse/0.17.3.gpu/b` instances to provide users with a set of environment varibles they may use to reference the `ROOT` or `HOME` installiation path of a software package. 
 
+- https://github.com/sdsc/spack/issues/74
+- https://github.com/sdsc/spack/issues/75
+
 
 
 ---
