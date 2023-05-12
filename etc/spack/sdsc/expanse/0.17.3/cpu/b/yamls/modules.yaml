@@ -17,6 +17,9 @@ modules:
           '+openmp': omp
           'threads=openmp': omp
           '+ipl64': i64
+        environment:
+          set:
+            '{name}HOME': '{prefix}'
       intel:
         environment:
           set:
