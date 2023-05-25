@@ -54,11 +54,12 @@ class Amber(Package,CudaPackage):
     depends_on('netcdf-c')
     depends_on('netcdf-fortran')
     depends_on('parallel-netcdf')
-    depends_on('boost')
-    depends_on('python')
     depends_on('mpi', when='+mpi')
     depends_on('cuda', when='+cuda')
     depends_on('cmake')
+    depends_on('zlib')
+    depends_on('bzip2')
+ 
 
 
     def install(self, spec, prefix):
@@ -80,8 +81,7 @@ class Amber(Package,CudaPackage):
         args.append('-DMPI=FALSE')
         args.append('-DCUDA=FALSE')
         args.append('-DINSTALL_TESTS=TRUE')
-        args.append('-DDOWNLOAD_MINICONDA=FALSE')
-        args.append('-DPYTHON_EXECUTABLE=python3')
+        args.append('-DDOWNLOAD_MINICONDA=TRUE')
         args.append('-DPnetCDF_C_LIBRARY='+join_path(spec['parallel-netcdf'].prefix,'lib','libpnetcdf.so'))
         args.append('-DPnetCDF_C_INCLUDE_DIR='+join_path(spec['parallel-netcdf'].prefix,'include'))
         args.append('-DNetCDF_INCLUDES='+join_path(spec['parallel-netcdf'].prefix,'include'))
@@ -94,6 +94,12 @@ class Amber(Package,CudaPackage):
         os.chdir('build')
         cmake(*args)
         make('install')
+        for x,y in enumerate(args):
+                if '-DDOWNLOAD_MINICONDA=TRUE' in y:
+                    args.remove(y)
+                    args.insert(x,'-DDOWNLOAD_MINICONDA=FALSE')
+             
+        args.append('-DBUILD_PYTHON=FALSE')
         if '+mpi' in spec:
             for x,y in enumerate(args):
                 if 'DMPI' in y:
