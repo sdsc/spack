@@ -8,6 +8,7 @@ from spack import *
 import os
 import subprocess
 import shutil
+import glob
 
 
 class Amber(Package,CudaPackage):
@@ -27,7 +28,7 @@ class Amber(Package,CudaPackage):
 
     resources = [
       # [version amber, version ambertools , sha256sum]
-        ('22', '22', '1571d4e0f7d45b2a71dce5999fa875aea8c90ee219eb218d7916bf30ea229121'),
+        ('22', '23', 'debb52e6ef2e1b4eaa917a8b4d4934bd2388659c660501a81ea044903bf9ee9d'),
     ]
 
     for ver, ambertools_ver, checksum in resources:
@@ -124,3 +125,14 @@ class Amber(Package,CudaPackage):
                         args.insert(x,'-DMPI=TRUE')
                         cmake(*args)
                         make('install')
+
+    def setup_run_environment(self, env):
+        env.set('AMBER_PREFIX', self.prefix)
+        env.set('AMBERHOME', self.prefix)
+        file = glob.glob(join_path(self.prefix,'miniconda','pkgs','python*'))[0]
+        env.prepend_path('PATH',join_path(file,'bin'))
+        file = glob.glob(join_path(self.prefix,'miniconda','lib','python*'))[0]
+        env.prepend_path('PYTHONPATH',join_path(file,'site-packages'))
+        file = glob.glob(join_path(self.prefix.lib,'python*'))[0]
+        env.prepend_path('PYTHONPATH',join_path(file,'site-packages'))
+
