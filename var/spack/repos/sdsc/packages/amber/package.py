@@ -129,8 +129,7 @@ class Amber(Package,CudaPackage):
     def setup_run_environment(self, env):
         env.set('AMBER_PREFIX', self.prefix)
         env.set('AMBERHOME', self.prefix)
-        file = glob.glob(join_path(self.prefix,'miniconda','pkgs','python*'))[0]
-        env.prepend_path('PATH',join_path(file,'bin'))
+        env.prepend_path('PATH',join_path(self.prefix,'miniconda','bin'))
         file = glob.glob(join_path(self.prefix,'miniconda','lib','python*'))[0]
         env.prepend_path('PYTHONPATH',join_path(file,'site-packages'))
         file = glob.glob(join_path(self.prefix.lib,'python*'))[0]
