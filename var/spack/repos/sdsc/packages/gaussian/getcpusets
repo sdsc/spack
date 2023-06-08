@@ -2,6 +2,7 @@
 pid=$1
 gpus=`echo $CUDA_VISIBLE_DEVICES|sed 's/,/ /g'`
 cpuset=`scontrol show job -d $SLURM_JOBID |grep CPU_IDs | sed 's/^.*CPU_IDs=//'|sed 's/ .*//'`
+cpuset=`echo $cpuset|sed 's/,/ /g'`
 for cpu in $cpuset; do
   if [[ "$cpu" =~  "-" ]];then
      range=`echo $cpu|sed 's/-/ /'`
