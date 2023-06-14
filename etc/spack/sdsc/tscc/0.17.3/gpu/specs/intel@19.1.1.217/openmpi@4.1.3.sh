@@ -41,7 +41,7 @@ module list
 declare -xr INTEL_LICENSE_FILE='40000@elprado.sdsc.edu:40200@elprado.sdsc.edu'
 declare -xr SPACK_PACKAGE='openmpi@4.1.3'
 declare -xr SPACK_COMPILER='intel@19.1.1.217'
-declare -xr SPACK_VARIANTS='~atomics +cuda cuda_arch=70,80 ~cxx ~cxx_exceptions ~gpfs ~internal-hwloc ~java +legacylaunchers +lustre ~memchecker +pmi +pmix +romio ~rsh ~singularity +static +vt +wrapper-rpath fabrics=ucx schedulers=slurm'
+declare -xr SPACK_VARIANTS='~atomics +cuda cuda_arch=60,75,80,86 ~cxx ~cxx_exceptions ~gpfs ~internal-hwloc ~java +legacylaunchers +lustre ~memchecker +pmi +pmix +romio ~rsh ~singularity +static +vt +wrapper-rpath fabrics=ucx schedulers=slurm'
 declare -xr SPACK_DEPENDENCIES="^lustre@2.15.2 ^slurm@22.05.8 ^ucx@1.10.1/$(spack find --format '{hash:7}' ucx@1.10.1 % intel@19.1.1.217)"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 echo ${SPACK_SPEC}  > spec.$$
@@ -56,7 +56,7 @@ spack config get packages
 spack config get repos
 spack config get upstreams
 
-#spack --show-cores=minimized spec --long --namespaces --types openmpi@4.1.3 % intel@19.1.1.217 ~atomics +cuda cuda_arch=70,80 ~cxx ~cxx_exceptions ~gpfs ~internal-hwloc ~java +legacylaunchers +lustre ~memchecker +pmi +pmix +romio ~rsh ~singularity +static +vt +wrapper-rpath fabrics=ucx schedulers=slurm "^lustre@2.15.2 ^slurm@22.05.8 ^ucx@1.10.1/$(spack find --format '{hash:7}' ucx@1.10.1 % intel@19.1.1.217)"
+#spack --show-cores=minimized spec --long --namespaces --types openmpi@4.1.3 % intel@19.1.1.217 ~atomics +cuda cuda_arch=60,75,80,86 ~cxx ~cxx_exceptions ~gpfs ~internal-hwloc ~java +legacylaunchers +lustre ~memchecker +pmi +pmix +romio ~rsh ~singularity +static +vt +wrapper-rpath fabrics=ucx schedulers=slurm "^lustre@2.15.2 ^slurm@22.05.8 ^ucx@1.10.1/$(spack find --format '{hash:7}' ucx@1.10.1 % intel@19.1.1.217)"
 
 spack spec --long --namespaces --types `cat spec.$$`
 

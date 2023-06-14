@@ -71,7 +71,7 @@ module list
 
 declare -xr SPACK_PACKAGE='amber@22'
 declare -xr SPACK_COMPILER='gcc@9.2.0'
-declare -xr SPACK_VARIANTS='+cuda cuda_arch=60 +mpi +openmp +update'
+declare -xr SPACK_VARIANTS='+cuda cuda_arch=60,75,80,86+mpi +openmp +update'
 declare -xr SPACK_DEPENDENCIES="^boost@1.77.0/$(spack find --format '{hash:7}' boost@1.77.0 % ${SPACK_COMPILER} ~mpi) ^intel-mpi@2019.10.317/$(spack find --format '{hash:7}' intel-mpi@2019.10.317 % ${SPACK_COMPILER}) ^netcdf-c@4.8.1/$(spack find --format '{hash:7}' netcdf-c@4.8.1 % ${SPACK_COMPILER} +mpi ^intel-mpi@2019.10.317) ^cuda@10.2.89/$(spack find --format '{hash:7}' cuda@10.2.89 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 echo ${SPACK_SPEC} > spec.$$
