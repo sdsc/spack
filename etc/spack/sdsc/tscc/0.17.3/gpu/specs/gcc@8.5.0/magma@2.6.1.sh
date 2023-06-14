@@ -36,7 +36,7 @@ module list
 
 declare -xr SPACK_PACKAGE='magma@2.6.1'
 declare -xr SPACK_COMPILER='gcc@8.5.0'
-declare -xr SPACK_VARIANTS='+cuda cuda_arch=60,80 +fortran ~ipo ~rocm +shared'
+declare -xr SPACK_VARIANTS='+cuda cuda_arch=60,75,80,86 +fortran ~ipo ~rocm +shared'
 declare -xr SPACK_DEPENDENCIES="^cuda@11.2.2/$(spack find --format '{hash:7}' cuda@11.2.2 % ${SPACK_COMPILER}) ^openblas@0.3.17/$(spack find --format '{hash:7}' openblas@0.3.17 % ${SPACK_COMPILER} ~ilp64 threads=none)"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
@@ -50,13 +50,13 @@ spack config get packages
 spack config get repos
 spack config get upstreams
 
-spack spec --long --namespaces --types magma@2.6.1 % gcc@8.5.0 +cuda cuda_arch=60,80 +fortran ~ipo ~rocm +shared "^cuda@11.2.2/$(spack find --format '{hash:7}' cuda@11.2.2 % ${SPACK_COMPILER}) ^openblas@0.3.17/$(spack find --format '{hash:7}' openblas@0.3.17 % ${SPACK_COMPILER} ~ilp64 threads=none)"
+spack spec --long --namespaces --types magma@2.6.1 % gcc@8.5.0 +cuda cuda_arch=60,75,80,86 +fortran ~ipo ~rocm +shared "^cuda@11.2.2/$(spack find --format '{hash:7}' cuda@11.2.2 % ${SPACK_COMPILER}) ^openblas@0.3.17/$(spack find --format '{hash:7}' openblas@0.3.17 % ${SPACK_COMPILER} ~ilp64 threads=none)"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack concretization failed.'
   exit 1
 fi
 
-time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all magma@2.6.1 % gcc@8.5.0 +cuda cuda_arch=60,80 +fortran ~ipo ~rocm +shared "^cuda@11.2.2/$(spack find --format '{hash:7}' cuda@11.2.2 % ${SPACK_COMPILER}) ^openblas@0.3.17/$(spack find --format '{hash:7}' openblas@0.3.17 % ${SPACK_COMPILER} ~ilp64 threads=none)"
+time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all magma@2.6.1 % gcc@8.5.0 +cuda cuda_arch=60,75,80,86 +fortran ~ipo ~rocm +shared "^cuda@11.2.2/$(spack find --format '{hash:7}' cuda@11.2.2 % ${SPACK_COMPILER}) ^openblas@0.3.17/$(spack find --format '{hash:7}' openblas@0.3.17 % ${SPACK_COMPILER} ~ilp64 threads=none)"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
   exit 1

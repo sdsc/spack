@@ -38,8 +38,8 @@ module list
 # leave explicit setting out or run into unsat conditions
 declare -xr SPACK_PACKAGE='openmpi@4.1.3'
 declare -xr SPACK_COMPILER='gcc@8.5.0'
-#declare -xr SPACK_VARIANTS='~atomics +cuda cuda_arch=60,80 ~cxx ~cxx_exceptions ~gpfs~internal-hwloc ~java +legacylaunchers +lustre ~memchecker +pmi +pmix +romio ~rsh ~singularity +static +vt +wrapper-rpath fabrics=ucx schedulers=slurm'
-declare -xr SPACK_VARIANTS='~atomics +cuda cuda_arch=60,80 ~cxx ~cxx_exceptions ~gpfs~internal-hwloc ~java +legacylaunchers ~memchecker +pmi +pmix +romio ~rsh ~singularity +static +vt +wrapper-rpath fabrics=ucx schedulers=slurm'
+#declare -xr SPACK_VARIANTS='~atomics +cuda cuda_arch=60,75,80,86 ~cxx ~cxx_exceptions ~gpfs~internal-hwloc ~java +legacylaunchers +lustre ~memchecker +pmi +pmix +romio ~rsh ~singularity +static +vt +wrapper-rpath fabrics=ucx schedulers=slurm'
+declare -xr SPACK_VARIANTS='~atomics +cuda cuda_arch=60,75,80,86 ~cxx ~cxx_exceptions ~gpfs~internal-hwloc ~java +legacylaunchers ~memchecker +pmi +pmix +romio ~rsh ~singularity +static +vt +wrapper-rpath fabrics=ucx schedulers=slurm'
 #declare -xr SPACK_DEPENDENCIES="^lustre@2.12.8 ^slurm@22.05.7 ^rdma-core@41.0 ^ucx@1.10.1/$(spack find --format '{hash:7}' ucx@1.10.1 % ${SPACK_COMPILER})"
 declare -xr SPACK_DEPENDENCIES="^slurm@22.05.7 ^rdma-core@41.0 ^ucx@1.10.1/$(spack find --format '{hash:7}' ucx@1.10.1 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
@@ -54,15 +54,15 @@ spack config get packages
 spack config get repos
 spack config get upstreams
 
-#spack spec --long --namespaces --types openmpi@4.1.3 % gcc@8.5.0 ~atomics +cuda cuda_arch=60,80 ~cxx ~cxx_exceptions ~gpfs~internal-hwloc ~java +legacylaunchers +lustre ~memchecker +pmi +pmix +romio ~rsh ~singularity +static +vt +wrapper-rpath fabrics=ucx schedulers=slurm "^lustre@2.12.8 ^slurm@22.05.7 ^rdma-core@41.0 ^ucx@1.10.1/$(spack find --format '{hash:7}' ucx@1.10.1 % ${SPACK_COMPILER})"
-spack spec --long --namespaces --types openmpi@4.1.3 % gcc@8.5.0 ~atomics +cuda cuda_arch=60,80 ~cxx ~cxx_exceptions ~gpfs~internal-hwloc ~java +legacylaunchers ~lustre ~memchecker +pmi +pmix +romio ~rsh ~singularity +static +vt +wrapper-rpath fabrics=ucx schedulers=slurm "^slurm@22.05.7 ^rdma-core@41.0 ^ucx@1.10.1/$(spack find --format '{hash:7}' ucx@1.10.1 % ${SPACK_COMPILER})"
+#spack spec --long --namespaces --types openmpi@4.1.3 % gcc@8.5.0 ~atomics +cuda cuda_arch=60,75,80,86 ~cxx ~cxx_exceptions ~gpfs~internal-hwloc ~java +legacylaunchers +lustre ~memchecker +pmi +pmix +romio ~rsh ~singularity +static +vt +wrapper-rpath fabrics=ucx schedulers=slurm "^lustre@2.12.8 ^slurm@22.05.7 ^rdma-core@41.0 ^ucx@1.10.1/$(spack find --format '{hash:7}' ucx@1.10.1 % ${SPACK_COMPILER})"
+spack spec --long --namespaces --types openmpi@4.1.3 % gcc@8.5.0 ~atomics +cuda cuda_arch=60,75,80,86 ~cxx ~cxx_exceptions ~gpfs~internal-hwloc ~java +legacylaunchers ~lustre ~memchecker +pmi +pmix +romio ~rsh ~singularity +static +vt +wrapper-rpath fabrics=ucx schedulers=slurm "^slurm@22.05.7 ^rdma-core@41.0 ^ucx@1.10.1/$(spack find --format '{hash:7}' ucx@1.10.1 % ${SPACK_COMPILER})"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack concretization failed.'
   exit 1
 fi
 
-#time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all openmpi@4.1.3 % gcc@8.5.0 ~atomics +cuda cuda_arch=60,80 ~cxx ~cxx_exceptions ~gpfs~internal-hwloc ~java +legacylaunchers +lustre ~memchecker +pmi +pmix +romio ~rsh ~singularity +static +vt +wrapper-rpath fabrics=ucx schedulers=slurm "^lustre@2.12.8 ^slurm@22.05.7 ^rdma-core@41.0 ^ucx@1.10.1/$(spack find --format '{hash:7}' ucx@1.10.1 % ${SPACK_COMPILER})"
-time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all openmpi@4.1.3 % gcc@8.5.0 ~atomics +cuda cuda_arch=60,80 ~cxx ~cxx_exceptions ~gpfs~internal-hwloc ~java +legacylaunchers ~lustre ~memchecker +pmi +pmix +romio ~rsh ~singularity +static +vt +wrapper-rpath fabrics=ucx schedulers=slurm "^slurm@22.05.7 ^rdma-core@41.0 ^ucx@1.10.1/$(spack find --format '{hash:7}' ucx@1.10.1 % ${SPACK_COMPILER})"
+#time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all openmpi@4.1.3 % gcc@8.5.0 ~atomics +cuda cuda_arch=60,75,80,86 ~cxx ~cxx_exceptions ~gpfs~internal-hwloc ~java +legacylaunchers +lustre ~memchecker +pmi +pmix +romio ~rsh ~singularity +static +vt +wrapper-rpath fabrics=ucx schedulers=slurm "^lustre@2.12.8 ^slurm@22.05.7 ^rdma-core@41.0 ^ucx@1.10.1/$(spack find --format '{hash:7}' ucx@1.10.1 % ${SPACK_COMPILER})"
+time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all openmpi@4.1.3 % gcc@8.5.0 ~atomics +cuda cuda_arch=60,75,80,86 ~cxx ~cxx_exceptions ~gpfs~internal-hwloc ~java +legacylaunchers ~lustre ~memchecker +pmi +pmix +romio ~rsh ~singularity +static +vt +wrapper-rpath fabrics=ucx schedulers=slurm "^slurm@22.05.7 ^rdma-core@41.0 ^ucx@1.10.1/$(spack find --format '{hash:7}' ucx@1.10.1 % ${SPACK_COMPILER})"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
   exit 1

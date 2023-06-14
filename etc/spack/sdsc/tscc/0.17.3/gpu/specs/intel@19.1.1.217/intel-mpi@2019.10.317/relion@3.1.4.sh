@@ -69,7 +69,7 @@ module list
 
 declare -xr SPACK_PACKAGE='relion@3.1.4'
 declare -xr SPACK_COMPILER='intel@19.1.1.217'
-declare -xr SPACK_VARIANTS='+allow_ctf_in_sagd +cuda cuda_arch=70,80 +double ~double-gpu ~gui ~ipo ~mklfft'
+declare -xr SPACK_VARIANTS='+allow_ctf_in_sagd +cuda cuda_arch=60,75,80,86 +double ~double-gpu ~gui ~ipo ~mklfft'
 declare -xr SPACK_DEPENDENCIES="^cuda@11.2.2/$(spack find --format '{hash:7}' cuda@11.2.2 % ${SPACK_COMPILER}) ^fftw@3.3.10/$(spack find --format '{hash:7}' fftw@3.3.10 % ${SPACK_COMPILER} +mpi ~openmp ^intel-mpi@2019.10.317)"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
@@ -83,13 +83,13 @@ spack config get packages
 spack config get repos
 spack config get upstreams
 
-spack spec --long --namespaces --types relion@3.1.4 % intel@19.1.1.217 +allow_ctf_in_sagd +cuda cuda_arch=70,80 +double ~double-gpu ~gui ~ipo ~mklfft "${SPACK_DEPENDENCIES}"
+spack spec --long --namespaces --types relion@3.1.4 % intel@19.1.1.217 +allow_ctf_in_sagd +cuda cuda_arch=60,75,80,86 +double ~double-gpu ~gui ~ipo ~mklfft "${SPACK_DEPENDENCIES}"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack concretization failed.'
   exit 1
 fi
 
-time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all relion@3.1.4 % intel@19.1.1.217 +allow_ctf_in_sagd +cuda cuda_arch=70,80 +double ~double-gpu ~gui ~ipo ~mklfft "${SPACK_DEPENDENCIES}"
+time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all relion@3.1.4 % intel@19.1.1.217 +allow_ctf_in_sagd +cuda cuda_arch=60,75,80,86 +double ~double-gpu ~gui ~ipo ~mklfft "${SPACK_DEPENDENCIES}"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
   exit 1

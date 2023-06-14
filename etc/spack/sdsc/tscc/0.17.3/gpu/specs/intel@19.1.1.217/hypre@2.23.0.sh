@@ -41,7 +41,7 @@ module list
 declare -xr INTEL_LICENSE_FILE='40000@elprado.sdsc.edu:40200@elprado.sdsc.edu'
 declare -xr SPACK_PACKAGE='hypre@2.23.0'
 declare -xr SPACK_COMPILER='intel@19.1.1.217'
-declare -xr SPACK_VARIANTS='~complex +cuda cuda_arch=60 ~debug +fortran ~int64 ~internal-superlu ~mixedint ~mpi ~openmp +shared ~superlu-dist ~unified-memory'
+declare -xr SPACK_VARIANTS='~complex +cuda cuda_arch=60,75,80,86 ~debug +fortran ~int64 ~internal-superlu ~mixedint ~mpi ~openmp +shared ~superlu-dist ~unified-memory'
 declare -xr SPACK_DEPENDENCIES="^cuda@11.2.2/$(spack find --format '{hash:7}' cuda@11.2.2 % intel@19.1.1.217) ^intel-mkl@2020.4.304/$(spack find --format '{hash:7}' intel-mkl@2020.4.304 % ${SPACK_COMPILER} ~ilp64 threads=none)"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 echo ${SPACK_SPEC} > spec.$$

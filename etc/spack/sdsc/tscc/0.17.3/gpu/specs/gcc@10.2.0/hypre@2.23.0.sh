@@ -36,7 +36,7 @@ module list
 
 declare -xr SPACK_PACKAGE='hypre@2.23.0'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS='~complex +cuda cuda_arch=60,80 ~debug +fortran ~int64 ~internal-superlu ~mixedint ~mpi ~openmp +shared ~superlu-dist ~unified-memory'
+declare -xr SPACK_VARIANTS='~complex +cuda cuda_arch=60,75,80,86 ~debug +fortran ~int64 ~internal-superlu ~mixedint ~mpi ~openmp +shared ~superlu-dist ~unified-memory'
 declare -xr SPACK_DEPENDENCIES="^cuda@11.2.2/$(spack find --format '{hash:7}' cuda@11.2.2 % gcc@10.2.0) ^openblas@0.3.17/$(spack find --format '{hash:7}' openblas@0.3.17 % ${SPACK_COMPILER} ~ilp64 threads=none)"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
@@ -50,13 +50,13 @@ spack config get packages
 spack config get repos
 spack config get upstreams
 
-spack spec --long --namespaces --types hypre@2.23.0 % gcc@10.2.0 ~complex +cuda cuda_arch=60,80 ~debug +fortran ~int64 ~internal-superlu ~mixedint ~mpi ~openmp +shared ~superlu-dist ~unified-memory "^cuda@11.2.2/$(spack find --format '{hash:7}' cuda@11.2.2 % gcc@10.2.0) ^openblas@0.3.17/$(spack find --format '{hash:7}' openblas@0.3.17 % ${SPACK_COMPILER} ~ilp64 threads=none)"
+spack spec --long --namespaces --types hypre@2.23.0 % gcc@10.2.0 ~complex +cuda cuda_arch=60,75,80,86 ~debug +fortran ~int64 ~internal-superlu ~mixedint ~mpi ~openmp +shared ~superlu-dist ~unified-memory "^cuda@11.2.2/$(spack find --format '{hash:7}' cuda@11.2.2 % gcc@10.2.0) ^openblas@0.3.17/$(spack find --format '{hash:7}' openblas@0.3.17 % ${SPACK_COMPILER} ~ilp64 threads=none)"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack concretization failed.'
   exit 1
 fi
 
-time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all hypre@2.23.0 % gcc@10.2.0 ~complex +cuda cuda_arch=60,80 ~debug +fortran ~int64 ~internal-superlu ~mixedint ~mpi ~openmp +shared ~superlu-dist ~unified-memory "^cuda@11.2.2/$(spack find --format '{hash:7}' cuda@11.2.2 % gcc@10.2.0) ^openblas@0.3.17/$(spack find --format '{hash:7}' openblas@0.3.17 % ${SPACK_COMPILER} ~ilp64 threads=none)"
+time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all hypre@2.23.0 % gcc@10.2.0 ~complex +cuda cuda_arch=60,75,80,86 ~debug +fortran ~int64 ~internal-superlu ~mixedint ~mpi ~openmp +shared ~superlu-dist ~unified-memory "^cuda@11.2.2/$(spack find --format '{hash:7}' cuda@11.2.2 % gcc@10.2.0) ^openblas@0.3.17/$(spack find --format '{hash:7}' openblas@0.3.17 % ${SPACK_COMPILER} ~ilp64 threads=none)"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
   exit 1

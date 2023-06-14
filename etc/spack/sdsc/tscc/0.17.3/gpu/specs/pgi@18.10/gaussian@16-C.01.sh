@@ -94,13 +94,13 @@ spack config get packages
 spack config get repos
 spack config get upstreams
 
-spack spec --long --namespaces --types gaussian@16-C.01 % pgi@18.10 ~binary +cuda cuda_arch=60 "${SPACK_DEPENDENCIES}"
+spack spec --long --namespaces --types gaussian@16-C.01 % pgi@18.10 ~binary +cuda cuda_arch=60,75,80,86"${SPACK_DEPENDENCIES}"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack concretization failed.'
   exit 1
 fi
 
-time -p spack install --keep-prefix -v --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all gaussian@16-C.01 % pgi@18.10 ~binary +cuda cuda_arch=60 "${SPACK_DEPENDENCIES}"
+time -p spack install --keep-prefix -v --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all gaussian@16-C.01 % pgi@18.10 ~binary +cuda cuda_arch=60,75,80,86"${SPACK_DEPENDENCIES}"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
   exit 1

@@ -47,7 +47,7 @@ module list
 
 declare -xr SPACK_PACKAGE='arrayfire@3.7.3'
 declare -xr SPACK_COMPILER='gcc@8.5.0'
-declare -xr SPACK_VARIANTS='+cuda cuda_arch=60,80 ~forge ~ipo ~opencl'
+declare -xr SPACK_VARIANTS='+cuda cuda_arch=60,75,80,86 ~forge ~ipo ~opencl'
 declare -xr SPACK_DEPENDENCIES="^cuda@11.2.2/$(spack find --format '{hash:7}' cuda@11.2.2 % gcc@8.5.0) ^openblas@0.3.17/$(spack find --format '{hash:7}' openblas@0.3.17 % ${SPACK_COMPILER} ~ilp64 threads=none) ^fftw@3.3.10/$(spack find --format '{hash:7}' fftw@3.3.10 % ${SPACK_COMPILER} ~mpi ~openmp) ^boost@1.77.0/$(spack find --format '{hash:7}' boost@1.77.0 % ${SPACK_COMPILER} ~mpi)"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
@@ -61,13 +61,13 @@ spack config get packages
 spack config get repos
 spack config get upstreams
 
-spack spec --long --namespaces --types arrayfire@3.7.3 % gcc@8.5.0 +cuda cuda_arch=60,80 ~forge ~ipo ~opencl "^cuda@11.2.2/$(spack find --format '{hash:7}' cuda@11.2.2 % gcc@8.5.0) ^openblas@0.3.17/$(spack find --format '{hash:7}' openblas@0.3.17 % ${SPACK_COMPILER} ~ilp64 threads=none) ^fftw@3.3.10/$(spack find --format '{hash:7}' fftw@3.3.10 % ${SPACK_COMPILER} ~mpi ~openmp) ^boost@1.77.0/$(spack find --format '{hash:7}' boost@1.77.0 % ${SPACK_COMPILER} ~mpi)"
+spack spec --long --namespaces --types arrayfire@3.7.3 % gcc@8.5.0 +cuda cuda_arch=60,75,80,86 ~forge ~ipo ~opencl "^cuda@11.2.2/$(spack find --format '{hash:7}' cuda@11.2.2 % gcc@8.5.0) ^openblas@0.3.17/$(spack find --format '{hash:7}' openblas@0.3.17 % ${SPACK_COMPILER} ~ilp64 threads=none) ^fftw@3.3.10/$(spack find --format '{hash:7}' fftw@3.3.10 % ${SPACK_COMPILER} ~mpi ~openmp) ^boost@1.77.0/$(spack find --format '{hash:7}' boost@1.77.0 % ${SPACK_COMPILER} ~mpi)"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack concretization failed.'
   exit 1
 fi
 
-time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all arrayfire@3.7.3 % gcc@8.5.0 +cuda cuda_arch=60,80 ~forge ~ipo ~opencl "^cuda@11.2.2/$(spack find --format '{hash:7}' cuda@11.2.2 % gcc@8.5.0) ^openblas@0.3.17/$(spack find --format '{hash:7}' openblas@0.3.17 % ${SPACK_COMPILER} ~ilp64 threads=none) ^fftw@3.3.10/$(spack find --format '{hash:7}' fftw@3.3.10 % ${SPACK_COMPILER} ~mpi ~openmp) ^boost@1.77.0/$(spack find --format '{hash:7}' boost@1.77.0 % ${SPACK_COMPILER} ~mpi)" 
+time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all arrayfire@3.7.3 % gcc@8.5.0 +cuda cuda_arch=60,75,80,86 ~forge ~ipo ~opencl "^cuda@11.2.2/$(spack find --format '{hash:7}' cuda@11.2.2 % gcc@8.5.0) ^openblas@0.3.17/$(spack find --format '{hash:7}' openblas@0.3.17 % ${SPACK_COMPILER} ~ilp64 threads=none) ^fftw@3.3.10/$(spack find --format '{hash:7}' fftw@3.3.10 % ${SPACK_COMPILER} ~mpi ~openmp) ^boost@1.77.0/$(spack find --format '{hash:7}' boost@1.77.0 % ${SPACK_COMPILER} ~mpi)" 
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
   exit 1

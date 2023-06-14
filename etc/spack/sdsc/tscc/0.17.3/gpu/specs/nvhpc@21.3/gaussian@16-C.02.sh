@@ -43,7 +43,7 @@ module list
 
 declare -xr PGROUPD_LICENSE_FILE='40000@elprado.sdsc.edu:40200@elprado.sdsc.edu'
 declare -xr LM_LICENSE_FILE='40000@elprado.sdsc.edu:40200@elprado.sdsc.edu'
-declare -xr SPACK_PACKAGE='gaussian@16-C.02' # 16-C.02 supports cuda_arch=80
+declare -xr SPACK_PACKAGE='gaussian@16-C.02' # 16-C.02 supports cuda_arch=60,75,80,86
 declare -xr SPACK_COMPILER='nvhpc@21.3'
 declare -xr SPACK_VARIANTS='~binary +cuda cuda_arch=60'
 declare -xr SPACK_DEPENDENCIES="^cuda@10.0.130/$(spack find --format '{hash:7}' cuda@10.0.130 % ${SPACK_COMPILER})"
@@ -59,13 +59,13 @@ spack config get packages
 spack config get repos
 spack config get upstreams
 
-spack spec --long --namespaces --types gaussian@16-C.02 % ${SPACK_COMPILER}  ~binary +cuda cuda_arch=70 "${SPACK_DEPENDENCIES}"
+spack spec --long --namespaces --types gaussian@16-C.02 % ${SPACK_COMPILER}  ~binary +cuda cuda_arch=60,75,80,86 "${SPACK_DEPENDENCIES}"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack concretization failed.'
   exit 1
 fi
 
-time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all gaussian@16-C.02 % ${SPACK_COMPILER}  ~binary +cuda cuda_arch=70 "${SPACK_DEPENDENCIES}"
+time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all gaussian@16-C.02 % ${SPACK_COMPILER}  ~binary +cuda cuda_arch=60,75,80,86 "${SPACK_DEPENDENCIES}"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
   exit 1

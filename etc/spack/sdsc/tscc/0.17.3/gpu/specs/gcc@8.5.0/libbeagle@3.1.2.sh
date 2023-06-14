@@ -51,13 +51,13 @@ spack config get packages
 spack config get repos
 spack config get upstreams
 
-spack spec --long --namespaces --types libbeagle@3.1.2 % gcc@8.5.0 +cuda cuda_arch=60 "^cuda@11.2.2/$(spack find --format '{hash:7}' cuda@11.2.2 % ${SPACK_COMPILER}) ^openjdk@11.0.12_7/$(spack find --format '{hash:7}' openjdk@11.0.12_7 % ${SPACK_COMPILER})"
+spack spec --long --namespaces --types libbeagle@3.1.2 % gcc@8.5.0 +cuda cuda_arch=60,75,80,86"^cuda@11.2.2/$(spack find --format '{hash:7}' cuda@11.2.2 % ${SPACK_COMPILER}) ^openjdk@11.0.12_7/$(spack find --format '{hash:7}' openjdk@11.0.12_7 % ${SPACK_COMPILER})"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack concretization failed.'
   exit 1
 fi
 
-time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all libbeagle@3.1.2 % gcc@8.5.0 +cuda cuda_arch=60 "^cuda@11.2.2/$(spack find --format '{hash:7}' cuda@11.2.2 % ${SPACK_COMPILER}) ^openjdk@11.0.12_7/$(spack find --format '{hash:7}' openjdk@11.0.12_7 % ${SPACK_COMPILER})"
+time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all libbeagle@3.1.2 % gcc@8.5.0 +cuda cuda_arch=60,75,80,86"^cuda@11.2.2/$(spack find --format '{hash:7}' cuda@11.2.2 % ${SPACK_COMPILER}) ^openjdk@11.0.12_7/$(spack find --format '{hash:7}' openjdk@11.0.12_7 % ${SPACK_COMPILER})"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
   exit 1

@@ -41,7 +41,7 @@ module list
 declare -xr INTEL_LICENSE_FILE='40000@elprado.sdsc.edu:40200@elprado.sdsc.edu'
 declare -xr SPACK_PACKAGE='hypre@2.23.0'
 declare -xr SPACK_COMPILER='intel@19.1.1.217'
-declare -xr SPACK_VARIANTS='~complex +cuda cuda_arch=70,80 ~debug +fortran ~int64 ~internal-superlu ~mixedint +mpi ~openmp +shared +superlu-dist ~unified-memory'
+declare -xr SPACK_VARIANTS='~complex +cuda cuda_arch=60,75,80,86 ~debug +fortran ~int64 ~internal-superlu ~mixedint +mpi ~openmp +shared +superlu-dist ~unified-memory'
 declare -xr SPACK_DEPENDENCIES="^intel-mkl@2020.4.304/$(spack find --format '{hash:7}' intel-mkl@2020.4.304 % ${SPACK_COMPILER} ~ilp64 threads=none) ^superlu-dist@7.1.1/$(spack find --format '{hash:7}' superlu-dist@7.1.1 % ${SPACK_COMPILER} ^intel-mpi@2019.10.317)"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
@@ -55,13 +55,13 @@ spack config get packages
 spack config get repos
 spack config get upstreams
 
-spack spec --long --namespaces --types hypre@2.23.0 % intel@19.1.1.217 ~complex +cuda cuda_arch=70,80 ~debug +fortran ~int64 ~internal-superlu ~mixedint +mpi ~openmp +shared +superlu-dist ~unified-memory "^intel-mkl@2020.4.304/$(spack find --format '{hash:7}' intel-mkl@2020.4.304 % ${SPACK_COMPILER} ~ilp64 threads=none) ^superlu-dist@7.1.1/$(spack find --format '{hash:7}' superlu-dist@7.1.1 % ${SPACK_COMPILER} ^intel-mpi@2019.10.317)"
+spack spec --long --namespaces --types hypre@2.23.0 % intel@19.1.1.217 ~complex +cuda cuda_arch=60,75,80,86 ~debug +fortran ~int64 ~internal-superlu ~mixedint +mpi ~openmp +shared +superlu-dist ~unified-memory "^intel-mkl@2020.4.304/$(spack find --format '{hash:7}' intel-mkl@2020.4.304 % ${SPACK_COMPILER} ~ilp64 threads=none) ^superlu-dist@7.1.1/$(spack find --format '{hash:7}' superlu-dist@7.1.1 % ${SPACK_COMPILER} ^intel-mpi@2019.10.317)"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack concretization failed.'
   exit 1
 fi
 
-time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all hypre@2.23.0 % intel@19.1.1.217 ~complex +cuda cuda_arch=70,80 ~debug +fortran ~int64 ~internal-superlu ~mixedint +mpi ~openmp +shared +superlu-dist ~unified-memory "^intel-mkl@2020.4.304/$(spack find --format '{hash:7}' intel-mkl@2020.4.304 % ${SPACK_COMPILER} ~ilp64 threads=none) ^superlu-dist@7.1.1/$(spack find --format '{hash:7}' superlu-dist@7.1.1 % ${SPACK_COMPILER} ^intel-mpi@2019.10.317)"
+time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all hypre@2.23.0 % intel@19.1.1.217 ~complex +cuda cuda_arch=60,75,80,86 ~debug +fortran ~int64 ~internal-superlu ~mixedint +mpi ~openmp +shared +superlu-dist ~unified-memory "^intel-mkl@2020.4.304/$(spack find --format '{hash:7}' intel-mkl@2020.4.304 % ${SPACK_COMPILER} ~ilp64 threads=none) ^superlu-dist@7.1.1/$(spack find --format '{hash:7}' superlu-dist@7.1.1 % ${SPACK_COMPILER} ^intel-mpi@2019.10.317)"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
   exit 1

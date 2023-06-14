@@ -34,7 +34,7 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-# ==> Error: ucx@1.10.1%gcc@8.5.0~assertions~cm+cma+cuda+dc~debug+dm+gdrcopy+ib-hw-tm~java~knem~logging+mlx5-dv+optimizations~parameter_checking+pic+rc~rocm+thread_mul tiple+ud~xpmem cuda_arch=60 ^cuda@11.2.2%gcc@8.5.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~dev arch=linux-rocky8-cascadelake ^libiconv@1.16%gcc@8.5.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  libs=shared,static arch=linux-rocky8-cascadelake ^libxml2@2.9.12%gcc@8.5.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~python arch=linux-rocky8-cascadelake ^xz@5.2.5%gcc@8.5.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~pic libs=shared,static arch=linux-rocky8-cascadelake ^zlib@1.2.11%gcc@8.5.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +optimize+pic+shared arch=linux-rocky8-cascadelake is unsatisfiable, conflicts are:
+# ==> Error: ucx@1.10.1%gcc@8.5.0~assertions~cm+cma+cuda+dc~debug+dm+gdrcopy+ib-hw-tm~java~knem~logging+mlx5-dv+optimizations~parameter_checking+pic+rc~rocm+thread_mul tiple+ud~xpmem cuda_arch=60,75,80,86^cuda@11.2.2%gcc@8.5.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~dev arch=linux-rocky8-cascadelake ^libiconv@1.16%gcc@8.5.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  libs=shared,static arch=linux-rocky8-cascadelake ^libxml2@2.9.12%gcc@8.5.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~python arch=linux-rocky8-cascadelake ^xz@5.2.5%gcc@8.5.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~pic libs=shared,static arch=linux-rocky8-cascadelake ^zlib@1.2.11%gcc@8.5.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +optimize+pic+shared arch=linux-rocky8-cascadelake is unsatisfiable, conflicts are:
 #  A conflict was triggered
 #  condition(4417)
 #  condition(4462)
@@ -82,7 +82,7 @@ module list
 
 declare -xr SPACK_PACKAGE='ucx@1.10.1'
 declare -xr SPACK_COMPILER='gcc@8.5.0'
-declare -xr SPACK_VARIANTS='~assertions ~cm +cma +cuda cuda_arch=60,80 +dc ~debug +dm +gdrcopy +ib-hw-tm ~java ~knem ~logging +mlx5-dv +optimizations ~parameter_checking +pic +rc ~rocm +thread_multiple +ud ~xpmem'
+declare -xr SPACK_VARIANTS='~assertions ~cm +cma +cuda cuda_arch=60,75,80,86 +dc ~debug +dm +gdrcopy +ib-hw-tm ~java ~knem ~logging +mlx5-dv +optimizations ~parameter_checking +pic +rc ~rocm +thread_multiple +ud ~xpmem'
 declare -xr SPACK_DEPENDENCIES="^cuda@11.2.2/$(spack find --format '{hash:7}' cuda@11.2.2 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
@@ -96,13 +96,13 @@ spack config get packages
 spack config get repos
 spack config get upstreams
 
-spack spec --long --namespaces --types ucx@1.10.1 % gcc@8.5.0 ~assertions ~cm +cma +cuda cuda_arch=60,80 +dc ~debug +dm +gdrcopy +ib-hw-tm ~java ~knem ~logging +mlx5-dv +optimizations ~parameter_checking +pic +rc ~rocm +thread_multiple +ud ~xpmem "^cuda@11.2.2/$(spack find --format '{hash:7}' cuda@11.2.2 % ${SPACK_COMPILER})"
+spack spec --long --namespaces --types ucx@1.10.1 % gcc@8.5.0 ~assertions ~cm +cma +cuda cuda_arch=60,75,80,86 +dc ~debug +dm +gdrcopy +ib-hw-tm ~java ~knem ~logging +mlx5-dv +optimizations ~parameter_checking +pic +rc ~rocm +thread_multiple +ud ~xpmem "^cuda@11.2.2/$(spack find --format '{hash:7}' cuda@11.2.2 % ${SPACK_COMPILER})"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack concretization failed.'
   exit 1
 fi
 
-time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all ucx@1.10.1 % gcc@8.5.0 ~assertions ~cm +cma +cuda cuda_arch=60,80 +dc ~debug +dm +gdrcopy +ib-hw-tm ~java ~knem ~logging +mlx5-dv +optimizations ~parameter_checking +pic +rc ~rocm +thread_multiple +ud ~xpmem "^cuda@11.2.2/$(spack find --format '{hash:7}' cuda@11.2.2 % ${SPACK_COMPILER})"
+time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all ucx@1.10.1 % gcc@8.5.0 ~assertions ~cm +cma +cuda cuda_arch=60,75,80,86 +dc ~debug +dm +gdrcopy +ib-hw-tm ~java ~knem ~logging +mlx5-dv +optimizations ~parameter_checking +pic +rc ~rocm +thread_multiple +ud ~xpmem "^cuda@11.2.2/$(spack find --format '{hash:7}' cuda@11.2.2 % ${SPACK_COMPILER})"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
   exit 1

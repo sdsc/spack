@@ -36,7 +36,7 @@ module list
 
 declare -xr SPACK_PACKAGE='nccl@2.8.4-1'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS='+cuda cuda_arch=60,80'
+declare -xr SPACK_VARIANTS='+cuda cuda_arch=60,75,80,86'
 declare -xr SPACK_DEPENDENCIES="^cuda@11.2.2/$(spack find --format '{hash:7}' cuda@11.2.2 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
@@ -50,13 +50,13 @@ spack config get packages
 spack config get repos
 spack config get upstreams
 
-spack spec --long --namespaces --types nccl@2.8.4-1 % gcc@10.2.0 +cuda cuda_arch=60,80 "^cuda@11.2.2/$(spack find --format '{hash:7}' cuda@11.2.2 % ${SPACK_COMPILER})"
+spack spec --long --namespaces --types nccl@2.8.4-1 % gcc@10.2.0 +cuda cuda_arch=60,75,80,86 "^cuda@11.2.2/$(spack find --format '{hash:7}' cuda@11.2.2 % ${SPACK_COMPILER})"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack concretization failed.'
   exit 1
 fi
 
-time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all nccl@2.8.4-1 % gcc@10.2.0 +cuda cuda_arch=60,80 "^cuda@11.2.2/$(spack find --format '{hash:7}' cuda@11.2.2 % ${SPACK_COMPILER})"
+time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all nccl@2.8.4-1 % gcc@10.2.0 +cuda cuda_arch=60,75,80,86 "^cuda@11.2.2/$(spack find --format '{hash:7}' cuda@11.2.2 % ${SPACK_COMPILER})"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
   exit 1
