@@ -2,7 +2,7 @@
 
 #SBATCH --job-name=spark@3.4.0
 #SBATCH --account=use300
-##SBATCH --reservation=rocky8u7_testing
+#SBATCH --reservation=root_73
 #SBATCH --partition=ind-shared
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
