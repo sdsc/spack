@@ -9,7 +9,7 @@ modules:
         - mpi
       hash_length: 0
       blacklist_implicits: true
-      whitelist: ['py-jupyter-core']
+      whitelist: ['py-jupyter-core', 'hadoop']
       naming_scheme: '{name}/{version}/{hash:7}'
       projections:
         all: '{name}/{version}/{hash:7}'
