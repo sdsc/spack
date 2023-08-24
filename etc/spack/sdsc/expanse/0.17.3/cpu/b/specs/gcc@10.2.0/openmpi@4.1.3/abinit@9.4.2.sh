@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=wannier90@3.1.0
+#SBATCH --job-name=abinit@9.4.2
 #SBATCH --account=use300
 #SBATCH --reservation=root_73
 #SBATCH --partition=ind-shared
@@ -41,10 +41,10 @@ module list
 shopt -s expand_aliases
 source ~/.bashrc
 
-declare -xr SPACK_PACKAGE='wannier90@3.1.0'
+declare -xr SPACK_PACKAGE='abinit@9.4.2'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS='+shared'
-declare -xr SPACK_DEPENDENCIES="^openblas@0.3.18/$(spack find --format '{hash:7}' openblas@0.3.18 % ${SPACK_COMPILER} ~ilp64 threads=none) ^openmpi@4.1.3/$(spack find --format '{hash:7}' openmpi@4.1.3 % ${SPACK_COMPILER})"
+declare -xr SPACK_VARIANTS='~libxml2 +mpi ~openmp +scalapack +wannier90'
+declare -xr SPACK_DEPENDENCIES="^fftw@3.3.10/$(spack find --format '{hash:7}' fftw@3.3.10 % ${SPACK_COMPILER} ~mpi ~openmp) ^netlib-scalapack@2.1.0/$(spack find --format '{hash:7}' netlib-scalapack@2.1.0 % ${SPACK_COMPILER} ^openmpi@4.1.3) ^netcdf-c@4.8.1/$(spack find --format '{hash:7}' netcdf-c@4.8.1 % ${SPACK_COMPILER} +mpi ^openmpi@4.1.3) ^wannier90@3.1.0/$(spack find --format '{hash:7}' wannier90@3.1.0 % ${SPACK_COMPILER} ^openmpi@4.1.3)"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -71,6 +71,6 @@ fi
 
 spack module lmod refresh -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'abinit@9.4.2.sh'
+#sbatch --dependency="afterok:${SLURM_JOB_ID}" ''
 
 sleep 30
