@@ -6,7 +6,7 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=8
-#SBATCH --time=01:00:00
+#SBATCH --time=03:00:00
 #SBATCH --output=%x.o%j.%N
 
 declare -xr LOCAL_TIME="$(date +'%Y%m%dT%H%M%S%z')"
@@ -16,7 +16,7 @@ declare -xr SYSTEM_NAME='tscc'
 
 declare -xr SPACK_VERSION='0.17.3'
 declare -xr SPACK_INSTANCE_NAME='gpu'
-declare -xr SPACK_INSTANCE_DIR="${HOME}/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}"
+declare -xr SPACK_INSTANCE_DIR="/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}"
 
 declare -xr SLURM_JOB_SCRIPT="$(scontrol show job ${SLURM_JOB_ID} | awk -F= '/Command=/{print $2}')"
 declare -xr SLURM_JOB_MD5SUM="$(md5sum ${SLURM_JOB_SCRIPT})"
@@ -70,7 +70,7 @@ module list
 
 declare -xr SPACK_PACKAGE='amber@22'
 declare -xr SPACK_COMPILER='gcc@8.5.0'
-declare -xr SPACK_VARIANTS='+cuda cuda_arch=60,75,80,86+mpi +openmp +update'
+declare -xr SPACK_VARIANTS='+cuda cuda_arch=60,75 +mpi +openmp +update'
 declare -xr SPACK_DEPENDENCIES="^intel-mpi@2019.10.317 ^hdf5@1.10.7/$(spack find --format '{hash:7}' hdf5@1.10.7 % ${SPACK_COMPILER} +fortran  +hl +mpi ~szip ^intel-mpi@2019.10.317) ^netcdf-c@4.8.1/$(spack find --format '{hash:7}' netcdf-c@4.8.1 % ${SPACK_COMPILER} +parallel-netcdf +mpi ^intel-mpi@2019.10.317) ^netcdf-fortran@4.5.3/$(spack find --format '{hash:7}' netcdf-fortran@4.5.3 % ${SPACK_COMPILER} ^intel-mpi@2019.10.317) ^cuda@10.2.89/$(spack find --format '{hash:7}' cuda@10.2.89 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 echo ${SPACK_SPEC} > spec.$$
