@@ -1,31 +1,34 @@
 # SDSC HPC Software Deployment Guide
 
-This document outlines the Spack-based software deployment process in 
-use by the San Diego Supercomputer Center's (SDSC) High-Performance 
-Computing (HPC) User Services Group. All definitions, procedures, 
-conventions, and policies defined within this guide are used by the 
-group to build and maintain the custom Spack instances they deploy on 
-SDSC's HPC systems for end users. 
+This guide documents the Spack-based software deployment process in use 
+by the CyberInfrastructure Services and Solutions (CISS) Group and the 
+High-Performance Computing (HPC) User Services Group at the San Diego 
+Supercomputer Center (SDSC). All of the definitions, conventions, 
+policies and procedures outlined within the guide are intended to help
+build, maintain, and deploy custom Spack instances on the HPC systems
+they run and manage on behalf of end users in collaboration with the 
+HPC Systems Group at SDSC. 
 
-## Disclaimer
+## Table of Contents
 
-This is a new and evolving software deployment process in development 
-and use by the SDSC HPC User Services Group to centrally manage HPC 
-software on HPC systems with Spack. Please consider the status of the
-project as a pre-alpha release at this time. Use at your own risk. 
+- [Definitions and Terminology](#definitions-and-terminology)
+- [General Guidelines](#general-guidelines)
+- [About the GitHub Repository](#about-the-github-repository)
+- [How to Contribute](CONTRIBUTING.md)
+- [Miscellaneous Notes](#miscellaneous-notes)
 
 ## Definitions and Terminology
 
 - A Spack ***instance*** is a unique, stand-alone installation of a 
   specific version of `spack` that includes custom Spack configuration 
-  files, Spack packages, and a collection of Spack-installed software 
-  applications, libraries, and utilities.
+  files, Spack packages, and a collection of software applications, 
+  libraries, and utilities built and installed by Spack.
 - A Spack ***package*** is a set of instructions that defines how a 
-  specific piece of software is compiled and/or installed by Spack. For 
-  example, a Spack package specifies where to find and how to retrieve 
-  the software's source code, its required (and/or optional) software 
-  dependencies, its compile-time options, any patches to apply, etc. A 
-  Spack package is primarily defined by it *package.py* file.
+  specific piece of software is compiled and/or installed by Spack. It
+  specifies where to find and how to retrieve its software's source code, 
+  its required (and/or optional) software dependencies, its compile-time 
+  options, any patches to apply, etc. A Spack package is primarily defined 
+  by it *package.py* file.
 - A Spack ***spec*** is a string descriptor that specifies a particular 
   build configuration of a Spack package. The full syntax of a spec 
   may include the package name, its version, the compiler it should be 
@@ -36,27 +39,44 @@ project as a pre-alpha release at this time. Use at your own risk.
   applications, libraries, and/or utilities compiled with Spack using 
   the default system compiler. These packages form the foundation of the 
   software environment upon which additional Spack packages are built.
-  In general, the core packages of a Spack instance are a set of (core)
-  compilers and other general software utilities. e.g., version control
-  systems, data transfer tools, etc.
-- A Spack package ***dependency chain*** is an explicitly-defined  
-  ordered set of Spack specs that share a common (core) compiler and/or
-  MPI library, may depend on one another (or share other software 
-  dependencies), and should be installed one after another, one at a 
-  time, as prescribed by their dependencies.
+  In general, the core packages of a Spack instance are a set of compilers
+  and other general software utilities. e.g., version control systems, 
+  data transfer tools, etc.
+- A Spack package ***dependency chain*** is an explicitly-defined ordered 
+  set of Spack specs that share a common (core) compiler and/or MPI library,
+  may depend on one another (or share other software dependencies), and 
+  should be installed serially one after another, one at a time, as 
+  prescribed by their dependencies.
 - A Spack ***deployment branch*** is a *trunk*-like branch for a specific 
   version of `spack` that tracks all of the Spack configuration files, 
   Spack packages, and Spack specs used to deploy a Spack instance (or a
-  set of instances). 
+  set of instances).
 
-## GitHub Repository
+## General Guidelines
 
-The [sdsc/spack](https://github.com/sdsc/spack) project is a custom fork 
-of the Spack project's main GitHub repository, which is referred to in 
-this guide as the [spack/spack](https://github.com/spack/spack) repo. 
-The primary aim of the sdsc/spack repo is to manage and track all 
-changes made to the custom Spack instances deployed by SDSC on its HPC 
-systems.
+The guidelines listed below are intended to provide a foundation for the
+conventions, policies, and procedures established by SDSC to manage its 
+Spack instances and the software deployment process on its HPC system. 
+While none of the guidelines are definitive and many may change over time,
+they should, however, be adhered to whenever possible, unless special 
+circumstances apply.
+
+- Any Spack instance deployed into production should originate from a 
+  deployment branch within the sdsc/spack repository.
+- Any change that must be made to a Spack instance already in production
+  should originate as a pull request submitted to one of the deployment 
+  brances within the sdsc/spack repository.
+- 
+
+- https://spack.readthedocs.io/en/latest/contribution_guide.html
+- https://spack.readthedocs.io/en/latest/packaging_guide.html
+- https://spack.readthedocs.io/en/latest/developer_guide.html
+
+## About the GitHub Repository
+
+The [sdsc/spack](https://github.com/sdsc/spack) GitHub repository is a 
+custom fork of the Spack project's main [spack/spack](https://github.com/spack/spack)
+GitHub repository.
 
 ### Deployment Branches
 
@@ -90,12 +110,21 @@ modifications are as follows:
 All other types of branches (see
   [CONTRIBUTING.md](CONTRIBUTING.md)) should start from a deployment
   branch.
-
+  
 ### Package Repository
 
 ### Instance Repositories
 
 ### Access Control and Permissions
+
+Write access to the sdsc/spack repository is restricted to SDSC team 
+members who are responsible for managing and tracking issues, reviewing
+and merging pull requests, and maintaining the custom deployment 
+branches in the repository. All other SDSC team members who wish to 
+contribute to the sdsc/spack repository should submit their changes via
+pull requests from their own public fork of the sdsc/spack repository.
+
+
 
 etc/spack/repos.yaml
 var/spack/repos/sdsc/repo.yaml
@@ -104,33 +133,4 @@ var/spack/repos/sdsc/packages
 etc/spack/sdsc/expanse/0.17.3/cpu/specs
 etc/spack/sdsc/expanse/0.17.3/cpu/yamls
 
-
-
-
-## Deploying HPC Software via Spack
-
-### Deploying a Spack Instance
-
-- start from existing deployment branch
-
-### Managing Changes to a Spack Instance
-
-- deploy change to configuration file
-- add new package to sdsc package repository
-- spack install a new spec
-
-### Setting up a Shared Instance Configuration
-
-### Using a Spack Mirror and Build Caches for Instance Backup(s)
-
-
-
-
-
-## Additional Notes
-
-### Protecting the sdsc/spack `develop` branch 
-
-### Fetching changes and re-syncing the `develop` branch 
-
-### Creating a new deployment branch
+## Miscellaneous Notes

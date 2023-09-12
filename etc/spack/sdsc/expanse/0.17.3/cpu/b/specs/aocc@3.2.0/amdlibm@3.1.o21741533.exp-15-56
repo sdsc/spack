@@ -1,0 +1,993 @@
+slurmstepd: error: Unable to create TMPDIR [/scratch/spack_cpu/job_21741491]: Permission denied
+slurmstepd: error: Setting TMPDIR to /tmp
+1681784835 21741533 3d29aed30951f31ae67e782e8048f762  /cm/shared/apps/spack/0.17.3/cpu/b/etc/spack/sdsc/expanse/0.17.3/cpu/specs/aocc@3.2.0/amdlibm@3.1.sh afterok:21741491
+
+#!/usr/bin/env bash
+
+#SBATCH --job-name=amdlibm@3.1
+#SBATCH --account=use300
+#SBATCH --reservation=rocky8u7_testing
+#SBATCH --partition=ind-shared
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=1
+#SBATCH --cpus-per-task=16
+#SBATCH --mem=32G
+#SBATCH --time=01:00:00
+#SBATCH --output=%x.o%j.%N
+
+declare -xr LOCAL_TIME="$(date +'%Y%m%dT%H%M%S%z')"
+declare -xir UNIX_TIME="$(date +'%s')"
+
+declare -xr LOCAL_SCRATCH_DIR="/scratch/${USER}/job_${SLURM_JOB_ID}"
+declare -xr TMPDIR="${LOCAL_SCRATCH_DIR}"
+
+declare -xr SYSTEM_NAME='expanse'
+
+declare -xr SPACK_VERSION='0.17.3'
+declare -xr SPACK_INSTANCE_NAME='cpu'
+declare -xr SPACK_INSTANCE_VERSION='b'
+declare -xr SPACK_INSTANCE_DIR="/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}/${SPACK_INSTANCE_VERSION}"
+
+declare -xr SLURM_JOB_SCRIPT="$(scontrol show job ${SLURM_JOB_ID} | awk -F= '/Command=/{print $2}')"
+declare -xr SLURM_JOB_MD5SUM="$(md5sum ${SLURM_JOB_SCRIPT})"
+
+declare -xr SCHEDULER_MODULE='slurm'
+
+echo "${UNIX_TIME} ${SLURM_JOB_ID} ${SLURM_JOB_MD5SUM} ${SLURM_JOB_DEPENDENCY}" 
+echo ""
+
+cat "${SLURM_JOB_SCRIPT}"
+
+module purge
+module load "${SCHEDULER_MODULE}"
+module list
+. "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
+
+declare -xr SPACK_PACKAGE='amdlibm@3.1'
+declare -xr SPACK_COMPILER='aocc@3.2.0'
+declare -xr SPACK_VARIANTS='~verbose'
+declare -xr SPACK_DEPENDENCIES=''
+declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS}"
+
+printenv
+
+spack config get compilers  
+spack config get config  
+spack config get mirrors
+spack config get modules
+spack config get packages
+spack config get repos
+spack config get upstreams
+
+time -p spack spec --long --namespaces --types "${SPACK_SPEC}"
+if [[ "${?}" -ne 0 ]]; then
+  echo 'ERROR: spack concretization failed.'
+  exit 1
+fi
+
+time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all "${SPACK_SPEC}"
+if [[ "${?}" -ne 0 ]]; then
+  echo 'ERROR: spack install failed.'
+  exit 1
+fi
+
+#spack module lmod refresh --delete-tree -y
+
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'eigen@3.4.0.sh'
+
+sleep 30
+
+Currently Loaded Modules:
+  1) slurm/expanse/21.08.8
+
+ 
+
+LD_LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:/cm/shared/apps/slurm/current/lib64
+LS_COLORS=rs=0:di=38;5;33:ln=38;5;51:mh=00:pi=40;38;5;11:so=38;5;13:do=38;5;5:bd=48;5;232;38;5;11:cd=48;5;232;38;5;3:or=48;5;232;38;5;9:mi=01;05;37;41:su=48;5;196;38;5;15:sg=48;5;11;38;5;16:ca=48;5;196;38;5;226:tw=48;5;10;38;5;16:ow=48;5;10;38;5;21:st=48;5;21;38;5;15:ex=38;5;40:*.tar=38;5;9:*.tgz=38;5;9:*.arc=38;5;9:*.arj=38;5;9:*.taz=38;5;9:*.lha=38;5;9:*.lz4=38;5;9:*.lzh=38;5;9:*.lzma=38;5;9:*.tlz=38;5;9:*.txz=38;5;9:*.tzo=38;5;9:*.t7z=38;5;9:*.zip=38;5;9:*.z=38;5;9:*.dz=38;5;9:*.gz=38;5;9:*.lrz=38;5;9:*.lz=38;5;9:*.lzo=38;5;9:*.xz=38;5;9:*.zst=38;5;9:*.tzst=38;5;9:*.bz2=38;5;9:*.bz=38;5;9:*.tbz=38;5;9:*.tbz2=38;5;9:*.tz=38;5;9:*.deb=38;5;9:*.rpm=38;5;9:*.jar=38;5;9:*.war=38;5;9:*.ear=38;5;9:*.sar=38;5;9:*.rar=38;5;9:*.alz=38;5;9:*.ace=38;5;9:*.zoo=38;5;9:*.cpio=38;5;9:*.7z=38;5;9:*.rz=38;5;9:*.cab=38;5;9:*.wim=38;5;9:*.swm=38;5;9:*.dwm=38;5;9:*.esd=38;5;9:*.jpg=38;5;13:*.jpeg=38;5;13:*.mjpg=38;5;13:*.mjpeg=38;5;13:*.gif=38;5;13:*.bmp=38;5;13:*.pbm=38;5;13:*.pgm=38;5;13:*.ppm=38;5;13:*.tga=38;5;13:*.xbm=38;5;13:*.xpm=38;5;13:*.tif=38;5;13:*.tiff=38;5;13:*.png=38;5;13:*.svg=38;5;13:*.svgz=38;5;13:*.mng=38;5;13:*.pcx=38;5;13:*.mov=38;5;13:*.mpg=38;5;13:*.mpeg=38;5;13:*.m2v=38;5;13:*.mkv=38;5;13:*.webm=38;5;13:*.ogm=38;5;13:*.mp4=38;5;13:*.m4v=38;5;13:*.mp4v=38;5;13:*.vob=38;5;13:*.qt=38;5;13:*.nuv=38;5;13:*.wmv=38;5;13:*.asf=38;5;13:*.rm=38;5;13:*.rmvb=38;5;13:*.flc=38;5;13:*.avi=38;5;13:*.fli=38;5;13:*.flv=38;5;13:*.gl=38;5;13:*.dl=38;5;13:*.xcf=38;5;13:*.xwd=38;5;13:*.yuv=38;5;13:*.cgm=38;5;13:*.emf=38;5;13:*.ogv=38;5;13:*.ogx=38;5;13:*.aac=38;5;45:*.au=38;5;45:*.flac=38;5;45:*.m4a=38;5;45:*.mid=38;5;45:*.midi=38;5;45:*.mka=38;5;45:*.mp3=38;5;45:*.mpc=38;5;45:*.ogg=38;5;45:*.ra=38;5;45:*.wav=38;5;45:*.oga=38;5;45:*.opus=38;5;45:*.spx=38;5;45:*.xspf=38;5;45:
+SRUN_DEBUG=3
+SLURM_STEP_ID=0
+LOCAL_SCRATCH_DIR=/scratch/spack_cpu/job_21741533
+SLURM_NODEID=0
+SLURM_TASK_PID=2536229
+__LMOD_REF_COUNT_PATH=/cm/shared/apps/slurm/current/sbin:1;/cm/shared/apps/slurm/current/bin:1;/cm/shared/apps/spack/0.17.3/cpu/b/bin:1;/home/spack_cpu/.local/bin:2;/home/spack_cpu/bin:2;/usr/local/bin:1;/usr/bin:1;/usr/local/sbin:1;/usr/sbin:1
+_ModuleTable002_=aWxlcyIsIi9ldGMvbW9kdWxlZmlsZXMiLCIvdXNyL3NoYXJlL21vZHVsZWZpbGVzIiwiL3Vzci9zaGFyZS9Nb2R1bGVzL21vZHVsZWZpbGVzIiwiL2NtL3NoYXJlZC9tb2R1bGVmaWxlcyIsfSxbInN5c3RlbUJhc2VNUEFUSCJdPSIvY20vbG9jYWwvbW9kdWxlZmlsZXM6L2NtL3NoYXJlZC9hcHBzL2FjY2Vzcy9tb2R1bGVmaWxlczovY20vc2hhcmVkL2FwcHMveHNlZGUvbW9kdWxlZmlsZXM6L2NtL3NoYXJlZC9tb2R1bGVmaWxlczovZXRjL21vZHVsZWZpbGVzOi91c3Ivc2hhcmUvbW9kdWxlZmlsZXM6L3Vzci9zaGFyZS9Nb2R1bGVzL21vZHVsZWZpbGVzIix9
+SSH_CONNECTION=198.202.100.13 35140 198.202.100.13 22
+SPACK_PYTHON=/usr/bin/python3
+SLURM_PRIO_PROCESS=0
+SLURM_CPU_BIND_VERBOSE=quiet
+LANG=en_US.UTF-8
+SLURM_SUBMIT_DIR=/cm/shared/apps/spack/0.17.3/cpu/b/etc/spack/sdsc/expanse/0.17.3/cpu/specs/aocc@3.2.0
+HISTCONTROL=ignoredups
+HOSTNAME=exp-15-56
+LMOD_SYSTEM_DEFAULT_MODULES=DefaultModules
+SLURM_JOB_DEPENDENCY=afterok:21741491
+OLDPWD=/cm/shared/apps/spack/0.17.3/cpu/b/etc/spack/sdsc/expanse/0.17.3/cpu/specs
+__LMOD_REF_COUNT__LMFILES_=/cm/local/modulefiles/slurm/expanse/21.08.8:1
+SLURM_CPUS_PER_TASK=16
+SLURM_STEPID=0
+SLURM_SRUN_COMM_HOST=10.21.0.19
+SPACK_DEPENDENCIES=
+SLURM_DISTRIBUTION=cyclic
+ENVIRONMENT=BATCH
+SPACK_VERSION=0.17.3
+SLURM_PROCID=0
+SPACK_INSTANCE_VERSION=b
+SLURM_JOB_GID=11491
+SPACK_VARIANTS=~verbose
+SPACK_INSTANCE_DIR=/cm/shared/apps/spack/0.17.3/cpu/b
+__LMOD_REF_COUNT_LD_LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:1;/cm/shared/apps/slurm/current/lib64:1
+SLURM_CPU_BIND=quiet,mask_cpu:0x0000000000000000000000000000FFFF
+SLURM_JOB_SCRIPT=/cm/shared/apps/spack/0.17.3/cpu/b/etc/spack/sdsc/expanse/0.17.3/cpu/specs/aocc@3.2.0/amdlibm@3.1.sh
+SLURMD_NODENAME=exp-15-56
+SLURM_TASKS_PER_NODE=1
+S_COLORS=auto
+which_declare=declare -f
+SPACK_COMPILER=aocc@3.2.0
+SLURM_JOB_RESERVATION=rocky8u7_testing
+XDG_SESSION_ID=50063
+SLURM_NNODES=1
+USER=spack_cpu
+SLURM_LAUNCH_NODE_IPADDR=10.21.0.19
+SLURM_STEP_TASKS_PER_NODE=1
+SLURM_NTASKS_PER_NODE=1
+__LMOD_REF_COUNT_MODULEPATH=/cm/local/modulefiles:1;/cm/shared/apps/access/modulefiles:1;/cm/shared/apps/xsede/modulefiles:1;/etc/modulefiles:1;/usr/share/modulefiles:1;/usr/share/Modules/modulefiles:1;/cm/shared/modulefiles:1
+__LMOD_REF_COUNT_LOADEDMODULES=slurm/expanse/21.08.8:1
+PWD=/cm/shared/apps/spack/0.17.3/cpu/b/etc/spack/sdsc/expanse/0.17.3/cpu/specs/aocc@3.2.0
+ENABLE_LMOD=1
+SLURM_JOB_NODELIST=exp-15-56
+HOME=/home/spack_cpu
+SLURM_CLUSTER_NAME=expanse
+LMOD_COLORIZE=yes
+LOCAL_TIME=20230417T192715-0700
+SLURM_NODELIST=exp-15-56
+SSH_CLIENT=198.202.100.13 35140 22
+LMOD_VERSION=8.2.4
+CPATH=/cm/shared/apps/slurm/current/include
+SLURM_NTASKS=1
+LMOD_SETTARG_CMD=:
+SLURM_JOB_CPUS_PER_NODE=16
+BASH_ENV=/usr/share/lmod/lmod/init/bash
+SLURM_TOPOLOGY_ADDR=exp-15-56
+SLURM_WORKING_CLUSTER=expanse:mgr1:6817:9472:109
+SLURM_JOB_MD5SUM=3d29aed30951f31ae67e782e8048f762  /cm/shared/apps/spack/0.17.3/cpu/b/etc/spack/sdsc/expanse/0.17.3/cpu/specs/aocc@3.2.0/amdlibm@3.1.sh
+SPACK_PACKAGE=amdlibm@3.1
+__LMOD_REF_COUNT_LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:1;/cm/shared/apps/slurm/current/lib64:1
+SLURM_STEP_NODELIST=exp-15-56
+SLURM_JOB_NAME=amdlibm@3.1
+SLURM_SRUN_COMM_PORT=44457
+TMPDIR=/scratch/spack_cpu/job_21741533
+LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:/cm/shared/apps/slurm/current/lib64
+LMOD_sys=Linux
+SLURM_JOBID=21741533
+SYSTEM_NAME=expanse
+_ModuleTable001_=X01vZHVsZVRhYmxlXz17WyJNVHZlcnNpb24iXT0zLFsiY19yZWJ1aWxkVGltZSJdPWZhbHNlLFsiY19zaG9ydFRpbWUiXT1mYWxzZSxkZXB0aFQ9e30sZmFtaWx5PXt9LG1UPXtzbHVybT17WyJmbiJdPSIvY20vbG9jYWwvbW9kdWxlZmlsZXMvc2x1cm0vZXhwYW5zZS8yMS4wOC44IixbImZ1bGxOYW1lIl09InNsdXJtL2V4cGFuc2UvMjEuMDguOCIsWyJsb2FkT3JkZXIiXT0xLHByb3BUPXt9LFsic3RhY2tEZXB0aCJdPTAsWyJzdGF0dXMiXT0iYWN0aXZlIixbInVzZXJOYW1lIl09InNsdXJtIix9LH0sbXBhdGhBPXsiL2NtL2xvY2FsL21vZHVsZWZpbGVzIiwiL2NtL3NoYXJlZC9hcHBzL2FjY2Vzcy9tb2R1bGVmaWxlcyIsIi9jbS9zaGFyZWQvYXBwcy94c2VkZS9tb2R1bGVm
+SLURM_CONF=/cm/shared/apps/slurm/var/etc/expanse/slurm.conf
+LOADEDMODULES=slurm/expanse/21.08.8
+__LMOD_REF_COUNT_MANPATH=/cm/shared/apps/slurm/current/man:3;/usr/share/lmod/lmod/share/man:1;/usr/local/share/man:2;/usr/share/man:2;/cm/local/apps/environment-modules/current/share/man:2
+_ModuleTable003_=dXJtPXtbImZuIl09Ii9jbS9sb2NhbC9tb2R1bGVmaWxlcy9zbHVybS9leHBhbnNlLzIxLjA4LjgiLFsiZnVsbE5hbWUiXT0ic2x1cm0vZXhwYW5zZS8yMS4wOC44IixbImxvYWRPcmRlciJdPTMscHJvcFQ9e30sWyJzdGFja0RlcHRoIl09MixbInN0YXR1cyJdPSJhY3RpdmUiLFsidXNlck5hbWUiXT0ic2x1cm0iLH0sfSxtcGF0aEE9eyIvY20vc2hhcmVkL2FwcHMvc3BhY2svY3B1L2xtb2QvbGludXgtY2VudG9zOC14ODZfNjQvQ29yZSIsIi9jbS9sb2NhbC9tb2R1bGVmaWxlcyIsIi9jbS9zaGFyZWQvYXBwcy9hY2Nlc3MvbW9kdWxlZmlsZXMiLCIvY20vc2hhcmVkL2FwcHMveHNlZGUvbW9kdWxlZmlsZXMiLCIvZXRjL21vZHVsZWZpbGVzIiwiL3Vzci9zaGFyZS9tb2R1bGVm
+SLURM_NODE_ALIASES=(null)
+SLURM_JOB_QOS=ind-shared-normal
+LMOD_ROOT=/usr/share/lmod
+SLURM_TOPOLOGY_ADDR_PATTERN=node
+SSH_TTY=/dev/pts/659
+MAIL=/var/spool/mail/spack_cpu
+SLURM_CPUS_ON_NODE=16
+LMOD_arch=x86_64
+SLURM_JOB_NUM_NODES=1
+__Init_Default_Modules=1
+CMD_WLM_CLUSTER_NAME=expanse
+SLURM_MEM_PER_NODE=32768
+SPACK_ROOT=/cm/shared/apps/spack/0.17.3/cpu/b
+SHELL=/bin/bash
+TERM=xterm-256color
+SLURM_JOB_UID=527834
+_ModuleTable_Sz_=2
+__LMOD_REF_COUNT_CPATH=/cm/shared/apps/slurm/current/include:1
+SLURM_JOB_PARTITION=ind-shared
+SLURM_PTY_WIN_ROW=24
+SLURM_CPU_BIND_LIST=0x0000000000000000000000000000FFFF
+SPACK_INSTANCE_NAME=cpu
+SLURM_JOB_USER=spack_cpu
+SLURM_PTY_WIN_COL=80
+SLURM_NPROCS=1
+SHLVL=4
+SLURM_SUBMIT_HOST=exp-15-56
+UNIX_TIME=1681784835
+SLURM_JOB_ACCOUNT=use300
+MANPATH=/cm/shared/apps/slurm/current/man:/usr/share/lmod/lmod/share/man:/usr/local/share/man:/usr/share/man:/cm/local/apps/environment-modules/current/share/man
+SPACK_LD_LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:/cm/shared/apps/slurm/current/lib64
+LMOD_PREPEND_BLOCK=normal
+SLURM_STEP_LAUNCHER_PORT=44457
+MODULEPATH=/cm/local/modulefiles:/cm/shared/apps/access/modulefiles:/cm/shared/apps/xsede/modulefiles:/etc/modulefiles:/usr/share/modulefiles:/usr/share/Modules/modulefiles:/cm/shared/modulefiles
+SLURM_PTY_PORT=42115
+SLURM_GTIDS=0
+LOGNAME=spack_cpu
+DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/527834/bus
+XDG_RUNTIME_DIR=/run/user/527834
+MODULEPATH_ROOT=/usr/share/modulefiles
+PATH=/cm/shared/apps/slurm/current/sbin:/cm/shared/apps/slurm/current/bin:/cm/shared/apps/spack/0.17.3/cpu/b/bin:/home/spack_cpu/.local/bin:/home/spack_cpu/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin
+SLURM_JOB_ID=21741533
+_LMFILES_=/cm/local/modulefiles/slurm/expanse/21.08.8
+SLURM_CPU_BIND_TYPE=mask_cpu:
+DEBUGINFOD_URLS=https://debuginfod.centos.org/ 
+SLURM_STEP_NUM_TASKS=1
+MODULESHOME=/usr/share/lmod/lmod
+SCHEDULER_MODULE=slurm
+LMOD_SETTARG_FULL_SUPPORT=no
+HISTSIZE=-1
+LMOD_PKG=/usr/share/lmod/lmod
+SLURM_STEP_NUM_NODES=1
+SPACK_SPEC=amdlibm@3.1 % aocc@3.2.0 ~verbose
+LMOD_CMD=/usr/share/lmod/lmod/libexec/lmod
+SLURM_LOCALID=0
+LESSOPEN=||/usr/bin/lesspipe.sh %s
+LMOD_FULL_SETTARG_SUPPORT=no
+LMOD_DIR=/usr/share/lmod/lmod/libexec
+BASH_FUNC_which%%=() {  ( alias;
+ eval ${which_declare} ) | /usr/bin/which --tty-only --read-alias --read-functions --show-tilde --show-dot $@
+}
+BASH_FUNC_module%%=() {  eval $($LMOD_CMD bash "$@") && eval $(${LMOD_SETTARG_CMD:-:} -s sh)
+}
+BASH_FUNC_spack%%=() {  : this is a shell function from: /cm/shared/apps/spack/0.17.3/cpu/b/share/spack/setup-env.sh;
+ : the real spack script is here: /cm/shared/apps/spack/0.17.3/cpu/b/bin/spack;
+ _spack_shell_wrapper "$@";
+ return $?
+}
+BASH_FUNC__spack_shell_wrapper%%=() {  for var in LD_LIBRARY_PATH DYLD_LIBRARY_PATH DYLD_FALLBACK_LIBRARY_PATH;
+ do
+ eval "if [ -n \"\${${var}-}\" ]; then export SPACK_$var=\${${var}}; fi";
+ done;
+ if [ -n "${ZSH_VERSION:-}" ]; then
+ emulate -L sh;
+ fi;
+ _sp_flags="";
+ while [ ! -z ${1+x} ] && [ "${1#-}" != "${1}" ]; do
+ _sp_flags="$_sp_flags $1";
+ shift;
+ done;
+ if [ -n "$_sp_flags" ] && [ "${_sp_flags#*h}" != "${_sp_flags}" ] || [ "${_sp_flags#*V}" != "${_sp_flags}" ]; then
+ command spack $_sp_flags "$@";
+ return;
+ fi;
+ _sp_subcommand="";
+ if [ ! -z ${1+x} ]; then
+ _sp_subcommand="$1";
+ shift;
+ fi;
+ case $_sp_subcommand in 
+ "cd")
+ _sp_arg="";
+ if [ -n "$1" ]; then
+ _sp_arg="$1";
+ shift;
+ fi;
+ if [ "$_sp_arg" = "-h" ] || [ "$_sp_arg" = "--help" ]; then
+ command spack cd -h;
+ else
+ LOC="$(spack location $_sp_arg "$@")";
+ if [ -d "$LOC" ]; then
+ cd "$LOC";
+ else
+ return 1;
+ fi;
+ fi;
+ return
+ ;;
+ "env")
+ _sp_arg="";
+ if [ -n "$1" ]; then
+ _sp_arg="$1";
+ shift;
+ fi;
+ if [ "$_sp_arg" = "-h" ] || [ "$_sp_arg" = "--help" ]; then
+ command spack env -h;
+ else
+ case $_sp_arg in 
+ activate)
+ _a=" $@";
+ if [ -z ${1+x} ] || [ "${_a#* --sh}" != "$_a" ] || [ "${_a#* --csh}" != "$_a" ] || [ "${_a#* -h}" != "$_a" ] || [ "${_a#* --help}" != "$_a" ]; then
+ command spack env activate "$@";
+ else
+ stdout="$(command spack $_sp_flags env activate --sh "$@")" || return;
+ eval "$stdout";
+ fi
+ ;;
+ deactivate)
+ _a=" $@";
+ if [ "${_a#* --sh}" != "$_a" ] || [ "${_a#* --csh}" != "$_a" ]; then
+ command spack env deactivate "$@";
+ else
+ if [ -n "$*" ]; then
+ command spack env deactivate -h;
+ else
+ stdout="$(command spack $_sp_flags env deactivate --sh)" || return;
+ eval "$stdout";
+ fi;
+ fi
+ ;;
+ *)
+ command spack env $_sp_arg "$@"
+ ;;
+ esac;
+ fi;
+ return
+ ;;
+ "load" | "unload")
+ _a=" $@";
+ if [ "${_a#* --sh}" != "$_a" ] || [ "${_a#* --csh}" != "$_a" ] || [ "${_a#* -h}" != "$_a" ] || [ "${_a#* --list}" != "$_a" ] || [ "${_a#* --help}" != "$_a" ]; then
+ command spack $_sp_flags $_sp_subcommand "$@";
+ else
+ stdout="$(command spack $_sp_flags $_sp_subcommand --sh "$@")" || return;
+ eval "$stdout";
+ fi
+ ;;
+ *)
+ command spack $_sp_flags $_sp_subcommand "$@"
+ ;;
+ esac
+}
+BASH_FUNC_ml%%=() {  eval $($LMOD_DIR/ml_cmd "$@")
+}
+_=/usr/bin/printenv
+compilers:
+- compiler:
+    spec: gcc@8.5.0
+    paths:
+      cc: /usr/bin/gcc
+      cxx: /usr/bin/g++
+      f77: /usr/bin/gfortran
+      fc: /usr/bin/gfortran
+    flags:
+      cflags: -O2 -march=native
+      cxxflags: -O2 -march=native
+      fflags: -O2 -march=native
+    operating_system: rocky8
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+- compiler:
+    spec: gcc@10.2.0
+    paths:
+      cc: /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen/gcc-8.5.0/gcc-10.2.0-npcyll4gxjhf4tejksmdzlsl3d3usqpd/bin/gcc
+      cxx: /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen/gcc-8.5.0/gcc-10.2.0-npcyll4gxjhf4tejksmdzlsl3d3usqpd/bin/g++
+      f77: /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen/gcc-8.5.0/gcc-10.2.0-npcyll4gxjhf4tejksmdzlsl3d3usqpd/bin/gfortran
+      fc: /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen/gcc-8.5.0/gcc-10.2.0-npcyll4gxjhf4tejksmdzlsl3d3usqpd/bin/gfortran
+    flags:
+      cflags: -O2 -march=native
+      cxxflags: -O2 -march=native
+      fflags: -O2 -march=native
+    operating_system: rocky8
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+- compiler:
+    spec: aocc@3.2.0
+    paths:
+      cc: /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen/gcc-8.5.0/aocc-3.2.0-io3s466wsnnichqc2o2rikbuloev5bmq/bin/clang
+      cxx: /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen/gcc-8.5.0/aocc-3.2.0-io3s466wsnnichqc2o2rikbuloev5bmq/bin/clang++
+      f77: /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen/gcc-8.5.0/aocc-3.2.0-io3s466wsnnichqc2o2rikbuloev5bmq/bin/flang
+      fc: /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen/gcc-8.5.0/aocc-3.2.0-io3s466wsnnichqc2o2rikbuloev5bmq/bin/flang
+    flags:
+      cflags: -O2 -march=native
+      cxxflags: -O2 -march=native
+      fflags: -O2 -march=native
+    operating_system: rocky8
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+config:
+  install_tree:
+    root: $spack/opt/spack
+    projections:
+      all: ${ARCHITECTURE}/${COMPILERNAME}-${COMPILERVER}/${PACKAGE}-${VERSION}-${HASH}
+  template_dirs:
+  - $spack/share/spack/templates
+
+  # Temporary locations Spack can try to use for builds.
+  #
+  # Recommended options are given below.
+  #
+  # Builds can be faster in temporary directories on some (e.g., HPC) systems.
+  # Specifying `$tempdir` will ensure use of the default temporary directory
+  # (i.e., ``$TMP` or ``$TMPDIR``).
+  #
+  # Another option that prevents conflicts and potential permission issues is
+  # to specify `$user_cache_path/stage`, which ensures each user builds in their
+  # home directory.
+  #
+  # A more traditional path uses the value of `$spack/var/spack/stage`, which
+  # builds directly inside Spack's instance without staging them in a
+  # temporary space.  Problems with specifying a path inside a Spack instance
+  # are that it precludes its use as a system package and its ability to be
+  # pip installable.
+  #
+  # In any case, if the username is not already in the path, Spack will append
+  # the value of `$user` in an attempt to avoid potential conflicts between
+  # users in shared temporary spaces.
+  #
+  # The build stage can be purged with `spack clean --stage` and
+  # `spack clean -a`, so it is important that the specified directory uniquely
+  # identifies Spack staging to avoid accidentally wiping out non-Spack work.
+  build_stage:
+  - $tempdir/$user/spack-stage
+  - $user_cache_path/stage
+  # - $spack/var/spack/stage
+
+  # Directory in which to run tests and store test results.
+  # Tests will be stored in directories named by date/time and package
+  # name/hash.
+  test_stage: $user_cache_path/test
+  source_cache: $spack/var/spack/cache
+  misc_cache: $user_cache_path/cache
+  connect_timeout: 10
+  verify_ssl: true
+  suppress_gpg_warnings: false
+  install_missing_compilers: false
+  checksum: true
+  deprecated: false
+  dirty: false
+  build_language: C
+  locks: true
+  url_fetch_method: urllib
+  ccache: false
+  concretizer: clingo
+  db_lock_timeout: 3
+  package_lock_timeout: null
+  shared_linking: rpath
+  allow_sgid: true
+  terminal_title: false
+  debug: false
+  build_jobs: 16
+mirrors:
+  spack-public: https://mirror.spack.io
+modules:
+  default:
+    'enable:':
+    - lmod
+    lmod:
+      core_compilers:
+      - gcc@8.5.0
+      hierarchy:
+      - mpi
+      hash_length: 0
+      blacklist_implicits: true
+      naming_scheme: '{name}/{version}/{hash:7}'
+      projections:
+        all: '{name}/{version}/{hash:7}'
+      all:
+        suffixes:
+          +openmp: omp
+          threads=openmp: omp
+          +ipl64: i64
+      intel:
+        environment:
+          set:
+            INTEL_LICENSE_FILE: 40000@elprado.sdsc.edu:40200@elprado.sdsc.edu
+      petsc:
+        suffixes:
+          +complex: cmplx
+      slepc:
+        suffixes:
+          ^petsc +complex: cmplx
+      ^python:
+        autoload: direct
+      ^ucx:
+        autoload: direct
+  prefix_inspections:
+    lib:
+    - LD_LIBRARY_PATH
+    lib64:
+    - LD_LIBRARY_PATH
+    bin:
+    - PATH
+    man:
+    - MANPATH
+    share/man:
+    - MANPATH
+    share/aclocal:
+    - ACLOCAL_PATH
+    lib/pkgconfig:
+    - PKG_CONFIG_PATH
+    lib64/pkgconfig:
+    - PKG_CONFIG_PATH
+    share/pkgconfig:
+    - PKG_CONFIG_PATH
+    ? ''
+    : - CMAKE_PREFIX_PATH
+
+  # These are configurations for the module set named "default"
+packages:
+  lmod:
+    externals:
+    - spec: lmod@8.2.4
+      prefix: /usr
+    buildable: false
+  lustre:
+    externals:
+    - spec: lustre@2.15.2
+      prefix: /usr
+    buildable: false
+  openssl:
+    externals:
+    - spec: openssl@1.1.1k
+      prefix: /usr
+    buildable: false
+  rdma-core:
+    externals:
+    - spec: rdma-core@43.0
+      prefix: /usr
+    buildable: false
+  slurm:
+    externals:
+    - spec: slurm@21.08.8
+      prefix: /cm/shared/apps/slurm/21.08.8
+    buildable: false
+  librsvg:
+    externals:
+    - spec: librsvg@2.42.7
+      prefix: /usr
+    buildable: false
+  ghostscript:
+    externals:
+    - spec: ghostscript@9.27
+      prefix: /usr
+    buildable: false
+  gaussian:
+    permissions:
+      read: group
+      group: gaussian
+  vasp6:
+    permissions:
+      read: group
+      group: vasp-6
+  all:
+    compiler: [gcc, intel, pgi, clang, xl, nag, fj, aocc]
+    providers:
+      awk: [gawk]
+      blas: [openblas, amdblis]
+      D: [ldc]
+      daal: [intel-daal]
+      elf: [elfutils]
+      fftw-api: [fftw, amdfftw]
+      flame: [libflame, amdlibflame]
+      fuse: [libfuse]
+      gl: [mesa+opengl, mesa18, opengl]
+      glu: [mesa-glu, openglu]
+      glx: [mesa+glx, mesa18+glx, opengl]
+      golang: [gcc]
+      iconv: [libiconv]
+      ipp: [intel-ipp]
+      java: [openjdk, jdk, ibm-java]
+      jpeg: [libjpeg-turbo, libjpeg]
+      lapack: [openblas, amdlibflame]
+      lua-lang: [lua, lua-luajit]
+      mariadb-client: [mariadb-c-client, mariadb]
+      mkl: [intel-mkl]
+      mpe: [mpe2]
+      mpi: [openmpi, mpich]
+      mysql-client: [mysql, mariadb-c-client]
+      opencl: [pocl]
+      onedal: [intel-oneapi-dal]
+      osmesa: [mesa+osmesa, mesa18+osmesa]
+      pbs: [openpbs, torque]
+      pil: [py-pillow]
+      pkgconfig: [pkgconf, pkg-config]
+      rpc: [libtirpc]
+      scalapack: [netlib-scalapack, amdscalapack]
+      sycl: [hipsycl]
+      szip: [libaec, libszip]
+      tbb: [intel-tbb]
+      unwind: [libunwind]
+      uuid: [util-linux-uuid, libuuid]
+      xxd: [xxd-standalone, vim]
+      yacc: [bison, byacc]
+      ziglang: [zig]
+    permissions:
+      read: world
+      write: user
+repos:
+- $spack/var/spack/repos/sdsc
+- $spack/var/spack/repos/builtin
+upstreams: {}
+Input spec
+--------------------------------
+[    ]  .amdlibm@3.1%aocc@3.2.0~verbose
+
+Concretized
+--------------------------------
+uil3tqx  [    ]  sdsc.amdlibm@3.1%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~verbose arch=linux-rocky8-zen2
+pfeamnw  [ l  ]      ^builtin.mpfr@4.1.0%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+77tykk5  [b   ]          ^builtin.autoconf@2.69%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  patches=35c449281546376449766f92d49fc121ca50e330e60fefcfc9be2af3253082c2,7793209b33013dc0f81208718c68440c5aae80e7a1c4b8d336e382525af791a7,a49dd5bac3b62daa0ff688ab4d508d71dbd2f4f8d7e2a02321926346161bf3ee arch=linux-rocky8-zen2
+knwgq3w  [b r ]              ^builtin.m4@1.4.19%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +sigsegv patches=9dc5fbd0d5cb1037ab1e6d0ecc74a30df218d0a94bdd5a02759a97f62daca573,bfdffa7c2eb01021d5849b36972c069693654ad826c1a20b53534009a4ec7a89 arch=linux-rocky8-zen2
+udaib53  [bl  ]                  ^builtin.libsigsegv@2.13%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+cytiibn  [blr ]              ^sdsc.perl@5.32.0%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +cpanm+shared+threads arch=linux-rocky8-zen2
+cthafj2  [bl  ]                  ^builtin.berkeley-db@18.1.40%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +cxx~docs+stl patches=b231fcc4d5cff05e5c3a4814f6a5af0e9a966428dc2176540d2c05aff41de522 arch=linux-rocky8-zen2
+pvpmqs4  [bl  ]                  ^builtin.bzip2@1.0.8%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~debug~pic+shared arch=linux-rocky8-zen2
+w24t6q4  [b   ]                      ^builtin.diffutils@3.8%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+wsl5g6s  [bl  ]                          ^builtin.libiconv@1.16%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  libs=shared,static arch=linux-rocky8-zen2
+fwban2n  [bl  ]                  ^sdsc.gdbm@1.19%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+zcvyw4d  [bl  ]                      ^builtin.readline@8.1%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+vrkfn5j  [bl  ]                          ^builtin.ncurses@6.2%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~symlinks+termlib abi=none arch=linux-rocky8-zen2
+tv7okri  [b   ]                              ^builtin.pkgconf@1.8.0%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+4flcxn7  [bl  ]                  ^builtin.zlib@1.2.11%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +optimize+pic+shared arch=linux-rocky8-zen2
+rqetmd5  [b   ]          ^builtin.autoconf-archive@2019.01.06%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+d6rkfit  [b   ]          ^builtin.automake@1.16.3%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+2zd4zvm  [bl  ]          ^builtin.gmp@6.2.1%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+r3nuadr  [b   ]              ^builtin.libtool@2.4.6%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+qn3awdo  [b   ]          ^builtin.texinfo@6.5%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  patches=12f6edb0c6b270b8c8dba2ce17998c580db01182d871ee32b7b6e4129bd1d23a,1732115f651cff98989cb0215d8f64da5e0f7911ebf0c13b064920f088f2ffe1 arch=linux-rocky8-zen2
+syvoijz  [b r ]      ^builtin.python@3.6.2%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +bz2+ctypes+dbm~debug+libxml2+lzma~nis~optimizations+pic+pyexpat+pythoncmd+readline+shared+sqlite3~ssl~tix~tkinter~ucs4+uuid+zlib arch=linux-rocky8-zen2
+d4wiitw  [bl  ]          ^builtin.expat@2.4.1%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +libbsd arch=linux-rocky8-zen2
+zpca44r  [bl  ]              ^builtin.libbsd@0.11.3%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+tlqbjjl  [bl  ]                  ^builtin.libmd@1.0.3%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+a5ype3y  [bl  ]          ^builtin.gettext@0.21%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +bzip2+curses+git~libunistring+libxml2+tar+xz arch=linux-rocky8-zen2
+6xxubr4  [bl  ]              ^builtin.libxml2@2.9.12%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~python arch=linux-rocky8-zen2
+pc3ghll  [blr ]                  ^builtin.xz@5.2.5%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~pic libs=shared,static arch=linux-rocky8-zen2
+zn3a5tk  [bl  ]              ^builtin.tar@1.34%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+34w374u  [bl  ]          ^builtin.libffi@3.3%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  patches=26f26c6f29a7ce9bf370ad3ab2610f99365b4bdd7b82e7c31df41a3370d685c0 arch=linux-rocky8-zen2
+5h6inaj  [bl  ]          ^builtin.sqlite@3.36.0%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +column_metadata+fts~functions~rtree arch=linux-rocky8-zen2
+bj7ksgi  [bl  ]          ^builtin.util-linux-uuid@2.36.2%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+em6elbu  [b   ]      ^builtin.scons@3.1.2%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  patches=9d18c6609ca27355f1e31d76da30fb4f03c8bed20737056e6f3d0133aec7f4db arch=linux-rocky8-zen2
+w5fzd2r  [b r ]          ^builtin.py-setuptools@58.2.0%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+
+real 2.37
+user 1.39
+sys 0.18
+==> Installing libsigsegv-2.13-udaib53fp5ctuqilubwlax3rg6oqxbva
+==> No binary for libsigsegv-2.13-udaib53fp5ctuqilubwlax3rg6oqxbva found: installing from source
+==> Warning: Missing a source id for amdlibm@3.1
+==> Warning: Expected user 527834 to own /scratch/spack_cpu, but it is owned by 0
+==> Fetching https://mirror.spack.io/_source-cache/archive/be/be78ee4176b05f7c75ff03298d84874db90f4b6c9d5503f0da1226b3a3c48119.tar.gz
+==> No patches needed for libsigsegv
+==> libsigsegv: Executing phase: 'autoreconf'
+==> libsigsegv: Executing phase: 'configure'
+==> libsigsegv: Executing phase: 'build'
+==> libsigsegv: Executing phase: 'install'
+==> libsigsegv: Successfully installed libsigsegv-2.13-udaib53fp5ctuqilubwlax3rg6oqxbva
+  Fetch: 0.09s.  Build: 10.35s.  Total: 10.44s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/aocc-3.2.0/libsigsegv-2.13-udaib53fp5ctuqilubwlax3rg6oqxbva
+==> Installing berkeley-db-18.1.40-cthafj2bcj5xwvbbwamdxhwgtjy7zhqp
+==> No binary for berkeley-db-18.1.40-cthafj2bcj5xwvbbwamdxhwgtjy7zhqp found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/0c/0cecb2ef0c67b166de93732769abdeba0555086d51de1090df325e18ee8da9c8.tar.gz
+==> Applied patch /cm/shared/apps/spack/0.17.3/cpu/b/var/spack/repos/builtin/packages/berkeley-db/drop-docs.patch
+==> Ran patch() for berkeley-db
+==> berkeley-db: Executing phase: 'autoreconf'
+==> berkeley-db: Executing phase: 'configure'
+==> berkeley-db: Executing phase: 'build'
+==> berkeley-db: Executing phase: 'install'
+==> berkeley-db: Successfully installed berkeley-db-18.1.40-cthafj2bcj5xwvbbwamdxhwgtjy7zhqp
+  Fetch: 1.17s.  Build: 35.49s.  Total: 36.66s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/aocc-3.2.0/berkeley-db-18.1.40-cthafj2bcj5xwvbbwamdxhwgtjy7zhqp
+==> Installing libiconv-1.16-wsl5g6st5jyapuwm6v4kcmqfwk4rgv4o
+==> No binary for libiconv-1.16-wsl5g6st5jyapuwm6v4kcmqfwk4rgv4o found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/e6/e6a1b1b589654277ee790cce3734f07876ac4ccfaecbee8afa0b649cf529cc04.tar.gz
+==> No patches needed for libiconv
+==> libiconv: Executing phase: 'autoreconf'
+==> libiconv: Executing phase: 'configure'
+==> libiconv: Executing phase: 'build'
+==> libiconv: Executing phase: 'install'
+==> libiconv: Successfully installed libiconv-1.16-wsl5g6st5jyapuwm6v4kcmqfwk4rgv4o
+  Fetch: 0.33s.  Build: 33.78s.  Total: 34.11s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/aocc-3.2.0/libiconv-1.16-wsl5g6st5jyapuwm6v4kcmqfwk4rgv4o
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/aocc-3.2.0/pkgconf-1.8.0-tv7okri5hrw42ipfld7jaux4dtdyhqmo
+==> Installing zlib-1.2.11-4flcxn7lslkefdgzznnuze45gsyvxwgh
+==> No binary for zlib-1.2.11-4flcxn7lslkefdgzznnuze45gsyvxwgh found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/c3/c3e5e9fdd5004dcb542feda5ee4f0ff0744628baf8ed2dd5d66f8ca1197cb1a1.tar.gz
+==> No patches needed for zlib
+==> zlib: Executing phase: 'install'
+==> zlib: Successfully installed zlib-1.2.11-4flcxn7lslkefdgzznnuze45gsyvxwgh
+  Fetch: 0.08s.  Build: 3.13s.  Total: 3.21s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/aocc-3.2.0/zlib-1.2.11-4flcxn7lslkefdgzznnuze45gsyvxwgh
+==> Installing autoconf-archive-2019.01.06-rqetmd5xvqcaj5si2ocpzbrzam6ofy35
+==> No binary for autoconf-archive-2019.01.06-rqetmd5xvqcaj5si2ocpzbrzam6ofy35 found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/17/17195c833098da79de5778ee90948f4c5d90ed1a0cf8391b4ab348e2ec511e3f.tar.xz
+==> No patches needed for autoconf-archive
+==> autoconf-archive: Executing phase: 'autoreconf'
+==> autoconf-archive: Executing phase: 'configure'
+==> autoconf-archive: Executing phase: 'build'
+==> autoconf-archive: Executing phase: 'install'
+==> autoconf-archive: Successfully installed autoconf-archive-2019.01.06-rqetmd5xvqcaj5si2ocpzbrzam6ofy35
+  Fetch: 0.23s.  Build: 1.62s.  Total: 1.85s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/aocc-3.2.0/autoconf-archive-2019.01.06-rqetmd5xvqcaj5si2ocpzbrzam6ofy35
+==> Installing libmd-1.0.3-tlqbjjl6svdsfo67us7wufkvihzu4gmq
+==> No binary for libmd-1.0.3-tlqbjjl6svdsfo67us7wufkvihzu4gmq found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/5a/5a02097f95cc250a3f1001865e4dbba5f1d15554120f95693c0541923c52af4a.tar.xz
+==> No patches needed for libmd
+==> libmd: Executing phase: 'autoreconf'
+==> libmd: Executing phase: 'configure'
+==> libmd: Executing phase: 'build'
+==> libmd: Executing phase: 'install'
+==> libmd: Successfully installed libmd-1.0.3-tlqbjjl6svdsfo67us7wufkvihzu4gmq
+  Fetch: 0.21s.  Build: 5.94s.  Total: 6.15s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/aocc-3.2.0/libmd-1.0.3-tlqbjjl6svdsfo67us7wufkvihzu4gmq
+==> Installing xz-5.2.5-pc3ghlluedfbvdez3zy5lhgi36fkpgkv
+==> No binary for xz-5.2.5-pc3ghlluedfbvdez3zy5lhgi36fkpgkv found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/51/5117f930900b341493827d63aa910ff5e011e0b994197c3b71c08a20228a42df.tar.bz2
+==> No patches needed for xz
+==> xz: Executing phase: 'autoreconf'
+==> xz: Executing phase: 'configure'
+==> xz: Executing phase: 'build'
+==> xz: Executing phase: 'install'
+==> xz: Successfully installed xz-5.2.5-pc3ghlluedfbvdez3zy5lhgi36fkpgkv
+  Fetch: 0.26s.  Build: 17.25s.  Total: 17.50s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/aocc-3.2.0/xz-5.2.5-pc3ghlluedfbvdez3zy5lhgi36fkpgkv
+==> Installing libffi-3.3-34w374upqmarumyeqlhq7t4cx5yfurei
+==> No binary for libffi-3.3-34w374upqmarumyeqlhq7t4cx5yfurei found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/72/72fba7922703ddfa7a028d513ac15a85c8d54c8d67f55fa5a4802885dc652056.tar.gz
+==> Applied patch /cm/shared/apps/spack/0.17.3/cpu/b/var/spack/repos/builtin/packages/libffi/powerpc-3.3.patch
+==> libffi: Executing phase: 'autoreconf'
+==> libffi: Executing phase: 'configure'
+==> libffi: Executing phase: 'build'
+==> libffi: Executing phase: 'install'
+==> libffi: Successfully installed libffi-3.3-34w374upqmarumyeqlhq7t4cx5yfurei
+  Fetch: 0.11s.  Build: 9.56s.  Total: 9.67s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/aocc-3.2.0/libffi-3.3-34w374upqmarumyeqlhq7t4cx5yfurei
+==> Installing m4-1.4.19-knwgq3ws7t5yorxgdzbtxvdov7sfnwg5
+==> No binary for m4-1.4.19-knwgq3ws7t5yorxgdzbtxvdov7sfnwg5 found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/3b/3be4a26d825ffdfda52a56fc43246456989a3630093cced3fbddf4771ee58a70.tar.gz
+==> Fetching https://mirror.spack.io/_source-cache/archive/bf/bfdffa7c2eb01021d5849b36972c069693654ad826c1a20b53534009a4ec7a89
+==> Fetching https://mirror.spack.io/_source-cache/archive/9d/9dc5fbd0d5cb1037ab1e6d0ecc74a30df218d0a94bdd5a02759a97f62daca573
+==> Applied patch http://git.savannah.gnu.org/cgit/m4.git/patch/?id=a1354086
+==> Applied patch http://git.savannah.gnu.org/cgit/m4.git/patch/?id=cd7f4d15
+==> Ran patch() for m4
+==> m4: Executing phase: 'autoreconf'
+==> m4: Executing phase: 'configure'
+==> m4: Executing phase: 'build'
+==> m4: Executing phase: 'install'
+==> m4: Successfully installed m4-1.4.19-knwgq3ws7t5yorxgdzbtxvdov7sfnwg5
+  Fetch: 0.17s.  Build: 58.47s.  Total: 58.65s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/aocc-3.2.0/m4-1.4.19-knwgq3ws7t5yorxgdzbtxvdov7sfnwg5
+==> Installing diffutils-3.8-w24t6q4iz77rkcetqkkk572e4sl2zgwb
+==> No binary for diffutils-3.8-w24t6q4iz77rkcetqkkk572e4sl2zgwb found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/a6/a6bdd7d1b31266d11c4f4de6c1b748d4607ab0231af5188fc2533d0ae2438fec.tar.xz
+==> No patches needed for diffutils
+==> diffutils: Executing phase: 'autoreconf'
+==> diffutils: Executing phase: 'configure'
+==> diffutils: Executing phase: 'build'
+==> diffutils: Executing phase: 'install'
+==> diffutils: Successfully installed diffutils-3.8-w24t6q4iz77rkcetqkkk572e4sl2zgwb
+  Fetch: 0.12s.  Build: 48.75s.  Total: 48.87s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/aocc-3.2.0/diffutils-3.8-w24t6q4iz77rkcetqkkk572e4sl2zgwb
+==> Installing tar-1.34-zn3a5tkx6mrvb7yg5ggfddsb3izaxn3a
+==> No binary for tar-1.34-zn3a5tkx6mrvb7yg5ggfddsb3izaxn3a found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/03/03d908cf5768cfe6b7ad588c921c6ed21acabfb2b79b788d1330453507647aed.tar.gz
+==> No patches needed for tar
+==> tar: Executing phase: 'autoreconf'
+==> tar: Executing phase: 'configure'
+==> tar: Executing phase: 'build'
+==> tar: Executing phase: 'install'
+==> tar: Successfully installed tar-1.34-zn3a5tkx6mrvb7yg5ggfddsb3izaxn3a
+  Fetch: 0.33s.  Build: 58.53s.  Total: 58.86s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/aocc-3.2.0/tar-1.34-zn3a5tkx6mrvb7yg5ggfddsb3izaxn3a
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/aocc-3.2.0/ncurses-6.2-vrkfn5jb4tcajusp2qyzifpbodxlfwui
+==> Installing util-linux-uuid-2.36.2-bj7ksgi35jpcp2uvpczt5px2hglxvwmh
+==> No binary for util-linux-uuid-2.36.2-bj7ksgi35jpcp2uvpczt5px2hglxvwmh found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/f5/f5dbe79057e7d68e1a46fc04083fc558b26a49499b1b3f50e4f4893150970463.tar.gz
+==> No patches needed for util-linux-uuid
+==> util-linux-uuid: Executing phase: 'autoreconf'
+==> util-linux-uuid: Executing phase: 'configure'
+==> util-linux-uuid: Executing phase: 'build'
+==> util-linux-uuid: Executing phase: 'install'
+==> util-linux-uuid: Successfully installed util-linux-uuid-2.36.2-bj7ksgi35jpcp2uvpczt5px2hglxvwmh
+  Fetch: 0.31s.  Build: 29.70s.  Total: 30.01s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/aocc-3.2.0/util-linux-uuid-2.36.2-bj7ksgi35jpcp2uvpczt5px2hglxvwmh
+==> Installing libbsd-0.11.3-zpca44rjvopphwief3cstodeknbsvn3f
+==> No binary for libbsd-0.11.3-zpca44rjvopphwief3cstodeknbsvn3f found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/ff/ff95cf8184151dacae4247832f8d4ea8800fa127dbd15033ecfe839f285b42a1.tar.xz
+==> Ran patch() for libbsd
+==> libbsd: Executing phase: 'autoreconf'
+==> libbsd: Executing phase: 'configure'
+==> libbsd: Executing phase: 'build'
+==> libbsd: Executing phase: 'install'
+==> libbsd: Successfully installed libbsd-0.11.3-zpca44rjvopphwief3cstodeknbsvn3f
+  Fetch: 0.21s.  Build: 11.63s.  Total: 11.84s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/aocc-3.2.0/libbsd-0.11.3-zpca44rjvopphwief3cstodeknbsvn3f
+==> Installing libxml2-2.9.12-6xxubr4qhvvonxrfmyomn5kcjzqru6b6
+==> No binary for libxml2-2.9.12-6xxubr4qhvvonxrfmyomn5kcjzqru6b6 found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/c8/c8d6681e38c56f172892c85ddc0852e1fd4b53b4209e7f4ebf17f7e2eae71d92.tar.gz
+==> Fetching https://mirror.spack.io/_source-cache/archive/96/96151685cec997e1f9f3387e3626d61e6284d4d6e66e0e440c209286c03e9cc7.tar.gz
+==> Moving resource stage
+	source: /scratch/spack_cpu/job_21741533/spack-stage/resource-xmlts-6xxubr4qhvvonxrfmyomn5kcjzqru6b6/spack-src/
+	destination: /scratch/spack_cpu/job_21741533/spack-stage/spack-stage-libxml2-2.9.12-6xxubr4qhvvonxrfmyomn5kcjzqru6b6/spack-src/xmlconf
+==> Ran patch() for libxml2
+==> libxml2: Executing phase: 'autoreconf'
+==> libxml2: Executing phase: 'configure'
+==> libxml2: Executing phase: 'build'
+==> libxml2: Executing phase: 'install'
+==> libxml2: Successfully installed libxml2-2.9.12-6xxubr4qhvvonxrfmyomn5kcjzqru6b6
+  Fetch: 0.56s.  Build: 31.71s.  Total: 32.28s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/aocc-3.2.0/libxml2-2.9.12-6xxubr4qhvvonxrfmyomn5kcjzqru6b6
+==> Installing libtool-2.4.6-r3nuadrm3tzk3x7j2tm64eukwzijgzoq
+==> No binary for libtool-2.4.6-r3nuadrm3tzk3x7j2tm64eukwzijgzoq found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/e3/e3bd4d5d3d025a36c21dd6af7ea818a2afcd4dfc1ea5a17b39d7854bcd0c06e3.tar.gz
+==> Ran patch() for libtool
+==> libtool: Executing phase: 'autoreconf'
+==> libtool: Executing phase: 'configure'
+==> libtool: Executing phase: 'build'
+==> libtool: Executing phase: 'install'
+==> libtool: Successfully installed libtool-2.4.6-r3nuadrm3tzk3x7j2tm64eukwzijgzoq
+  Fetch: 0.26s.  Build: 12.32s.  Total: 12.58s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/aocc-3.2.0/libtool-2.4.6-r3nuadrm3tzk3x7j2tm64eukwzijgzoq
+==> Installing bzip2-1.0.8-pvpmqs4qb64szb4x53ihiwodo5loh7b2
+==> No binary for bzip2-1.0.8-pvpmqs4qb64szb4x53ihiwodo5loh7b2 found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/ab/ab5a03176ee106d3f0fa90e381da478ddae405918153cca248e682cd0c4a2269.tar.gz
+==> Ran patch() for bzip2
+==> bzip2: Executing phase: 'install'
+==> bzip2: Successfully installed bzip2-1.0.8-pvpmqs4qb64szb4x53ihiwodo5loh7b2
+  Fetch: 0.08s.  Build: 2.89s.  Total: 2.98s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/aocc-3.2.0/bzip2-1.0.8-pvpmqs4qb64szb4x53ihiwodo5loh7b2
+==> Installing readline-8.1-zcvyw4dxzoa4aoawktt6xdvghq2g7ilp
+==> No binary for readline-8.1-zcvyw4dxzoa4aoawktt6xdvghq2g7ilp found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/f8/f8ceb4ee131e3232226a17f51b164afc46cd0b9e6cef344be87c65962cb82b02.tar.gz
+==> Ran patch() for readline
+==> readline: Executing phase: 'autoreconf'
+==> readline: Executing phase: 'configure'
+==> readline: Executing phase: 'build'
+==> readline: Executing phase: 'install'
+==> readline: Successfully installed readline-8.1-zcvyw4dxzoa4aoawktt6xdvghq2g7ilp
+  Fetch: 0.24s.  Build: 13.73s.  Total: 13.97s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/aocc-3.2.0/readline-8.1-zcvyw4dxzoa4aoawktt6xdvghq2g7ilp
+==> Installing expat-2.4.1-d4wiitwext7ubq4kqj6bpajzu42xdzq7
+==> No binary for expat-2.4.1-d4wiitwext7ubq4kqj6bpajzu42xdzq7 found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/2f/2f9b6a580b94577b150a7d5617ad4643a4301a6616ff459307df3e225bcfbf40.tar.bz2
+==> No patches needed for expat
+==> expat: Executing phase: 'autoreconf'
+==> expat: Executing phase: 'configure'
+==> expat: Executing phase: 'build'
+==> expat: Executing phase: 'install'
+==> expat: Successfully installed expat-2.4.1-d4wiitwext7ubq4kqj6bpajzu42xdzq7
+  Fetch: 0.22s.  Build: 15.36s.  Total: 15.59s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/aocc-3.2.0/expat-2.4.1-d4wiitwext7ubq4kqj6bpajzu42xdzq7
+==> Installing gettext-0.21-a5ype3yd6xbddv6tl2f6qr3urwg2gevp
+==> No binary for gettext-0.21-a5ype3yd6xbddv6tl2f6qr3urwg2gevp found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/d2/d20fcbb537e02dcf1383197ba05bd0734ef7bf5db06bdb241eb69b7d16b73192.tar.xz
+==> No patches needed for gettext
+==> gettext: Executing phase: 'autoreconf'
+==> gettext: Executing phase: 'configure'
+==> gettext: Executing phase: 'build'
+==> gettext: Executing phase: 'install'
+==> gettext: Successfully installed gettext-0.21-a5ype3yd6xbddv6tl2f6qr3urwg2gevp
+  Fetch: 0.84s.  Build: 6m 11.25s.  Total: 6m 12.09s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/aocc-3.2.0/gettext-0.21-a5ype3yd6xbddv6tl2f6qr3urwg2gevp
+==> Installing sqlite-3.36.0-5h6inajon6ra5cam6pr4lvq5ei65y72t
+==> No binary for sqlite-3.36.0-5h6inajon6ra5cam6pr4lvq5ei65y72t found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/bd/bd90c3eb96bee996206b83be7065c9ce19aef38c3f4fb53073ada0d0b69bbce3.tar.gz
+==> No patches needed for sqlite
+==> sqlite: Executing phase: 'autoreconf'
+==> sqlite: Executing phase: 'configure'
+==> sqlite: Executing phase: 'build'
+==> sqlite: Executing phase: 'install'
+==> sqlite: Successfully installed sqlite-3.36.0-5h6inajon6ra5cam6pr4lvq5ei65y72t
+  Fetch: 0.26s.  Build: 2m 45.23s.  Total: 2m 45.49s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/aocc-3.2.0/sqlite-3.36.0-5h6inajon6ra5cam6pr4lvq5ei65y72t
+==> Installing gdbm-1.19-fwban2n2jwnwygj5ospckd2wdxslf3ln
+==> No binary for gdbm-1.19-fwban2n2jwnwygj5ospckd2wdxslf3ln found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/37/37ed12214122b972e18a0d94995039e57748191939ef74115b1d41d8811364bc.tar.gz
+==> No patches needed for gdbm
+==> gdbm: Executing phase: 'autoreconf'
+==> gdbm: Executing phase: 'configure'
+==> gdbm: Executing phase: 'build'
+==> gdbm: Executing phase: 'install'
+==> gdbm: Successfully installed gdbm-1.19-fwban2n2jwnwygj5ospckd2wdxslf3ln
+  Fetch: 0.24s.  Build: 11.94s.  Total: 12.17s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/aocc-3.2.0/gdbm-1.19-fwban2n2jwnwygj5ospckd2wdxslf3ln
+==> Installing python-3.6.2-syvoijziwdqnlnhqtde2ibkiqrss4leo
+==> No binary for python-3.6.2-syvoijziwdqnlnhqtde2ibkiqrss4leo found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/79/7919489310a5f17f7acbab64d731e46dca0702874840dadce8bd4b2b3b8e7a82.tgz
+==> Ran patch() for python
+==> Warning: Python v3.6.2 does not have the C++ "distutils" patch; errors may occur when installing Python modules w/ mixed C/C++ source files.
+==> python: Executing phase: 'autoreconf'
+==> python: Executing phase: 'configure'
+==> python: Executing phase: 'build'
+==> python: Executing phase: 'install'
+==> python: Successfully installed python-3.6.2-syvoijziwdqnlnhqtde2ibkiqrss4leo
+  Fetch: 1.12s.  Build: 1m 38.53s.  Total: 1m 39.65s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/aocc-3.2.0/python-3.6.2-syvoijziwdqnlnhqtde2ibkiqrss4leo
+==> Installing perl-5.32.0-cytiibn6rrhqpkrmlsyzu36p42achxhl
+==> No binary for perl-5.32.0-cytiibn6rrhqpkrmlsyzu36p42achxhl found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/ef/efeb1ce1f10824190ad1cadbcccf6fdb8a5d37007d0100d2d9ae5f2b5900c0b4.tar.gz
+==> Fetching https://mirror.spack.io/_source-cache/archive/9d/9da50e155df72bce55cb69f51f1dbb4b62d23740fb99f6178bb27f22ebdf8a46.tar.gz
+==> Moving resource stage
+	source: /scratch/spack_cpu/job_21741533/spack-stage/resource-cpanm-cytiibn6rrhqpkrmlsyzu36p42achxhl/spack-src/
+	destination: /scratch/spack_cpu/job_21741533/spack-stage/spack-stage-perl-5.32.0-cytiibn6rrhqpkrmlsyzu36p42achxhl/spack-src/cpanm/cpanm
+==> Ran patch() for perl
+==> perl: Executing phase: 'configure'
+==> perl: Executing phase: 'build'
+==> perl: Executing phase: 'install'
+==> perl: Successfully installed perl-5.32.0-cytiibn6rrhqpkrmlsyzu36p42achxhl
+  Fetch: 0.87s.  Build: 2m 22.66s.  Total: 2m 23.53s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/aocc-3.2.0/perl-5.32.0-cytiibn6rrhqpkrmlsyzu36p42achxhl
+==> Installing py-setuptools-58.2.0-w5fzd2ruc2weqjicwcwkg44otxc4xxqh
+==> No binary for py-setuptools-58.2.0-w5fzd2ruc2weqjicwcwkg44otxc4xxqh found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/2c/2c55bdb85d5bb460bd2e3b12052b677879cffcf46c0c688f2e5bf51d36001145.tar.gz
+==> No patches needed for py-setuptools
+==> py-setuptools: Executing phase: 'build'
+==> py-setuptools: Executing phase: 'install'
+==> py-setuptools: Successfully installed py-setuptools-58.2.0-w5fzd2ruc2weqjicwcwkg44otxc4xxqh
+  Fetch: 0.25s.  Build: 1.21s.  Total: 1.46s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/aocc-3.2.0/py-setuptools-58.2.0-w5fzd2ruc2weqjicwcwkg44otxc4xxqh
+==> Installing texinfo-6.5-qn3awdo6airm4bdvaonnkdbtuea2ohzo
+==> No binary for texinfo-6.5-qn3awdo6airm4bdvaonnkdbtuea2ohzo found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/d3/d34272e4042c46186ddcd66bd5d980c0ca14ff734444686ccf8131f6ec8b1427.tar.gz
+==> Applied patch /cm/shared/apps/spack/0.17.3/cpu/b/var/spack/repos/builtin/packages/texinfo/fix_unescaped_braces.patch
+==> Applied patch /cm/shared/apps/spack/0.17.3/cpu/b/var/spack/repos/builtin/packages/texinfo/update_locale_handling.patch
+==> texinfo: Executing phase: 'autoreconf'
+==> texinfo: Executing phase: 'configure'
+==> texinfo: Executing phase: 'build'
+==> texinfo: Executing phase: 'install'
+==> texinfo: Successfully installed texinfo-6.5-qn3awdo6airm4bdvaonnkdbtuea2ohzo
+  Fetch: 0.24s.  Build: 1m 1.93s.  Total: 1m 2.18s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/aocc-3.2.0/texinfo-6.5-qn3awdo6airm4bdvaonnkdbtuea2ohzo
+==> Installing autoconf-2.69-77tykk5lr7bzvn5wx6cgixtpxmppu5sp
+==> No binary for autoconf-2.69-77tykk5lr7bzvn5wx6cgixtpxmppu5sp found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/95/954bd69b391edc12d6a4a51a2dd1476543da5c6bbf05a95b59dc0dd6fd4c2969.tar.gz
+==> Fetching https://mirror.spack.io/_source-cache/archive/77/7793209b33013dc0f81208718c68440c5aae80e7a1c4b8d336e382525af791a7
+==> Fetching https://mirror.spack.io/_source-cache/archive/35/35c449281546376449766f92d49fc121ca50e330e60fefcfc9be2af3253082c2
+==> Fetching https://mirror.spack.io/_source-cache/archive/a4/a49dd5bac3b62daa0ff688ab4d508d71dbd2f4f8d7e2a02321926346161bf3ee
+==> Applied patch http://mirrors.mit.edu/gentoo-portage/sys-devel/autoconf/files/autoconf-2.69-fix-libtool-test.patch
+==> Applied patch http://mirrors.mit.edu/gentoo-portage/sys-devel/autoconf/files/autoconf-2.69-perl-5.26.patch
+==> Applied patch http://mirrors.mit.edu/gentoo-portage/sys-devel/autoconf/files/autoconf-2.69-perl-5.26-2.patch
+==> Ran patch() for autoconf
+==> autoconf: Executing phase: 'autoreconf'
+==> autoconf: Executing phase: 'configure'
+==> autoconf: Executing phase: 'build'
+==> autoconf: Executing phase: 'install'
+==> autoconf: Successfully installed autoconf-2.69-77tykk5lr7bzvn5wx6cgixtpxmppu5sp
+  Fetch: 0.13s.  Build: 2.88s.  Total: 3.01s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/aocc-3.2.0/autoconf-2.69-77tykk5lr7bzvn5wx6cgixtpxmppu5sp
+==> Installing scons-3.1.2-em6elbuaqmnvglymrg2rg4pun2s5nnob
+==> No binary for scons-3.1.2-em6elbuaqmnvglymrg2rg4pun2s5nnob found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/8a/8aaa483c303efeb678e6f7c776c8444a482f8ddc3ad891f8b6cdd35264da9a1f.tar.gz
+==> Applied patch /cm/shared/apps/spack/0.17.3/cpu/b/var/spack/repos/builtin/packages/scons/py3-hashbang.patch
+==> scons: Executing phase: 'build'
+==> scons: Executing phase: 'install'
+==> scons: Successfully installed scons-3.1.2-em6elbuaqmnvglymrg2rg4pun2s5nnob
+  Fetch: 0.22s.  Build: 0.96s.  Total: 1.18s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/aocc-3.2.0/scons-3.1.2-em6elbuaqmnvglymrg2rg4pun2s5nnob
+==> Installing automake-1.16.3-d6rkfitbpotizhtz2jxo7ukp6r3nhzsn
+==> No binary for automake-1.16.3-d6rkfitbpotizhtz2jxo7ukp6r3nhzsn found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/ce/ce010788b51f64511a1e9bb2a1ec626037c6d0e7ede32c1c103611b9d3cba65f.tar.gz
+==> Ran patch() for automake
+==> automake: Executing phase: 'autoreconf'
+==> automake: Executing phase: 'configure'
+==> automake: Executing phase: 'build'
+==> automake: Executing phase: 'install'
+==> automake: Successfully installed automake-1.16.3-d6rkfitbpotizhtz2jxo7ukp6r3nhzsn
+  Fetch: 0.23s.  Build: 4.46s.  Total: 4.69s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/aocc-3.2.0/automake-1.16.3-d6rkfitbpotizhtz2jxo7ukp6r3nhzsn
+==> Installing gmp-6.2.1-2zd4zvmrd3tdjcncbhvbhviyaawh7vdj
+==> No binary for gmp-6.2.1-2zd4zvmrd3tdjcncbhvbhviyaawh7vdj found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/ea/eae9326beb4158c386e39a356818031bd28f3124cf915f8c5b1dc4c7a36b4d7c.tar.bz2
+==> No patches needed for gmp
+==> gmp: Executing phase: 'autoreconf'
+==> gmp: Executing phase: 'configure'
+==> gmp: Executing phase: 'build'
+==> gmp: Executing phase: 'install'
+==> gmp: Successfully installed gmp-6.2.1-2zd4zvmrd3tdjcncbhvbhviyaawh7vdj
+  Fetch: 0.15s.  Build: 52.55s.  Total: 52.70s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/aocc-3.2.0/gmp-6.2.1-2zd4zvmrd3tdjcncbhvbhviyaawh7vdj
+==> Installing mpfr-4.1.0-pfeamnwu7iwczlk5rhp3ny5jrzck4sgr
+==> No binary for mpfr-4.1.0-pfeamnwu7iwczlk5rhp3ny5jrzck4sgr found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/fe/feced2d430dd5a97805fa289fed3fc8ff2b094c02d05287fd6133e7f1f0ec926.tar.bz2
+==> No patches needed for mpfr
+==> mpfr: Executing phase: 'autoreconf'
+==> mpfr: Executing phase: 'configure'
+==> mpfr: Executing phase: 'build'
+==> mpfr: Executing phase: 'install'
+==> mpfr: Successfully installed mpfr-4.1.0-pfeamnwu7iwczlk5rhp3ny5jrzck4sgr
+  Fetch: 0.13s.  Build: 32.16s.  Total: 32.29s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/aocc-3.2.0/mpfr-4.1.0-pfeamnwu7iwczlk5rhp3ny5jrzck4sgr
+==> Installing amdlibm-3.1-uil3tqxlulnazc4rqr5adkex7xow5prm
+==> No binary for amdlibm-3.1-uil3tqxlulnazc4rqr5adkex7xow5prm found: installing from source
+==> No patches needed for amdlibm
+==> amdlibm: Executing phase: 'build'
+==> amdlibm: Executing phase: 'install'
+==> amdlibm: Successfully installed amdlibm-3.1-uil3tqxlulnazc4rqr5adkex7xow5prm
+  Fetch: 1.64s.  Build: 23.39s.  Total: 25.03s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/aocc-3.2.0/amdlibm-3.1-uil3tqxlulnazc4rqr5adkex7xow5prm
+real 1417.47
+user 2290.84
+sys 717.96
+Submitted batch job 21741994

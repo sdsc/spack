@@ -1,0 +1,35 @@
+--- gamess-2019.06/comp	2019-08-04 10:27:44.000000000 -0700
++++ patch-files/comp	2019-09-06 10:14:02.290907991 -0700
+@@ -1,4 +1,4 @@
+-#!/bin/csh
++#!/bin/csh -f
+ #
+ # set verbose
+ #
+@@ -1941,7 +1941,7 @@
+            set OPT="$OPT -openmp"
+          endif
+          switch ($MODULE)
+-             case omp*:
++             c -fase omp*:
+              case rimp2grd:
+              breaksw
+              default:
+@@ -2015,7 +2015,7 @@
+ #
+ #         first, initialize OPT and EXTRAOPT
+ #
+-      set OPT='-O2'
++      set OPT='-O0'
+       if ($MODULE == zheev)  set OPT='-O0'  # defensive compiling
+ 
+       set EXTRAOPT=" "
+@@ -2307,7 +2307,7 @@
+ #     -WB means warn but don't fail on out-of-bounds array references
+ #     -ftz flushes underflow results to zero
+ #
+-      set OPT = '-O2'
++      set OPT = '-O2 -xHost'
+       if (".$GMS_DEBUG_FLAGS" != .) set OPT="$GMS_DEBUG_FLAGS"
+ #       alas, I'm so tired of hearing about so many versions failing to
+ #       diagonalize, that this time critical code is run w/o optimization.
