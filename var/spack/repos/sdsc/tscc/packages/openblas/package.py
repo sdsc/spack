@@ -258,6 +258,8 @@ class Openblas(MakefilePackage):
         # When mixing compilers make sure that
         # $SPACK_ROOT/lib/spack/env/<compiler> have symlinks with reasonable
         # names and hack them inside lib/spack/spack/compilers/<compiler>.py
+#       if self.compiler.name == 'intel':
+#              filter_file('Makefile.system','= -lm','-L' + join_path(self.spec['intel'],'compilers_and_libraries','linux','lib','intel64'))
         make_defs = [
             'CC={0}'.format(spack_cc),
             'FC={0}'.format(spack_fc),

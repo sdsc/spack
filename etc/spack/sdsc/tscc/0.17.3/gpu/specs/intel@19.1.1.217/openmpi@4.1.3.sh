@@ -1,13 +1,12 @@
 #!/usr/bin/env bash
 
 #SBATCH --job-name=openmpi@4.1.3
-#SBATCH --account=use300
+#SBATCH --account=sys200
 ##SBATCH --reservation=root_73
 #SBATCH --partition=hotel-gpu
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=8
-#SBATCH -w gpu1
 #SBATCH --time=48:00:00
 #SBATCH --output=%x.o%j.%N
 
@@ -18,7 +17,7 @@ declare -xr SYSTEM_NAME='tscc'
 
 declare -xr SPACK_VERSION='0.17.3'
 declare -xr SPACK_INSTANCE_NAME='gpu'
-declare -xr SPACK_INSTANCE_DIR="${HOME}/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}"
+declare -xr SPACK_INSTANCE_DIR="/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}"
 
 declare -xr SLURM_JOB_SCRIPT="$(scontrol show job ${SLURM_JOB_ID} | awk -F= '/Command=/{print $2}')"
 declare -xr SLURM_JOB_MD5SUM="$(md5sum ${SLURM_JOB_SCRIPT})"
@@ -42,7 +41,7 @@ declare -xr INTEL_LICENSE_FILE='40000@elprado.sdsc.edu:40200@elprado.sdsc.edu'
 declare -xr SPACK_PACKAGE='openmpi@4.1.3'
 declare -xr SPACK_COMPILER='intel@19.1.1.217'
 declare -xr SPACK_VARIANTS='~atomics +cuda cuda_arch=60,75,80,86 ~cxx ~cxx_exceptions ~gpfs ~internal-hwloc ~java +legacylaunchers +lustre ~memchecker +pmi +pmix +romio ~rsh ~singularity +static +vt +wrapper-rpath fabrics=ucx schedulers=slurm'
-declare -xr SPACK_DEPENDENCIES="^lustre@2.15.2 ^slurm@22.05.8 ^ucx@1.10.1/$(spack find --format '{hash:7}' ucx@1.10.1 % intel@19.1.1.217)"
+declare -xr SPACK_DEPENDENCIES="^lustre@2.15.2 ^slurm@22.05.9 ^ucx@1.10.1/$(spack find --format '{hash:7}' ucx@1.10.1 % intel@19.1.1.217)"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 echo ${SPACK_SPEC}  > spec.$$
 
@@ -65,7 +64,7 @@ if [[ "${?}" -ne 0 ]]; then
   exit 1
 fi
 
-time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all `cat spec.$$`
+time -p spack install --dirty --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all `cat spec.$$`
 
 rm spec.$$
 

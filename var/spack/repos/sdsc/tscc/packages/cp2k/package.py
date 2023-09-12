@@ -201,7 +201,8 @@ class Cp2k(MakefilePackage, CudaPackage):
           when="@8.2")
 
     def setup_build_environment(self, env):
-        env.set('LDFLAGS','-L'+join_path(self.spec['cuda'].prefix,'targets','x86_64-linux','lib','stubs'))
+        if '+cuda' in self.spec:
+            env.set('LDFLAGS','-L'+join_path(self.spec['cuda'].prefix,'targets','x86_64-linux','lib','stubs'))
 
 
     @property

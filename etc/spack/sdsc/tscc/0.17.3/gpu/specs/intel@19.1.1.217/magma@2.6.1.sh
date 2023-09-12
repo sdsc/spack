@@ -1,13 +1,12 @@
 #!/usr/bin/env bash
 
 #SBATCH --job-name=magma@2.6.1
-#SBATCH --account=use300
+#SBATCH --account=sys200
 ##SBATCH --reservation=root_63
 #SBATCH --partition=hotel-gpu
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=8
-#SBATCH -w gpu1
 #SBATCH --time=00:30:00
 #SBATCH --output=%x.o%j.%N
 
@@ -18,7 +17,7 @@ declare -xr SYSTEM_NAME='tscc'
 
 declare -xr SPACK_VERSION='0.17.3'
 declare -xr SPACK_INSTANCE_NAME='gpu'
-declare -xr SPACK_INSTANCE_DIR="${HOME}/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}"
+declare -xr SPACK_INSTANCE_DIR="/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}"
 
 declare -xr SLURM_JOB_SCRIPT="$(scontrol show job ${SLURM_JOB_ID} | awk -F= '/Command=/{print $2}')"
 declare -xr SLURM_JOB_MD5SUM="$(md5sum ${SLURM_JOB_SCRIPT})"
@@ -41,7 +40,7 @@ module list
 declare -xr INTEL_LICENSE_FILE='40000@elprado.sdsc.edu:40200@elprado.sdsc.edu'
 declare -xr SPACK_PACKAGE='magma@2.6.1'
 declare -xr SPACK_COMPILER='intel@19.1.1.217'
-declare -xr SPACK_VARIANTS='+cuda cuda_arch=60,75,80,86+fortran ~ipo ~rocm +shared'
+declare -xr SPACK_VARIANTS='+cuda cuda_arch=60,75,80,86 +fortran ~ipo ~rocm +shared'
 declare -xr SPACK_DEPENDENCIES="^cuda@11.2.2/$(spack find --format '{hash:7}' cuda@11.2.2 % ${SPACK_COMPILER}) ^intel-mkl@2020.4.304/$(spack find --format '{hash:7}' intel-mkl@2020.4.304 % ${SPACK_COMPILER} ~ilp64 threads=none) ^cmake@3.21.4/$(spack find --format '{hash:7}' cmake@3.21.4 % ${SPACK_COMPILER}) ^ncurses@6.2/$(spack find --format '{hash:7}' ncurses@6.2% ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 echo ${SPACK_SPEC} > spec.$$
@@ -64,7 +63,7 @@ fi
 
 gccpath=$(spack find --format '{prefix}' gcc@10.2.0)/bin
 export PATH=${gccpath}:${PATH}
-time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all `cat spec.$$`
+time -p spack install --dirty --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all `cat spec.$$`
  
 rm spec.$$
 

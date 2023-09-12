@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 
 #SBATCH --job-name=openblas@0.3.17
-#SBATCH --account=use300
-##SBATCH --reservation=root_73
+#SBATCH --account=sys200
 #SBATCH --partition=hotel-gpu
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
@@ -18,7 +17,7 @@ declare -xr SYSTEM_NAME='tscc'
 
 declare -xr SPACK_VERSION='0.17.3'
 declare -xr SPACK_INSTANCE_NAME='gpu'
-declare -xr SPACK_INSTANCE_DIR="${HOME}/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}"
+declare -xr SPACK_INSTANCE_DIR="/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}"
 
 declare -xr SLURM_JOB_SCRIPT="$(scontrol show job ${SLURM_JOB_ID} | awk -F= '/Command=/{print $2}')"
 declare -xr SLURM_JOB_MD5SUM="$(md5sum ${SLURM_JOB_SCRIPT})"
@@ -29,19 +28,16 @@ echo "${UNIX_TIME} ${SLURM_JOB_ID} ${SLURM_JOB_MD5SUM} ${SLURM_JOB_DEPENDENCY}"
 echo ""
 
 cat "${SLURM_JOB_SCRIPT}"
-declare -xr COMPILER_MODULE='intel/19.1.1.217'
 
 module purge
 module load "${SCHEDULER_MODULE}"
-module load ${SPACK_INSTANCE_NAME}
-module load ${COMPILER_MODULE}
+module load intel/19.1.1.217
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-declare -xr INTEL_LICENSE_FILE='40000@elprado.sdsc.edu:40200@elprado.sdsc.edu'
 declare -xr SPACK_PACKAGE='openblas@0.3.17'
 declare -xr SPACK_COMPILER='intel@19.1.1.217'
-declare -xr SPACK_VARIANTS='~bignuma ~consistent_fpcsr ~ilp64 +locking +pic ~shared threads=none'
+declare -xr SPACK_VARIANTS='~bignuma ~consistent_fpcsr ~ilp64 +locking +pic +shared threads=none'
 declare -xr SPACK_DEPENDENCIES=''
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS}"
 
@@ -61,13 +57,13 @@ if [[ "${?}" -ne 0 ]]; then
   exit 1
 fi
 
-time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all "${SPACK_SPEC}"
+time -p spack install --dirty --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all "${SPACK_SPEC}"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
   exit 1
 fi
 
-#spack module lmod refresh --delete-tree -y
+spack module lmod refresh --delete-tree -y
 
 sbatch --dependency="afterok:${SLURM_JOB_ID}" 'openblas@0.3.17-omp.sh'
 

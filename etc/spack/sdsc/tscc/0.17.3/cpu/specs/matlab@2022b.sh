@@ -1,11 +1,10 @@
 #!/usr/bin/env bash
 
 #SBATCH --job-name=matlab@2022b
-#SBATCH --account=sdac
+#SBATCH --account=sys200
 #SBATCH --partition=hotel
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH  --exclude=gpu1
 #SBATCH --cpus-per-task=8
 #SBATCH --time=24:00:00
 #SBATCH --output=%x.o%j.%N
@@ -29,10 +28,8 @@ echo ""
 
 cat "${SLURM_JOB_SCRIPT}"
 
-module purge
-module load "${SCHEDULER_MODULE}"
-module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
+
 
 # Set ~dataman because build failed; may be int32->int64 issue
 declare -xr SPACK_PACKAGE='matlab@2022b'
