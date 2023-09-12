@@ -1,0 +1,1 @@
+sed -i s/expanse/tscc/g $1

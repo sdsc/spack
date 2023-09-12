@@ -1,0 +1,1 @@
+sed -i s/slurm@22.05.7/slurm@22.05.8/g $1

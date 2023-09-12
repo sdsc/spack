@@ -1,0 +1,1 @@
+sed -i 's/#SBATCH --cpus-per-task=.*/#SBATCH --cpus-per-task=8/g' $1
