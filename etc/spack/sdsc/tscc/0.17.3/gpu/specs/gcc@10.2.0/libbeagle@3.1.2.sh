@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #SBATCH --job-name=libbeagle@3.1.2
-#SBATCH --account=sdsc
+#SBATCH --account=sys200
 #SBATCH --partition=hotel-gpu
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
@@ -17,7 +17,7 @@ declare -xr SYSTEM_NAME='tscc'
 
 declare -xr SPACK_VERSION='0.17.3'
 declare -xr SPACK_INSTANCE_NAME='gpu'
-declare -xr SPACK_INSTANCE_DIR="${HOME}/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}"
+declare -xr SPACK_INSTANCE_DIR="/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}"
 
 declare -xr SLURM_JOB_SCRIPT="$(scontrol show job ${SLURM_JOB_ID} | awk -F= '/Command=/{print $2}')"
 declare -xr SLURM_JOB_MD5SUM="$(md5sum ${SLURM_JOB_SCRIPT})"
@@ -51,13 +51,13 @@ spack config get packages
 spack config get repos
 spack config get upstreams
 
-spack spec --long --namespaces --types libbeagle@3.1.2 % gcc@10.2.0 +cuda cuda_arch=60,75,80,86"^cuda@11.2.2/$(spack find --format '{hash:7}' cuda@11.2.2 % ${SPACK_COMPILER}) ^openjdk@11.0.12_7/$(spack find --format '{hash:7}' openjdk@11.0.12_7 % ${SPACK_COMPILER})"
+spack spec --long --namespaces --types libbeagle@3.1.2 % gcc@10.2.0 +cuda cuda_arch=60 ^cuda@11.2.2/$(spack find --format '{hash:7}' cuda@11.2.2 % ${SPACK_COMPILER}) ^openjdk@11.0.12_7/$(spack find --format '{hash:7}' openjdk@11.0.12_7 % ${SPACK_COMPILER})
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack concretization failed.'
   exit 1
 fi
 
-time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all libbeagle@3.1.2 % gcc@10.2.0 +cuda cuda_arch=60,75,80,86"^cuda@11.2.2/$(spack find --format '{hash:7}' cuda@11.2.2 % ${SPACK_COMPILER}) ^openjdk@11.0.12_7/$(spack find --format '{hash:7}' openjdk@11.0.12_7 % ${SPACK_COMPILER})"
+time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all libbeagle@3.1.2 % gcc@10.2.0 +cuda cuda_arch=60 ^cuda@11.2.2/$(spack find --format '{hash:7}' cuda@11.2.2 % ${SPACK_COMPILER}) ^openjdk@11.0.12_7/$(spack find --format '{hash:7}' openjdk@11.0.12_7 % ${SPACK_COMPILER})
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
   exit 1

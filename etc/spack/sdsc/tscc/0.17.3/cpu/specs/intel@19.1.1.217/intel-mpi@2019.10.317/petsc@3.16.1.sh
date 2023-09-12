@@ -2,7 +2,7 @@
 # real 1214.82
 
 #SBATCH --job-name=petsc@3.16.1
-#SBATCH --account=sdsc
+#SBATCH --account=sys200
 #SBATCH --partition=hotel
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
@@ -17,7 +17,7 @@ declare -xr SYSTEM_NAME='tscc'
 
 declare -xr SPACK_VERSION='0.17.3'
 declare -xr SPACK_INSTANCE_NAME='cpu'
-declare -xr SPACK_INSTANCE_DIR="${HOME}/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}"
+declare -xr SPACK_INSTANCE_DIR="/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}"
 
 declare -xr SLURM_JOB_SCRIPT="$(scontrol show job ${SLURM_JOB_ID} | awk -F= '/Command=/{print $2}')"
 declare -xr SLURM_JOB_MD5SUM="$(md5sum ${SLURM_JOB_SCRIPT})"
@@ -29,9 +29,6 @@ echo ""
 
 cat "${SLURM_JOB_SCRIPT}"
 
-module purge
-module load "${SCHEDULER_MODULE}"
-module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
 # [mkandes@login02 spack]$ spack --show-cores=minimized spec -l petsc@3.16.1 % intel@19.1.1.217 ~X ~batch ~cgns ~complex ~cuda ~debug +double ~exodusii +fftw ~giflib +hdf5 ~hpddm ~hwloc +hypre ~int64 ~jpeg ~knl ~libpng ~libyaml ~memkind +metis ~mkl-pardiso ~mmg ~moab ~mpfr +mpi +mumps ~p4est ~parmmg +ptscotch ~random123 ~rocm ~saws +scalapack +shared ~strumpack +suite-sparse +superlu-dist ~tetgen ~trilinos ~valgrind "^python@3.8.12/$(spack find --format '{hash:7}' python@3.8.12 % ${SPACK_COMPILER}) ^openblas@0.3.17/$(spack find --format '{hash:7}' openblas@0.3.17 % ${SPACK_COMPILER} ~ilp64 threads=none) ^fftw@3.3.10/$(spack find --format '{hash:7}' fftw@3.3.10 % ${SPACK_COMPILER} +mpi ^intel-mpi@2019.10.317) ^hdf5@1.10.7/$(spack find --format '{hash:7}' hdf5@1.10.7 % ${SPACK_COMPILER} +mpi ^intel-mpi@2019.10.317) ^hypre@2.23.0/$(spack find --format '{hash:7}' hypre@2.23.0 % ${SPACK_COMPILER} ~int64 +mpi ^intel-mpi@2019.10.317) ^mumps@5.4.0/$(spack find --format '{hash:7}' mumps@5.4.0 % ${SPACK_COMPILER} ~int64 +mpi ^intel-mpi@2019.10.317) ^suite-sparse@5.10.1/$(spack find --format '{hash:7}' suite-sparse@5.10.1 % ${SPACK_COMPILER}) ^superlu-dist@7.1.1/$(spack find --format '{hash:7}' superlu-dist@7.1.1 % ${SPACK_COMPILER} ~int64 ^intel-mpi@2019.10.317)"
@@ -236,6 +233,12 @@ declare -xr SPACK_COMPILER='intel@19.1.1.217'
 declare -xr SPACK_VARIANTS='~X ~batch ~cgns ~complex ~cuda ~debug +double ~exodusii ~fftw ~giflib +hdf5 ~hpddm ~hwloc ~hypre ~int64 ~jpeg ~knl ~libpng ~libyaml ~memkind +metis ~mkl-pardiso ~mmg ~moab ~mpfr +mpi ~mumps ~p4est ~parmmg +ptscotch ~random123 ~rocm ~saws ~scalapack +shared ~strumpack ~suite-sparse ~superlu-dist ~tetgen ~trilinos ~valgrind'
 declare -xr SPACK_DEPENDENCIES="^python@3.8.12/$(spack find --format '{hash:7}' python@3.8.12 % ${SPACK_COMPILER}) ^openblas@0.3.17/$(spack find --format '{hash:7}' openblas@0.3.17 % ${SPACK_COMPILER} ~ilp64 threads=none) ^hdf5@1.10.7/$(spack find --format '{hash:7}' hdf5@1.10.7 % ${SPACK_COMPILER} +mpi ^intel-mpi@2019.10.317) ^parmetis@4.0.3/$(spack find --format '{hash:7}' parmetis@4.0.3 % ${SPACK_COMPILER} ~int64 ^intel-mpi@2019.10.317)"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
+
+module purge
+module load "${SCHEDULER_MODULE}"
+module load "${SPACK_INSTANCE_NAME}"
+module load intel/19.1.1.217
+module list
 
 printenv
 

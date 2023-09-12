@@ -1,1 +1,1 @@
-sed -i s/\$\(HOME\)/\${HOME}/ $1
+sed -i s/\$\(HOME\)/\/ $1

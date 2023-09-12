@@ -1,12 +1,11 @@
 #!/usr/bin/env bash
 
 #SBATCH --job-name=gaussian@16-C.02b
-#SBATCH --account=sdsc
+#SBATCH --account=sys200
 #SBATCH --partition=hotel-gpu
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=8
-#SBATCH -w gpu1
 #SBATCH --time=01:00:00
 #SBATCH --output=%x.o%j.%N
 
@@ -17,7 +16,7 @@ declare -xr SYSTEM_NAME='tscc'
 
 declare -xr SPACK_VERSION='0.17.3'
 declare -xr SPACK_INSTANCE_NAME='gpu'
-declare -xr SPACK_INSTANCE_DIR="${HOME}/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}"
+declare -xr SPACK_INSTANCE_DIR="/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}"
 declare -xr TMPDIR="${LOCAL_SCRATCH_DIR}/spack-stage"
 declare -xt TMP="${TMPDIR}"
 
@@ -25,7 +24,7 @@ declare -xr SLURM_JOB_SCRIPT="$(scontrol show job ${SLURM_JOB_ID} | awk -F= '/Co
 declare -xr SLURM_JOB_MD5SUM="$(md5sum ${SLURM_JOB_SCRIPT})"
 
 declare -xr SCHEDULER_MODULE='slurm'
-declare -xr COMPILER_MODULE='nvhpc/21.3'
+declare -xr COMPILER_MODULE='gcc/11.2.0'
 declare -xr CUDA_MODULE='cuda/10.0.130'
 
 echo "${UNIX_TIME} ${SLURM_JOB_ID} ${SLURM_JOB_MD5SUM} ${SLURM_JOB_DEPENDENCY}" 
@@ -79,8 +78,8 @@ module list
 declare -xr PGROUPD_LICENSE_FILE='40000@elprado.sdsc.edu:40200@elprado.sdsc.edu'
 declare -xr LM_LICENSE_FILE='40000@elprado.sdsc.edu:40200@elprado.sdsc.edu'
 declare -xr SPACK_PACKAGE='gaussian@16-C.02b' 
-declare -xr SPACK_COMPILER='pgi@18.10'
-declare -xr SPACK_VARIANTS='+binary ~cuda'
+declare -xr SPACK_COMPILER='gcc@11.2.0'
+declare -xr SPACK_VARIANTS='+binary +cuda'
 declare -xr SPACK_DEPENDENCIES=""
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
@@ -94,13 +93,13 @@ spack config get packages
 spack config get repos
 spack config get upstreams
 
-spack spec --long --namespaces --types gaussian@16-C.02b % pgi@18.10 +binary  "${SPACK_DEPENDENCIES}"
+spack spec --long --namespaces --types gaussian@16-C.02b % gcc@11.2.0  +binary  "${SPACK_DEPENDENCIES}"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack concretization failed.'
   exit 1
 fi
 
-time -p spack install -v --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all gaussian@16-C.02b % pgi@18.10 +binary "${SPACK_DEPENDENCIES}"
+time -p spack install -v --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all gaussian@16-C.02b % gcc@11.2.0  +binary "${SPACK_DEPENDENCIES}"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
   exit 1

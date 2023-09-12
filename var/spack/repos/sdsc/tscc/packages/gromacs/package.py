@@ -229,7 +229,9 @@ class Gromacs(CMakePackage,CudaPackage):
         options = []
 
         if self.compiler.name == 'intel':
-            options.append('-DCMAKE_CXX_FLAGS=-gcc-name=/home/jpg/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-8.5.0-mf5bqu2cwyzoxa5c7btqbbdxng3whbmf/bin/gcc')
+             
+            if '+cuda' in self.spec:
+                options.append('-DCMAKE_CXX_FLAGS=-gcc-name=/home/jpg/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-8.5.0-mf5bqu2cwyzoxa5c7btqbbdxng3whbmf/bin/gcc')
         if '+mpi' in self.spec:
             options.append('-DGMX_MPI:BOOL=ON')
             if self.version < Version('2020'):

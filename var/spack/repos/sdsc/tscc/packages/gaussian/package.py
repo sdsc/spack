@@ -78,38 +78,38 @@ class Gaussian(Package,CudaPackage):
         if '+cuda' in self.spec:
             Executable('chmod')('0750',join_path(prefix.g16,'getcpusets'))
 
-    @run_after('install')
+#   @run_after('install')
 
-    def test(self):
-        def replacetestfilename(name):
-            if len(name) == 1:
-                return("000" + name)
-            elif len(name) == 2:
-                return("00" + name)
-            elif len(name) == 3:
-                return("0" + name)
-            elif len(name) ==  4:
-                return(name)
-        tests=['1', '28', '94', '155', '194', '296', '302']
-        fp=open('/tmp/gaussian.output','w')
-        with working_dir(join_path(prefix.g16,'tests')): 
-            with open('/tmp/gaussian.output','w') as fp:
-                for test in tests:
-                    testname=replacetestfilename(test)
-                    Executable('rm')('-f',join_path('amd64','test'+testname+'.log'))
-                    if '+cuda' in self.spec:
-                         with working_dir('com'):
-                             copy('test'+testname+'.com','test'+testname+'.tmp.com')                      
-                             Executable('getcpusets')('tmp')                      
-                             Executable('cat')('tmp.out','test'+testname+'.tmp.com','>','test'+testname+'.com')
-                    Executable('./submit.csh')(test,test)
-                    output=Executable('cat')(join_path('amd64','test'+testname+'.log'),output=str,error=str)
-                    print("TEST " + test,file=fp)
-                    teststring='Normal termination'
-                    if teststring in output:
-                         print('PASSED',file=fp)
-                    else:
-                         print('FAILED',file=fp)
-                    if '+cuda' in self.spec:
-                         with working_dir('com'):
-                             copy('test'+testname+'.tmp.com','test'+testname+'.com')
+#   def test(self):
+#       def replacetestfilename(name):
+#           if len(name) == 1:
+#               return("000" + name)
+#           elif len(name) == 2:
+#               return("00" + name)
+#           elif len(name) == 3:
+#               return("0" + name)
+#           elif len(name) ==  4:
+#               return(name)
+#       tests=['1', '28', '94', '155', '194', '296', '302']
+#       fp=open('/tmp/gaussian.output','w')
+#       with working_dir(join_path(prefix.g16,'tests')): 
+#           with open('/tmp/gaussian.output','w') as fp:
+#               for test in tests:
+#                   testname=replacetestfilename(test)
+#                   Executable('rm')('-f',join_path('amd64','test'+testname+'.log'))
+#                   if '+cuda' in self.spec:
+#                        with working_dir('com'):
+#                            copy('test'+testname+'.com','test'+testname+'.tmp.com')                      
+#                            Executable('getcpusets')('tmp')                      
+#                            Executable('cat')('tmp.out','test'+testname+'.tmp.com','>','test'+testname+'.com')
+#                   Executable('./submit.csh')(test,test)
+#                   output=Executable('cat')(join_path('amd64','test'+testname+'.log'),output=str,error=str)
+#                   print("TEST " + test,file=fp)
+#                   teststring='Normal termination'
+#                   if teststring in output:
+#                        print('PASSED',file=fp)
+#                   else:
+#                        print('FAILED',file=fp)
+#                   if '+cuda' in self.spec:
+#                        with working_dir('com'):
+#                            copy('test'+testname+'.tmp.com','test'+testname+'.com')

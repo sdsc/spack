@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #SBATCH --job-name=relion@3.1.3
-#SBATCH --account=sdsc
+#SBATCH --account=sys200
 #SBATCH --partition=hotel-gpu
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
@@ -17,7 +17,7 @@ declare -xr SYSTEM_NAME='tscc'
 
 declare -xr SPACK_VERSION='0.17.3'
 declare -xr SPACK_INSTANCE_NAME='gpu'
-declare -xr SPACK_INSTANCE_DIR="${HOME}/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}"
+declare -xr SPACK_INSTANCE_DIR="/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}"
 
 declare -xr SLURM_JOB_SCRIPT="$(scontrol show job ${SLURM_JOB_ID} | awk -F= '/Command=/{print $2}')"
 declare -xr SLURM_JOB_MD5SUM="$(md5sum ${SLURM_JOB_SCRIPT})"
@@ -36,7 +36,7 @@ module list
 
 declare -xr SPACK_PACKAGE='relion@3.1.3'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS='+allow_ctf_in_sagd +cuda cuda_arch=60,75,80,86+double ~double-gpu ~gui ~ipo ~mklfft'
+declare -xr SPACK_VARIANTS='+allow_ctf_in_sagd +cuda cuda_arch=60,75,80,86 +double ~double-gpu ~gui ~ipo ~mklfft'
 declare -xr SPACK_DEPENDENCIES="^fftw@3.3.10/$(spack find --format '{hash:7}' fftw@3.3.10 % ${SPACK_COMPILER} +mpi ~openmp ^openmpi@4.1.3)"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
@@ -50,13 +50,13 @@ spack config get packages
 spack config get repos
 spack config get upstreams
 
-spack spec --long --namespaces --types relion@3.1.3 % gcc@10.2.0 +allow_ctf_in_sagd +cuda cuda_arch=60,75,80,86+double ~double-gpu ~gui ~ipo ~mklfft "^fftw@3.3.10/$(spack find --format '{hash:7}' fftw@3.3.10 % ${SPACK_COMPILER} +mpi ~openmp ^openmpi@4.1.3)"
+spack spec --long --namespaces --types relion@3.1.3 % gcc@10.2.0 +allow_ctf_in_sagd +cuda cuda_arch=60,75,80,86 +double ~double-gpu ~gui ~ipo ~mklfft "^fftw@3.3.10/$(spack find --format '{hash:7}' fftw@3.3.10 % ${SPACK_COMPILER} +mpi ~openmp ^openmpi@4.1.3)"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack concretization failed.'
   exit 1
 fi
 
-time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all relion@3.1.3 % gcc@10.2.0 +allow_ctf_in_sagd +cuda cuda_arch=60,75,80,86+double ~double-gpu ~gui ~ipo ~mklfft "^fftw@3.3.10/$(spack find --format '{hash:7}' fftw@3.3.10 % ${SPACK_COMPILER} +mpi ~openmp ^openmpi@4.1.3)"
+time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all relion@3.1.3 % gcc@10.2.0 +allow_ctf_in_sagd +cuda cuda_arch=60,75,80,86 +double ~double-gpu ~gui ~ipo ~mklfft "^fftw@3.3.10/$(spack find --format '{hash:7}' fftw@3.3.10 % ${SPACK_COMPILER} +mpi ~openmp ^openmpi@4.1.3)"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
   exit 1

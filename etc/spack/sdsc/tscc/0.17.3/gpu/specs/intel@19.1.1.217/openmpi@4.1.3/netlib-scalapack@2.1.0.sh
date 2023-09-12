@@ -1,12 +1,11 @@
 #!/usr/bin/env bash
 
 #SBATCH --job-name=netlib-scalapack@2.1.0
-#SBATCH --account=sdsc
+#SBATCH --account=sys200
 #SBATCH --partition=hotel-gpu
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=8
-#SBATCH -w gpu1
 #SBATCH --time=00:30:00
 #SBATCH --output=%x.o%j.%N
 

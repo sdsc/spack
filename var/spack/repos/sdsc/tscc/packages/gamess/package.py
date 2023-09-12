@@ -27,6 +27,7 @@ class Gamess(Package):
     depends_on('intel-mkl', when='mathlib=mkl')
     depends_on('atlas', when='mathlib=atlas')
 
+    patch('compddi2.patch',when='@2021.09')
     patch('compddi.patch',when='@:2019.06')
     patch('comp.patch',when='@:2019.06')
     patch('compall.patch',when='@:2019.06')
@@ -59,7 +60,10 @@ class Gamess(Package):
                    + 'setenv GMS_PATH '  + cwd + '\n' \
                    + 'setenv GMS_BUILD_DIR  ' + cwd + '\n' \
                    + 'setenv GMS_TARGET         linux64' + '\n'
-        mpicmd = Executable(join_path(mpipath,'bin/mpif77'))('-show',output=str,error=str)
+        if 'intel-mpi' in spec['mpi'].name:
+            mpicmd = Executable(join_path(mpipath,'compilers_and_libraries','linux','mpi','intel64','bin','mpif77'))('-show',output=str,error=str)
+        else:
+            mpicmd = Executable(join_path(mpipath,'bin','mpif77'))('-show',output=str,error=str)
         mpilibs = re.sub(r'^.*-L','-L',mpicmd)
         if spec.version <= Version('2019.06'):
            filter_file('ROLLMPILIBS',mpilibs,'lked')
@@ -138,3 +142,6 @@ class Gamess(Package):
         env.set('GMSPATH',self.prefix)
         env.prepend_path('PATH',self.prefix)
 
+    def setup_build_environment(self, env):
+        if 'intel-mpi' in self.spec['mpi'].name and self.spec.compiler.name == "intel":
+            env.set('I_MPI_F77','ifort')
