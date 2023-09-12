@@ -1,0 +1,1314 @@
+slurmstepd: error: Unable to create TMPDIR [/scratch/spack_cpu/job_21701547]: Permission denied
+slurmstepd: error: Setting TMPDIR to /tmp
+1681616383 21701569 e1ecc07238ae894b09173d979a4faf7a  /cm/shared/apps/spack/0.17.3/cpu/b/etc/spack/sdsc/expanse/0.17.3/cpu/specs/gcc@10.2.0/py-jupyterlab@3.2.1.sh afterok:21701547
+
+#!/usr/bin/env bash
+
+#SBATCH --job-name=py-jupyterlab@3.2.1
+#SBATCH --account=use300
+#SBATCH --reservation=rocky8u7_testing
+#SBATCH --partition=ind-shared
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=1
+#SBATCH --cpus-per-task=16
+#SBATCH --mem=32G
+#SBATCH --time=01:00:00
+#SBATCH --output=%x.o%j.%N
+
+declare -xr LOCAL_TIME="$(date +'%Y%m%dT%H%M%S%z')"
+declare -xir UNIX_TIME="$(date +'%s')"
+
+declare -xr LOCAL_SCRATCH_DIR="/scratch/${USER}/job_${SLURM_JOB_ID}"
+declare -xr TMPDIR="${LOCAL_SCRATCH_DIR}"
+
+declare -xr SYSTEM_NAME='expanse'
+
+declare -xr SPACK_VERSION='0.17.3'
+declare -xr SPACK_INSTANCE_NAME='cpu'
+declare -xr SPACK_INSTANCE_VERSION='b'
+declare -xr SPACK_INSTANCE_DIR="/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}/${SPACK_INSTANCE_VERSION}"
+
+declare -xr SLURM_JOB_SCRIPT="$(scontrol show job ${SLURM_JOB_ID} | awk -F= '/Command=/{print $2}')"
+declare -xr SLURM_JOB_MD5SUM="$(md5sum ${SLURM_JOB_SCRIPT})"
+
+declare -xr SCHEDULER_MODULE='slurm'
+
+echo "${UNIX_TIME} ${SLURM_JOB_ID} ${SLURM_JOB_MD5SUM} ${SLURM_JOB_DEPENDENCY}" 
+echo ""
+
+cat "${SLURM_JOB_SCRIPT}"
+
+module purge
+module load "${SCHEDULER_MODULE}"
+module list
+. "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
+
+declare -xr SPACK_PACKAGE='py-jupyterlab@3.2.1'
+declare -xr SPACK_COMPILER='gcc@10.2.0'
+declare -xr SPACK_VARIANTS=''
+declare -xr SPACK_DEPENDENCIES="^python@3.8.12/$(spack find --format '{hash:7}' python@3.8.12 % ${SPACK_COMPILER})"
+declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
+
+printenv
+
+spack config get compilers  
+spack config get config  
+spack config get mirrors
+spack config get modules
+spack config get packages
+spack config get repos
+spack config get upstreams
+
+time -p spack spec --long --namespaces --types "${SPACK_SPEC}"
+if [[ "${?}" -ne 0 ]]; then
+  echo 'ERROR: spack concretization failed.'
+  exit 1
+fi
+
+time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all "${SPACK_SPEC}"
+if [[ "${?}" -ne 0 ]]; then
+  echo 'ERROR: spack install failed.'
+  exit 1
+fi
+
+#spack module lmod refresh --delete-tree -y
+
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'arpack-ng@3.8.0.sh'
+
+sleep 30
+
+Currently Loaded Modules:
+  1) slurm/expanse/21.08.8
+
+ 
+
+LD_LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:/cm/shared/apps/slurm/current/lib64
+LS_COLORS=rs=0:di=38;5;33:ln=38;5;51:mh=00:pi=40;38;5;11:so=38;5;13:do=38;5;5:bd=48;5;232;38;5;11:cd=48;5;232;38;5;3:or=48;5;232;38;5;9:mi=01;05;37;41:su=48;5;196;38;5;15:sg=48;5;11;38;5;16:ca=48;5;196;38;5;226:tw=48;5;10;38;5;16:ow=48;5;10;38;5;21:st=48;5;21;38;5;15:ex=38;5;40:*.tar=38;5;9:*.tgz=38;5;9:*.arc=38;5;9:*.arj=38;5;9:*.taz=38;5;9:*.lha=38;5;9:*.lz4=38;5;9:*.lzh=38;5;9:*.lzma=38;5;9:*.tlz=38;5;9:*.txz=38;5;9:*.tzo=38;5;9:*.t7z=38;5;9:*.zip=38;5;9:*.z=38;5;9:*.dz=38;5;9:*.gz=38;5;9:*.lrz=38;5;9:*.lz=38;5;9:*.lzo=38;5;9:*.xz=38;5;9:*.zst=38;5;9:*.tzst=38;5;9:*.bz2=38;5;9:*.bz=38;5;9:*.tbz=38;5;9:*.tbz2=38;5;9:*.tz=38;5;9:*.deb=38;5;9:*.rpm=38;5;9:*.jar=38;5;9:*.war=38;5;9:*.ear=38;5;9:*.sar=38;5;9:*.rar=38;5;9:*.alz=38;5;9:*.ace=38;5;9:*.zoo=38;5;9:*.cpio=38;5;9:*.7z=38;5;9:*.rz=38;5;9:*.cab=38;5;9:*.wim=38;5;9:*.swm=38;5;9:*.dwm=38;5;9:*.esd=38;5;9:*.jpg=38;5;13:*.jpeg=38;5;13:*.mjpg=38;5;13:*.mjpeg=38;5;13:*.gif=38;5;13:*.bmp=38;5;13:*.pbm=38;5;13:*.pgm=38;5;13:*.ppm=38;5;13:*.tga=38;5;13:*.xbm=38;5;13:*.xpm=38;5;13:*.tif=38;5;13:*.tiff=38;5;13:*.png=38;5;13:*.svg=38;5;13:*.svgz=38;5;13:*.mng=38;5;13:*.pcx=38;5;13:*.mov=38;5;13:*.mpg=38;5;13:*.mpeg=38;5;13:*.m2v=38;5;13:*.mkv=38;5;13:*.webm=38;5;13:*.ogm=38;5;13:*.mp4=38;5;13:*.m4v=38;5;13:*.mp4v=38;5;13:*.vob=38;5;13:*.qt=38;5;13:*.nuv=38;5;13:*.wmv=38;5;13:*.asf=38;5;13:*.rm=38;5;13:*.rmvb=38;5;13:*.flc=38;5;13:*.avi=38;5;13:*.fli=38;5;13:*.flv=38;5;13:*.gl=38;5;13:*.dl=38;5;13:*.xcf=38;5;13:*.xwd=38;5;13:*.yuv=38;5;13:*.cgm=38;5;13:*.emf=38;5;13:*.ogv=38;5;13:*.ogx=38;5;13:*.aac=38;5;45:*.au=38;5;45:*.flac=38;5;45:*.m4a=38;5;45:*.mid=38;5;45:*.midi=38;5;45:*.mka=38;5;45:*.mp3=38;5;45:*.mpc=38;5;45:*.ogg=38;5;45:*.ra=38;5;45:*.wav=38;5;45:*.oga=38;5;45:*.opus=38;5;45:*.spx=38;5;45:*.xspf=38;5;45:
+SRUN_DEBUG=3
+SLURM_STEP_ID=0
+LOCAL_SCRATCH_DIR=/scratch/spack_cpu/job_21701569
+SLURM_NODEID=0
+SLURM_TASK_PID=2352004
+__LMOD_REF_COUNT_PATH=/cm/shared/apps/slurm/current/sbin:1;/cm/shared/apps/slurm/current/bin:1;/cm/shared/apps/spack/0.17.3/cpu/b/bin:1;/home/spack_cpu/.local/bin:2;/home/spack_cpu/bin:2;/usr/local/bin:1;/usr/bin:1;/usr/local/sbin:1;/usr/sbin:1
+_ModuleTable002_=aWxlcyIsIi9ldGMvbW9kdWxlZmlsZXMiLCIvdXNyL3NoYXJlL21vZHVsZWZpbGVzIiwiL3Vzci9zaGFyZS9Nb2R1bGVzL21vZHVsZWZpbGVzIiwiL2NtL3NoYXJlZC9tb2R1bGVmaWxlcyIsfSxbInN5c3RlbUJhc2VNUEFUSCJdPSIvY20vbG9jYWwvbW9kdWxlZmlsZXM6L2NtL3NoYXJlZC9hcHBzL2FjY2Vzcy9tb2R1bGVmaWxlczovY20vc2hhcmVkL2FwcHMveHNlZGUvbW9kdWxlZmlsZXM6L2NtL3NoYXJlZC9tb2R1bGVmaWxlczovZXRjL21vZHVsZWZpbGVzOi91c3Ivc2hhcmUvbW9kdWxlZmlsZXM6L3Vzci9zaGFyZS9Nb2R1bGVzL21vZHVsZWZpbGVzIix9
+SSH_CONNECTION=198.202.100.13 61274 198.202.100.13 22
+SPACK_PYTHON=/usr/bin/python3
+SLURM_PRIO_PROCESS=0
+SLURM_CPU_BIND_VERBOSE=quiet
+LANG=en_US.UTF-8
+SLURM_SUBMIT_DIR=/cm/shared/apps/spack/0.17.3/cpu/b/etc/spack/sdsc/expanse/0.17.3/cpu/specs/gcc@10.2.0
+HISTCONTROL=ignoredups
+HOSTNAME=exp-15-56
+LMOD_SYSTEM_DEFAULT_MODULES=DefaultModules
+SLURM_JOB_DEPENDENCY=afterok:21701547
+OLDPWD=/cm/shared/apps/spack/0.17.3/cpu/b/etc/spack/sdsc/expanse/0.17.3/cpu/specs
+__LMOD_REF_COUNT__LMFILES_=/cm/local/modulefiles/slurm/expanse/21.08.8:1
+SLURM_CPUS_PER_TASK=16
+SLURM_STEPID=0
+SLURM_SRUN_COMM_HOST=10.21.0.19
+SPACK_DEPENDENCIES=^python@3.8.12/7zdjza7
+SLURM_DISTRIBUTION=cyclic
+ENVIRONMENT=BATCH
+SPACK_VERSION=0.17.3
+SLURM_PROCID=0
+SPACK_INSTANCE_VERSION=b
+SLURM_JOB_GID=11491
+SPACK_VARIANTS=
+SPACK_INSTANCE_DIR=/cm/shared/apps/spack/0.17.3/cpu/b
+__LMOD_REF_COUNT_LD_LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:1;/cm/shared/apps/slurm/current/lib64:1
+SLURM_CPU_BIND=quiet,mask_cpu:0x0000000000000000000000000000FFFF
+SLURM_JOB_SCRIPT=/cm/shared/apps/spack/0.17.3/cpu/b/etc/spack/sdsc/expanse/0.17.3/cpu/specs/gcc@10.2.0/py-jupyterlab@3.2.1.sh
+SLURMD_NODENAME=exp-15-56
+SLURM_TASKS_PER_NODE=1
+S_COLORS=auto
+which_declare=declare -f
+SPACK_COMPILER=gcc@10.2.0
+SLURM_JOB_RESERVATION=rocky8u7_testing
+XDG_SESSION_ID=31726
+USER=spack_cpu
+SLURM_NNODES=1
+SLURM_LAUNCH_NODE_IPADDR=10.21.0.19
+SLURM_STEP_TASKS_PER_NODE=1
+SLURM_NTASKS_PER_NODE=1
+__LMOD_REF_COUNT_MODULEPATH=/cm/local/modulefiles:1;/cm/shared/apps/access/modulefiles:1;/cm/shared/apps/xsede/modulefiles:1;/etc/modulefiles:1;/usr/share/modulefiles:1;/usr/share/Modules/modulefiles:1;/cm/shared/modulefiles:1
+__LMOD_REF_COUNT_LOADEDMODULES=slurm/expanse/21.08.8:1
+PWD=/cm/shared/apps/spack/0.17.3/cpu/b/etc/spack/sdsc/expanse/0.17.3/cpu/specs/gcc@10.2.0
+ENABLE_LMOD=1
+SLURM_JOB_NODELIST=exp-15-56
+HOME=/home/spack_cpu
+SLURM_CLUSTER_NAME=expanse
+LMOD_COLORIZE=yes
+LOCAL_TIME=20230415T203943-0700
+SLURM_NODELIST=exp-15-56
+SSH_CLIENT=198.202.100.13 61274 22
+LMOD_VERSION=8.2.4
+CPATH=/cm/shared/apps/slurm/current/include
+SLURM_NTASKS=1
+LMOD_SETTARG_CMD=:
+SLURM_JOB_CPUS_PER_NODE=16
+BASH_ENV=/usr/share/lmod/lmod/init/bash
+SLURM_TOPOLOGY_ADDR=exp-15-56
+SLURM_WORKING_CLUSTER=expanse:mgr1:6817:9472:109
+SLURM_JOB_MD5SUM=e1ecc07238ae894b09173d979a4faf7a  /cm/shared/apps/spack/0.17.3/cpu/b/etc/spack/sdsc/expanse/0.17.3/cpu/specs/gcc@10.2.0/py-jupyterlab@3.2.1.sh
+SPACK_PACKAGE=py-jupyterlab@3.2.1
+__LMOD_REF_COUNT_LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:1;/cm/shared/apps/slurm/current/lib64:1
+SLURM_STEP_NODELIST=exp-15-56
+SLURM_JOB_NAME=py-jupyterlab@3.2.1
+SLURM_SRUN_COMM_PORT=46299
+TMPDIR=/scratch/spack_cpu/job_21701569
+LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:/cm/shared/apps/slurm/current/lib64
+LMOD_sys=Linux
+SLURM_JOBID=21701569
+SYSTEM_NAME=expanse
+_ModuleTable001_=X01vZHVsZVRhYmxlXz17WyJNVHZlcnNpb24iXT0zLFsiY19yZWJ1aWxkVGltZSJdPWZhbHNlLFsiY19zaG9ydFRpbWUiXT1mYWxzZSxkZXB0aFQ9e30sZmFtaWx5PXt9LG1UPXtzbHVybT17WyJmbiJdPSIvY20vbG9jYWwvbW9kdWxlZmlsZXMvc2x1cm0vZXhwYW5zZS8yMS4wOC44IixbImZ1bGxOYW1lIl09InNsdXJtL2V4cGFuc2UvMjEuMDguOCIsWyJsb2FkT3JkZXIiXT0xLHByb3BUPXt9LFsic3RhY2tEZXB0aCJdPTAsWyJzdGF0dXMiXT0iYWN0aXZlIixbInVzZXJOYW1lIl09InNsdXJtIix9LH0sbXBhdGhBPXsiL2NtL2xvY2FsL21vZHVsZWZpbGVzIiwiL2NtL3NoYXJlZC9hcHBzL2FjY2Vzcy9tb2R1bGVmaWxlcyIsIi9jbS9zaGFyZWQvYXBwcy94c2VkZS9tb2R1bGVm
+SLURM_CONF=/cm/shared/apps/slurm/var/etc/expanse/slurm.conf
+LOADEDMODULES=slurm/expanse/21.08.8
+__LMOD_REF_COUNT_MANPATH=/cm/shared/apps/slurm/current/man:3;/usr/share/lmod/lmod/share/man:1;/usr/local/share/man:2;/usr/share/man:2;/cm/local/apps/environment-modules/current/share/man:2
+_ModuleTable003_=dXJtPXtbImZuIl09Ii9jbS9sb2NhbC9tb2R1bGVmaWxlcy9zbHVybS9leHBhbnNlLzIxLjA4LjgiLFsiZnVsbE5hbWUiXT0ic2x1cm0vZXhwYW5zZS8yMS4wOC44IixbImxvYWRPcmRlciJdPTMscHJvcFQ9e30sWyJzdGFja0RlcHRoIl09MixbInN0YXR1cyJdPSJhY3RpdmUiLFsidXNlck5hbWUiXT0ic2x1cm0iLH0sfSxtcGF0aEE9eyIvY20vc2hhcmVkL2FwcHMvc3BhY2svY3B1L2xtb2QvbGludXgtY2VudG9zOC14ODZfNjQvQ29yZSIsIi9jbS9sb2NhbC9tb2R1bGVmaWxlcyIsIi9jbS9zaGFyZWQvYXBwcy9hY2Nlc3MvbW9kdWxlZmlsZXMiLCIvY20vc2hhcmVkL2FwcHMveHNlZGUvbW9kdWxlZmlsZXMiLCIvZXRjL21vZHVsZWZpbGVzIiwiL3Vzci9zaGFyZS9tb2R1bGVm
+SLURM_NODE_ALIASES=(null)
+LMOD_ROOT=/usr/share/lmod
+SLURM_JOB_QOS=ind-shared-normal
+SLURM_TOPOLOGY_ADDR_PATTERN=node
+SSH_TTY=/dev/pts/267
+MAIL=/var/spool/mail/spack_cpu
+SLURM_CPUS_ON_NODE=16
+LMOD_arch=x86_64
+SLURM_JOB_NUM_NODES=1
+__Init_Default_Modules=1
+CMD_WLM_CLUSTER_NAME=expanse
+SLURM_MEM_PER_NODE=32768
+SPACK_ROOT=/cm/shared/apps/spack/0.17.3/cpu/b
+TERM=xterm-256color
+SHELL=/bin/bash
+_ModuleTable_Sz_=2
+SLURM_JOB_UID=527834
+__LMOD_REF_COUNT_CPATH=/cm/shared/apps/slurm/current/include:1
+SLURM_JOB_PARTITION=ind-shared
+SLURM_PTY_WIN_ROW=48
+SLURM_CPU_BIND_LIST=0x0000000000000000000000000000FFFF
+SPACK_INSTANCE_NAME=cpu
+SLURM_JOB_USER=spack_cpu
+SLURM_PTY_WIN_COL=166
+SLURM_NPROCS=1
+SHLVL=31
+SLURM_SUBMIT_HOST=exp-15-56
+UNIX_TIME=1681616383
+SLURM_JOB_ACCOUNT=use300
+MANPATH=/cm/shared/apps/slurm/current/man:/usr/share/lmod/lmod/share/man:/usr/local/share/man:/usr/share/man:/cm/local/apps/environment-modules/current/share/man
+SPACK_LD_LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:/cm/shared/apps/slurm/current/lib64
+LMOD_PREPEND_BLOCK=normal
+SLURM_STEP_LAUNCHER_PORT=46299
+MODULEPATH=/cm/local/modulefiles:/cm/shared/apps/access/modulefiles:/cm/shared/apps/xsede/modulefiles:/etc/modulefiles:/usr/share/modulefiles:/usr/share/Modules/modulefiles:/cm/shared/modulefiles
+SLURM_PTY_PORT=41649
+SLURM_GTIDS=0
+LOGNAME=spack_cpu
+DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/527834/bus
+XDG_RUNTIME_DIR=/run/user/527834
+MODULEPATH_ROOT=/usr/share/modulefiles
+PATH=/cm/shared/apps/slurm/current/sbin:/cm/shared/apps/slurm/current/bin:/cm/shared/apps/spack/0.17.3/cpu/b/bin:/home/spack_cpu/.local/bin:/home/spack_cpu/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin
+SLURM_JOB_ID=21701569
+_LMFILES_=/cm/local/modulefiles/slurm/expanse/21.08.8
+SLURM_CPU_BIND_TYPE=mask_cpu:
+DEBUGINFOD_URLS=https://debuginfod.centos.org/ 
+SLURM_STEP_NUM_TASKS=1
+SCHEDULER_MODULE=slurm
+MODULESHOME=/usr/share/lmod/lmod
+LMOD_SETTARG_FULL_SUPPORT=no
+HISTSIZE=-1
+LMOD_PKG=/usr/share/lmod/lmod
+SLURM_STEP_NUM_NODES=1
+SPACK_SPEC=py-jupyterlab@3.2.1 % gcc@10.2.0  ^python@3.8.12/7zdjza7
+LMOD_CMD=/usr/share/lmod/lmod/libexec/lmod
+SLURM_LOCALID=0
+LESSOPEN=||/usr/bin/lesspipe.sh %s
+LMOD_FULL_SETTARG_SUPPORT=no
+LMOD_DIR=/usr/share/lmod/lmod/libexec
+BASH_FUNC_which%%=() {  ( alias;
+ eval ${which_declare} ) | /usr/bin/which --tty-only --read-alias --read-functions --show-tilde --show-dot $@
+}
+BASH_FUNC_module%%=() {  eval $($LMOD_CMD bash "$@") && eval $(${LMOD_SETTARG_CMD:-:} -s sh)
+}
+BASH_FUNC_spack%%=() {  : this is a shell function from: /cm/shared/apps/spack/0.17.3/cpu/b/share/spack/setup-env.sh;
+ : the real spack script is here: /cm/shared/apps/spack/0.17.3/cpu/b/bin/spack;
+ _spack_shell_wrapper "$@";
+ return $?
+}
+BASH_FUNC__spack_shell_wrapper%%=() {  for var in LD_LIBRARY_PATH DYLD_LIBRARY_PATH DYLD_FALLBACK_LIBRARY_PATH;
+ do
+ eval "if [ -n \"\${${var}-}\" ]; then export SPACK_$var=\${${var}}; fi";
+ done;
+ if [ -n "${ZSH_VERSION:-}" ]; then
+ emulate -L sh;
+ fi;
+ _sp_flags="";
+ while [ ! -z ${1+x} ] && [ "${1#-}" != "${1}" ]; do
+ _sp_flags="$_sp_flags $1";
+ shift;
+ done;
+ if [ -n "$_sp_flags" ] && [ "${_sp_flags#*h}" != "${_sp_flags}" ] || [ "${_sp_flags#*V}" != "${_sp_flags}" ]; then
+ command spack $_sp_flags "$@";
+ return;
+ fi;
+ _sp_subcommand="";
+ if [ ! -z ${1+x} ]; then
+ _sp_subcommand="$1";
+ shift;
+ fi;
+ case $_sp_subcommand in 
+ "cd")
+ _sp_arg="";
+ if [ -n "$1" ]; then
+ _sp_arg="$1";
+ shift;
+ fi;
+ if [ "$_sp_arg" = "-h" ] || [ "$_sp_arg" = "--help" ]; then
+ command spack cd -h;
+ else
+ LOC="$(spack location $_sp_arg "$@")";
+ if [ -d "$LOC" ]; then
+ cd "$LOC";
+ else
+ return 1;
+ fi;
+ fi;
+ return
+ ;;
+ "env")
+ _sp_arg="";
+ if [ -n "$1" ]; then
+ _sp_arg="$1";
+ shift;
+ fi;
+ if [ "$_sp_arg" = "-h" ] || [ "$_sp_arg" = "--help" ]; then
+ command spack env -h;
+ else
+ case $_sp_arg in 
+ activate)
+ _a=" $@";
+ if [ -z ${1+x} ] || [ "${_a#* --sh}" != "$_a" ] || [ "${_a#* --csh}" != "$_a" ] || [ "${_a#* -h}" != "$_a" ] || [ "${_a#* --help}" != "$_a" ]; then
+ command spack env activate "$@";
+ else
+ stdout="$(command spack $_sp_flags env activate --sh "$@")" || return;
+ eval "$stdout";
+ fi
+ ;;
+ deactivate)
+ _a=" $@";
+ if [ "${_a#* --sh}" != "$_a" ] || [ "${_a#* --csh}" != "$_a" ]; then
+ command spack env deactivate "$@";
+ else
+ if [ -n "$*" ]; then
+ command spack env deactivate -h;
+ else
+ stdout="$(command spack $_sp_flags env deactivate --sh)" || return;
+ eval "$stdout";
+ fi;
+ fi
+ ;;
+ *)
+ command spack env $_sp_arg "$@"
+ ;;
+ esac;
+ fi;
+ return
+ ;;
+ "load" | "unload")
+ _a=" $@";
+ if [ "${_a#* --sh}" != "$_a" ] || [ "${_a#* --csh}" != "$_a" ] || [ "${_a#* -h}" != "$_a" ] || [ "${_a#* --list}" != "$_a" ] || [ "${_a#* --help}" != "$_a" ]; then
+ command spack $_sp_flags $_sp_subcommand "$@";
+ else
+ stdout="$(command spack $_sp_flags $_sp_subcommand --sh "$@")" || return;
+ eval "$stdout";
+ fi
+ ;;
+ *)
+ command spack $_sp_flags $_sp_subcommand "$@"
+ ;;
+ esac
+}
+BASH_FUNC_ml%%=() {  eval $($LMOD_DIR/ml_cmd "$@")
+}
+_=/usr/bin/printenv
+compilers:
+- compiler:
+    spec: gcc@8.5.0
+    paths:
+      cc: /usr/bin/gcc
+      cxx: /usr/bin/g++
+      f77: /usr/bin/gfortran
+      fc: /usr/bin/gfortran
+    flags:
+      cflags: -O2 -march=native
+      cxxflags: -O2 -march=native
+      fflags: -O2 -march=native
+    operating_system: rocky8
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+- compiler:
+    spec: gcc@10.2.0
+    paths:
+      cc: /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen/gcc-8.5.0/gcc-10.2.0-npcyll4gxjhf4tejksmdzlsl3d3usqpd/bin/gcc
+      cxx: /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen/gcc-8.5.0/gcc-10.2.0-npcyll4gxjhf4tejksmdzlsl3d3usqpd/bin/g++
+      f77: /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen/gcc-8.5.0/gcc-10.2.0-npcyll4gxjhf4tejksmdzlsl3d3usqpd/bin/gfortran
+      fc: /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen/gcc-8.5.0/gcc-10.2.0-npcyll4gxjhf4tejksmdzlsl3d3usqpd/bin/gfortran
+    flags:
+      cflags: -O2 -march=native
+      cxxflags: -O2 -march=native
+      fflags: -O2 -march=native
+    operating_system: rocky8
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+config:
+  install_tree:
+    root: $spack/opt/spack
+    projections:
+      all: ${ARCHITECTURE}/${COMPILERNAME}-${COMPILERVER}/${PACKAGE}-${VERSION}-${HASH}
+  template_dirs:
+  - $spack/share/spack/templates
+
+  # Temporary locations Spack can try to use for builds.
+  #
+  # Recommended options are given below.
+  #
+  # Builds can be faster in temporary directories on some (e.g., HPC) systems.
+  # Specifying `$tempdir` will ensure use of the default temporary directory
+  # (i.e., ``$TMP` or ``$TMPDIR``).
+  #
+  # Another option that prevents conflicts and potential permission issues is
+  # to specify `$user_cache_path/stage`, which ensures each user builds in their
+  # home directory.
+  #
+  # A more traditional path uses the value of `$spack/var/spack/stage`, which
+  # builds directly inside Spack's instance without staging them in a
+  # temporary space.  Problems with specifying a path inside a Spack instance
+  # are that it precludes its use as a system package and its ability to be
+  # pip installable.
+  #
+  # In any case, if the username is not already in the path, Spack will append
+  # the value of `$user` in an attempt to avoid potential conflicts between
+  # users in shared temporary spaces.
+  #
+  # The build stage can be purged with `spack clean --stage` and
+  # `spack clean -a`, so it is important that the specified directory uniquely
+  # identifies Spack staging to avoid accidentally wiping out non-Spack work.
+  build_stage:
+  - $tempdir/$user/spack-stage
+  - $user_cache_path/stage
+  # - $spack/var/spack/stage
+
+  # Directory in which to run tests and store test results.
+  # Tests will be stored in directories named by date/time and package
+  # name/hash.
+  test_stage: $user_cache_path/test
+  source_cache: $spack/var/spack/cache
+  misc_cache: $user_cache_path/cache
+  connect_timeout: 10
+  verify_ssl: true
+  suppress_gpg_warnings: false
+  install_missing_compilers: false
+  checksum: true
+  deprecated: false
+  dirty: false
+  build_language: C
+  locks: true
+  url_fetch_method: urllib
+  ccache: false
+  concretizer: clingo
+  db_lock_timeout: 3
+  package_lock_timeout: null
+  shared_linking: rpath
+  allow_sgid: true
+  terminal_title: false
+  debug: false
+  build_jobs: 16
+mirrors:
+  spack-public: https://mirror.spack.io
+modules:
+  default:
+    'enable:':
+    - lmod
+    lmod:
+      core_compilers:
+      - gcc@8.5.0
+      hierarchy:
+      - mpi
+      hash_length: 0
+      blacklist_implicits: true
+      naming_scheme: '{name}/{version}/{hash:7}'
+      projections:
+        all: '{name}/{version}/{hash:7}'
+      all:
+        suffixes:
+          +openmp: omp
+          threads=openmp: omp
+          +ipl64: i64
+      intel:
+        environment:
+          set:
+            INTEL_LICENSE_FILE: 40000@elprado.sdsc.edu:40200@elprado.sdsc.edu
+      petsc:
+        suffixes:
+          +complex: cmplx
+      slepc:
+        suffixes:
+          ^petsc +complex: cmplx
+      ^python:
+        autoload: direct
+      ^ucx:
+        autoload: direct
+  prefix_inspections:
+    lib:
+    - LD_LIBRARY_PATH
+    lib64:
+    - LD_LIBRARY_PATH
+    bin:
+    - PATH
+    man:
+    - MANPATH
+    share/man:
+    - MANPATH
+    share/aclocal:
+    - ACLOCAL_PATH
+    lib/pkgconfig:
+    - PKG_CONFIG_PATH
+    lib64/pkgconfig:
+    - PKG_CONFIG_PATH
+    share/pkgconfig:
+    - PKG_CONFIG_PATH
+    ? ''
+    : - CMAKE_PREFIX_PATH
+
+  # These are configurations for the module set named "default"
+packages:
+  lmod:
+    externals:
+    - spec: lmod@8.2.4
+      prefix: /usr
+    buildable: false
+  lustre:
+    externals:
+    - spec: lustre@2.15.2
+      prefix: /usr
+    buildable: false
+  openssl:
+    externals:
+    - spec: openssl@1.1.1k
+      prefix: /usr
+    buildable: false
+  rdma-core:
+    externals:
+    - spec: rdma-core@43.0
+      prefix: /usr
+    buildable: false
+  slurm:
+    externals:
+    - spec: slurm@21.08.8
+      prefix: /cm/shared/apps/slurm/21.08.8
+    buildable: false
+  librsvg:
+    externals:
+    - spec: librsvg@2.42.7
+      prefix: /usr
+    buildable: false
+  ghostscript:
+    externals:
+    - spec: ghostscript@9.27
+      prefix: /usr
+    buildable: false
+  gaussian:
+    permissions:
+      read: group
+      group: gaussian
+  vasp6:
+    permissions:
+      read: group
+      group: vasp-6
+  all:
+    compiler: [gcc, intel, pgi, clang, xl, nag, fj, aocc]
+    providers:
+      awk: [gawk]
+      blas: [openblas, amdblis]
+      D: [ldc]
+      daal: [intel-daal]
+      elf: [elfutils]
+      fftw-api: [fftw, amdfftw]
+      flame: [libflame, amdlibflame]
+      fuse: [libfuse]
+      gl: [mesa+opengl, mesa18, opengl]
+      glu: [mesa-glu, openglu]
+      glx: [mesa+glx, mesa18+glx, opengl]
+      golang: [gcc]
+      iconv: [libiconv]
+      ipp: [intel-ipp]
+      java: [openjdk, jdk, ibm-java]
+      jpeg: [libjpeg-turbo, libjpeg]
+      lapack: [openblas, amdlibflame]
+      lua-lang: [lua, lua-luajit]
+      mariadb-client: [mariadb-c-client, mariadb]
+      mkl: [intel-mkl]
+      mpe: [mpe2]
+      mpi: [openmpi, mpich]
+      mysql-client: [mysql, mariadb-c-client]
+      opencl: [pocl]
+      onedal: [intel-oneapi-dal]
+      osmesa: [mesa+osmesa, mesa18+osmesa]
+      pbs: [openpbs, torque]
+      pil: [py-pillow]
+      pkgconfig: [pkgconf, pkg-config]
+      rpc: [libtirpc]
+      scalapack: [netlib-scalapack, amdscalapack]
+      sycl: [hipsycl]
+      szip: [libaec, libszip]
+      tbb: [intel-tbb]
+      unwind: [libunwind]
+      uuid: [util-linux-uuid, libuuid]
+      xxd: [xxd-standalone, vim]
+      yacc: [bison, byacc]
+      ziglang: [zig]
+    permissions:
+      read: world
+      write: user
+repos:
+- $spack/var/spack/repos/sdsc
+- $spack/var/spack/repos/builtin
+upstreams: {}
+Input spec
+--------------------------------
+[    ]  .py-jupyterlab@3.2.1%gcc@10.2.0
+[    ]      ^builtin.python@3.8.12%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +bz2+ctypes+dbm~debug+libxml2+lzma~nis+optimizations+pic+pyexpat+pythoncmd+readline+shared+sqlite3+ssl~tix~tkinter~ucs4+uuid+zlib patches=0d98e93189bc278fbc37a50ed7f183bd8aaf249a8e1670a465f0db6bb4f8cf87,4c2457325f2b608b1b6a2c63087df8c26e07db3e3d493caf36a56f0ecf6fb768,f2fd060afc4b4618fe8104c4c5d771f36dc55b1db5a4623785a4ea707ec72fb4 arch=linux-rocky8-zen2
+[bl  ]          ^builtin.bzip2@1.0.8%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~debug~pic+shared arch=linux-rocky8-zen2
+[bl  ]          ^builtin.expat@2.4.1%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +libbsd arch=linux-rocky8-zen2
+[bl  ]              ^builtin.libbsd@0.11.3%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+[bl  ]                  ^builtin.libmd@1.0.3%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+[bl  ]          ^sdsc.gdbm@1.19%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+[bl  ]              ^builtin.readline@8.1%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+[bl  ]                  ^builtin.ncurses@6.2%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~symlinks+termlib abi=none arch=linux-rocky8-zen2
+[bl  ]          ^builtin.gettext@0.21%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +bzip2+curses+git~libunistring+libxml2+tar+xz arch=linux-rocky8-zen2
+[bl  ]              ^builtin.libiconv@1.16%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  libs=shared,static arch=linux-rocky8-zen2
+[bl  ]              ^builtin.libxml2@2.9.12%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~python arch=linux-rocky8-zen2
+[blr ]                  ^builtin.xz@5.2.5%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~pic libs=shared,static arch=linux-rocky8-zen2
+[bl  ]                  ^builtin.zlib@1.2.11%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +optimize+pic+shared arch=linux-rocky8-zen2
+[bl  ]              ^builtin.tar@1.34%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+[bl  ]          ^builtin.libffi@3.3%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  patches=26f26c6f29a7ce9bf370ad3ab2610f99365b4bdd7b82e7c31df41a3370d685c0 arch=linux-rocky8-zen2
+[bl  ]          ^builtin.openssl@1.1.1k%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~docs certs=system arch=linux-rocky8-zen2
+[bl  ]          ^builtin.sqlite@3.36.0%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +column_metadata+fts~functions~rtree arch=linux-rocky8-zen2
+[bl  ]          ^builtin.util-linux-uuid@2.36.2%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+
+Concretized
+--------------------------------
+fbrlmmt  [    ]  builtin.py-jupyterlab@3.2.1%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+mvp6pf6  [b r ]      ^builtin.py-ipython@7.28.0%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+bqkhqz6  [b r ]          ^builtin.py-backcall@0.2.0%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+7zdjza7  [blr ]              ^builtin.python@3.8.12%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +bz2+ctypes+dbm~debug+libxml2+lzma~nis+optimizations+pic+pyexpat+pythoncmd+readline+shared+sqlite3+ssl~tix~tkinter~ucs4+uuid+zlib patches=0d98e93189bc278fbc37a50ed7f183bd8aaf249a8e1670a465f0db6bb4f8cf87,4c2457325f2b608b1b6a2c63087df8c26e07db3e3d493caf36a56f0ecf6fb768,f2fd060afc4b4618fe8104c4c5d771f36dc55b1db5a4623785a4ea707ec72fb4 arch=linux-rocky8-zen2
+pulggjv  [bl  ]                  ^builtin.bzip2@1.0.8%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~debug~pic+shared arch=linux-rocky8-zen2
+tawwsnw  [bl  ]                  ^builtin.expat@2.4.1%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +libbsd arch=linux-rocky8-zen2
+wblxldx  [bl  ]                      ^builtin.libbsd@0.11.3%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+rgboqoh  [bl  ]                          ^builtin.libmd@1.0.3%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+clf6bmr  [bl  ]                  ^sdsc.gdbm@1.19%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+clxlnwz  [bl  ]                      ^builtin.readline@8.1%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+5lhvslt  [bl  ]                          ^builtin.ncurses@6.2%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~symlinks+termlib abi=none arch=linux-rocky8-zen2
+ey3k6dv  [bl  ]                  ^builtin.gettext@0.21%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +bzip2+curses+git~libunistring+libxml2+tar+xz arch=linux-rocky8-zen2
+zduoj2d  [bl  ]                      ^builtin.libiconv@1.16%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  libs=shared,static arch=linux-rocky8-zen2
+mgovjpj  [bl  ]                      ^builtin.libxml2@2.9.12%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~python arch=linux-rocky8-zen2
+paz7hxz  [blr ]                          ^builtin.xz@5.2.5%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~pic libs=shared,static arch=linux-rocky8-zen2
+ws4iari  [bl  ]                          ^builtin.zlib@1.2.11%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +optimize+pic+shared arch=linux-rocky8-zen2
+e2brhcb  [bl  ]                      ^builtin.tar@1.34%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+5oh6vxq  [bl  ]                  ^builtin.libffi@3.3%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  patches=26f26c6f29a7ce9bf370ad3ab2610f99365b4bdd7b82e7c31df41a3370d685c0 arch=linux-rocky8-zen2
+v3ycaao  [bl  ]                  ^builtin.openssl@1.1.1k%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~docs certs=system arch=linux-rocky8-zen2
+fxmvvsx  [bl  ]                  ^builtin.sqlite@3.36.0%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +column_metadata+fts~functions~rtree arch=linux-rocky8-zen2
+vncpkij  [bl  ]                  ^builtin.util-linux-uuid@2.36.2%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+tfhjpcr  [b r ]          ^builtin.py-decorator@5.1.0%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+eefp7mw  [blr ]              ^builtin.py-setuptools@58.2.0%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+ylb2eyg  [b r ]          ^builtin.py-jedi@0.18.0%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+nffujhw  [b r ]              ^builtin.py-parso@0.8.1%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+2yz57mi  [b r ]          ^builtin.py-matplotlib-inline@0.1.2%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+tgmdvu5  [b r ]              ^builtin.py-traitlets@5.0.4%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+rdtmef6  [b r ]                  ^builtin.py-ipython-genutils@0.2.0%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+qr476ks  [b r ]          ^builtin.py-pexpect@4.7.0%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+h47csp4  [b r ]              ^builtin.py-ptyprocess@0.7.0%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+fzvhipv  [b r ]          ^builtin.py-pickleshare@0.7.5%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+6v3i6sc  [b r ]          ^builtin.py-prompt-toolkit@3.0.17%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+pmcrn3f  [b r ]              ^builtin.py-wcwidth@0.1.7%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+qt57wpw  [b r ]          ^builtin.py-pygments@2.10.0%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+tii53wa  [b r ]      ^builtin.py-jinja2@3.0.1%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~i18n arch=linux-rocky8-zen2
+rwjfg7k  [b r ]          ^builtin.py-markupsafe@2.0.1%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+kvvn7xl  [b r ]      ^builtin.py-jupyter-core@4.7.1%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+mmrtjp2  [b r ]      ^builtin.py-jupyter-packaging@0.10.6%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+arrahzv  [b r ]          ^builtin.py-deprecation@2.1.0%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+g6mmglv  [b r ]              ^builtin.py-packaging@21.0%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+s3u7665  [b r ]                  ^builtin.py-pyparsing@2.4.7%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+yt6h7qz  [b r ]          ^builtin.py-tomlkit@0.7.0%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+zkdmwjs  [b r ]          ^builtin.py-wheel@0.36.2%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+vfhopxc  [b r ]      ^builtin.py-jupyter-server@1.11.2%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+73kktmg  [b r ]          ^builtin.py-anyio@3.3.4%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+wpxacqi  [b r ]              ^builtin.py-idna@2.9%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+5ih5xun  [b   ]              ^builtin.py-setuptools-scm@6.3.2%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +toml arch=linux-rocky8-zen2
+5xrp2px  [b r ]                  ^builtin.py-tomli@1.2.1%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+mddhf7t  [b   ]                      ^builtin.py-pip@21.1.2%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+eso77ow  [b r ]              ^builtin.py-sniffio@1.2.0%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+owgmuiy  [b r ]          ^builtin.py-argon2-cffi@21.1.0%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+7432hr7  [b r ]              ^builtin.py-cffi@1.15.0%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+qftywfd  [b   ]                  ^builtin.pkgconf@1.8.0%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+3g2xfg4  [b r ]                  ^builtin.py-pycparser@2.20%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+mjbbuzh  [b r ]          ^builtin.py-jupyter-client@6.1.12%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+ziofzeg  [b r ]              ^builtin.py-python-dateutil@2.8.2%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+5upkfxf  [b r ]                  ^builtin.py-six@1.16.0%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+7q7fbcf  [b r ]              ^builtin.py-pyzmq@18.1.0%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+fmyngkb  [bl  ]                  ^builtin.libzmq@4.3.3%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~drafts+libsodium arch=linux-rocky8-zen2
+ogjxoap  [bl  ]                      ^builtin.libsodium@1.0.18%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+y4pzeb6  [b   ]                  ^builtin.py-cython@0.29.24%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+cfpm3ri  [b r ]                  ^builtin.py-gevent@1.5.0%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+fli65uu  [b r ]                      ^builtin.py-greenlet@1.1.0%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+g63sdoo  [b r ]                  ^builtin.py-py@1.9.0%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+ulmmmxj  [b r ]              ^builtin.py-tornado@6.1%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+ve72pzq  [b r ]          ^builtin.py-nbconvert@6.0.1%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +serve arch=linux-rocky8-zen2
+2csgoj3  [b r ]              ^builtin.py-bleach@4.1.0%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+itjwkaa  [b r ]                  ^builtin.py-webencodings@0.5.1%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+3un6zcu  [b r ]              ^builtin.py-defusedxml@0.7.1%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+tauwyxd  [b r ]              ^builtin.py-entrypoints@0.3%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+s3wvztv  [b r ]              ^builtin.py-jupyterlab-pygments@0.1.2%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+ohrb3oe  [b r ]              ^builtin.py-mistune@0.8.4%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+fsb2hzn  [b r ]              ^builtin.py-nbclient@0.5.0%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+4de2lnf  [b r ]                  ^builtin.py-async-generator@1.10%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+h4sjq53  [b r ]                  ^builtin.py-nbformat@5.1.3%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+hzn5h7j  [b r ]                      ^builtin.py-jsonschema@3.2.0%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+ellpavl  [b r ]                          ^builtin.py-attrs@21.2.0%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+szcrcmx  [b r ]                          ^builtin.py-pyrsistent@0.15.7%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+ef6bh2m  [b r ]                  ^builtin.py-nest-asyncio@1.4.0%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+yz7fq2s  [b r ]              ^builtin.py-pandocfilters@1.4.2%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+s4ecykr  [b r ]              ^builtin.py-testpath@0.4.2%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+u6b4b5q  [b r ]          ^builtin.py-prometheus-client@0.7.1%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~twisted arch=linux-rocky8-zen2
+de2pdun  [b r ]          ^builtin.py-send2trash@1.5.0%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+p746dxx  [b r ]          ^builtin.py-terminado@0.8.3%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+imzs2vt  [b r ]          ^builtin.py-websocket-client@0.57.0%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+yz3efgb  [b r ]      ^builtin.py-jupyterlab-server@2.6.0%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+dmx3a3e  [b r ]          ^builtin.py-babel@2.7.0%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+jyfqak5  [b r ]              ^builtin.py-pytz@2021.1%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+xx4a45t  [b r ]          ^builtin.py-json5@0.9.4%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+2lxicrp  [b r ]          ^builtin.py-requests@2.25.1%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~socks arch=linux-rocky8-zen2
+prtrvpe  [b r ]              ^builtin.py-certifi@2021.10.8%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+h5ca5hz  [b r ]              ^builtin.py-chardet@4.0.0%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+lzj4wbv  [b r ]              ^builtin.py-urllib3@1.26.6%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~brotli~secure~socks arch=linux-rocky8-zen2
+urjnxr2  [b r ]      ^builtin.py-nbclassic@0.3.1%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+ktsja2d  [b r ]          ^builtin.py-notebook@6.1.4%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+zai7lvw  [b r ]              ^builtin.py-ipykernel@6.4.1%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+5caoncw  [b r ]                  ^builtin.py-debugpy@1.4.1%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+
+real 9.95
+user 8.76
+sys 0.29
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/bzip2-1.0.8-pulggjvnvoaxafraqmwl5da34f7hrfo5
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/libmd-1.0.3-rgboqohjnwhqdwilchst3s5saixguvd7
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/ncurses-6.2-5lhvsltgtbpsak4szzorveqvxke32sog
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/libiconv-1.16-zduoj2duq26hlfta4shqtafuq42gp3rq
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/xz-5.2.5-paz7hxzjnp6khsfch7dm66ytubmw5v5j
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/zlib-1.2.11-ws4iari52j2lphd52i7kd72yj37o32zt
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/libffi-3.3-5oh6vxq7t6iq2uby3lcyk5vue4kiv57z
+[+] /usr (external openssl-1.1.1k-v3ycaaoay2opbtwdqpu5jtxcv7fzowaz)
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/util-linux-uuid-2.36.2-vncpkijjrjxcolgrmiusjqkxcwi2pt2h
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/pkgconf-1.8.0-qftywfdvtf3vvb7ilifrvhgjcvyldcjc
+==> Installing libsodium-1.0.18-ogjxoapgihcj3suolxm74xspoqhe3ll6
+==> No binary for libsodium-1.0.18-ogjxoapgihcj3suolxm74xspoqhe3ll6 found: installing from source
+==> Warning: Expected user 527834 to own /scratch/spack_cpu, but it is owned by 0
+==> Fetching https://mirror.spack.io/_source-cache/archive/6f/6f504490b342a4f8a4c4a02fc9b866cbef8622d5df4e5452b46be121e46636c1.tar.gz
+==> Ran patch() for libsodium
+==> libsodium: Executing phase: 'autoreconf'
+==> libsodium: Executing phase: 'configure'
+==> libsodium: Executing phase: 'build'
+==> libsodium: Executing phase: 'install'
+==> libsodium: Successfully installed libsodium-1.0.18-ogjxoapgihcj3suolxm74xspoqhe3ll6
+  Fetch: 0.58s.  Build: 17.49s.  Total: 18.06s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/libsodium-1.0.18-ogjxoapgihcj3suolxm74xspoqhe3ll6
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/libbsd-0.11.3-wblxldxgzmcyjm2l6htct6do3bk5vcdl
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/readline-8.1-clxlnwzk5ujzaul2giwamfatsgqbprc7
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/tar-1.34-e2brhcbivlbrwap7rfsi45mwvrbkumcd
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/libxml2-2.9.12-mgovjpj47znwb45ityck57ufrgu57mcc
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/expat-2.4.1-tawwsnwy62kp6qd77ly6ik2wgxcrcw7i
+==> Installing libzmq-4.3.3-fmyngkbngjtr4t26nfnfjtwexnddxobc
+==> No binary for libzmq-4.3.3-fmyngkbngjtr4t26nfnfjtwexnddxobc found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/9d/9d9285db37ae942ed0780c016da87060497877af45094ff9e1a1ca736e3875a2.tar.gz
+==> No patches needed for libzmq
+==> libzmq: Executing phase: 'autoreconf'
+==> libzmq: Executing phase: 'configure'
+==> libzmq: Executing phase: 'build'
+==> libzmq: Executing phase: 'install'
+==> libzmq: Successfully installed libzmq-4.3.3-fmyngkbngjtr4t26nfnfjtwexnddxobc
+  Fetch: 0.62s.  Build: 39.13s.  Total: 39.75s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/libzmq-4.3.3-fmyngkbngjtr4t26nfnfjtwexnddxobc
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/gdbm-1.19-clf6bmrgapuzdnchri2wzrrad7fkjdvl
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/sqlite-3.36.0-fxmvvsxyjcdwzqj2judxbw47nzi4zkow
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/gettext-0.21-ey3k6dvq5bpidcova3wnruxfbfku6mit
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/python-3.8.12-7zdjza7xxfccxr5syuaomd2fpvp2x35i
+==> Installing py-backcall-0.2.0-bqkhqz6c4tu335cgzr5q2ob6lzrntcvu
+==> No binary for py-backcall-0.2.0-bqkhqz6c4tu335cgzr5q2ob6lzrntcvu found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/5c/5cbdbf27be5e7cfadb448baf0aa95508f91f2bbc6c6437cd9cd06e2a4c215e1e.tar.gz
+==> No patches needed for py-backcall
+==> py-backcall: Executing phase: 'build'
+==> py-backcall: Executing phase: 'install'
+==> py-backcall: Successfully installed py-backcall-0.2.0-bqkhqz6c4tu335cgzr5q2ob6lzrntcvu
+  Fetch: 0.26s.  Build: 0.28s.  Total: 0.54s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/py-backcall-0.2.0-bqkhqz6c4tu335cgzr5q2ob6lzrntcvu
+==> Installing py-testpath-0.4.2-s4ecykryw2r4hin7xnzfkikjgtx27leu
+==> No binary for py-testpath-0.4.2-s4ecykryw2r4hin7xnzfkikjgtx27leu found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/b6/b694b3d9288dbd81685c5d2e7140b81365d46c29f5db4bc659de5aa6b98780f8.tar.gz
+==> No patches needed for py-testpath
+==> py-testpath: Executing phase: 'build'
+==> py-testpath: Executing phase: 'install'
+==> py-testpath: Successfully installed py-testpath-0.4.2-s4ecykryw2r4hin7xnzfkikjgtx27leu
+  Fetch: 0.55s.  Build: 0.21s.  Total: 0.76s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/py-testpath-0.4.2-s4ecykryw2r4hin7xnzfkikjgtx27leu
+==> Installing py-entrypoints-0.3-tauwyxd7n4b5oi23ibito2yf36mscupw
+==> No binary for py-entrypoints-0.3-tauwyxd7n4b5oi23ibito2yf36mscupw found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/c7/c70dd71abe5a8c85e55e12c19bd91ccfeec11a6e99044204511f9ed547d48451.tar.gz
+==> No patches needed for py-entrypoints
+==> py-entrypoints: Executing phase: 'build'
+==> py-entrypoints: Executing phase: 'install'
+==> py-entrypoints: Successfully installed py-entrypoints-0.3-tauwyxd7n4b5oi23ibito2yf36mscupw
+  Fetch: 0.11s.  Build: 0.26s.  Total: 0.37s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/py-entrypoints-0.3-tauwyxd7n4b5oi23ibito2yf36mscupw
+==> Installing py-ipython-genutils-0.2.0-rdtmef6ijlb7qbslilxzkwhvl4twneus
+==> No binary for py-ipython-genutils-0.2.0-rdtmef6ijlb7qbslilxzkwhvl4twneus found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/eb/eb2e116e75ecef9d4d228fdc66af54269afa26ab4463042e33785b887c628ba8.tar.gz
+==> No patches needed for py-ipython-genutils
+==> py-ipython-genutils: Executing phase: 'build'
+==> py-ipython-genutils: Executing phase: 'install'
+==> py-ipython-genutils: Successfully installed py-ipython-genutils-0.2.0-rdtmef6ijlb7qbslilxzkwhvl4twneus
+  Fetch: 0.21s.  Build: 0.23s.  Total: 0.44s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/py-ipython-genutils-0.2.0-rdtmef6ijlb7qbslilxzkwhvl4twneus
+==> Installing py-pandocfilters-1.4.2-yz7fq2sprzsjq2yfcghx7ptwm2nh3a2a
+==> No binary for py-pandocfilters-1.4.2-yz7fq2sprzsjq2yfcghx7ptwm2nh3a2a found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/b3/b3dd70e169bb5449e6bc6ff96aea89c5eea8c5f6ab5e207fc2f521a2cf4a0da9.tar.gz
+==> No patches needed for py-pandocfilters
+==> py-pandocfilters: Executing phase: 'build'
+==> py-pandocfilters: Executing phase: 'install'
+==> py-pandocfilters: Successfully installed py-pandocfilters-1.4.2-yz7fq2sprzsjq2yfcghx7ptwm2nh3a2a
+  Fetch: 0.37s.  Build: 0.20s.  Total: 0.58s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/py-pandocfilters-1.4.2-yz7fq2sprzsjq2yfcghx7ptwm2nh3a2a
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/py-setuptools-58.2.0-eefp7mw6h4dsdn32evjnrj4s5q7nv5x5
+==> Installing py-ptyprocess-0.7.0-h47csp42nqlz27phroj3hocthzogtqes
+==> No binary for py-ptyprocess-0.7.0-h47csp42nqlz27phroj3hocthzogtqes found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/5c/5c5d0a3b48ceee0b48485e0c26037c0acd7d29765ca3fbb5cb3831d347423220.tar.gz
+==> No patches needed for py-ptyprocess
+==> py-ptyprocess: Executing phase: 'build'
+==> py-ptyprocess: Executing phase: 'install'
+==> py-ptyprocess: Successfully installed py-ptyprocess-0.7.0-h47csp42nqlz27phroj3hocthzogtqes
+  Fetch: 0.20s.  Build: 0.21s.  Total: 0.41s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/py-ptyprocess-0.7.0-h47csp42nqlz27phroj3hocthzogtqes
+==> Installing py-traitlets-5.0.4-tgmdvu5pgwx2olbef7ycry3jrxrjl2h4
+==> No binary for py-traitlets-5.0.4-tgmdvu5pgwx2olbef7ycry3jrxrjl2h4 found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/86/86c9351f94f95de9db8a04ad8e892da299a088a64fd283f9f6f18770ae5eae1b.tar.gz
+==> No patches needed for py-traitlets
+==> py-traitlets: Executing phase: 'build'
+==> py-traitlets: Executing phase: 'install'
+==> py-traitlets: Successfully installed py-traitlets-5.0.4-tgmdvu5pgwx2olbef7ycry3jrxrjl2h4
+  Fetch: 0.54s.  Build: 0.30s.  Total: 0.84s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/py-traitlets-5.0.4-tgmdvu5pgwx2olbef7ycry3jrxrjl2h4
+==> Installing py-pygments-2.10.0-qt57wpweaqdcl46tfxlllrhy6xqd3vuf
+==> No binary for py-pygments-2.10.0-qt57wpweaqdcl46tfxlllrhy6xqd3vuf found: installing from source
+==> Using cached archive: /cm/shared/apps/spack/0.17.3/cpu/b/var/spack/cache/_source-cache/archive/f3/f398865f7eb6874156579fdf36bc840a03cab64d1cde9e93d68f46a425ec52c6.tar.gz
+==> No patches needed for py-pygments
+==> py-pygments: Executing phase: 'build'
+==> py-pygments: Executing phase: 'install'
+==> py-pygments: Successfully installed py-pygments-2.10.0-qt57wpweaqdcl46tfxlllrhy6xqd3vuf
+  Fetch: 0.01s.  Build: 1.48s.  Total: 1.50s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/py-pygments-2.10.0-qt57wpweaqdcl46tfxlllrhy6xqd3vuf
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/py-certifi-2021.10.8-prtrvpev4ixnkreibimj3qf73f7wfxah
+==> Installing py-debugpy-1.4.1-5caoncw5ww7hx7kgdh7dgcmayq4bijs4
+==> No binary for py-debugpy-1.4.1-5caoncw5ww7hx7kgdh7dgcmayq4bijs4 found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/88/889316de0b8ff3732927cb058cfbd3371e4cd0002ecc170d34c755ad289c867c.zip
+==> No patches needed for py-debugpy
+==> py-debugpy: Executing phase: 'build'
+==> py-debugpy: Executing phase: 'install'
+==> py-debugpy: Successfully installed py-debugpy-1.4.1-5caoncw5ww7hx7kgdh7dgcmayq4bijs4
+  Fetch: 0.76s.  Build: 22.90s.  Total: 23.66s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/py-debugpy-1.4.1-5caoncw5ww7hx7kgdh7dgcmayq4bijs4
+==> Installing py-parso-0.8.1-nffujhwtq7mffy2qwwtmqzncusruf2q7
+==> No binary for py-parso-0.8.1-nffujhwtq7mffy2qwwtmqzncusruf2q7 found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/85/8519430ad07087d4c997fda3a7918f7cfa27cb58972a8c89c2a0295a1c940e9e.tar.gz
+==> No patches needed for py-parso
+==> py-parso: Executing phase: 'build'
+==> py-parso: Executing phase: 'install'
+==> py-parso: Successfully installed py-parso-0.8.1-nffujhwtq7mffy2qwwtmqzncusruf2q7
+  Fetch: 0.56s.  Build: 0.58s.  Total: 1.14s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/py-parso-0.8.1-nffujhwtq7mffy2qwwtmqzncusruf2q7
+==> Installing py-async-generator-1.10-4de2lnfa3eu7ryy656iod4kua6qg5r2z
+==> No binary for py-async-generator-1.10-4de2lnfa3eu7ryy656iod4kua6qg5r2z found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/6e/6ebb3d106c12920aaae42ccb6f787ef5eefdcdd166ea3d628fa8476abe712144.tar.gz
+==> No patches needed for py-async-generator
+==> py-async-generator: Executing phase: 'build'
+==> py-async-generator: Executing phase: 'install'
+==> py-async-generator: Successfully installed py-async-generator-1.10-4de2lnfa3eu7ryy656iod4kua6qg5r2z
+  Fetch: 0.39s.  Build: 0.46s.  Total: 0.84s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/py-async-generator-1.10-4de2lnfa3eu7ryy656iod4kua6qg5r2z
+==> Installing py-json5-0.9.4-xx4a45tkp243mhkngaxqdxvwbsempvi3
+==> No binary for py-json5-0.9.4-xx4a45tkp243mhkngaxqdxvwbsempvi3 found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/2e/2ebfad1cd502dca6aecab5b5c36a21c732c3461ddbc412fb0e9a52b07ddfe586.tar.gz
+==> No patches needed for py-json5
+==> py-json5: Executing phase: 'build'
+==> py-json5: Executing phase: 'install'
+==> py-json5: Successfully installed py-json5-0.9.4-xx4a45tkp243mhkngaxqdxvwbsempvi3
+  Fetch: 0.37s.  Build: 0.47s.  Total: 0.84s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/py-json5-0.9.4-xx4a45tkp243mhkngaxqdxvwbsempvi3
+==> Installing py-webencodings-0.5.1-itjwkaanbfpq53o5xm3xmfdjpek45hku
+==> No binary for py-webencodings-0.5.1-itjwkaanbfpq53o5xm3xmfdjpek45hku found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/b3/b36a1c245f2d304965eb4e0a82848379241dc04b865afcc4aab16748587e1923.tar.gz
+==> No patches needed for py-webencodings
+==> py-webencodings: Executing phase: 'build'
+==> py-webencodings: Executing phase: 'install'
+==> py-webencodings: Successfully installed py-webencodings-0.5.1-itjwkaanbfpq53o5xm3xmfdjpek45hku
+  Fetch: 0.19s.  Build: 0.45s.  Total: 0.64s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/py-webencodings-0.5.1-itjwkaanbfpq53o5xm3xmfdjpek45hku
+==> Installing py-pickleshare-0.7.5-fzvhipvprs6kwwov5xiiu54csejinqmy
+==> No binary for py-pickleshare-0.7.5-fzvhipvprs6kwwov5xiiu54csejinqmy found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/87/87683d47965c1da65cdacaf31c8441d12b8044cdec9aca500cd78fc2c683afca.tar.gz
+==> No patches needed for py-pickleshare
+==> py-pickleshare: Executing phase: 'build'
+==> py-pickleshare: Executing phase: 'install'
+==> py-pickleshare: Successfully installed py-pickleshare-0.7.5-fzvhipvprs6kwwov5xiiu54csejinqmy
+  Fetch: 0.20s.  Build: 0.44s.  Total: 0.64s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/py-pickleshare-0.7.5-fzvhipvprs6kwwov5xiiu54csejinqmy
+==> Installing py-idna-2.9-wpxacqi6k3jamdqvfjuyewtgljjrzq7k
+==> No binary for py-idna-2.9-wpxacqi6k3jamdqvfjuyewtgljjrzq7k found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/75/7588d1c14ae4c77d74036e8c22ff447b26d0fde8f007354fd48a7814db15b7cb.tar.gz
+==> No patches needed for py-idna
+==> py-idna: Executing phase: 'build'
+==> py-idna: Executing phase: 'install'
+==> py-idna: Successfully installed py-idna-2.9-wpxacqi6k3jamdqvfjuyewtgljjrzq7k
+  Fetch: 0.52s.  Build: 0.50s.  Total: 1.02s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/py-idna-2.9-wpxacqi6k3jamdqvfjuyewtgljjrzq7k
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/py-cython-0.29.24-y4pzeb646jhcpkay2x3ldhs577pz3joh
+==> Installing py-sniffio-1.2.0-eso77owqeocdc5j3skuyo76kzb5asrzf
+==> No binary for py-sniffio-1.2.0-eso77owqeocdc5j3skuyo76kzb5asrzf found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/c4/c4666eecec1d3f50960c6bdf61ab7bc350648da6c126e3cf6898d8cd4ddcd3de.tar.gz
+==> No patches needed for py-sniffio
+==> py-sniffio: Executing phase: 'build'
+==> py-sniffio: Executing phase: 'install'
+==> py-sniffio: Successfully installed py-sniffio-1.2.0-eso77owqeocdc5j3skuyo76kzb5asrzf
+  Fetch: 0.23s.  Build: 0.44s.  Total: 0.67s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/py-sniffio-1.2.0-eso77owqeocdc5j3skuyo76kzb5asrzf
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/py-six-1.16.0-5upkfxffvcpdg4ubxzlg2kkmm6nmafl2
+==> Installing py-decorator-5.1.0-tfhjpcrnta33iigbp36r53qdt7fhv5an
+==> No binary for py-decorator-5.1.0-tfhjpcrnta33iigbp36r53qdt7fhv5an found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/e5/e59913af105b9860aa2c8d3272d9de5a56a4e608db9a2f167a8480b323d529a7.tar.gz
+==> No patches needed for py-decorator
+==> py-decorator: Executing phase: 'build'
+==> py-decorator: Executing phase: 'install'
+==> py-decorator: Successfully installed py-decorator-5.1.0-tfhjpcrnta33iigbp36r53qdt7fhv5an
+  Fetch: 0.40s.  Build: 0.44s.  Total: 0.84s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/py-decorator-5.1.0-tfhjpcrnta33iigbp36r53qdt7fhv5an
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/py-wheel-0.36.2-zkdmwjsdrjfr6mg6wiho6qiebk3c55b6
+==> Installing py-send2trash-1.5.0-de2pduncimfdkvu4ism5bhp5dejsjz5z
+==> No binary for py-send2trash-1.5.0-de2pduncimfdkvu4ism5bhp5dejsjz5z found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/7c/7cebc0ffc8b6d6e553bce9c6bb915614610ba2dec17c2f0643b1b97251da2a41.tar.gz
+==> No patches needed for py-send2trash
+==> py-send2trash: Executing phase: 'build'
+==> py-send2trash: Executing phase: 'install'
+==> py-send2trash: Successfully installed py-send2trash-1.5.0-de2pduncimfdkvu4ism5bhp5dejsjz5z
+  Fetch: 0.28s.  Build: 0.43s.  Total: 0.71s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/py-send2trash-1.5.0-de2pduncimfdkvu4ism5bhp5dejsjz5z
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/py-tornado-6.1-ulmmmxj4fh6g4bhiqyhuednpxc2qsd67
+==> Installing py-defusedxml-0.7.1-3un6zcuzilhuicxjphz3d2t4aoce3ltl
+==> No binary for py-defusedxml-0.7.1-3un6zcuzilhuicxjphz3d2t4aoce3ltl found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/1b/1bb3032db185915b62d7c6209c5a8792be6a32ab2fedacc84e01b52c51aa3e69.tar.gz
+==> No patches needed for py-defusedxml
+==> py-defusedxml: Executing phase: 'build'
+==> py-defusedxml: Executing phase: 'install'
+==> py-defusedxml: Successfully installed py-defusedxml-0.7.1-3un6zcuzilhuicxjphz3d2t4aoce3ltl
+  Fetch: 0.21s.  Build: 0.46s.  Total: 0.67s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/py-defusedxml-0.7.1-3un6zcuzilhuicxjphz3d2t4aoce3ltl
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/py-markupsafe-2.0.1-rwjfg7kt63qvabu3knxliahoudszofwi
+==> Installing py-greenlet-1.1.0-fli65uupue2hlranyuuf6cv6llwzn5ya
+==> No binary for py-greenlet-1.1.0-fli65uupue2hlranyuuf6cv6llwzn5ya found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/c8/c87df8ae3f01ffb4483c796fe1b15232ce2b219f0b18126948616224d3f658ee.tar.gz
+==> No patches needed for py-greenlet
+==> py-greenlet: Executing phase: 'build'
+==> py-greenlet: Executing phase: 'install'
+==> py-greenlet: Successfully installed py-greenlet-1.1.0-fli65uupue2hlranyuuf6cv6llwzn5ya
+  Fetch: 0.48s.  Build: 1.43s.  Total: 1.91s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/py-greenlet-1.1.0-fli65uupue2hlranyuuf6cv6llwzn5ya
+==> Installing py-urllib3-1.26.6-lzj4wbvxwiiz3zbda2ddpczhijy3v2th
+==> No binary for py-urllib3-1.26.6-lzj4wbvxwiiz3zbda2ddpczhijy3v2th found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/f5/f57b4c16c62fa2760b7e3d97c35b255512fb6b59a259730f36ba32ce9f8e342f.tar.gz
+==> No patches needed for py-urllib3
+==> py-urllib3: Executing phase: 'build'
+==> py-urllib3: Executing phase: 'install'
+==> py-urllib3: Successfully installed py-urllib3-1.26.6-lzj4wbvxwiiz3zbda2ddpczhijy3v2th
+  Fetch: 0.12s.  Build: 0.57s.  Total: 0.69s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/py-urllib3-1.26.6-lzj4wbvxwiiz3zbda2ddpczhijy3v2th
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/py-pip-21.1.2-mddhf7tz2mui7v3rag2p46ci4uz6a2mb
+==> Installing py-wcwidth-0.1.7-pmcrn3fv5j2t2gvlbqwlc4eayq6k3wbz
+==> No binary for py-wcwidth-0.1.7-pmcrn3fv5j2t2gvlbqwlc4eayq6k3wbz found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/3d/3df37372226d6e63e1b1e1eda15c594bca98a22d33a23832a90998faa96bc65e.tar.gz
+==> No patches needed for py-wcwidth
+==> py-wcwidth: Executing phase: 'build'
+==> py-wcwidth: Executing phase: 'install'
+==> py-wcwidth: Successfully installed py-wcwidth-0.1.7-pmcrn3fv5j2t2gvlbqwlc4eayq6k3wbz
+  Fetch: 0.39s.  Build: 0.51s.  Total: 0.90s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/py-wcwidth-0.1.7-pmcrn3fv5j2t2gvlbqwlc4eayq6k3wbz
+==> Installing py-tomlkit-0.7.0-yt6h7qzeimsmpfk72dze6aayok4jzzxw
+==> No binary for py-tomlkit-0.7.0-yt6h7qzeimsmpfk72dze6aayok4jzzxw found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/ac/ac57f29693fab3e309ea789252fcce3061e19110085aa31af5446ca749325618.tar.gz
+==> No patches needed for py-tomlkit
+==> py-tomlkit: Executing phase: 'build'
+==> py-tomlkit: Executing phase: 'install'
+==> py-tomlkit: Successfully installed py-tomlkit-0.7.0-yt6h7qzeimsmpfk72dze6aayok4jzzxw
+  Fetch: 0.54s.  Build: 0.78s.  Total: 1.32s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/py-tomlkit-0.7.0-yt6h7qzeimsmpfk72dze6aayok4jzzxw
+==> Installing py-mistune-0.8.4-ohrb3oekh3akvb3dexb6iqc3nu733f42
+==> No binary for py-mistune-0.8.4-ohrb3oekh3akvb3dexb6iqc3nu733f42 found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/a1/a1443771ea9ed7268a0cb3cf31462604ae148938ba32070bd5c54545f8f36a5d.tar.gz
+==> No patches needed for py-mistune
+==> py-mistune: Executing phase: 'build'
+==> py-mistune: Executing phase: 'install'
+==> py-mistune: Successfully installed py-mistune-0.8.4-ohrb3oekh3akvb3dexb6iqc3nu733f42
+  Fetch: 0.45s.  Build: 0.46s.  Total: 0.92s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/py-mistune-0.8.4-ohrb3oekh3akvb3dexb6iqc3nu733f42
+==> Installing py-nest-asyncio-1.4.0-ef6bh2mjd63qkmmlfy7ep2tce2brfns5
+==> No binary for py-nest-asyncio-1.4.0-ef6bh2mjd63qkmmlfy7ep2tce2brfns5 found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/57/5773054bbc14579b000236f85bc01ecced7ffd045ec8ca4a9809371ec65a59c8.tar.gz
+==> No patches needed for py-nest-asyncio
+==> py-nest-asyncio: Executing phase: 'build'
+==> py-nest-asyncio: Executing phase: 'install'
+==> py-nest-asyncio: Successfully installed py-nest-asyncio-1.4.0-ef6bh2mjd63qkmmlfy7ep2tce2brfns5
+  Fetch: 0.30s.  Build: 0.44s.  Total: 0.74s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/py-nest-asyncio-1.4.0-ef6bh2mjd63qkmmlfy7ep2tce2brfns5
+==> Installing py-attrs-21.2.0-ellpavlpbp263e4ze4yvfq7zdvyveupg
+==> No binary for py-attrs-21.2.0-ellpavlpbp263e4ze4yvfq7zdvyveupg found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/ef/ef6aaac3ca6cd92904cdd0d83f629a15f18053ec84e6432106f7a4d04ae4f5fb.tar.gz
+==> No patches needed for py-attrs
+==> py-attrs: Executing phase: 'build'
+==> py-attrs: Executing phase: 'install'
+==> py-attrs: Successfully installed py-attrs-21.2.0-ellpavlpbp263e4ze4yvfq7zdvyveupg
+  Fetch: 0.42s.  Build: 0.53s.  Total: 0.95s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/py-attrs-21.2.0-ellpavlpbp263e4ze4yvfq7zdvyveupg
+==> Installing py-chardet-4.0.0-h5ca5hzlrdoogs3eir4j6l2ynr3pkvgf
+==> No binary for py-chardet-4.0.0-h5ca5hzlrdoogs3eir4j6l2ynr3pkvgf found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/0d/0d6f53a15db4120f2b08c94f11e7d93d2c911ee118b6b30a04ec3ee8310179fa.tar.gz
+==> No patches needed for py-chardet
+==> py-chardet: Executing phase: 'build'
+==> py-chardet: Executing phase: 'install'
+==> py-chardet: Successfully installed py-chardet-4.0.0-h5ca5hzlrdoogs3eir4j6l2ynr3pkvgf
+  Fetch: 0.64s.  Build: 0.65s.  Total: 1.29s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/py-chardet-4.0.0-h5ca5hzlrdoogs3eir4j6l2ynr3pkvgf
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/py-pyparsing-2.4.7-s3u7665uniwdbrmxgvllm3slhesewtre
+==> Installing py-pycparser-2.20-3g2xfg4rz43d4xkpb6cgwwr43bdt5oq7
+==> No binary for py-pycparser-2.20-3g2xfg4rz43d4xkpb6cgwwr43bdt5oq7 found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/2d/2d475327684562c3a96cc71adf7dc8c4f0565175cf86b6d7a404ff4c771f15f0.tar.gz
+==> No patches needed for py-pycparser
+==> py-pycparser: Executing phase: 'build'
+==> py-pycparser: Executing phase: 'install'
+==> py-pycparser: Successfully installed py-pycparser-2.20-3g2xfg4rz43d4xkpb6cgwwr43bdt5oq7
+  Fetch: 0.21s.  Build: 0.62s.  Total: 0.83s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/py-pycparser-2.20-3g2xfg4rz43d4xkpb6cgwwr43bdt5oq7
+==> Installing py-prometheus-client-0.7.1-u6b4b5qyv55pqiqeg2ryucfmok5ieumt
+==> No binary for py-prometheus-client-0.7.1-u6b4b5qyv55pqiqeg2ryucfmok5ieumt found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/71/71cd24a2b3eb335cb800c7159f423df1bd4dcd5171b234be15e3f31ec9f622da.tar.gz
+==> No patches needed for py-prometheus-client
+==> py-prometheus-client: Executing phase: 'build'
+==> py-prometheus-client: Executing phase: 'install'
+==> py-prometheus-client: Successfully installed py-prometheus-client-0.7.1-u6b4b5qyv55pqiqeg2ryucfmok5ieumt
+  Fetch: 0.41s.  Build: 0.48s.  Total: 0.88s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/py-prometheus-client-0.7.1-u6b4b5qyv55pqiqeg2ryucfmok5ieumt
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/py-pytz-2021.1-jyfqak5ph5xyu7xpcaz6fqqqpuygnglv
+==> Installing py-pexpect-4.7.0-qr476ksdoq4kjf3xribgm4frmpkf4ylk
+==> No binary for py-pexpect-4.7.0-qr476ksdoq4kjf3xribgm4frmpkf4ylk found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/9e/9e2c1fd0e6ee3a49b28f95d4b33bc389c89b20af6a1255906e90ff1262ce62eb.tar.gz
+==> No patches needed for py-pexpect
+==> py-pexpect: Executing phase: 'build'
+==> py-pexpect: Executing phase: 'install'
+==> py-pexpect: Successfully installed py-pexpect-4.7.0-qr476ksdoq4kjf3xribgm4frmpkf4ylk
+  Fetch: 0.56s.  Build: 0.24s.  Total: 0.79s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/py-pexpect-4.7.0-qr476ksdoq4kjf3xribgm4frmpkf4ylk
+==> Installing py-matplotlib-inline-0.1.2-2yz57milrcbvfekhzhxtuj7swlpgam4z
+==> No binary for py-matplotlib-inline-0.1.2-2yz57milrcbvfekhzhxtuj7swlpgam4z found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/f4/f41d5ff73c9f5385775d5c0bc13b424535c8402fe70ea8210f93e11f3683993e.tar.gz
+==> No patches needed for py-matplotlib-inline
+==> py-matplotlib-inline: Executing phase: 'build'
+==> py-matplotlib-inline: Executing phase: 'install'
+==> py-matplotlib-inline: Successfully installed py-matplotlib-inline-0.1.2-2yz57milrcbvfekhzhxtuj7swlpgam4z
+  Fetch: 0.29s.  Build: 0.48s.  Total: 0.77s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/py-matplotlib-inline-0.1.2-2yz57milrcbvfekhzhxtuj7swlpgam4z
+==> Installing py-jupyter-core-4.7.1-kvvn7xlgvw2fmmzidfj52ili2bfujfkv
+==> No binary for py-jupyter-core-4.7.1-kvvn7xlgvw2fmmzidfj52ili2bfujfkv found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/79/79025cb3225efcd36847d0840f3fc672c0abd7afd0de83ba8a1d3837619122b4.tar.gz
+==> No patches needed for py-jupyter-core
+==> py-jupyter-core: Executing phase: 'build'
+==> py-jupyter-core: Executing phase: 'install'
+==> py-jupyter-core: Successfully installed py-jupyter-core-4.7.1-kvvn7xlgvw2fmmzidfj52ili2bfujfkv
+  Fetch: 0.41s.  Build: 0.55s.  Total: 0.95s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/py-jupyter-core-4.7.1-kvvn7xlgvw2fmmzidfj52ili2bfujfkv
+==> Installing py-jupyterlab-pygments-0.1.2-s3wvztv3a5ngejs7bxjt5burptihywyh
+==> No binary for py-jupyterlab-pygments-0.1.2-s3wvztv3a5ngejs7bxjt5burptihywyh found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/cf/cfcda0873626150932f438eccf0f8bf22bfa92345b814890ab360d666b254146.tar.gz
+==> No patches needed for py-jupyterlab-pygments
+==> py-jupyterlab-pygments: Executing phase: 'build'
+==> py-jupyterlab-pygments: Executing phase: 'install'
+==> py-jupyterlab-pygments: Successfully installed py-jupyterlab-pygments-0.1.2-s3wvztv3a5ngejs7bxjt5burptihywyh
+  Fetch: 0.20s.  Build: 0.50s.  Total: 0.71s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/py-jupyterlab-pygments-0.1.2-s3wvztv3a5ngejs7bxjt5burptihywyh
+==> Installing py-jedi-0.18.0-ylb2eygtxyiazx3zxbsognyqjj7gzh23
+==> No binary for py-jedi-0.18.0-ylb2eygtxyiazx3zxbsognyqjj7gzh23 found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/92/92550a404bad8afed881a137ec9a461fed49eca661414be45059329614ed0707.tar.gz
+==> No patches needed for py-jedi
+==> py-jedi: Executing phase: 'build'
+==> py-jedi: Executing phase: 'install'
+==> py-jedi: Successfully installed py-jedi-0.18.0-ylb2eygtxyiazx3zxbsognyqjj7gzh23
+  Fetch: 0.59s.  Build: 1.75s.  Total: 2.35s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/py-jedi-0.18.0-ylb2eygtxyiazx3zxbsognyqjj7gzh23
+==> Installing py-websocket-client-0.57.0-imzs2vtdw2qeoauqxpt73245ekugikaj
+==> No binary for py-websocket-client-0.57.0-imzs2vtdw2qeoauqxpt73245ekugikaj found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/d7/d735b91d6d1692a6a181f2a8c9e0238e5f6373356f561bb9dc4c7af36f452010.tar.gz
+==> No patches needed for py-websocket-client
+==> py-websocket-client: Executing phase: 'build'
+==> py-websocket-client: Executing phase: 'install'
+==> py-websocket-client: Successfully installed py-websocket-client-0.57.0-imzs2vtdw2qeoauqxpt73245ekugikaj
+  Fetch: 0.30s.  Build: 0.49s.  Total: 0.79s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/py-websocket-client-0.57.0-imzs2vtdw2qeoauqxpt73245ekugikaj
+==> Installing py-pyrsistent-0.15.7-szcrcmxo7zk373cbb2m2iq3txo2tf5mn
+==> No binary for py-pyrsistent-0.15.7-szcrcmxo7zk373cbb2m2iq3txo2tf5mn found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/cd/cdc7b5e3ed77bed61270a47d35434a30617b9becdf2478af76ad2c6ade307280.tar.gz
+==> No patches needed for py-pyrsistent
+==> py-pyrsistent: Executing phase: 'build'
+==> py-pyrsistent: Executing phase: 'install'
+==> py-pyrsistent: Successfully installed py-pyrsistent-0.15.7-szcrcmxo7zk373cbb2m2iq3txo2tf5mn
+  Fetch: 0.50s.  Build: 1.17s.  Total: 1.66s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/py-pyrsistent-0.15.7-szcrcmxo7zk373cbb2m2iq3txo2tf5mn
+==> Installing py-terminado-0.8.3-p746dxxc5egk6lwwzsmti5donbyuc4nb
+==> No binary for py-terminado-0.8.3-p746dxxc5egk6lwwzsmti5donbyuc4nb found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/48/4804a774f802306a7d9af7322193c5390f1da0abb429e082a10ef1d46e6fb2c2.tar.gz
+==> No patches needed for py-terminado
+==> py-terminado: Executing phase: 'build'
+==> py-terminado: Executing phase: 'install'
+==> py-terminado: Successfully installed py-terminado-0.8.3-p746dxxc5egk6lwwzsmti5donbyuc4nb
+  Fetch: 0.38s.  Build: 0.26s.  Total: 0.64s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/py-terminado-0.8.3-p746dxxc5egk6lwwzsmti5donbyuc4nb
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/py-jinja2-3.0.1-tii53wagnfeufo3szscf3flqboyjfxzm
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/py-tomli-1.2.1-5xrp2px6pvpk53ck4rgvcsbctz7rffi5
+==> Installing py-prompt-toolkit-3.0.17-6v3i6scw4kfx2mguf2xhzucbo3z6hudd
+==> No binary for py-prompt-toolkit-3.0.17-6v3i6scw4kfx2mguf2xhzucbo3z6hudd found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/93/9397a7162cf45449147ad6042fa37983a081b8a73363a5253dd4072666333137.tar.gz
+==> No patches needed for py-prompt-toolkit
+==> py-prompt-toolkit: Executing phase: 'build'
+==> py-prompt-toolkit: Executing phase: 'install'
+==> py-prompt-toolkit: Successfully installed py-prompt-toolkit-3.0.17-6v3i6scw4kfx2mguf2xhzucbo3z6hudd
+  Fetch: 0.85s.  Build: 0.79s.  Total: 1.64s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/py-prompt-toolkit-3.0.17-6v3i6scw4kfx2mguf2xhzucbo3z6hudd
+==> Installing py-requests-2.25.1-2lxicrp7eb2fcymdll6lbrdyirrds7ly
+==> No binary for py-requests-2.25.1-2lxicrp7eb2fcymdll6lbrdyirrds7ly found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/27/27973dd4a904a4f13b263a19c866c13b92a39ed1c964655f025f3f8d3d75b804.tar.gz
+==> No patches needed for py-requests
+==> py-requests: Executing phase: 'build'
+==> py-requests: Executing phase: 'install'
+==> py-requests: Successfully installed py-requests-2.25.1-2lxicrp7eb2fcymdll6lbrdyirrds7ly
+  Fetch: 0.50s.  Build: 0.58s.  Total: 1.08s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/py-requests-2.25.1-2lxicrp7eb2fcymdll6lbrdyirrds7ly
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/py-packaging-21.0-g6mmglvgtkwonxf2va4eud5qwoaum24y
+==> Installing py-cffi-1.15.0-7432hr73nswzyrz4d3f4at2uhx3pivht
+==> No binary for py-cffi-1.15.0-7432hr73nswzyrz4d3f4at2uhx3pivht found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/92/920f0d66a896c2d99f0adbb391f990a84091179542c205fa53ce5787aff87954.tar.gz
+==> No patches needed for py-cffi
+==> py-cffi: Executing phase: 'build'
+==> py-cffi: Executing phase: 'install'
+==> py-cffi: Successfully installed py-cffi-1.15.0-7432hr73nswzyrz4d3f4at2uhx3pivht
+  Fetch: 0.52s.  Build: 3.87s.  Total: 4.39s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/py-cffi-1.15.0-7432hr73nswzyrz4d3f4at2uhx3pivht
+==> Installing py-babel-2.7.0-dmx3a3edr6v3pfikrepj4ue52zmmzhcv
+==> No binary for py-babel-2.7.0-dmx3a3edr6v3pfikrepj4ue52zmmzhcv found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/e8/e86135ae101e31e2c8ec20a4e0c5220f4eed12487d5cf3f78be7e98d3a57fc28.tar.gz
+==> No patches needed for py-babel
+==> py-babel: Executing phase: 'build'
+==> py-babel: Executing phase: 'install'
+==> py-babel: Successfully installed py-babel-2.7.0-dmx3a3edr6v3pfikrepj4ue52zmmzhcv
+  Fetch: 0.82s.  Build: 1.19s.  Total: 2.01s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/py-babel-2.7.0-dmx3a3edr6v3pfikrepj4ue52zmmzhcv
+==> Installing py-ipython-7.28.0-mvp6pf6liuhv4tly6kfd73luykxfet6k
+==> No binary for py-ipython-7.28.0-mvp6pf6liuhv4tly6kfd73luykxfet6k found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/20/2097be5c814d1b974aea57673176a924c4c8c9583890e7a5f082f547b9975b11.tar.gz
+==> No patches needed for py-ipython
+==> py-ipython: Executing phase: 'build'
+==> py-ipython: Executing phase: 'install'
+==> py-ipython: Successfully installed py-ipython-7.28.0-mvp6pf6liuhv4tly6kfd73luykxfet6k
+  Fetch: 0.84s.  Build: 0.87s.  Total: 1.71s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/py-ipython-7.28.0-mvp6pf6liuhv4tly6kfd73luykxfet6k
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/py-setuptools-scm-6.3.2-5ih5xun55s5rjj67ylyoloax23v4rm4o
+==> Installing py-deprecation-2.1.0-arrahzva3qkxjftxc3gdwwaoqke4jbcu
+==> No binary for py-deprecation-2.1.0-arrahzva3qkxjftxc3gdwwaoqke4jbcu found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/72/72b3bde64e5d778694b0cf68178aed03d15e15477116add3fb773e581f9518ff.tar.gz
+==> No patches needed for py-deprecation
+==> py-deprecation: Executing phase: 'build'
+==> py-deprecation: Executing phase: 'install'
+==> py-deprecation: Successfully installed py-deprecation-2.1.0-arrahzva3qkxjftxc3gdwwaoqke4jbcu
+  Fetch: 0.21s.  Build: 0.46s.  Total: 0.67s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/py-deprecation-2.1.0-arrahzva3qkxjftxc3gdwwaoqke4jbcu
+==> Installing py-bleach-4.1.0-2csgoj3xlrx33buvveqmoq4kph4f54p2
+==> No binary for py-bleach-4.1.0-2csgoj3xlrx33buvveqmoq4kph4f54p2 found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/09/0900d8b37eba61a802ee40ac0061f8c2b5dee29c1927dd1d233e075ebf5a71da.tar.gz
+==> No patches needed for py-bleach
+==> py-bleach: Executing phase: 'build'
+==> py-bleach: Executing phase: 'install'
+==> py-bleach: Successfully installed py-bleach-4.1.0-2csgoj3xlrx33buvveqmoq4kph4f54p2
+  Fetch: 0.23s.  Build: 0.63s.  Total: 0.86s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/py-bleach-4.1.0-2csgoj3xlrx33buvveqmoq4kph4f54p2
+==> Installing py-argon2-cffi-21.1.0-owgmuiyow5dy35emhyxunwdgdsklyguk
+==> No binary for py-argon2-cffi-21.1.0-owgmuiyow5dy35emhyxunwdgdsklyguk found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/f7/f710b61103d1a1f692ca3ecbd1373e28aa5e545ac625ba067ff2feca1b2bb870.tar.gz
+==> No patches needed for py-argon2-cffi
+==> py-argon2-cffi: Executing phase: 'build'
+==> py-argon2-cffi: Executing phase: 'install'
+==> py-argon2-cffi: Successfully installed py-argon2-cffi-21.1.0-owgmuiyow5dy35emhyxunwdgdsklyguk
+  Fetch: 0.65s.  Build: 2.93s.  Total: 3.59s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/py-argon2-cffi-21.1.0-owgmuiyow5dy35emhyxunwdgdsklyguk
+==> Installing py-gevent-1.5.0-cfpm3ripn2qe6htnpm5degcim577dfx5
+==> No binary for py-gevent-1.5.0-cfpm3ripn2qe6htnpm5degcim577dfx5 found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/b2/b2814258e3b3fb32786bb73af271ad31f51e1ac01f33b37426b66cb8491b4c29.tar.gz
+==> No patches needed for py-gevent
+==> py-gevent: Executing phase: 'build'
+==> py-gevent: Executing phase: 'install'
+==> py-gevent: Successfully installed py-gevent-1.5.0-cfpm3ripn2qe6htnpm5degcim577dfx5
+  Fetch: 0.71s.  Build: 1m 46.87s.  Total: 1m 47.58s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/py-gevent-1.5.0-cfpm3ripn2qe6htnpm5degcim577dfx5
+==> Installing py-py-1.9.0-g63sdooc62nwesfecxrrkm7kw4ver43j
+==> No binary for py-py-1.9.0-g63sdooc62nwesfecxrrkm7kw4ver43j found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/9c/9ca6883ce56b4e8da7e79ac18787889fa5206c79dcc67fb065376cd2fe03f342.tar.gz
+==> No patches needed for py-py
+==> py-py: Executing phase: 'build'
+==> py-py: Executing phase: 'install'
+==> py-py: Successfully installed py-py-1.9.0-g63sdooc62nwesfecxrrkm7kw4ver43j
+  Fetch: 0.55s.  Build: 0.67s.  Total: 1.23s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/py-py-1.9.0-g63sdooc62nwesfecxrrkm7kw4ver43j
+==> Installing py-jsonschema-3.2.0-hzn5h7jehrldph4qp6namvxrjxc7toni
+==> No binary for py-jsonschema-3.2.0-hzn5h7jehrldph4qp6namvxrjxc7toni found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/c8/c8a85b28d377cc7737e46e2d9f2b4f44ee3c0e1deac6bf46ddefc7187d30797a.tar.gz
+==> No patches needed for py-jsonschema
+==> py-jsonschema: Executing phase: 'build'
+==> py-jsonschema: Executing phase: 'install'
+==> py-jsonschema: Successfully installed py-jsonschema-3.2.0-hzn5h7jehrldph4qp6namvxrjxc7toni
+  Fetch: 0.50s.  Build: 0.67s.  Total: 1.17s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/py-jsonschema-3.2.0-hzn5h7jehrldph4qp6namvxrjxc7toni
+==> Installing py-anyio-3.3.4-73kktmgrnjntgjplmiety5wfadyaqzzx
+==> No binary for py-anyio-3.3.4-73kktmgrnjntgjplmiety5wfadyaqzzx found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/67/67da67b5b21f96b9d3d65daa6ea99f5d5282cb09f50eb4456f8fb51dffefc3ff.tar.gz
+==> No patches needed for py-anyio
+==> py-anyio: Executing phase: 'build'
+==> py-anyio: Executing phase: 'install'
+==> py-anyio: Successfully installed py-anyio-3.3.4-73kktmgrnjntgjplmiety5wfadyaqzzx
+  Fetch: 0.52s.  Build: 0.68s.  Total: 1.20s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/py-anyio-3.3.4-73kktmgrnjntgjplmiety5wfadyaqzzx
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/py-python-dateutil-2.8.2-ziofzegcyf7hisohkkbuuvtjzeoxa5pc
+==> Installing py-jupyter-packaging-0.10.6-mmrtjp2iky5qgydakyd6cejbmhkvo4cv
+==> No binary for py-jupyter-packaging-0.10.6-mmrtjp2iky5qgydakyd6cejbmhkvo4cv found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/a8/a8a2c90bf2e0cae83be63ccb0b7035032a1589f268cc08b1d479e37ce50fc940.tar.gz
+==> No patches needed for py-jupyter-packaging
+==> py-jupyter-packaging: Executing phase: 'build'
+==> py-jupyter-packaging: Executing phase: 'install'
+==> py-jupyter-packaging: Successfully installed py-jupyter-packaging-0.10.6-mmrtjp2iky5qgydakyd6cejbmhkvo4cv
+  Fetch: 0.44s.  Build: 0.60s.  Total: 1.04s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/py-jupyter-packaging-0.10.6-mmrtjp2iky5qgydakyd6cejbmhkvo4cv
+==> Installing py-pyzmq-18.1.0-7q7fbcfxshnl5dxn6ukzjvwwopoh7d6k
+==> No binary for py-pyzmq-18.1.0-7q7fbcfxshnl5dxn6ukzjvwwopoh7d6k found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/32/32f7618b8104021bc96cbd60be4330bdf37b929e8061dbce362c9f3478a08e21.tar.gz
+==> No patches needed for py-pyzmq
+==> py-pyzmq: Executing phase: 'build'
+==> py-pyzmq: Executing phase: 'install'
+==> py-pyzmq: Successfully installed py-pyzmq-18.1.0-7q7fbcfxshnl5dxn6ukzjvwwopoh7d6k
+  Fetch: 0.47s.  Build: 17.01s.  Total: 17.49s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/py-pyzmq-18.1.0-7q7fbcfxshnl5dxn6ukzjvwwopoh7d6k
+==> Installing py-nbformat-5.1.3-h4sjq53olw4egpgxuesaczs4xhjuufur
+==> No binary for py-nbformat-5.1.3-h4sjq53olw4egpgxuesaczs4xhjuufur found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/b5/b516788ad70771c6250977c1374fcca6edebe6126fd2adb5a69aa5c2356fd1c8.tar.gz
+==> No patches needed for py-nbformat
+==> py-nbformat: Executing phase: 'build'
+==> py-nbformat: Executing phase: 'install'
+==> py-nbformat: Successfully installed py-nbformat-5.1.3-h4sjq53olw4egpgxuesaczs4xhjuufur
+  Fetch: 0.21s.  Build: 0.35s.  Total: 0.56s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/py-nbformat-5.1.3-h4sjq53olw4egpgxuesaczs4xhjuufur
+==> Installing py-jupyter-client-6.1.12-mjbbuzh2imeen6ncfuwwvvzfhzjjzdyg
+==> No binary for py-jupyter-client-6.1.12-mjbbuzh2imeen6ncfuwwvvzfhzjjzdyg found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/c4/c4bca1d0846186ca8be97f4d2fa6d2bae889cce4892a167ffa1ba6bd1f73e782.tar.gz
+==> No patches needed for py-jupyter-client
+==> py-jupyter-client: Executing phase: 'build'
+==> py-jupyter-client: Executing phase: 'install'
+==> py-jupyter-client: Successfully installed py-jupyter-client-6.1.12-mjbbuzh2imeen6ncfuwwvvzfhzjjzdyg
+  Fetch: 0.52s.  Build: 0.75s.  Total: 1.27s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/py-jupyter-client-6.1.12-mjbbuzh2imeen6ncfuwwvvzfhzjjzdyg
+==> Installing py-ipykernel-6.4.1-zai7lvwkdehiul2nrrapl2ub32hy4nmf
+==> No binary for py-ipykernel-6.4.1-zai7lvwkdehiul2nrrapl2ub32hy4nmf found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/df/df3355e5eec23126bc89767a676c5f0abfc7f4c3497d118c592b83b316e8c0cd.tar.gz
+==> No patches needed for py-ipykernel
+==> py-ipykernel: Executing phase: 'build'
+==> py-ipykernel: Executing phase: 'install'
+==> py-ipykernel: Executing phase: 'install_data'
+==> py-ipykernel: Successfully installed py-ipykernel-6.4.1-zai7lvwkdehiul2nrrapl2ub32hy4nmf
+  Fetch: 0.53s.  Build: 1.98s.  Total: 2.50s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/py-ipykernel-6.4.1-zai7lvwkdehiul2nrrapl2ub32hy4nmf
+==> Installing py-nbclient-0.5.0-fsb2hzn2zorgepsyz44muwxtv53stfrh
+==> No binary for py-nbclient-0.5.0-fsb2hzn2zorgepsyz44muwxtv53stfrh found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/8a/8ad52d27ba144fca1402db014857e53c5a864a2f407be66ca9d74c3a56d6591d.tar.gz
+==> No patches needed for py-nbclient
+==> py-nbclient: Executing phase: 'build'
+==> py-nbclient: Executing phase: 'install'
+==> py-nbclient: Successfully installed py-nbclient-0.5.0-fsb2hzn2zorgepsyz44muwxtv53stfrh
+  Fetch: 0.42s.  Build: 0.80s.  Total: 1.23s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/py-nbclient-0.5.0-fsb2hzn2zorgepsyz44muwxtv53stfrh
+==> Installing py-nbconvert-6.0.1-ve72pzqxlxr3nznhojeght5d62dtxstb
+==> No binary for py-nbconvert-6.0.1-ve72pzqxlxr3nznhojeght5d62dtxstb found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/db/db94117fbac29153834447e31b30cda337d4450e46e0bdb1a36eafbbf4435156.tar.gz
+==> Ran patch() for py-nbconvert
+==> py-nbconvert: Executing phase: 'build'
+==> py-nbconvert: Executing phase: 'install'
+==> py-nbconvert: Successfully installed py-nbconvert-6.0.1-ve72pzqxlxr3nznhojeght5d62dtxstb
+  Fetch: 0.67s.  Build: 1.07s.  Total: 1.75s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/py-nbconvert-6.0.1-ve72pzqxlxr3nznhojeght5d62dtxstb
+==> Installing py-jupyter-server-1.11.2-vfhopxc7mzx7etgc2qc5zncarhpgdm3t
+==> No binary for py-jupyter-server-1.11.2-vfhopxc7mzx7etgc2qc5zncarhpgdm3t found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/c1/c1f32e0c1807ab2de37bf70af97a36b4436db0bc8af3124632b1f4441038bf95.tar.gz
+==> No patches needed for py-jupyter-server
+==> py-jupyter-server: Executing phase: 'build'
+==> py-jupyter-server: Executing phase: 'install'
+==> py-jupyter-server: Successfully installed py-jupyter-server-1.11.2-vfhopxc7mzx7etgc2qc5zncarhpgdm3t
+  Fetch: 0.46s.  Build: 1.32s.  Total: 1.78s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/py-jupyter-server-1.11.2-vfhopxc7mzx7etgc2qc5zncarhpgdm3t
+==> Installing py-notebook-6.1.4-ktsja2d7q6ttk6guddonumwjw6o6hsgb
+==> No binary for py-notebook-6.1.4-ktsja2d7q6ttk6guddonumwjw6o6hsgb found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/68/687d01f963ea20360c0b904ee7a37c3d8cda553858c8d6e33fd0afd13e89de32.tar.gz
+==> No patches needed for py-notebook
+==> py-notebook: Executing phase: 'build'
+==> py-notebook: Executing phase: 'install'
+==> py-notebook: Successfully installed py-notebook-6.1.4-ktsja2d7q6ttk6guddonumwjw6o6hsgb
+  Fetch: 0.83s.  Build: 2.31s.  Total: 3.15s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/py-notebook-6.1.4-ktsja2d7q6ttk6guddonumwjw6o6hsgb
+==> Installing py-jupyterlab-server-2.6.0-yz3efgb7ji7h5qg5pmy3r5rjiub6dylu
+==> No binary for py-jupyterlab-server-2.6.0-yz3efgb7ji7h5qg5pmy3r5rjiub6dylu found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/f3/f300adf6bb0a952bebe9c807a3b2a345d62da39b476b4f69ea0dc6b5f3f6b97d.tar.gz
+==> No patches needed for py-jupyterlab-server
+==> py-jupyterlab-server: Executing phase: 'build'
+==> py-jupyterlab-server: Executing phase: 'install'
+==> py-jupyterlab-server: Successfully installed py-jupyterlab-server-2.6.0-yz3efgb7ji7h5qg5pmy3r5rjiub6dylu
+  Fetch: 0.39s.  Build: 1.79s.  Total: 2.18s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/py-jupyterlab-server-2.6.0-yz3efgb7ji7h5qg5pmy3r5rjiub6dylu
+==> Installing py-nbclassic-0.3.1-urjnxr26lwg6xjg6mo3rnzxowqhjx5cp
+==> No binary for py-nbclassic-0.3.1-urjnxr26lwg6xjg6mo3rnzxowqhjx5cp found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/f9/f920f8d09849bea7950e1017ff3bd101763a8d68f565a51ce053572e65aa7947.tar.gz
+==> No patches needed for py-nbclassic
+==> py-nbclassic: Executing phase: 'build'
+==> py-nbclassic: Executing phase: 'install'
+==> py-nbclassic: Successfully installed py-nbclassic-0.3.1-urjnxr26lwg6xjg6mo3rnzxowqhjx5cp
+  Fetch: 0.42s.  Build: 1.06s.  Total: 1.48s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/py-nbclassic-0.3.1-urjnxr26lwg6xjg6mo3rnzxowqhjx5cp
+==> Installing py-jupyterlab-3.2.1-fbrlmmttxrfdtv3azhgffdaw4ctowp2r
+==> No binary for py-jupyterlab-3.2.1-fbrlmmttxrfdtv3azhgffdaw4ctowp2r found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/54/54466941bcd9b52f23373a32038fbb4e50fd652d4536df6179b53e1ffb8ef431.tar.gz
+==> No patches needed for py-jupyterlab
+==> py-jupyterlab: Executing phase: 'build'
+==> py-jupyterlab: Executing phase: 'install'
+==> py-jupyterlab: Successfully installed py-jupyterlab-3.2.1-fbrlmmttxrfdtv3azhgffdaw4ctowp2r
+  Fetch: 0.93s.  Build: 2.65s.  Total: 3.59s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen2/gcc-10.2.0/py-jupyterlab-3.2.1-fbrlmmttxrfdtv3azhgffdaw4ctowp2r
+real 345.58
+user 358.04
+sys 422.44
+Submitted batch job 21701600

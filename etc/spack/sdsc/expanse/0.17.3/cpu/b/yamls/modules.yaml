@@ -1,0 +1,37 @@
+modules:
+  default:
+    enable::
+      - lmod
+    lmod:
+      core_compilers:
+        - 'gcc@8.5.0'
+      hierarchy:
+        - mpi
+      hash_length: 0
+      blacklist_implicits: true
+      whitelist: ['py-jupyter-core', 'hadoop']
+      naming_scheme: '{name}/{version}/{hash:7}'
+      projections:
+        all: '{name}/{version}/{hash:7}'
+      all:
+        suffixes:
+          '+openmp': omp
+          'threads=openmp': omp
+          '+ipl64': i64
+        environment:
+          set:
+            '{name}HOME': '{prefix}'
+      intel:
+        environment:
+          set:
+            INTEL_LICENSE_FILE: '40000@elprado.sdsc.edu:40200@elprado.sdsc.edu'
+      petsc:
+        suffixes:
+          '+complex': cmplx
+      slepc:
+        suffixes:
+          '^petsc +complex': cmplx
+      ^python:
+        autoload: 'direct'
+      ^ucx:
+        autoload: 'direct'
