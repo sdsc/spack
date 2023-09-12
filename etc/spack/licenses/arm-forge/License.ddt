@@ -1,0 +1,6 @@
+type=2
+serial_number=4164
+hostname=elprado.sdsc.edu
+serverport=4241
+features=ddt,cuda
+hash2=6420174f4fcf497c9c2a62b41ae9af46d560651c

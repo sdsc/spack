@@ -1,0 +1,137 @@
+compilers:
+- compiler:
+    spec: gcc@11.2.0
+    paths:
+      cc: /usr/bin/gcc
+      cxx: /usr/bin/g++
+      f77: /usr/bin/gfortran
+      fc: /usr/bin/gfortran
+    flags:
+      cflags: -O2 -march=native
+      cxxflags: -O2 -march=native
+      fflags: -O2 -march=native
+    operating_system: rocky9
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+- compiler:
+    spec: gcc@10.2.0
+    paths:
+      cc: /home/jpg/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-10.2.0-mqbpsxf6a5jhxi4vlwdtfyqe7q3yjgse/bin/gcc
+      cxx: /home/jpg/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-10.2.0-mqbpsxf6a5jhxi4vlwdtfyqe7q3yjgse/bin/g++
+      f77: /home/jpg/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-10.2.0-mqbpsxf6a5jhxi4vlwdtfyqe7q3yjgse/bin/gfortran
+      fc: /home/jpg/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-10.2.0-mqbpsxf6a5jhxi4vlwdtfyqe7q3yjgse/bin/gfortran
+    flags: {}
+    operating_system: rocky9
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+- compiler:
+    spec: gcc@9.2.0
+    paths:
+      cc:  /home/jpg/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-9.2.0-nx6afhcfe2pccw7nla4fjmvdqvbhieh6/bin/gcc
+      cxx:  /home/jpg/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-9.2.0-nx6afhcfe2pccw7nla4fjmvdqvbhieh6/bin/g++
+      f77:  /home/jpg/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-9.2.0-nx6afhcfe2pccw7nla4fjmvdqvbhieh6/bin/gfortran
+      fc:  /home/jpg/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-9.2.0-nx6afhcfe2pccw7nla4fjmvdqvbhieh6/bin/gfortran
+    flags: {}
+    operating_system: rocky9
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+- compiler:
+    spec: intel@19.1.1.217
+    paths:
+      cc: /home/jpg/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/intel-19.1.1.217-7fcjggodrui3okoovfgtjf6gl5nf6nlv/bin/icc
+      cxx: /home/jpg/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/intel-19.1.1.217-7fcjggodrui3okoovfgtjf6gl5nf6nlv/bin/icpc
+      f77: /home/jpg/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/intel-19.1.1.217-7fcjggodrui3okoovfgtjf6gl5nf6nlv/bin/ifort
+      fc: /home/jpg/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/intel-19.1.1.217-7fcjggodrui3okoovfgtjf6gl5nf6nlv/bin/ifort
+    flags:
+      cflags: -gcc-name=/home/jpg/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-8.5.0-mf5bqu2cwyzoxa5c7btqbbdxng3whbmf/bin/gcc
+      cxxflags: -gcc-name=/home/jpg/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-8.5.0-mf5bqu2cwyzoxa5c7btqbbdxng3whbmf/bin/gcc
+      fflags: -gcc-name=/home/jpg/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-8.5.0-mf5bqu2cwyzoxa5c7btqbbdxng3whbmf/bin/gcc
+    operating_system: rocky9
+    target: x86_64
+    modules: [intel/19.1.1.217]
+    environment: {}
+    extra_rpaths: []
+- compiler:
+     spec: nvhpc@21.3
+     paths:
+       cc:  /home/jpg/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/nvhpc-21.3-dfr5ipkjfslwzlg2fs7sn5mfrnrg2igs/Linux_x86_64/21.3/compilers/bin/nvc
+       cxx:  /home/jpg/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/nvhpc-21.3-dfr5ipkjfslwzlg2fs7sn5mfrnrg2igs/Linux_x86_64/21.3/compilers/bin/nvc++
+       f77:  /home/jpg/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/nvhpc-21.3-dfr5ipkjfslwzlg2fs7sn5mfrnrg2igs/Linux_x86_64/21.3/compilers/bin/nvfortran
+       fc:  /home/jpg/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/nvhpc-21.3-dfr5ipkjfslwzlg2fs7sn5mfrnrg2igs/Linux_x86_64/21.3/compilers/bin/nvfortran
+     flags: {}
+     operating_system: rocky9
+     target: x86_64
+     modules: [nvhpc/21.3]
+     environment: {}
+     extra_rpaths: []
+- compiler:
+     spec: nvhpc@22.1
+     paths:
+       cc:  /home/jpg/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/nvhpc-22.1-rsks4ptuwyfjjxigybva7k53ihgacw3y/Linux_x86_64/22.1/compilers/bin/nvc
+       cxx: /home/jpg/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/nvhpc-22.1-rsks4ptuwyfjjxigybva7k53ihgacw3y/Linux_x86_64/22.1/compilers/bin/nvc++
+       f77: /home/jpg/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/nvhpc-22.1-rsks4ptuwyfjjxigybva7k53ihgacw3y/Linux_x86_64/22.1/compilers/bin/nvfortran
+       fc:  /home/jpg/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/nvhpc-22.1-rsks4ptuwyfjjxigybva7k53ihgacw3y/Linux_x86_64/22.1/compilers/bin/nvfortran
+     flags: {}
+     operating_system: rocky9
+     target: x86_64
+     modules: [nvhpc/22.1]
+     environment: {}
+     extra_rpaths: []
+- compiler:
+     spec: nvhpc@21.9
+     paths:
+       cc:  /home/jpg/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/nvhpc-21.9-q2fl5spymewvfw7egelw7rrpvarfab37/Linux_x86_64/21.3/compilers/bin/nvc
+       cxx: /home/jpg/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/nvhpc-21.9-q2fl5spymewvfw7egelw7rrpvarfab37/Linux_x86_64/21.3/compilers/bin/nvc++
+       f77: /home/jpg/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/nvhpc-21.9-q2fl5spymewvfw7egelw7rrpvarfab37/Linux_x86_64/21.3/compilers/bin/nvfortran
+       fc:  /home/jpg/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/nvhpc-21.9-q2fl5spymewvfw7egelw7rrpvarfab37/Linux_x86_64/21.3/compilers/bin/nvfortran
+     flags: {}
+     operating_system: rocky9
+     target: x86_64
+     modules: [nvhpc/21.9]
+     environment: {}
+     extra_rpaths: []
+- compiler:
+     spec: nvhpc@23.1
+     paths:
+       cc:  /home/jpg/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/nvhpc-23.1-2pso2q22ztofinucbx4bjlokrhtbxzso/Linux_x86_64/21.3/compilers/bin/nvc
+       cxx: /home/jpg/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/nvhpc-23.1-2pso2q22ztofinucbx4bjlokrhtbxzso/Linux_x86_64/21.3/compilers/bin/nvc++
+       f77: /home/jpg/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/nvhpc-23.1-2pso2q22ztofinucbx4bjlokrhtbxzso/Linux_x86_64/21.3/compilers/bin/nvfortran
+       fc:  /home/jpg/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/nvhpc-23.1-2pso2q22ztofinucbx4bjlokrhtbxzso/Linux_x86_64/21.3/compilers/bin/nvfortran
+     flags: {}
+     operating_system: rocky9
+     target: x86_64
+     modules: [nvhpc/23.1]
+     environment: {}
+     extra_rpaths: []
+- compiler:
+    spec: pgi@18.10
+    paths:
+      cc: /home/jpg/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/pgi-18.10-xaqspxalbr2rvjsi6tuu2dzzxoj27x46/linux86-64/18.10/bin/pgcc
+      cxx: /home/jpg/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/pgi-18.10-xaqspxalbr2rvjsi6tuu2dzzxoj27x46/linux86-64/18.10/bin/pgc++
+      f77: /home/jpg/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/pgi-18.10-xaqspxalbr2rvjsi6tuu2dzzxoj27x46/linux86-64/18.10/bin/pgfortran
+      fc: /home/jpg/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/pgi-18.10-xaqspxalbr2rvjsi6tuu2dzzxoj27x46/linux86-64/18.10/bin/pgfortran
+    flags: {}
+    operating_system: rocky9
+    target: x86_64
+    modules: [pgi/18.10]
+    environment: {}
+    extra_rpaths: []
+- compiler:
+    spec: gcc@8.5.0
+    paths:
+      cc: /home/jpg/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-8.5.0-mf5bqu2cwyzoxa5c7btqbbdxng3whbmf/bin/gcc
+      cxx: /home/jpg/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-8.5.0-mf5bqu2cwyzoxa5c7btqbbdxng3whbmf/bin/g++
+      f77: /home/jpg/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-8.5.0-mf5bqu2cwyzoxa5c7btqbbdxng3whbmf/bin/gfortran
+      fc: /home/jpg/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-8.5.0-mf5bqu2cwyzoxa5c7btqbbdxng3whbmf/bin/gfortran
+    flags: {}
+    operating_system: rocky9
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []

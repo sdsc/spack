@@ -1,0 +1,1 @@
+sed -i 's/#SBATCH --partition=defq/#SBATCH --partition=hotel-gpu/g' $1

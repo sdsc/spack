@@ -1,0 +1,1 @@
+sed -i 's/#SBATCH --gpus=1/#SBATCH -w gpu1/g' $1

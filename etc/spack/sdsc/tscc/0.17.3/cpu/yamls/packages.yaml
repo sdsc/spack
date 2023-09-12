@@ -1,0 +1,72 @@
+packages:
+  lustre:
+    externals:
+      - spec: 'lustre@2.15.2 % gcc@10.2.0 arch=linux-rocky9-cascadelake'
+        prefix: /usr
+      - spec: 'lustre@2.15.2 % gcc@11.2.0 arch=linux-rocky9-cascadelake'
+        prefix: /usr
+      - spec: 'lustre@2.15.2 % intel@19.1.1.217 arch=linux-rocky9-cascadelake'
+        prefix: /usr
+    buildable: false
+  texlive:
+    externals:
+      - spec: 'texlive@live % gcc@10.2.0  arch=linux-rocky9-cascadelake'
+        prefix: /usr
+      - spec: 'texlive@live % gcc@11.2.0  arch=linux-rocky9-cascadelake'
+        prefix: /usr
+      - spec: 'texlive@live % intel@19.1.1.217  arch=linux-rocky9-cascadelake'
+        prefix: /usr
+    buildable: false
+  openssl:
+    externals:
+      - spec: 'openssl@3.0.1 % gcc@10.2.0 arch=linux-rocky9-cascadelake'
+        prefix: /usr
+      - spec: 'openssl@3.0.1 % gcc@11.2.0 arch=linux-rocky9-cascadelake'
+        prefix: /usr
+      - spec: 'openssl@3.0.1 % intel@19.1.1.217 arch=linux-rocky9-cascadelake'
+        prefix: /usr
+    buildable: false
+  rdma-core:
+    externals:
+      - spec: 'rdma-core@41.0 % gcc@11.2.0 arch=linux-rocky9-cascadelake'
+        prefix: /usr
+      - spec: 'rdma-core@41.0 % gcc@10.2.0 arch=linux-rocky9-cascadelake'
+        prefix: /usr
+      - spec: 'rdma-core@41.0 % intel@19.1.1.217 arch=linux-rocky9-cascadelake'
+        prefix: /usr
+    buildable: false
+  slurm:
+    externals:
+      - spec: 'slurm@22.05.8 % gcc@11.2.0 arch=linux-rocky9-cascadelake'
+        prefix: /cm/shared/apps/slurm/22.05.8
+      - spec: 'slurm@22.05.8 % gcc@10.2.0 arch=linux-rocky9-cascadelake'
+        prefix: /cm/shared/apps/slurm/22.05.8
+      - spec: 'slurm@22.05.8 % intel@19.1.1.217 arch=linux-rocky9-cascadelake'
+        prefix: /cm/shared/apps/slurm/22.05.8
+    buildable: false
+  librsvg:
+    externals:
+      - spec: 'librsvg@2.42.7 % gcc@10.2.0 arch=linux-rocky9-cascadelake'
+        prefix: /usr
+      - spec: 'librsvg@2.42.7 % gcc@11.2.0 arch=linux-rocky9-cascadelake'
+        prefix: /usr
+      - spec: 'librsvg@2.42.7 % intel@19.1.1.217 arch=linux-rocky9-cascadelake'
+        prefix: /usr
+    buildable: false
+  ghostscript:
+    externals:
+      - spec: 'ghostscript@9.27 % gcc@10.2.0 arch=linux-rocky9-cascadelake'
+        prefix: /usr
+      - spec: 'ghostscript@9.27 % gcc@11.2.0 arch=linux-rocky9-cascadelake'
+        prefix: /usr
+      - spec: 'ghostscript@9.27 % intel@19.1.1.217 arch=linux-rocky9-cascadelake'
+        prefix: /usr
+    buildable: false
+  gaussian:
+    permissions:
+      read: group
+      group: jpg
+  vasp6:
+    permissions:
+      read: group
+      group: vasp-6
