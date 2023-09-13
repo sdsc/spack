@@ -1,0 +1,101 @@
+1687669266 2825 5c044e00c953e4ea33849f70d0098b55  /cm/shared/apps/spack/0.17.3/cpu/etc/spack/sdsc/tscc/0.17.3/cpu/specs/intel@19.1.1.217/intel-mpi@2019.10.317/vasp@6.4.0.sh afterok:2824
+
+#!/usr/bin/env bash
+
+#SBATCH --job-name=vasp@6.4.0
+#SBATCH --account=sys200
+#SBATCH --partition=hotel
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=8
+#SBATCH --time=02:00:00
+#SBATCH --output=%x.o%j.%N
+
+declare -xr LOCAL_TIME="$(date +'%Y%m%dT%H%M%S%z')"
+declare -xir UNIX_TIME="$(date +'%s')"
+
+declare -xr SYSTEM_NAME='tscc'
+
+declare -xr SPACK_VERSION='0.17.3'
+declare -xr SPACK_INSTANCE_NAME='cpu'
+declare -xr SPACK_INSTANCE_DIR="/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}"
+
+declare -xr SLURM_JOB_SCRIPT="$(scontrol show job ${SLURM_JOB_ID} | awk -F= '/Command=/{print $2}')"
+declare -xr SLURM_JOB_MD5SUM="$(md5sum ${SLURM_JOB_SCRIPT})"
+
+declare -xr SCHEDULER_MODULE='slurm'
+
+echo "${UNIX_TIME} ${SLURM_JOB_ID} ${SLURM_JOB_MD5SUM} ${SLURM_JOB_DEPENDENCY}" 
+echo ""
+
+cat "${SLURM_JOB_SCRIPT}"
+
+. "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
+
+declare -xr SPACK_PACKAGE='vasp@6.4.0'
+declare -xr SPACK_COMPILER='intel@19.1.1.217'
+declare -xr SPACK_VARIANTS='~cuda ~openmp +scalapack'
+declare -xr SPACK_DEPENDENCIES="^intel-mpi@2019.10.317/$(spack find --format '{hash:7}' intel-mpi@2019.10.317 % ${SPACK_COMPILER}) ^intel-mkl@2020.4.304/$(spack find --format '{hash:7}' intel-mkl@2020.4.304 % ${SPACK_COMPILER})"
+declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
+
+module purge
+module load "${SCHEDULER_MODULE}"
+module load "${SPACK_COMPILER}"
+module list
+
+printenv
+
+spack config get compilers
+spack config get config  
+spack config get mirrors
+spack config get modules
+spack config get packages
+spack config get repos
+spack config get upstreams
+
+spack spec --long --namespaces --types "${SPACK_SPEC}"
+if [[ "${?}" -ne 0 ]]; then
+  echo 'ERROR: spack concretization failed.'
+  exit 1
+fi
+
+time -p spack install -v --jobs "${SLURM_TASKS_PER_NODE}" --fail-fast --yes-to-all "${SPACK_SPEC}"
+if [[ "${?}" -ne 0 ]]; then
+  echo 'ERROR: spack install failed.'
+  exit 1
+fi
+
+spack module lmod refresh --delete-tree -y
+
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'sundials@5.8.0.sh'
+
+sleep 20
+
+
+Lmod has detected the following error: The following module(s) are unknown:
+"intel@19.1.1.217"
+
+Please check the spelling or version number. Also try "module spider ..."
+It is also possible your cache file is out-of-date; it may help to try:
+  $ module --ignore_cache load "intel@19.1.1.217"
+
+Also make sure that all modulefiles written in TCL start with the string
+#%Module
+
+
+
+
+Currently Loaded Modules:
+  1) slurm/slurm/22.05.9
+
+ 
+
+/cm/local/apps/slurm/var/spool/job02825/slurm_script: line 43: printenv: command not found
+/cm/shared/apps/spack/0.17.3/cpu/share/spack/setup-env.sh: line 194: spack: command not found
+/cm/shared/apps/spack/0.17.3/cpu/share/spack/setup-env.sh: line 194: spack: command not found
+/cm/shared/apps/spack/0.17.3/cpu/share/spack/setup-env.sh: line 194: spack: command not found
+/cm/shared/apps/spack/0.17.3/cpu/share/spack/setup-env.sh: line 194: spack: command not found
+/cm/shared/apps/spack/0.17.3/cpu/share/spack/setup-env.sh: line 194: spack: command not found
+/cm/shared/apps/spack/0.17.3/cpu/share/spack/setup-env.sh: line 194: spack: command not found
+/cm/shared/apps/spack/0.17.3/cpu/share/spack/setup-env.sh: line 194: spack: command not found
+/cm/shared/apps/spack/0.17.3/cpu/share/spack/setup-env.sh: line 194: spack: command not found
+ERROR: spack concretization failed.

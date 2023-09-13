@@ -1,0 +1,1189 @@
+1687495455 2406 b44d269cd723175876f3ca7510b2a5ed  /cm/shared/apps/spack/0.17.3/cpu/etc/spack/sdsc/tscc/0.17.3/cpu/specs/gcc@10.2.0/imagemagick@7.0.8-7.sh afterok:2404
+
+#!/usr/bin/env bash
+
+#SBATCH --job-name=imagemagick@7.0.8-7
+#SBATCH --account=sys200
+#SBATCH --partition=hotel
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=1
+#SBATCH --cpus-per-task=8
+#SBATCH --time=01:00:00
+#SBATCH --output=%x.o%j.%N
+
+declare -xr LOCAL_TIME="$(date +'%Y%m%dT%H%M%S%z')"
+declare -xir UNIX_TIME="$(date +'%s')"
+
+declare -xr SYSTEM_NAME='tscc'
+
+declare -xr SPACK_VERSION='0.17.3'
+declare -xr SPACK_INSTANCE_NAME='cpu'
+declare -xr SPACK_INSTANCE_DIR="/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}"
+
+declare -xr SLURM_JOB_SCRIPT="$(scontrol show job ${SLURM_JOB_ID} | awk -F= '/Command=/{print $2}')"
+declare -xr SLURM_JOB_MD5SUM="$(md5sum ${SLURM_JOB_SCRIPT})"
+
+declare -xr SCHEDULER_MODULE='slurm'
+
+echo "${UNIX_TIME} ${SLURM_JOB_ID} ${SLURM_JOB_MD5SUM} ${SLURM_JOB_DEPENDENCY}" 
+echo ""
+
+cat "${SLURM_JOB_SCRIPT}"
+
+module purge
+module load "${SCHEDULER_MODULE}"
+module list
+. "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
+
+declare -xr SPACK_PACKAGE='imagemagick@7.0.8-7'
+declare -xr SPACK_COMPILER='gcc@10.2.0'
+declare -xr SPACK_VARIANTS=''
+#declare -xr SPACK_DEPENDENCIES="^ghostscript@9.50/$(spack find --format '{hash:7}' ghostscript@9.50 % ${SPACK_COMPILER})"
+declare -xr SPACK_DEPENDENCIES="^python@3.8.12/$(spack find --format '{hash:7}' python@3.8.12 % ${SPACK_COMPILER}) ^ghostscript@9.27"
+declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
+
+printenv
+
+spack config get compilers  
+spack config get config  
+spack config get mirrors
+spack config get modules
+spack config get packages
+spack config get repos
+spack config get upstreams
+
+spack spec --long --namespaces --types "${SPACK_SPEC}"
+if [[ "${?}" -ne 0 ]]; then
+  echo 'ERROR: spack concretization failed.'
+  exit 1
+fi
+
+time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all "${SPACK_SPEC}"
+if [[ "${?}" -ne 0 ]]; then
+  echo 'ERROR: spack install failed.'
+  exit 1
+fi
+
+spack module lmod refresh --delete-tree -y
+
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'gnuplot@5.4.2.sh'
+
+sleep 20
+
+Currently Loaded Modules:
+  1) slurm/slurm/22.05.9
+
+ 
+
+SHELL=/bin/bash
+SLURM_JOB_USER=jpg
+SLURM_TASKS_PER_NODE=1
+SLURM_JOB_UID=422
+HISTCONTROL=ignoredups
+SLURM_JOB_MD5SUM=b44d269cd723175876f3ca7510b2a5ed  /cm/shared/apps/spack/0.17.3/cpu/etc/spack/sdsc/tscc/0.17.3/cpu/specs/gcc@10.2.0/imagemagick@7.0.8-7.sh
+SLURM_TASK_PID=1528992
+LMOD_arch=x86_64
+SLURM_LOCALID=0
+SLURM_SUBMIT_DIR=/cm/shared/apps/spack/0.17.3/cpu/etc/spack/sdsc/tscc/0.17.3/cpu/specs/gcc@10.2.0
+HISTSIZE=1000
+HOSTNAME=compute-11-56
+SLURMD_NODENAME=compute-11-56
+FPATH=/usr/share/lmod/lmod/init/ksh_funcs
+_ModuleTable002_=IiwiL3Vzci9zaGFyZS9tb2R1bGVmaWxlcyIsIi91c3Ivc2hhcmUvTW9kdWxlcy9tb2R1bGVmaWxlcyIsIi9jbS9zaGFyZWQvbW9kdWxlZmlsZXMiLH0sWyJzeXN0ZW1CYXNlTVBBVEgiXT0iL2NtL2xvY2FsL21vZHVsZWZpbGVzOi9jbS9zaGFyZWQvbW9kdWxlZmlsZXM6L2V0Yy9tb2R1bGVmaWxlczovdXNyL3NoYXJlL21vZHVsZWZpbGVzOi91c3Ivc2hhcmUvTW9kdWxlcy9tb2R1bGVmaWxlcyIsfQ==
+SPACK_LD_LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:/cm/shared/apps/slurm/current/lib64
+__LMOD_REF_COUNT_MODULEPATH=/cm/local/modulefiles:2;/etc/modulefiles:1;/usr/share/modulefiles:1;/usr/share/Modules/modulefiles:1;/cm/shared/modulefiles:1
+SLURM_NODE_ALIASES=(null)
+SLURM_CLUSTER_NAME=slurm
+SLURM_JOB_SCRIPT=/cm/shared/apps/spack/0.17.3/cpu/etc/spack/sdsc/tscc/0.17.3/cpu/specs/gcc@10.2.0/imagemagick@7.0.8-7.sh
+SLURM_CPUS_ON_NODE=8
+SPACK_INSTANCE_NAME=cpu
+SCHEDULER_MODULE=slurm
+__LMOD_REF_COUNT__LMFILES_=/cm/local/modulefiles/slurm/slurm/22.05.9:1
+SLURM_JOB_CPUS_PER_NODE=8
+SPACK_VARIANTS=
+LMOD_DIR=/usr/share/lmod/lmod/libexec
+SPACK_DEPENDENCIES=^python@3.8.12/zbtfzsi ^ghostscript@9.27
+PWD=/home/jpg/specs_cpu_0.17.3/gcc@10.2.0
+SLURM_GTIDS=0
+LOGNAME=jpg
+XDG_SESSION_TYPE=tty
+SLURM_JOB_PARTITION=hotel
+MODULESHOME=/usr/share/lmod/lmod
+MANPATH=/cm/shared/apps/slurm/current/man:/usr/share/lmod/lmod/share/man:/usr/local/share/man:/usr/share/man:/cm/local/apps/environment-modules/current/share/man
+LMOD_PREPEND_BLOCK=normal
+SLURM_JOB_NUM_NODES=1
+SPACK_INSTANCE_DIR=/cm/shared/apps/spack/0.17.3/cpu
+SPACK_PYTHON=/usr/bin/python3
+SLURM_JOBID=2406
+SLURM_JOB_QOS=normal
+MOTD_SHOWN=pam
+__LMOD_REF_COUNT_PATH=/cm/shared/apps/slurm/current/sbin:1;/cm/shared/apps/slurm/current/bin:1;/cm/shared/apps/spack/0.17.3/cpu/bin:1;/home/jpg/usr/bin:2;/home/jpg/bin:3;/home/jpg/.local/bin:1;/usr/local/bin:1;/usr/bin:1;/usr/local/sbin:1;/usr/sbin:1
+HOME=/home/jpg
+_ModuleTable_Sz_=2
+__LMOD_REF_COUNT_LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:1;/cm/shared/apps/slurm/current/lib64:1
+LANG=en_US.UTF-8
+SLURM_JOB_DEPENDENCY=afterok:2404
+__LMOD_REF_COUNT_LOADEDMODULES=slurm/slurm/22.05.9:1
+LS_COLORS=rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=01;37;41:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=01;36:*.au=01;36:*.flac=01;36:*.m4a=01;36:*.mid=01;36:*.midi=01;36:*.mka=01;36:*.mp3=01;36:*.mpc=01;36:*.ogg=01;36:*.ra=01;36:*.wav=01;36:*.oga=01;36:*.opus=01;36:*.spx=01;36:*.xspf=01;36:
+SLURM_PROCID=0
+__LMOD_REF_COUNT_CPATH=/cm/shared/apps/slurm/current/include:1
+LMOD_SETTARG_FULL_SUPPORT=no
+SPACK_COMPILER=gcc@10.2.0
+TMPDIR=/tmp
+SLURM_CPUS_PER_TASK=8
+SLURM_NTASKS=1
+SLURM_TOPOLOGY_ADDR=compute-11-56
+LMOD_VERSION=8.5
+SSH_CONNECTION=70.95.82.22 58238 132.249.107.93 22
+SPACK_ROOT=/cm/shared/apps/spack/0.17.3/cpu
+MODULEPATH_ROOT=/usr/share/modulefiles
+SLURM_TOPOLOGY_ADDR_PATTERN=node
+XDG_SESSION_CLASS=user
+LMOD_PKG=/usr/share/lmod/lmod
+SLURM_WORKING_CLUSTER=slurm:mgr2:6817:9728:109
+TERM=xterm-256color
+LESSOPEN=||/usr/bin/lesspipe.sh %s
+USER=jpg
+LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:/cm/shared/apps/slurm/current/lib64
+SLURM_NODELIST=compute-11-56
+ENVIRONMENT=BATCH
+LOADEDMODULES=slurm/slurm/22.05.9
+SPACK_SPEC=imagemagick@7.0.8-7 % gcc@10.2.0  ^python@3.8.12/zbtfzsi ^ghostscript@9.27
+SLURM_JOB_ACCOUNT=sys200
+SLURM_PRIO_PROCESS=0
+SLURM_NPROCS=1
+LMOD_ROOT=/usr/share/lmod
+LMOD_SETTARG_CMD=:
+SHLVL=19
+SLURM_NNODES=1
+BASH_ENV=/usr/share/lmod/lmod/init/bash
+LMOD_FULL_SETTARG_SUPPORT=no
+LMOD_sys=Linux
+__LMOD_REF_COUNT_MANPATH=/cm/shared/apps/slurm/current/man:1;/usr/share/lmod/lmod/share/man:1;/usr/local/share/man:1;/usr/share/man:1;/cm/local/apps/environment-modules/current/share/man:1
+XDG_SESSION_ID=83895
+SLURM_SUBMIT_HOST=compute-11-56
+__LMOD_SET_FPATH=1
+_ModuleTable001_=X01vZHVsZVRhYmxlXz17WyJNVHZlcnNpb24iXT0zLFsiY19yZWJ1aWxkVGltZSJdPWZhbHNlLFsiY19zaG9ydFRpbWUiXT1mYWxzZSxkZXB0aFQ9e30sZmFtaWx5PXt9LG1UPXtzbHVybT17WyJmbiJdPSIvY20vbG9jYWwvbW9kdWxlZmlsZXMvc2x1cm0vc2x1cm0vMjIuMDUuOSIsWyJmdWxsTmFtZSJdPSJzbHVybS9zbHVybS8yMi4wNS45IixbImxvYWRPcmRlciJdPTEscHJvcFQ9e30sWyJzdGFja0RlcHRoIl09MCxbInN0YXR1cyJdPSJhY3RpdmUiLFsidXNlck5hbWUiXT0ic2x1cm0iLFsid1YiXT0iKnNsdXJtLzAwMDAwMDAyMi4wMDAwMDAwMDUuMDAwMDAwMDA5Lip6ZmluYWwiLH0sfSxtcGF0aEE9eyIvY20vbG9jYWwvbW9kdWxlZmlsZXMiLCIvZXRjL21vZHVsZWZpbGVz
+SPACK_PACKAGE=imagemagick@7.0.8-7
+LD_LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:/cm/shared/apps/slurm/current/lib64
+LMOD_COLORIZE=yes
+XDG_RUNTIME_DIR=/run/user/422
+SLURM_JOB_ID=2406
+SLURM_NODEID=0
+S_COLORS=auto
+SSH_CLIENT=70.95.82.22 58238 22
+DEBUGINFOD_URLS=https://debuginfod.centos.org/ 
+CMD_WLM_CLUSTER_NAME=slurm
+ENABLE_LMOD=1
+which_declare=declare -f
+UNIX_TIME=1687495455
+__Init_Default_Modules=1
+SLURM_CONF=/cm/shared/apps/slurm/var/etc/slurm/slurm.conf
+PATH=/cm/shared/apps/slurm/current/sbin:/cm/shared/apps/slurm/current/bin:/cm/shared/apps/spack/0.17.3/cpu/bin:/home/jpg/usr/bin:/home/jpg/bin:/home/jpg/.local/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin
+SLURM_JOB_NAME=imagemagick@7.0.8-7
+LOCAL_TIME=20230622T214415-0700
+MODULEPATH=/cm/local/modulefiles:/etc/modulefiles:/usr/share/modulefiles:/usr/share/Modules/modulefiles:/cm/shared/modulefiles
+SLURM_NTASKS_PER_NODE=1
+_LMFILES_=/cm/local/modulefiles/slurm/slurm/22.05.9
+DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/422/bus
+SYSTEM_NAME=tscc
+LMOD_CMD=/usr/share/lmod/lmod/libexec/lmod
+MAIL=/var/spool/mail/jpg
+SSH_TTY=/dev/pts/0
+__LMOD_REF_COUNT_LD_LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:1;/cm/shared/apps/slurm/current/lib64:1
+LMOD_SYSTEM_DEFAULT_MODULES=DefaultModules
+SLURM_JOB_GID=7193
+CPATH=/cm/shared/apps/slurm/current/include
+SPACK_VERSION=0.17.3
+OLDPWD=/home/jpg/specs_cpu_0.17.3
+SLURM_JOB_NODELIST=compute-11-56
+BASH_FUNC_ml%%=() {  eval $($LMOD_DIR/ml_cmd "$@")
+}
+BASH_FUNC_which%%=() {  ( alias;
+ eval ${which_declare} ) | /usr/bin/which --tty-only --read-alias --read-functions --show-tilde --show-dot $@
+}
+BASH_FUNC_module%%=() {  eval $($LMOD_CMD bash "$@") && eval $(${LMOD_SETTARG_CMD:-:} -s sh)
+}
+BASH_FUNC__spack_shell_wrapper%%=() {  for var in LD_LIBRARY_PATH DYLD_LIBRARY_PATH DYLD_FALLBACK_LIBRARY_PATH;
+ do
+ eval "if [ -n \"\${${var}-}\" ]; then export SPACK_$var=\${${var}}; fi";
+ done;
+ if [ -n "${ZSH_VERSION:-}" ]; then
+ emulate -L sh;
+ fi;
+ _sp_flags="";
+ while [ ! -z ${1+x} ] && [ "${1#-}" != "${1}" ]; do
+ _sp_flags="$_sp_flags $1";
+ shift;
+ done;
+ if [ -n "$_sp_flags" ] && [ "${_sp_flags#*h}" != "${_sp_flags}" ] || [ "${_sp_flags#*V}" != "${_sp_flags}" ]; then
+ command spack $_sp_flags "$@";
+ return;
+ fi;
+ _sp_subcommand="";
+ if [ ! -z ${1+x} ]; then
+ _sp_subcommand="$1";
+ shift;
+ fi;
+ case $_sp_subcommand in 
+ "cd")
+ _sp_arg="";
+ if [ -n "$1" ]; then
+ _sp_arg="$1";
+ shift;
+ fi;
+ if [ "$_sp_arg" = "-h" ] || [ "$_sp_arg" = "--help" ]; then
+ command spack cd -h;
+ else
+ LOC="$(spack location $_sp_arg "$@")";
+ if [ -d "$LOC" ]; then
+ cd "$LOC";
+ else
+ return 1;
+ fi;
+ fi;
+ return
+ ;;
+ "env")
+ _sp_arg="";
+ if [ -n "$1" ]; then
+ _sp_arg="$1";
+ shift;
+ fi;
+ if [ "$_sp_arg" = "-h" ] || [ "$_sp_arg" = "--help" ]; then
+ command spack env -h;
+ else
+ case $_sp_arg in 
+ activate)
+ _a=" $@";
+ if [ -z ${1+x} ] || [ "${_a#* --sh}" != "$_a" ] || [ "${_a#* --csh}" != "$_a" ] || [ "${_a#* -h}" != "$_a" ] || [ "${_a#* --help}" != "$_a" ]; then
+ command spack env activate "$@";
+ else
+ stdout="$(command spack $_sp_flags env activate --sh "$@")" || return;
+ eval "$stdout";
+ fi
+ ;;
+ deactivate)
+ _a=" $@";
+ if [ "${_a#* --sh}" != "$_a" ] || [ "${_a#* --csh}" != "$_a" ]; then
+ command spack env deactivate "$@";
+ else
+ if [ -n "$*" ]; then
+ command spack env deactivate -h;
+ else
+ stdout="$(command spack $_sp_flags env deactivate --sh)" || return;
+ eval "$stdout";
+ fi;
+ fi
+ ;;
+ *)
+ command spack env $_sp_arg "$@"
+ ;;
+ esac;
+ fi;
+ return
+ ;;
+ "load" | "unload")
+ _a=" $@";
+ if [ "${_a#* --sh}" != "$_a" ] || [ "${_a#* --csh}" != "$_a" ] || [ "${_a#* -h}" != "$_a" ] || [ "${_a#* --list}" != "$_a" ] || [ "${_a#* --help}" != "$_a" ]; then
+ command spack $_sp_flags $_sp_subcommand "$@";
+ else
+ stdout="$(command spack $_sp_flags $_sp_subcommand --sh "$@")" || return;
+ eval "$stdout";
+ fi
+ ;;
+ *)
+ command spack $_sp_flags $_sp_subcommand "$@"
+ ;;
+ esac
+}
+BASH_FUNC_spack%%=() {  : this is a shell function from: /cm/shared/apps/spack/0.17.3/cpu/share/spack/setup-env.sh;
+ : the real spack script is here: /cm/shared/apps/spack/0.17.3/cpu/bin/spack;
+ _spack_shell_wrapper "$@";
+ return $?
+}
+_=/usr/bin/printenv
+compilers:
+- compiler:
+    spec: gcc@11.2.0
+    paths:
+      cc: /usr/bin/gcc
+      cxx: /usr/bin/g++
+      f77: /usr/bin/gfortran
+      fc: /usr/bin/gfortran
+    flags:
+      cflags: -O2 -march=native
+      cxxflags: -O2 -march=native
+      fflags: -O2 -march=native
+    operating_system: rocky9
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+- compiler:
+    spec: gcc@10.2.0
+    paths:
+      cc: /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-10.2.0-2ml3m2ltzeohnaco3bxthfprl6dr5gfi/bin/gcc
+      cxx: /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-10.2.0-2ml3m2ltzeohnaco3bxthfprl6dr5gfi/bin/g++
+      f77: /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-10.2.0-2ml3m2ltzeohnaco3bxthfprl6dr5gfi/bin/gfortran
+      fc: /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-10.2.0-2ml3m2ltzeohnaco3bxthfprl6dr5gfi/bin/gfortran
+    flags: {}
+    operating_system: rocky9
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+config:
+  install_tree:
+    root: $spack/opt/spack
+    projections:
+      all: ${ARCHITECTURE}/${COMPILERNAME}-${COMPILERVER}/${PACKAGE}-${VERSION}-${HASH}
+  template_dirs:
+  - $spack/share/spack/templates
+
+  # Temporary locations Spack can try to use for builds.
+  #
+  # Recommended options are given below.
+  #
+  # Builds can be faster in temporary directories on some (e.g., HPC) systems.
+  # Specifying `$tempdir` will ensure use of the default temporary directory
+  # (i.e., ``$TMP` or ``$TMPDIR``).
+  #
+  # Another option that prevents conflicts and potential permission issues is
+  # to specify `$user_cache_path/stage`, which ensures each user builds in their
+  # home directory.
+  #
+  # A more traditional path uses the value of `$spack/var/spack/stage`, which
+  # builds directly inside Spack's instance without staging them in a
+  # temporary space.  Problems with specifying a path inside a Spack instance
+  # are that it precludes its use as a system package and its ability to be
+  # pip installable.
+  #
+  # In any case, if the username is not already in the path, Spack will append
+  # the value of `$user` in an attempt to avoid potential conflicts between
+  # users in shared temporary spaces.
+  #
+  # The build stage can be purged with `spack clean --stage` and
+  # `spack clean -a`, so it is important that the specified directory uniquely
+  # identifies Spack staging to avoid accidentally wiping out non-Spack work.
+  build_stage:
+  - $tempdir/$user/spack-stage
+  - $user_cache_path/stage
+  # - $spack/var/spack/stage
+
+  # Directory in which to run tests and store test results.
+  # Tests will be stored in directories named by date/time and package
+  # name/hash.
+  test_stage: $user_cache_path/test
+  source_cache: $spack/var/spack/cache
+  misc_cache: $user_cache_path/cache
+  connect_timeout: 10
+  verify_ssl: true
+  suppress_gpg_warnings: false
+  install_missing_compilers: false
+  checksum: true
+  deprecated: false
+  dirty: false
+  build_language: C
+  locks: true
+  url_fetch_method: urllib
+  ccache: false
+  concretizer: clingo
+  db_lock_timeout: 3
+  package_lock_timeout: null
+  shared_linking: rpath
+  allow_sgid: true
+  terminal_title: false
+  debug: false
+  build_jobs: 16
+mirrors:
+  spack-public: https://mirror.spack.io
+modules:
+  default:
+    lmod:
+      core_compilers:
+      - gcc@11.2.0
+      hierarchy:
+      - mpi
+      hash_length: 7
+      blacklist_implicits: true
+      naming_scheme: '{name}/{version}'
+      projections:
+        all: '{name}/{version}'
+      adol-c:
+        suffixes:
+          +openmp: omp
+      amdblis:
+        suffixes:
+          threads=openmp: omp
+      fftw:
+        suffixes:
+          +openmp: omp
+      hpl:
+        suffixes:
+          +openmp: omp
+      hypre:
+        suffixes:
+          +openmp: omp
+      intel:
+        environment:
+          set:
+            INTEL_LICENSE_FILE: 40000@elprado.sdsc.edu:40100@elprado.sdsc.edu
+      kokkos:
+        suffixes:
+          +openmp: omp
+      openblas:
+        suffixes:
+          threads=openmp: omp
+          +ilp64: ilp64
+      'netlib-scalapack:':
+        suffixes:
+          ^openblas threads=openmp: omp
+      petsc:
+        suffixes:
+          +complex: cmplx
+      slepc:
+        suffixes:
+          ^petsc +complex: cmplx
+      ^python:
+        autoload: direct
+      ^ucx:
+        autoload: direct
+    'enable:':
+    - lmod
+  prefix_inspections:
+    lib:
+    - LD_LIBRARY_PATH
+    lib64:
+    - LD_LIBRARY_PATH
+    bin:
+    - PATH
+    man:
+    - MANPATH
+    share/man:
+    - MANPATH
+    share/aclocal:
+    - ACLOCAL_PATH
+    lib/pkgconfig:
+    - PKG_CONFIG_PATH
+    lib64/pkgconfig:
+    - PKG_CONFIG_PATH
+    share/pkgconfig:
+    - PKG_CONFIG_PATH
+    ? ''
+    : - CMAKE_PREFIX_PATH
+
+  # These are configurations for the module set named "default"
+packages:
+  lustre:
+    externals:
+    - spec: lustre@2.15.2 % gcc@10.2.0 arch=linux-rocky9-cascadelake
+      prefix: /usr
+    - spec: lustre@2.15.2 % gcc@11.2.0 arch=linux-rocky9-cascadelake
+      prefix: /usr
+    - spec: lustre@2.15.2 % intel@19.1.1.217 arch=linux-rocky9-cascadelake
+      prefix: /usr
+    buildable: false
+  texlive:
+    externals:
+    - spec: texlive@live % gcc@10.2.0  arch=linux-rocky9-cascadelake
+      prefix: /usr
+    - spec: texlive@live % gcc@11.2.0  arch=linux-rocky9-cascadelake
+      prefix: /usr
+    - spec: texlive@live % intel@19.1.1.217  arch=linux-rocky9-cascadelake
+      prefix: /usr
+    buildable: false
+  openssl:
+    externals:
+    - spec: openssl@3.0.1 % gcc@10.2.0 arch=linux-rocky9-cascadelake
+      prefix: /usr
+    - spec: openssl@3.0.1 % gcc@11.2.0 arch=linux-rocky9-cascadelake
+      prefix: /usr
+    - spec: openssl@3.0.1 % intel@19.1.1.217 arch=linux-rocky9-cascadelake
+      prefix: /usr
+    buildable: false
+  rdma-core:
+    externals:
+    - spec: rdma-core@41.0 % gcc@11.2.0 arch=linux-rocky9-cascadelake
+      prefix: /usr
+    - spec: rdma-core@41.0 % gcc@10.2.0 arch=linux-rocky9-cascadelake
+      prefix: /usr
+    - spec: rdma-core@41.0 % intel@19.1.1.217 arch=linux-rocky9-cascadelake
+      prefix: /usr
+    buildable: false
+  slurm:
+    externals:
+    - spec: slurm@22.05.9 % gcc@11.2.0 arch=linux-rocky9-cascadelake
+      prefix: /cm/shared/apps/slurm/22.05.9
+    - spec: slurm@22.05.8 % gcc@10.2.0 arch=linux-rocky9-cascadelake
+      prefix: /cm/shared/apps/slurm/22.05.9
+    - spec: slurm@22.05.8 % intel@19.1.1.217 arch=linux-rocky9-cascadelake
+      prefix: /cm/shared/apps/slurm/22.05.9
+    buildable: false
+  librsvg:
+    externals:
+    - spec: librsvg@2.42.7 % gcc@10.2.0 arch=linux-rocky9-cascadelake
+      prefix: /usr
+    - spec: librsvg@2.42.7 % gcc@11.2.0 arch=linux-rocky9-cascadelake
+      prefix: /usr
+    - spec: librsvg@2.42.7 % intel@19.1.1.217 arch=linux-rocky9-cascadelake
+      prefix: /usr
+    buildable: false
+  ghostscript:
+    externals:
+    - spec: ghostscript@9.27 % gcc@10.2.0 arch=linux-rocky9-cascadelake
+      prefix: /usr
+    - spec: ghostscript@9.27 % gcc@11.2.0 arch=linux-rocky9-cascadelake
+      prefix: /usr
+    - spec: ghostscript@9.27 % intel@19.1.1.217 arch=linux-rocky9-cascadelake
+      prefix: /usr
+    buildable: false
+  gaussian:
+    permissions:
+      read: group
+      group: jpg
+  vasp6:
+    permissions:
+      read: group
+      group: vasp-6
+  all:
+    compiler: [gcc, intel, pgi, clang, xl, nag, fj, aocc]
+    providers:
+      awk: [gawk]
+      blas: [openblas, amdblis]
+      D: [ldc]
+      daal: [intel-daal]
+      elf: [elfutils]
+      fftw-api: [fftw, amdfftw]
+      flame: [libflame, amdlibflame]
+      fuse: [libfuse]
+      gl: [mesa+opengl, mesa18, opengl]
+      glu: [mesa-glu, openglu]
+      glx: [mesa+glx, mesa18+glx, opengl]
+      golang: [gcc]
+      iconv: [libiconv]
+      ipp: [intel-ipp]
+      java: [openjdk, jdk, ibm-java]
+      jpeg: [libjpeg-turbo, libjpeg]
+      lapack: [openblas, amdlibflame]
+      lua-lang: [lua, lua-luajit]
+      mariadb-client: [mariadb-c-client, mariadb]
+      mkl: [intel-mkl]
+      mpe: [mpe2]
+      mpi: [openmpi, mpich]
+      mysql-client: [mysql, mariadb-c-client]
+      opencl: [pocl]
+      onedal: [intel-oneapi-dal]
+      osmesa: [mesa+osmesa, mesa18+osmesa]
+      pbs: [openpbs, torque]
+      pil: [py-pillow]
+      pkgconfig: [pkgconf, pkg-config]
+      rpc: [libtirpc]
+      scalapack: [netlib-scalapack, amdscalapack]
+      sycl: [hipsycl]
+      szip: [libaec, libszip]
+      tbb: [intel-tbb]
+      unwind: [libunwind]
+      uuid: [util-linux-uuid, libuuid]
+      xxd: [xxd-standalone, vim]
+      yacc: [bison, byacc]
+      ziglang: [zig]
+    permissions:
+      read: world
+      write: user
+repos:
+- $spack/var/spack/repos/sdsc
+- $spack/var/spack/repos/builtin
+upstreams: {}
+Input spec
+--------------------------------
+[    ]  .imagemagick@7.0.8-7%gcc@10.2.0
+[    ]      ^.ghostscript@9.27
+[    ]      ^builtin.python@3.8.12%gcc@10.2.0+bz2+ctypes+dbm~debug+libxml2+lzma~nis+optimizations+pic+pyexpat+pythoncmd+readline+shared+sqlite3+ssl~tix~tkinter~ucs4+uuid+zlib patches=0d98e93189bc278fbc37a50ed7f183bd8aaf249a8e1670a465f0db6bb4f8cf87,4c2457325f2b608b1b6a2c63087df8c26e07db3e3d493caf36a56f0ecf6fb768,f2fd060afc4b4618fe8104c4c5d771f36dc55b1db5a4623785a4ea707ec72fb4 arch=linux-rocky9-cascadelake
+[bl  ]          ^builtin.bzip2@1.0.8%gcc@10.2.0~debug~pic+shared arch=linux-rocky9-cascadelake
+[bl  ]          ^builtin.expat@2.4.1%gcc@10.2.0+libbsd arch=linux-rocky9-cascadelake
+[bl  ]              ^builtin.libbsd@0.11.3%gcc@10.2.0 arch=linux-rocky9-cascadelake
+[bl  ]                  ^builtin.libmd@1.0.3%gcc@10.2.0 arch=linux-rocky9-cascadelake
+[bl  ]          ^sdsc.gdbm@1.19%gcc@10.2.0 arch=linux-rocky9-cascadelake
+[bl  ]              ^builtin.readline@8.1%gcc@10.2.0 arch=linux-rocky9-cascadelake
+[bl  ]                  ^builtin.ncurses@6.2%gcc@10.2.0~symlinks+termlib abi=none arch=linux-rocky9-cascadelake
+[bl  ]          ^builtin.gettext@0.21%gcc@10.2.0+bzip2+curses+git~libunistring+libxml2+tar+xz arch=linux-rocky9-cascadelake
+[bl  ]              ^builtin.libiconv@1.16%gcc@10.2.0 libs=shared,static arch=linux-rocky9-cascadelake
+[bl  ]              ^builtin.libxml2@2.9.12%gcc@10.2.0~python arch=linux-rocky9-cascadelake
+[blr ]                  ^builtin.xz@5.2.5%gcc@10.2.0~pic libs=shared,static arch=linux-rocky9-cascadelake
+[bl  ]                  ^builtin.zlib@1.2.11%gcc@10.2.0+optimize+pic+shared arch=linux-rocky9-cascadelake
+[bl  ]              ^builtin.tar@1.34%gcc@10.2.0 arch=linux-rocky9-cascadelake
+[bl  ]          ^builtin.libffi@3.3%gcc@10.2.0 patches=26f26c6f29a7ce9bf370ad3ab2610f99365b4bdd7b82e7c31df41a3370d685c0 arch=linux-rocky9-cascadelake
+[bl  ]          ^builtin.openssl@3.0.1%gcc@10.2.0~docs certs=system arch=linux-rocky9-cascadelake
+[bl  ]          ^builtin.sqlite@3.36.0%gcc@10.2.0+column_metadata+fts~functions~rtree arch=linux-rocky9-cascadelake
+[bl  ]          ^builtin.util-linux-uuid@2.36.2%gcc@10.2.0 arch=linux-rocky9-cascadelake
+
+Concretized
+--------------------------------
+oxw3s3w  [    ]  builtin.imagemagick@7.0.8-7%gcc@10.2.0 arch=linux-rocky9-cascadelake
+nx6w2xh  [bl  ]      ^builtin.fontconfig@2.13.94%gcc@10.2.0 arch=linux-rocky9-cascadelake
+wrnwjdi  [bl  ]          ^builtin.font-util@1.3.2%gcc@10.2.0 fonts=encodings,font-adobe-100dpi,font-adobe-75dpi,font-adobe-utopia-100dpi,font-adobe-utopia-75dpi,font-adobe-utopia-type1,font-alias,font-arabic-misc,font-bh-100dpi,font-bh-75dpi,font-bh-lucidatypewriter-100dpi,font-bh-lucidatypewriter-75dpi,font-bh-type1,font-bitstream-100dpi,font-bitstream-75dpi,font-bitstream-speedo,font-bitstream-type1,font-cronyx-cyrillic,font-cursor-misc,font-daewoo-misc,font-dec-misc,font-ibm-type1,font-isas-misc,font-jis-misc,font-micro-misc,font-misc-cyrillic,font-misc-ethiopic,font-misc-meltho,font-misc-misc,font-mutt-misc,font-schumacher-misc,font-screen-cyrillic,font-sun-misc,font-winitzki-cyrillic,font-xfree86-type1 arch=linux-rocky9-cascadelake
+5ioejy7  [b   ]              ^builtin.autoconf@2.69%gcc@10.2.0 patches=35c449281546376449766f92d49fc121ca50e330e60fefcfc9be2af3253082c2,7793209b33013dc0f81208718c68440c5aae80e7a1c4b8d336e382525af791a7,a49dd5bac3b62daa0ff688ab4d508d71dbd2f4f8d7e2a02321926346161bf3ee arch=linux-rocky9-cascadelake
+iicu2mi  [b r ]                  ^builtin.m4@1.4.19%gcc@10.2.0+sigsegv patches=9dc5fbd0d5cb1037ab1e6d0ecc74a30df218d0a94bdd5a02759a97f62daca573,bfdffa7c2eb01021d5849b36972c069693654ad826c1a20b53534009a4ec7a89 arch=linux-rocky9-cascadelake
+hktmtay  [bl  ]                      ^builtin.libsigsegv@2.13%gcc@10.2.0 arch=linux-rocky9-cascadelake
+6rhlmh6  [b r ]                  ^sdsc.perl@5.32.0%gcc@10.2.0+cpanm+shared+threads arch=linux-rocky9-cascadelake
+jtqvkkl  [bl  ]                      ^builtin.berkeley-db@18.1.40%gcc@10.2.0+cxx~docs+stl patches=b231fcc4d5cff05e5c3a4814f6a5af0e9a966428dc2176540d2c05aff41de522 arch=linux-rocky9-cascadelake
+ajm27op  [bl  ]                      ^builtin.bzip2@1.0.8%gcc@10.2.0~debug~pic+shared arch=linux-rocky9-cascadelake
+72i4jhj  [bl  ]                      ^sdsc.gdbm@1.19%gcc@10.2.0 arch=linux-rocky9-cascadelake
+xbqj6ko  [bl  ]                          ^builtin.readline@8.1%gcc@10.2.0 arch=linux-rocky9-cascadelake
+bsjgtdt  [bl  ]                              ^builtin.ncurses@6.2%gcc@10.2.0~symlinks+termlib abi=none arch=linux-rocky9-cascadelake
+4uqbysq  [bl  ]                      ^builtin.zlib@1.2.11%gcc@10.2.0+optimize+pic+shared arch=linux-rocky9-cascadelake
+ibn4cup  [b   ]              ^builtin.automake@1.16.3%gcc@10.2.0 arch=linux-rocky9-cascadelake
+tshkroz  [b   ]              ^builtin.bdftopcf@1.0.5%gcc@10.2.0 arch=linux-rocky9-cascadelake
+53vqgot  [bl  ]                  ^builtin.fontsproto@2.1.3%gcc@10.2.0 arch=linux-rocky9-cascadelake
+fb5xiok  [b   ]                      ^builtin.pkgconf@1.8.0%gcc@10.2.0 arch=linux-rocky9-cascadelake
+tdnzbkl  [b   ]                      ^builtin.util-macros@1.19.3%gcc@10.2.0 arch=linux-rocky9-cascadelake
+ntvx4kh  [bl  ]                  ^builtin.libxfont@1.5.2%gcc@10.2.0 arch=linux-rocky9-cascadelake
+n3iwwll  [bl  ]                      ^builtin.freetype@2.11.0%gcc@10.2.0 arch=linux-rocky9-cascadelake
+emuqdf4  [bl  ]                          ^builtin.libpng@1.6.37%gcc@10.2.0 arch=linux-rocky9-cascadelake
+feqzjbt  [bl  ]                      ^builtin.libfontenc@1.1.3%gcc@10.2.0 arch=linux-rocky9-cascadelake
+2j3nx2y  [bl  ]                          ^builtin.xproto@7.0.31%gcc@10.2.0 arch=linux-rocky9-cascadelake
+h6hyd5f  [bl  ]                      ^builtin.xtrans@1.3.5%gcc@10.2.0 arch=linux-rocky9-cascadelake
+ez2tloq  [b   ]              ^builtin.mkfontdir@1.0.7%gcc@10.2.0 arch=linux-rocky9-cascadelake
+2a2wmf3  [b r ]                  ^builtin.mkfontscale@1.1.2%gcc@10.2.0 arch=linux-rocky9-cascadelake
+d5a7gtt  [b   ]          ^builtin.gperf@3.1%gcc@10.2.0 arch=linux-rocky9-cascadelake
+vykfqo5  [bl  ]          ^builtin.libxml2@2.9.12%gcc@10.2.0~python arch=linux-rocky9-cascadelake
+wtudqp7  [bl  ]              ^builtin.libiconv@1.16%gcc@10.2.0 libs=shared,static arch=linux-rocky9-cascadelake
+ou33t6h  [blr ]              ^builtin.xz@5.2.5%gcc@10.2.0~pic libs=shared,static arch=linux-rocky9-cascadelake
+zbtfzsi  [blr ]          ^builtin.python@3.8.12%gcc@10.2.0+bz2+ctypes+dbm~debug+libxml2+lzma~nis+optimizations+pic+pyexpat+pythoncmd+readline+shared+sqlite3+ssl~tix~tkinter~ucs4+uuid+zlib patches=0d98e93189bc278fbc37a50ed7f183bd8aaf249a8e1670a465f0db6bb4f8cf87,4c2457325f2b608b1b6a2c63087df8c26e07db3e3d493caf36a56f0ecf6fb768,f2fd060afc4b4618fe8104c4c5d771f36dc55b1db5a4623785a4ea707ec72fb4 arch=linux-rocky9-cascadelake
+qj5aln7  [bl  ]              ^builtin.expat@2.4.1%gcc@10.2.0+libbsd arch=linux-rocky9-cascadelake
+uau6dnm  [bl  ]                  ^builtin.libbsd@0.11.3%gcc@10.2.0 arch=linux-rocky9-cascadelake
+v7ub3z4  [bl  ]                      ^builtin.libmd@1.0.3%gcc@10.2.0 arch=linux-rocky9-cascadelake
+6vsp75v  [bl  ]              ^builtin.gettext@0.21%gcc@10.2.0+bzip2+curses+git~libunistring+libxml2+tar+xz arch=linux-rocky9-cascadelake
+hmarh6a  [bl  ]                  ^builtin.tar@1.34%gcc@10.2.0 arch=linux-rocky9-cascadelake
+2mnqniq  [bl  ]              ^builtin.libffi@3.3%gcc@10.2.0 patches=26f26c6f29a7ce9bf370ad3ab2610f99365b4bdd7b82e7c31df41a3370d685c0 arch=linux-rocky9-cascadelake
+hzcjij5  [bl  ]              ^builtin.openssl@3.0.1%gcc@10.2.0~docs certs=system arch=linux-rocky9-cascadelake
+bljffxn  [bl  ]              ^builtin.sqlite@3.36.0%gcc@10.2.0+column_metadata+fts~functions~rtree arch=linux-rocky9-cascadelake
+5r52k3d  [bl  ]              ^builtin.util-linux-uuid@2.36.2%gcc@10.2.0 arch=linux-rocky9-cascadelake
+mwrtc32  [bl  ]      ^builtin.ghostscript@9.27%gcc@10.2.0~tesseract arch=linux-rocky9-cascadelake
+xqbkmnz  [bl  ]      ^builtin.ghostscript-fonts@8.11%gcc@10.2.0 arch=linux-rocky9-cascadelake
+ggkrrmm  [bl  ]      ^builtin.libjpeg-turbo@2.1.0%gcc@10.2.0 arch=linux-rocky9-cascadelake
+msypfs7  [b   ]          ^builtin.cmake@3.21.4%gcc@10.2.0~doc+ncurses+openssl+ownlibs~qt build_type=Release arch=linux-rocky9-cascadelake
+c7c4vjb  [b   ]          ^builtin.nasm@2.15.05%gcc@10.2.0 arch=linux-rocky9-cascadelake
+vjolmrg  [bl  ]      ^builtin.libsm@1.2.3%gcc@10.2.0 arch=linux-rocky9-cascadelake
+nkcadke  [bl  ]          ^builtin.libice@1.0.9%gcc@10.2.0 arch=linux-rocky9-cascadelake
+3vhixwr  [bl  ]      ^builtin.libtiff@4.3.0%gcc@10.2.0~jbig~jpeg~jpeg12~lerc~libdeflate~lzma~old-jpeg~pixarlog~webp~zlib~zstd arch=linux-rocky9-cascadelake
+jdsmqaa  [bl  ]      ^builtin.libtool@2.4.6%gcc@10.2.0 arch=linux-rocky9-cascadelake
+wfre5r5  [bl  ]      ^builtin.pango@1.42.0%gcc@10.2.0~X arch=linux-rocky9-cascadelake
+pzz5ju6  [bl  ]          ^builtin.cairo@1.16.0%gcc@10.2.0~X+fc+ft+gobject+pdf~png~svg patches=7c4da77767fe9feb03f8051def0832f0c67f99162913275cfa127a88df19cf51 arch=linux-rocky9-cascadelake
+kawq5ti  [bl  ]              ^builtin.glib@2.70.0%gcc@10.2.0~libmount patches=8547954e50d0a720fa9794b84c31569df6a7419319b95ac9de0ed861d8969ffd tracing=none arch=linux-rocky9-cascadelake
+7tccydf  [b   ]                  ^builtin.meson@0.60.0%gcc@10.2.0 patches=aa6c50d5a2aeb1a487d16f6712be4357fefb923aae37ab830699b07338388287 arch=linux-rocky9-cascadelake
+xmcqiev  [b r ]                      ^builtin.ninja@1.10.2%gcc@10.2.0 arch=linux-rocky9-cascadelake
+x4ymo7r  [b r ]                      ^builtin.py-setuptools@58.2.0%gcc@10.2.0 arch=linux-rocky9-cascadelake
+7v7gjy2  [bl  ]                  ^builtin.pcre@8.44%gcc@10.2.0~jit+multibyte+utf arch=linux-rocky9-cascadelake
+wglpccn  [bl  ]              ^builtin.pixman@0.40.0%gcc@10.2.0 arch=linux-rocky9-cascadelake
+u3pq6lz  [bl  ]          ^builtin.fribidi@1.0.5%gcc@10.2.0 arch=linux-rocky9-cascadelake
+bubyjxh  [bl  ]          ^builtin.gobject-introspection@1.56.1%gcc@10.2.0 patches=6f90bb267efa043ed70b900b4b8e2faf9e8133afae311893b01060356ea81bba,7700828b638c85255c87fcc317ea7e9572ff443f65c86648796528885e5b4cea arch=linux-rocky9-cascadelake
+egvqhvi  [b   ]              ^builtin.bison@3.8.2%gcc@10.2.0 arch=linux-rocky9-cascadelake
+eduenvo  [b   ]                  ^builtin.diffutils@3.8%gcc@10.2.0 arch=linux-rocky9-cascadelake
+rmcjigp  [b   ]              ^builtin.flex@2.6.3%gcc@10.2.0+lex~nls arch=linux-rocky9-cascadelake
+ljmyskd  [b   ]                  ^builtin.findutils@4.8.0%gcc@10.2.0 arch=linux-rocky9-cascadelake
+gj3cupe  [bl  ]          ^builtin.harfbuzz@2.6.8%gcc@10.2.0~graphite2 arch=linux-rocky9-cascadelake
+xhocqoa  [bl  ]              ^builtin.icu4c@67.1%gcc@10.2.0 cxxstd=11 arch=linux-rocky9-cascadelake
+
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/libsigsegv-2.13-hktmtayi77vhvccpaozxk7ptnydrcuox
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/berkeley-db-18.1.40-jtqvkkl7yqo2ltog5teew6oh7kzbv6oa
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/bzip2-1.0.8-ajm27opt7ijxmem5ggf4n5cxxc3t3adi
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/ncurses-6.2-bsjgtdtspyy5jo24t43pkbllqzvzi7f7
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/zlib-1.2.11-4uqbysqityp77r5nt3yi57vwyw4qnsoq
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/pkgconf-1.8.0-fb5xiokhlcrkbqmkzf2d2tqou2mbrdzc
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/util-macros-1.19.3-tdnzbkl74cgez4msdrngqoeptxaewryn
+==> Installing gperf-3.1-d5a7gttrhupedmy2wfpkt7mz4jkwx67e
+==> No binary for gperf-3.1-d5a7gttrhupedmy2wfpkt7mz4jkwx67e found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/58/588546b945bba4b70b6a3a616e80b4ab466e3f33024a352fc2198112cdbb3ae2.tar.gz
+==> No patches needed for gperf
+==> gperf: Executing phase: 'autoreconf'
+==> gperf: Executing phase: 'configure'
+==> gperf: Executing phase: 'build'
+==> gperf: Executing phase: 'install'
+==> gperf: Successfully installed gperf-3.1-d5a7gttrhupedmy2wfpkt7mz4jkwx67e
+  Fetch: 0.28s.  Build: 3.77s.  Total: 4.05s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/gperf-3.1-d5a7gttrhupedmy2wfpkt7mz4jkwx67e
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/libiconv-1.16-wtudqp7hljfefzx4fcbhnlgfntzgt2xp
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/xz-5.2.5-ou33t6hr3g4vspgpxkharomlppeoachh
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/libmd-1.0.3-v7ub3z4irykjddtmqzu43opgkbwrbfd5
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/libffi-3.3-2mnqniqgxxkzayjkb76afxi5xdy2hk5e
+[+] /usr (external openssl-3.0.1-hzcjij5xskkgom4gruklbckiveahq7zx)
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/util-linux-uuid-2.36.2-5r52k3duohk6cjunr3jmiakfem77274o
+[+] /usr (external ghostscript-9.27-mwrtc32hsrmqs4kit32badzjkrbltosd)
+==> Installing ghostscript-fonts-8.11-xqbkmnzc2fhnl4qxvwz7tk2mjabihet4
+==> No binary for ghostscript-fonts-8.11-xqbkmnzc2fhnl4qxvwz7tk2mjabihet4 found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/0e/0eb6f356119f2e49b2563210852e17f57f9dcc5755f350a69a46a0d641a0c401.tar.gz
+==> No patches needed for ghostscript-fonts
+==> ghostscript-fonts: Executing phase: 'install'
+==> ghostscript-fonts: Successfully installed ghostscript-fonts-8.11-xqbkmnzc2fhnl4qxvwz7tk2mjabihet4
+  Fetch: 0.80s.  Build: 3.99s.  Total: 4.79s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/ghostscript-fonts-8.11-xqbkmnzc2fhnl4qxvwz7tk2mjabihet4
+==> Installing nasm-2.15.05-c7c4vjbmulthziaknoihpxtwqizuxtwv
+==> No binary for nasm-2.15.05-c7c4vjbmulthziaknoihpxtwqizuxtwv found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/3c/3caf6729c1073bf96629b57cee31eeb54f4f8129b01902c73428836550b30a3f.tar.xz
+==> Ran patch() for nasm
+==> nasm: Executing phase: 'autoreconf'
+==> nasm: Executing phase: 'configure'
+==> nasm: Executing phase: 'build'
+==> nasm: Executing phase: 'install'
+==> nasm: Successfully installed nasm-2.15.05-c7c4vjbmulthziaknoihpxtwqizuxtwv
+  Fetch: 0.52s.  Build: 12.75s.  Total: 13.27s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/nasm-2.15.05-c7c4vjbmulthziaknoihpxtwqizuxtwv
+==> Installing libtiff-4.3.0-3vhixwrpdwiumyvnchsmib2h2pcyvmvb
+==> No binary for libtiff-4.3.0-3vhixwrpdwiumyvnchsmib2h2pcyvmvb found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/0e/0e46e5acb087ce7d1ac53cf4f56a09b221537fc86dfc5daaad1c2e89e1b37ac8.tar.gz
+==> Ran patch() for libtiff
+==> libtiff: Executing phase: 'autoreconf'
+==> libtiff: Executing phase: 'configure'
+==> libtiff: Executing phase: 'build'
+==> libtiff: Executing phase: 'install'
+==> libtiff: Successfully installed libtiff-4.3.0-3vhixwrpdwiumyvnchsmib2h2pcyvmvb
+  Fetch: 0.77s.  Build: 24.38s.  Total: 25.16s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/libtiff-4.3.0-3vhixwrpdwiumyvnchsmib2h2pcyvmvb
+==> Installing pcre-8.44-7v7gjy2tdd43o4yfwgp4vtp5syerdvqd
+==> No binary for pcre-8.44-7v7gjy2tdd43o4yfwgp4vtp5syerdvqd found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/19/19108658b23b3ec5058edc9f66ac545ea19f9537234be1ec62b714c84399366d.tar.bz2
+==> No patches needed for pcre
+==> pcre: Executing phase: 'autoreconf'
+==> pcre: Executing phase: 'configure'
+==> pcre: Executing phase: 'build'
+==> pcre: Executing phase: 'install'
+==> pcre: Successfully installed pcre-8.44-7v7gjy2tdd43o4yfwgp4vtp5syerdvqd
+  Fetch: 0.62s.  Build: 17.71s.  Total: 18.33s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/pcre-8.44-7v7gjy2tdd43o4yfwgp4vtp5syerdvqd
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/findutils-4.8.0-ljmyskdwetbdrxluuntqve7pwghieybl
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/m4-1.4.19-iicu2mi436w36lirbi4y65mm2pbc5b77
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/readline-8.1-xbqj6kojps2er2fphfy76qa3akb5qpcd
+==> Installing libpng-1.6.37-emuqdf4saii7hyhinjau73yswlqphqrs
+==> No binary for libpng-1.6.37-emuqdf4saii7hyhinjau73yswlqphqrs found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/50/505e70834d35383537b6491e7ae8641f1a4bed1876dbfe361201fc80868d88ca.tar.xz
+==> No patches needed for libpng
+==> libpng: Executing phase: 'autoreconf'
+==> libpng: Executing phase: 'configure'
+==> libpng: Executing phase: 'build'
+==> libpng: Executing phase: 'install'
+==> libpng: Successfully installed libpng-1.6.37-emuqdf4saii7hyhinjau73yswlqphqrs
+  Fetch: 0.28s.  Build: 9.76s.  Total: 10.04s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/libpng-1.6.37-emuqdf4saii7hyhinjau73yswlqphqrs
+==> Installing fontsproto-2.1.3-53vqgoth4jp23suxqdrbrtcihy4bbwbx
+==> No binary for fontsproto-2.1.3-53vqgoth4jp23suxqdrbrtcihy4bbwbx found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/72/72c44e63044b2b66f6fa112921621ecc20c71193982de4f198d9a29cda385c5e.tar.gz
+==> No patches needed for fontsproto
+==> fontsproto: Executing phase: 'autoreconf'
+==> fontsproto: Executing phase: 'configure'
+==> fontsproto: Executing phase: 'build'
+==> fontsproto: Executing phase: 'install'
+==> fontsproto: Successfully installed fontsproto-2.1.3-53vqgoth4jp23suxqdrbrtcihy4bbwbx
+  Fetch: 0.27s.  Build: 4.06s.  Total: 4.33s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/fontsproto-2.1.3-53vqgoth4jp23suxqdrbrtcihy4bbwbx
+==> Installing xproto-7.0.31-2j3nx2yqlgfnrecu3v5uxjfaikzmnyna
+==> No binary for xproto-7.0.31-2j3nx2yqlgfnrecu3v5uxjfaikzmnyna found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/6d/6d755eaae27b45c5cc75529a12855fed5de5969b367ed05003944cf901ed43c7.tar.gz
+==> No patches needed for xproto
+==> xproto: Executing phase: 'autoreconf'
+==> xproto: Executing phase: 'configure'
+==> xproto: Executing phase: 'build'
+==> xproto: Executing phase: 'install'
+==> xproto: Successfully installed xproto-7.0.31-2j3nx2yqlgfnrecu3v5uxjfaikzmnyna
+  Fetch: 0.27s.  Build: 9.21s.  Total: 9.48s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/xproto-7.0.31-2j3nx2yqlgfnrecu3v5uxjfaikzmnyna
+==> Installing xtrans-1.3.5-h6hyd5f5utnbadcf7r65kfhuev4ru4hn
+==> No binary for xtrans-1.3.5-h6hyd5f5utnbadcf7r65kfhuev4ru4hn found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/b7/b7a577c1b6c75030145e53b4793db9c88f9359ac49e7d771d4385d21b3e5945d.tar.gz
+==> No patches needed for xtrans
+==> xtrans: Executing phase: 'autoreconf'
+==> xtrans: Executing phase: 'configure'
+==> xtrans: Executing phase: 'build'
+==> xtrans: Executing phase: 'install'
+==> xtrans: Successfully installed xtrans-1.3.5-h6hyd5f5utnbadcf7r65kfhuev4ru4hn
+  Fetch: 0.56s.  Build: 4.14s.  Total: 4.70s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/xtrans-1.3.5-h6hyd5f5utnbadcf7r65kfhuev4ru4hn
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/diffutils-3.8-eduenvop5dj34nt6zw5nhvzyxeknewpk
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/tar-1.34-hmarh6a5scrrrvy55lozh7yve2z4bjnm
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/libxml2-2.9.12-vykfqo5bcbyn55h62vjyw33pb2fo5e25
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/libbsd-0.11.3-uau6dnmu5oiufrxbbdnxxb3p4nowljws
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/libtool-2.4.6-jdsmqaa5z3wn4wcm3hdsbgox5mttap74
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/gdbm-1.19-72i4jhjkiit4mdywj3duxglj2gf2fsdr
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/sqlite-3.36.0-bljffxnoagqrxmddnzvusobmeb2c7dt5
+==> Installing freetype-2.11.0-n3iwwllkfzs765jle7rvgvjh6qmycldo
+==> No binary for freetype-2.11.0-n3iwwllkfzs765jle7rvgvjh6qmycldo found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/a4/a45c6b403413abd5706f3582f04c8339d26397c4304b78fa552f2215df64101f.tar.gz
+==> No patches needed for freetype
+==> freetype: Executing phase: 'autoreconf'
+==> freetype: Executing phase: 'configure'
+==> freetype: Executing phase: 'build'
+==> freetype: Executing phase: 'install'
+==> freetype: Successfully installed freetype-2.11.0-n3iwwllkfzs765jle7rvgvjh6qmycldo
+  Fetch: 0.77s.  Build: 15.63s.  Total: 16.40s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/freetype-2.11.0-n3iwwllkfzs765jle7rvgvjh6qmycldo
+==> Installing pixman-0.40.0-wglpccn3fdoobcnjswhutdds7ewozj7i
+==> No binary for pixman-0.40.0-wglpccn3fdoobcnjswhutdds7ewozj7i found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/6d/6d200dec3740d9ec4ec8d1180e25779c00bc749f94278c8b9021f5534db223fc.tar.gz
+==> No patches needed for pixman
+==> pixman: Executing phase: 'autoreconf'
+==> pixman: Executing phase: 'configure'
+==> pixman: Executing phase: 'build'
+==> pixman: Executing phase: 'install'
+==> pixman: Successfully installed pixman-0.40.0-wglpccn3fdoobcnjswhutdds7ewozj7i
+  Fetch: 0.64s.  Build: 25.44s.  Total: 26.08s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/pixman-0.40.0-wglpccn3fdoobcnjswhutdds7ewozj7i
+==> Installing libfontenc-1.1.3-feqzjbts5ox73py2s4ctwxitq6jn3ivk
+==> No binary for libfontenc-1.1.3-feqzjbts5ox73py2s4ctwxitq6jn3ivk found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/6f/6fba26760ca8d5045f2b52ddf641c12cedc19ee30939c6478162b7db8b6220fb.tar.gz
+==> No patches needed for libfontenc
+==> libfontenc: Executing phase: 'autoreconf'
+==> libfontenc: Executing phase: 'configure'
+==> libfontenc: Executing phase: 'build'
+==> libfontenc: Executing phase: 'install'
+==> libfontenc: Successfully installed libfontenc-1.1.3-feqzjbts5ox73py2s4ctwxitq6jn3ivk
+  Fetch: 0.60s.  Build: 6.16s.  Total: 6.75s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/libfontenc-1.1.3-feqzjbts5ox73py2s4ctwxitq6jn3ivk
+==> Installing libice-1.0.9-nkcadke6xzfin4axciekrgs4gk7l2skp
+==> No binary for libice-1.0.9-nkcadke6xzfin4axciekrgs4gk7l2skp found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/78/7812a824a66dd654c830d21982749b3b563d9c2dfe0b88b203cefc14a891edc0.tar.gz
+==> No patches needed for libice
+==> libice: Executing phase: 'autoreconf'
+==> libice: Executing phase: 'configure'
+==> libice: Executing phase: 'build'
+==> libice: Executing phase: 'install'
+==> libice: Successfully installed libice-1.0.9-nkcadke6xzfin4axciekrgs4gk7l2skp
+  Fetch: 0.27s.  Build: 7.85s.  Total: 8.12s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/libice-1.0.9-nkcadke6xzfin4axciekrgs4gk7l2skp
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/gettext-0.21-6vsp75vosm5awm7hqlolf6lhfqjdoexk
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/expat-2.4.1-qj5aln7z27szycd6v2wbzzydof5sjxee
+==> Installing libjpeg-turbo-2.1.0-ggkrrmmhdpkojt3dqtt462s5mye4yj4r
+==> No binary for libjpeg-turbo-2.1.0-ggkrrmmhdpkojt3dqtt462s5mye4yj4r found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/d6/d6b7790927d658108dfd3bee2f0c66a2924c51ee7f9dc930f62c452f4a638c52.tar.gz
+==> No patches needed for libjpeg-turbo
+==> libjpeg-turbo: Executing phase: 'install'
+==> libjpeg-turbo: Successfully installed libjpeg-turbo-2.1.0-ggkrrmmhdpkojt3dqtt462s5mye4yj4r
+  Fetch: 0.71s.  Build: 16.80s.  Total: 17.51s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/libjpeg-turbo-2.1.0-ggkrrmmhdpkojt3dqtt462s5mye4yj4r
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/perl-5.32.0-6rhlmh6zt2avljkidzhcwpqml6rtxvok
+==> Installing libxfont-1.5.2-ntvx4khl5o3gqa3xip7s3qn4vxwozjwc
+==> No binary for libxfont-1.5.2-ntvx4khl5o3gqa3xip7s3qn4vxwozjwc found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/a7/a7350c75171d03d06ae0d623e42240356d6d3e1ac7dfe606639bf20f0d653c93.tar.gz
+==> No patches needed for libxfont
+==> libxfont: Executing phase: 'autoreconf'
+==> libxfont: Executing phase: 'configure'
+==> libxfont: Executing phase: 'build'
+==> libxfont: Executing phase: 'install'
+==> libxfont: Successfully installed libxfont-1.5.2-ntvx4khl5o3gqa3xip7s3qn4vxwozjwc
+  Fetch: 0.57s.  Build: 16.80s.  Total: 17.38s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/libxfont-1.5.2-ntvx4khl5o3gqa3xip7s3qn4vxwozjwc
+==> Installing mkfontscale-1.1.2-2a2wmf3s357w6pc535xotgbkmjgsqs7e
+==> No binary for mkfontscale-1.1.2-2a2wmf3s357w6pc535xotgbkmjgsqs7e found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/8b/8bba59e60fbc4cb082092cf6b67e810b47b4fe64fbc77dbea1d7e7d55312b2e4.tar.gz
+==> No patches needed for mkfontscale
+==> mkfontscale: Executing phase: 'autoreconf'
+==> mkfontscale: Executing phase: 'configure'
+==> mkfontscale: Executing phase: 'build'
+==> mkfontscale: Executing phase: 'install'
+==> mkfontscale: Successfully installed mkfontscale-1.1.2-2a2wmf3s357w6pc535xotgbkmjgsqs7e
+  Fetch: 0.67s.  Build: 8.38s.  Total: 9.05s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/mkfontscale-1.1.2-2a2wmf3s357w6pc535xotgbkmjgsqs7e
+==> Installing libsm-1.2.3-vjolmrghe534vsmak2rmsql7iaezejnc
+==> No binary for libsm-1.2.3-vjolmrghe534vsmak2rmsql7iaezejnc found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/1e/1e92408417cb6c6c477a8a6104291001a40b3bb56a4a60608fdd9cd2c5a0f320.tar.gz
+==> No patches needed for libsm
+==> libsm: Executing phase: 'autoreconf'
+==> libsm: Executing phase: 'configure'
+==> libsm: Executing phase: 'build'
+==> libsm: Executing phase: 'install'
+==> libsm: Successfully installed libsm-1.2.3-vjolmrghe534vsmak2rmsql7iaezejnc
+  Fetch: 0.27s.  Build: 7.11s.  Total: 7.38s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/libsm-1.2.3-vjolmrghe534vsmak2rmsql7iaezejnc
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/python-3.8.12-zbtfzsi35ydhprggy2ibwfd6kyjjeqrz
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/bison-3.8.2-egvqhviywlssx3jqxi6ean2jvm5hgbi4
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/autoconf-2.69-5ioejy7pdaefurpni2su25kbu56drp7u
+==> Installing bdftopcf-1.0.5-tshkrozsouftrnp3wtttcz2fqw7ejh4k
+==> No binary for bdftopcf-1.0.5-tshkrozsouftrnp3wtttcz2fqw7ejh4k found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/78/78a5ec945de1d33e6812167b1383554fda36e38576849e74a9039dc7364ff2c3.tar.gz
+==> No patches needed for bdftopcf
+==> bdftopcf: Executing phase: 'autoreconf'
+==> bdftopcf: Executing phase: 'configure'
+==> bdftopcf: Executing phase: 'build'
+==> bdftopcf: Executing phase: 'install'
+==> bdftopcf: Successfully installed bdftopcf-1.0.5-tshkrozsouftrnp3wtttcz2fqw7ejh4k
+  Fetch: 0.55s.  Build: 4.80s.  Total: 5.35s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/bdftopcf-1.0.5-tshkrozsouftrnp3wtttcz2fqw7ejh4k
+==> Installing mkfontdir-1.0.7-ez2tloql6gfmew6ha5grytwyzaoeirbp
+==> No binary for mkfontdir-1.0.7-ez2tloql6gfmew6ha5grytwyzaoeirbp found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/bc/bccc5fb7af1b614eabe4a22766758c87bfc36d66191d08c19d2fa97674b7b5b7.tar.gz
+==> No patches needed for mkfontdir
+==> mkfontdir: Executing phase: 'autoreconf'
+==> mkfontdir: Executing phase: 'configure'
+==> mkfontdir: Executing phase: 'build'
+==> mkfontdir: Executing phase: 'install'
+==> mkfontdir: Successfully installed mkfontdir-1.0.7-ez2tloql6gfmew6ha5grytwyzaoeirbp
+  Fetch: 0.26s.  Build: 5.25s.  Total: 5.51s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/mkfontdir-1.0.7-ez2tloql6gfmew6ha5grytwyzaoeirbp
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/py-setuptools-58.2.0-x4ymo7rpvsyfzfnjmsmybemvl6xf6jei
+==> Installing icu4c-67.1-xhocqoauxhrduyaouccvytolxkmyf52a
+==> No binary for icu4c-67.1-xhocqoauxhrduyaouccvytolxkmyf52a found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/94/94a80cd6f251a53bd2a997f6f1b5ac6653fe791dfab66e1eb0227740fb86d5dc.tgz
+==> No patches needed for icu4c
+==> icu4c: Executing phase: 'autoreconf'
+==> icu4c: Executing phase: 'configure'
+==> icu4c: Executing phase: 'build'
+==> icu4c: Executing phase: 'install'
+==> icu4c: Successfully installed icu4c-67.1-xhocqoauxhrduyaouccvytolxkmyf52a
+  Fetch: 0.51s.  Build: 1m 1.76s.  Total: 1m 2.27s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/icu4c-67.1-xhocqoauxhrduyaouccvytolxkmyf52a
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/ninja-1.10.2-xmcqievvgqsqrmgjoatdk34s2437cslh
+==> Installing flex-2.6.3-rmcjigpusuzodkjz3zcwecikkzcjrgwq
+==> No binary for flex-2.6.3-rmcjigpusuzodkjz3zcwecikkzcjrgwq found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/68/68b2742233e747c462f781462a2a1e299dc6207401dac8f0bbb316f48565c2aa.tar.gz
+==> No patches needed for flex
+==> flex: Executing phase: 'autoreconf'
+==> flex: Executing phase: 'configure'
+==> flex: Executing phase: 'build'
+==> flex: Executing phase: 'install'
+==> flex: Successfully installed flex-2.6.3-rmcjigpusuzodkjz3zcwecikkzcjrgwq
+  Fetch: 0.71s.  Build: 16.41s.  Total: 17.12s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/flex-2.6.3-rmcjigpusuzodkjz3zcwecikkzcjrgwq
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/automake-1.16.3-ibn4cupobmtez7piomuox2c6xc3vbhwy
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/meson-0.60.0-7tccydfeu2jiywceixkcmzfau7ovfwna
+==> Installing fribidi-1.0.5-u3pq6lzix4yhepdjpifc7457l7uckpbu
+==> No binary for fribidi-1.0.5-u3pq6lzix4yhepdjpifc7457l7uckpbu found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/6a/6a64f2a687f5c4f203a46fa659f43dd43d1f8b845df8d723107e8a7e6158e4ce.tar.bz2
+==> No patches needed for fribidi
+==> fribidi: Executing phase: 'autoreconf'
+==> fribidi: Executing phase: 'configure'
+==> fribidi: Executing phase: 'build'
+==> fribidi: Executing phase: 'install'
+==> fribidi: Successfully installed fribidi-1.0.5-u3pq6lzix4yhepdjpifc7457l7uckpbu
+  Fetch: 0.66s.  Build: 13.41s.  Total: 14.08s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/fribidi-1.0.5-u3pq6lzix4yhepdjpifc7457l7uckpbu
+==> Installing font-util-1.3.2-wrnwjdiitjy35l6gybvgztht2c36zjs3
+==> No binary for font-util-1.3.2-wrnwjdiitjy35l6gybvgztht2c36zjs3 found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/f1/f115a3735604de1e852a4bf669be0269d8ce8f21f8e0e74ec5934b31dadc1e76.tar.gz
+==> Fetching https://mirror.spack.io/_source-cache/archive/55/55861d9cf456bd717a3d30a3193402c02174ed3c0dcee828798165fe307ee324.tar.gz
+==> Fetching https://mirror.spack.io/_source-cache/archive/63/63087cb61d17bfc9cd6f4f9359f63a3b1dd83300a31a42fd93dca084724c6afb.tar.gz
+==> Fetching https://mirror.spack.io/_source-cache/archive/72/720b6a513894bfc09a163951ec3dd8311201e08ee40e8891547b6c129ffb5fce.tar.gz
+==> Fetching https://mirror.spack.io/_source-cache/archive/d5/d5602f1d749ccd31d3bc1bb6f0c5d77400de0e5e3ac5abebd2a867aa2a4081a4.tar.gz
+==> Fetching https://mirror.spack.io/_source-cache/archive/c4/c4923342f6068c83fd4f5dbcf60d671c28461300db7e2aee930c8634b1e4b74a.tar.gz
+==> Fetching https://mirror.spack.io/_source-cache/archive/57/57c2db8824865117287d57d47f2c8cf4b2842d036c7475534b5054be69690c73.tar.gz
+==> Fetching https://mirror.spack.io/_source-cache/archive/54/549c6ba59979da25e85c218a26e5c527c3c24ebab2c76509c1ebc34d94fae227.tar.gz
+==> Fetching https://mirror.spack.io/_source-cache/archive/81/817703372f080d6508cf109011b17f3572ff31047559fe82d93b487ca4e4e2d9.tar.gz
+==> Fetching https://mirror.spack.io/_source-cache/archive/45/4509703e9e581061309cf4823bffd4a93f10f48fe192a1d8be1f183fd6ab9711.tar.gz
+==> Fetching https://mirror.spack.io/_source-cache/archive/49/493965263070a5ee2a301dfdb2e87c1ca3c00c7882bfb3dd99368565ba558ff5.tar.gz
+==> Fetching https://mirror.spack.io/_source-cache/archive/46/46142c876e176036c61c0c24c0a689079704d5ca5b510d48c025861ee2dbf829.tar.gz
+==> Fetching https://mirror.spack.io/_source-cache/archive/fc/fcecbfc475dfe5826d137f8edc623ba27d58d32f069165c248a013b3c566bb59.tar.gz
+==> Fetching https://mirror.spack.io/_source-cache/archive/97/97ee77a9d8ca3e7caf0c78c386eb0b96e8a825ca3642ec035cfb83f5f2cf1475.tar.gz
+==> Fetching https://mirror.spack.io/_source-cache/archive/61/61eb1fcfec89f7435cb92cd68712fbe4ba412ca562b1f5feec1f6daa1b8544f6.tar.gz
+==> Fetching https://mirror.spack.io/_source-cache/archive/30/3022b6b124f4cc6aade961f8d1306f67ff42e3b7922fb2244847f287344aefea.tar.gz
+==> Fetching https://mirror.spack.io/_source-cache/archive/a0/a0b146139363dd0a704c7265ff9cd9150d4ae7c0d248091a9a42093e1618c427.tar.gz
+==> Fetching https://mirror.spack.io/_source-cache/archive/21/21166546b0490aa3ec73215fa4ea28d91c6027b56178800ba51426bd3d840cc3.tar.gz
+==> Fetching https://mirror.spack.io/_source-cache/archive/ea/eaddfc6d9b32bf38c9dc87c354be3b646a385bc8d9de6e536269f6e1ca50644e.tar.gz
+==> Fetching https://mirror.spack.io/_source-cache/archive/97/97d9c1e706938838e4134d74f0836ae9d9ca6705ecb405c9a0ac8fdcbd9c2159.tar.gz
+==> Fetching https://mirror.spack.io/_source-cache/archive/79/79dfde93d356e41c298c2c1b9c638ec1a144f438d5146d0df6219afb1c2b8818.tar.gz
+==> Fetching https://mirror.spack.io/_source-cache/archive/d3/d3b93f7f73a526919bf73a38e10ef4643cd541403a682a8068d54bbcdd9c7e27.tar.gz
+==> Fetching https://mirror.spack.io/_source-cache/archive/02/02b3839ae79ba6a7750525bb3b0c281305664b95bf63b4a0baa230a277b4f928.tar.gz
+==> Fetching https://mirror.spack.io/_source-cache/archive/c4/c43ae370932eb8a4789a5b1f9801da15228b0d4c803251785c38d82aef024a4b.tar.gz
+==> Fetching https://mirror.spack.io/_source-cache/archive/33/3399b7586c18be509cdaeceeebf754b861faa1d8799dda1aae01aeb2a7a30f01.tar.gz
+==> Fetching https://mirror.spack.io/_source-cache/archive/d6/d64b9bfa5fa8dedf084f1695997cc32149485d2a195c810f62a1991ab5cd5519.tar.gz
+==> Fetching https://mirror.spack.io/_source-cache/archive/dc/dc3b8d5890480943e735e0375f0e0d8333094fcb6d6845ba321b2e39db78d148.tar.gz
+==> Fetching https://mirror.spack.io/_source-cache/archive/9e/9e82783758e8c67a9aadaf1a7222d13418a87455e4ce0a9974fb1df0278bdf74.tar.gz
+==> Fetching https://mirror.spack.io/_source-cache/archive/0a/0a8c77c1540dc376fb2bb5a02bd33ee5f3563fbac9fc07c7947cac462c4bb48a.tar.gz
+==> Fetching https://mirror.spack.io/_source-cache/archive/ae/aeea5f130480a3f05149bde13d240e668d8fb4b32c02b18914fcccd1182abe72.tar.gz
+==> Fetching https://mirror.spack.io/_source-cache/archive/50/503e70ee66af34f6ec4426c0f4ae708e9d30dafdcd58f671a87c7bf56b1952a3.tar.gz
+==> Fetching https://mirror.spack.io/_source-cache/archive/25/254be39c09da1c4e77d2a75a2969330ee2db395120a428671c50aef3ab745fc0.tar.gz
+==> Fetching https://mirror.spack.io/_source-cache/archive/d9/d9e86a8805b0fb78222409169d839a8531a1f5c7284ee117ff2a0af2e5016c3f.tar.gz
+==> Fetching https://mirror.spack.io/_source-cache/archive/e8/e8c3417d89183b1fc383fb3e0f3948c0d01fabcb9edace8b7ec85eab8cdc18c4.tar.gz
+==> Fetching https://mirror.spack.io/_source-cache/archive/38/38301bbdb6374494f30c0b44acc7052ed8fc2289e917e648ca566fc591f0a9e0.tar.gz
+==> Fetching https://mirror.spack.io/_source-cache/archive/5e/5e05a642182ec6a77bd7cacb913d3c86b364429329a5f223b69792d418f90ae9.tar.gz
+==> Moving resource stage
+	source: /tmp/jpg/spack-stage/resource-encodings-wrnwjdiitjy35l6gybvgztht2c36zjs3/spack-src/
+	destination: /tmp/jpg/spack-stage/spack-stage-font-util-1.3.2-wrnwjdiitjy35l6gybvgztht2c36zjs3/spack-src/encodings/encodings-1.0.4
+==> Moving resource stage
+	source: /tmp/jpg/spack-stage/resource-font-alias-wrnwjdiitjy35l6gybvgztht2c36zjs3/spack-src/
+	destination: /tmp/jpg/spack-stage/spack-stage-font-util-1.3.2-wrnwjdiitjy35l6gybvgztht2c36zjs3/spack-src/font-alias/font-alias-1.0.3
+==> Moving resource stage
+	source: /tmp/jpg/spack-stage/resource-font-bh-75dpi-wrnwjdiitjy35l6gybvgztht2c36zjs3/spack-src/
+	destination: /tmp/jpg/spack-stage/spack-stage-font-util-1.3.2-wrnwjdiitjy35l6gybvgztht2c36zjs3/spack-src/font-bh-75dpi/font-bh-75dpi-1.0.3
+==> Moving resource stage
+	source: /tmp/jpg/spack-stage/resource-font-bh-type1-wrnwjdiitjy35l6gybvgztht2c36zjs3/spack-src/
+	destination: /tmp/jpg/spack-stage/spack-stage-font-util-1.3.2-wrnwjdiitjy35l6gybvgztht2c36zjs3/spack-src/font-bh-type1/font-bh-type1-1.0.3
+==> Moving resource stage
+	source: /tmp/jpg/spack-stage/resource-font-dec-misc-wrnwjdiitjy35l6gybvgztht2c36zjs3/spack-src/
+	destination: /tmp/jpg/spack-stage/spack-stage-font-util-1.3.2-wrnwjdiitjy35l6gybvgztht2c36zjs3/spack-src/font-dec-misc/font-dec-misc-1.0.3
+==> Moving resource stage
+	source: /tmp/jpg/spack-stage/resource-font-jis-misc-wrnwjdiitjy35l6gybvgztht2c36zjs3/spack-src/
+	destination: /tmp/jpg/spack-stage/spack-stage-font-util-1.3.2-wrnwjdiitjy35l6gybvgztht2c36zjs3/spack-src/font-jis-misc/font-jis-misc-1.0.3
+==> Moving resource stage
+	source: /tmp/jpg/spack-stage/resource-font-sun-misc-wrnwjdiitjy35l6gybvgztht2c36zjs3/spack-src/
+	destination: /tmp/jpg/spack-stage/spack-stage-font-util-1.3.2-wrnwjdiitjy35l6gybvgztht2c36zjs3/spack-src/font-sun-misc/font-sun-misc-1.0.3
+==> Moving resource stage
+	source: /tmp/jpg/spack-stage/resource-font-bh-100dpi-wrnwjdiitjy35l6gybvgztht2c36zjs3/spack-src/
+	destination: /tmp/jpg/spack-stage/spack-stage-font-util-1.3.2-wrnwjdiitjy35l6gybvgztht2c36zjs3/spack-src/font-bh-100dpi/font-bh-100dpi-1.0.3
+==> Moving resource stage
+	source: /tmp/jpg/spack-stage/resource-font-ibm-type1-wrnwjdiitjy35l6gybvgztht2c36zjs3/spack-src/
+	destination: /tmp/jpg/spack-stage/spack-stage-font-util-1.3.2-wrnwjdiitjy35l6gybvgztht2c36zjs3/spack-src/font-ibm-type1/font-ibm-type1-1.0.3
+==> Moving resource stage
+	source: /tmp/jpg/spack-stage/resource-font-isas-misc-wrnwjdiitjy35l6gybvgztht2c36zjs3/spack-src/
+	destination: /tmp/jpg/spack-stage/spack-stage-font-util-1.3.2-wrnwjdiitjy35l6gybvgztht2c36zjs3/spack-src/font-isas-misc/font-isas-misc-1.0.3
+==> Moving resource stage
+	source: /tmp/jpg/spack-stage/resource-font-misc-misc-wrnwjdiitjy35l6gybvgztht2c36zjs3/spack-src/
+	destination: /tmp/jpg/spack-stage/spack-stage-font-util-1.3.2-wrnwjdiitjy35l6gybvgztht2c36zjs3/spack-src/font-misc-misc/font-misc-misc-1.1.2
+==> Moving resource stage
+	source: /tmp/jpg/spack-stage/resource-font-mutt-misc-wrnwjdiitjy35l6gybvgztht2c36zjs3/spack-src/
+	destination: /tmp/jpg/spack-stage/spack-stage-font-util-1.3.2-wrnwjdiitjy35l6gybvgztht2c36zjs3/spack-src/font-mutt-misc/font-mutt-misc-1.0.3
+==> Moving resource stage
+	source: /tmp/jpg/spack-stage/resource-font-micro-misc-wrnwjdiitjy35l6gybvgztht2c36zjs3/spack-src/
+	destination: /tmp/jpg/spack-stage/spack-stage-font-util-1.3.2-wrnwjdiitjy35l6gybvgztht2c36zjs3/spack-src/font-micro-misc/font-micro-misc-1.0.3
+==> Moving resource stage
+	source: /tmp/jpg/spack-stage/resource-font-adobe-75dpi-wrnwjdiitjy35l6gybvgztht2c36zjs3/spack-src/
+	destination: /tmp/jpg/spack-stage/spack-stage-font-util-1.3.2-wrnwjdiitjy35l6gybvgztht2c36zjs3/spack-src/font-adobe-75dpi/font-adobe-75dpi-1.0.3
+==> Moving resource stage
+	source: /tmp/jpg/spack-stage/resource-font-arabic-misc-wrnwjdiitjy35l6gybvgztht2c36zjs3/spack-src/
+	destination: /tmp/jpg/spack-stage/spack-stage-font-util-1.3.2-wrnwjdiitjy35l6gybvgztht2c36zjs3/spack-src/font-arabic-misc/font-arabic-misc-1.0.3
+==> Moving resource stage
+	source: /tmp/jpg/spack-stage/resource-font-cursor-misc-wrnwjdiitjy35l6gybvgztht2c36zjs3/spack-src/
+	destination: /tmp/jpg/spack-stage/spack-stage-font-util-1.3.2-wrnwjdiitjy35l6gybvgztht2c36zjs3/spack-src/font-cursor-misc/font-cursor-misc-1.0.3
+==> Moving resource stage
+	source: /tmp/jpg/spack-stage/resource-font-daewoo-misc-wrnwjdiitjy35l6gybvgztht2c36zjs3/spack-src/
+	destination: /tmp/jpg/spack-stage/spack-stage-font-util-1.3.2-wrnwjdiitjy35l6gybvgztht2c36zjs3/spack-src/font-daewoo-misc/font-daewoo-misc-1.0.3
+==> Moving resource stage
+	source: /tmp/jpg/spack-stage/resource-font-misc-meltho-wrnwjdiitjy35l6gybvgztht2c36zjs3/spack-src/
+	destination: /tmp/jpg/spack-stage/spack-stage-font-util-1.3.2-wrnwjdiitjy35l6gybvgztht2c36zjs3/spack-src/font-misc-meltho/font-misc-meltho-1.0.3
+==> Moving resource stage
+	source: /tmp/jpg/spack-stage/resource-font-adobe-100dpi-wrnwjdiitjy35l6gybvgztht2c36zjs3/spack-src/
+	destination: /tmp/jpg/spack-stage/spack-stage-font-util-1.3.2-wrnwjdiitjy35l6gybvgztht2c36zjs3/spack-src/font-adobe-100dpi/font-adobe-100dpi-1.0.3
+==> Moving resource stage
+	source: /tmp/jpg/spack-stage/resource-font-misc-cyrillic-wrnwjdiitjy35l6gybvgztht2c36zjs3/spack-src/
+	destination: /tmp/jpg/spack-stage/spack-stage-font-util-1.3.2-wrnwjdiitjy35l6gybvgztht2c36zjs3/spack-src/font-misc-cyrillic/font-misc-cyrillic-1.0.3
+==> Moving resource stage
+	source: /tmp/jpg/spack-stage/resource-font-misc-ethiopic-wrnwjdiitjy35l6gybvgztht2c36zjs3/spack-src/
+	destination: /tmp/jpg/spack-stage/spack-stage-font-util-1.3.2-wrnwjdiitjy35l6gybvgztht2c36zjs3/spack-src/font-misc-ethiopic/font-misc-ethiopic-1.0.3
+==> Moving resource stage
+	source: /tmp/jpg/spack-stage/resource-font-xfree86-type1-wrnwjdiitjy35l6gybvgztht2c36zjs3/spack-src/
+	destination: /tmp/jpg/spack-stage/spack-stage-font-util-1.3.2-wrnwjdiitjy35l6gybvgztht2c36zjs3/spack-src/font-xfree86-type1/font-xfree86-type1-1.0.4
+==> Moving resource stage
+	source: /tmp/jpg/spack-stage/resource-font-bitstream-75dpi-wrnwjdiitjy35l6gybvgztht2c36zjs3/spack-src/
+	destination: /tmp/jpg/spack-stage/spack-stage-font-util-1.3.2-wrnwjdiitjy35l6gybvgztht2c36zjs3/spack-src/font-bitstream-75dpi/font-bitstream-75dpi-1.0.3
+==> Moving resource stage
+	source: /tmp/jpg/spack-stage/resource-font-bitstream-type1-wrnwjdiitjy35l6gybvgztht2c36zjs3/spack-src/
+	destination: /tmp/jpg/spack-stage/spack-stage-font-util-1.3.2-wrnwjdiitjy35l6gybvgztht2c36zjs3/spack-src/font-bitstream-type1/font-bitstream-type1-1.0.3
+==> Moving resource stage
+	source: /tmp/jpg/spack-stage/resource-font-cronyx-cyrillic-wrnwjdiitjy35l6gybvgztht2c36zjs3/spack-src/
+	destination: /tmp/jpg/spack-stage/spack-stage-font-util-1.3.2-wrnwjdiitjy35l6gybvgztht2c36zjs3/spack-src/font-cronyx-cyrillic/font-cronyx-cyrillic-1.0.3
+==> Moving resource stage
+	source: /tmp/jpg/spack-stage/resource-font-schumacher-misc-wrnwjdiitjy35l6gybvgztht2c36zjs3/spack-src/
+	destination: /tmp/jpg/spack-stage/spack-stage-font-util-1.3.2-wrnwjdiitjy35l6gybvgztht2c36zjs3/spack-src/font-schumacher-misc/font-schumacher-misc-1.1.2
+==> Moving resource stage
+	source: /tmp/jpg/spack-stage/resource-font-screen-cyrillic-wrnwjdiitjy35l6gybvgztht2c36zjs3/spack-src/
+	destination: /tmp/jpg/spack-stage/spack-stage-font-util-1.3.2-wrnwjdiitjy35l6gybvgztht2c36zjs3/spack-src/font-screen-cyrillic/font-screen-cyrillic-1.0.4
+==> Moving resource stage
+	source: /tmp/jpg/spack-stage/resource-font-bitstream-100dpi-wrnwjdiitjy35l6gybvgztht2c36zjs3/spack-src/
+	destination: /tmp/jpg/spack-stage/spack-stage-font-util-1.3.2-wrnwjdiitjy35l6gybvgztht2c36zjs3/spack-src/font-bitstream-100dpi/font-bitstream-100dpi-1.0.3
+==> Moving resource stage
+	source: /tmp/jpg/spack-stage/resource-font-bitstream-speedo-wrnwjdiitjy35l6gybvgztht2c36zjs3/spack-src/
+	destination: /tmp/jpg/spack-stage/spack-stage-font-util-1.3.2-wrnwjdiitjy35l6gybvgztht2c36zjs3/spack-src/font-bitstream-speedo/font-bitstream-speedo-1.0.2
+==> Moving resource stage
+	source: /tmp/jpg/spack-stage/resource-font-winitzki-cyrillic-wrnwjdiitjy35l6gybvgztht2c36zjs3/spack-src/
+	destination: /tmp/jpg/spack-stage/spack-stage-font-util-1.3.2-wrnwjdiitjy35l6gybvgztht2c36zjs3/spack-src/font-winitzki-cyrillic/font-winitzki-cyrillic-1.0.3
+==> Moving resource stage
+	source: /tmp/jpg/spack-stage/resource-font-adobe-utopia-75dpi-wrnwjdiitjy35l6gybvgztht2c36zjs3/spack-src/
+	destination: /tmp/jpg/spack-stage/spack-stage-font-util-1.3.2-wrnwjdiitjy35l6gybvgztht2c36zjs3/spack-src/font-adobe-utopia-75dpi/font-adobe-utopia-75dpi-1.0.4
+==> Moving resource stage
+	source: /tmp/jpg/spack-stage/resource-font-adobe-utopia-type1-wrnwjdiitjy35l6gybvgztht2c36zjs3/spack-src/
+	destination: /tmp/jpg/spack-stage/spack-stage-font-util-1.3.2-wrnwjdiitjy35l6gybvgztht2c36zjs3/spack-src/font-adobe-utopia-type1/font-adobe-utopia-type1-1.0.4
+==> Moving resource stage
+	source: /tmp/jpg/spack-stage/resource-font-adobe-utopia-100dpi-wrnwjdiitjy35l6gybvgztht2c36zjs3/spack-src/
+	destination: /tmp/jpg/spack-stage/spack-stage-font-util-1.3.2-wrnwjdiitjy35l6gybvgztht2c36zjs3/spack-src/font-adobe-utopia-100dpi/font-adobe-utopia-100dpi-1.0.4
+==> Moving resource stage
+	source: /tmp/jpg/spack-stage/resource-font-bh-lucidatypewriter-75dpi-wrnwjdiitjy35l6gybvgztht2c36zjs3/spack-src/
+	destination: /tmp/jpg/spack-stage/spack-stage-font-util-1.3.2-wrnwjdiitjy35l6gybvgztht2c36zjs3/spack-src/font-bh-lucidatypewriter-75dpi/font-bh-lucidatypewriter-75dpi-1.0.3
+==> Moving resource stage
+	source: /tmp/jpg/spack-stage/resource-font-bh-lucidatypewriter-100dpi-wrnwjdiitjy35l6gybvgztht2c36zjs3/spack-src/
+	destination: /tmp/jpg/spack-stage/spack-stage-font-util-1.3.2-wrnwjdiitjy35l6gybvgztht2c36zjs3/spack-src/font-bh-lucidatypewriter-100dpi/font-bh-lucidatypewriter-100dpi-1.0.3
+==> No patches needed for font-util
+==> font-util: Executing phase: 'autoreconf'
+==> font-util: Executing phase: 'configure'
+==> font-util: Executing phase: 'build'
+==> font-util: Executing phase: 'install'
+==> font-util: Successfully installed font-util-1.3.2-wrnwjdiitjy35l6gybvgztht2c36zjs3
+  Fetch: 9.48s.  Build: 7m 38.98s.  Total: 7m 48.46s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/font-util-1.3.2-wrnwjdiitjy35l6gybvgztht2c36zjs3
+==> Installing glib-2.70.0-kawq5tiolw7fyfmlvxa2nijjvnhlgrpn
+==> No binary for glib-2.70.0-kawq5tiolw7fyfmlvxa2nijjvnhlgrpn found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/20/200d7df811c5ba634afbf109f14bb40ba7fde670e89389885da14e27c0840742.tar.xz
+==> Applied patch /cm/shared/apps/spack/0.17.3/cpu/var/spack/repos/builtin/packages/glib/meson-gettext-2.70.patch
+==> Ran patch() for glib
+==> glib: Executing phase: 'install'
+==> glib: Successfully installed glib-2.70.0-kawq5tiolw7fyfmlvxa2nijjvnhlgrpn
+  Fetch: 0.79s.  Build: 1m 16.68s.  Total: 1m 17.47s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/glib-2.70.0-kawq5tiolw7fyfmlvxa2nijjvnhlgrpn
+==> Installing fontconfig-2.13.94-nx6w2xhihvvjsgg3qikqrc5dxeeky6pe
+==> No binary for fontconfig-2.13.94-nx6w2xhihvvjsgg3qikqrc5dxeeky6pe found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/24/246d1640a7e54fba697b28e4445f4d9eb63dda1b511d19986249368ee7191882.tar.gz
+==> Ran patch() for fontconfig
+==> fontconfig: Executing phase: 'autoreconf'
+==> fontconfig: Executing phase: 'configure'
+==> fontconfig: Executing phase: 'build'
+==> fontconfig: Executing phase: 'install'
+==> fontconfig: Successfully installed fontconfig-2.13.94-nx6w2xhihvvjsgg3qikqrc5dxeeky6pe
+  Fetch: 0.72s.  Build: 28.72s.  Total: 29.44s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/fontconfig-2.13.94-nx6w2xhihvvjsgg3qikqrc5dxeeky6pe
+==> Installing cairo-1.16.0-pzz5ju6d67zgmdmbs34zm5nukcnilgdw
+==> No binary for cairo-1.16.0-pzz5ju6d67zgmdmbs34zm5nukcnilgdw found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/5e/5e7b29b3f113ef870d1e3ecf8adf21f923396401604bda16d44be45e66052331.tar.xz
+==> Applied patch /cm/shared/apps/spack/0.17.3/cpu/var/spack/repos/builtin/packages/cairo/fontconfig.patch
+==> cairo: Executing phase: 'autoreconf'
+==> cairo: Executing phase: 'configure'
+==> cairo: Executing phase: 'build'
+==> cairo: Executing phase: 'install'
+==> cairo: Successfully installed cairo-1.16.0-pzz5ju6d67zgmdmbs34zm5nukcnilgdw
+  Fetch: 0.64s.  Build: 1m 18.71s.  Total: 1m 19.35s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cairo-1.16.0-pzz5ju6d67zgmdmbs34zm5nukcnilgdw
+==> Installing gobject-introspection-1.56.1-bubyjxhdtraocjolhon7l3c6xnygdx6x
+==> No binary for gobject-introspection-1.56.1-bubyjxhdtraocjolhon7l3c6xnygdx6x found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/5b/5b2875ccff99ff7baab63a34b67f8c920def240e178ff50add809e267d9ea24b.tar.xz
+==> Fetching https://mirror.spack.io/_source-cache/archive/77/7700828b638c85255c87fcc317ea7e9572ff443f65c86648796528885e5b4cea
+==> Applied patch /cm/shared/apps/spack/0.17.3/cpu/var/spack/repos/builtin/packages/gobject-introspection/sbang.patch
+==> Applied patch https://gitlab.gnome.org/GNOME/gobject-introspection/-/commit/1f9284228092b2a7200e8a78bc0ea6702231c6db.patch
+==> gobject-introspection: Executing phase: 'install'
+==> gobject-introspection: Successfully installed gobject-introspection-1.56.1-bubyjxhdtraocjolhon7l3c6xnygdx6x
+  Fetch: 0.74s.  Build: 34.03s.  Total: 34.77s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/gobject-introspection-1.56.1-bubyjxhdtraocjolhon7l3c6xnygdx6x
+==> Installing harfbuzz-2.6.8-gj3cupep7zi7eabezljjjtayskocxrpq
+==> No binary for harfbuzz-2.6.8-gj3cupep7zi7eabezljjjtayskocxrpq found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/66/6648a571a27f186e47094121f0095e1b809e918b3037c630c7f38ffad86e3035.tar.xz
+==> Ran patch() for harfbuzz
+==> harfbuzz: Executing phase: 'autoreconf'
+==> harfbuzz: Executing phase: 'configure'
+==> harfbuzz: Executing phase: 'build'
+==> harfbuzz: Executing phase: 'install'
+==> harfbuzz: Successfully installed harfbuzz-2.6.8-gj3cupep7zi7eabezljjjtayskocxrpq
+  Fetch: 0.98s.  Build: 39.04s.  Total: 40.02s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/harfbuzz-2.6.8-gj3cupep7zi7eabezljjjtayskocxrpq
+==> Installing pango-1.42.0-wfre5r5n6hhads3a4vw3tuq36tettn6o
+==> No binary for pango-1.42.0-wfre5r5n6hhads3a4vw3tuq36tettn6o found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/99/9924d88a3dcedff753f0763814a1605307c5c9c931413b8b47ea7267d1b19446.tar.xz
+==> No patches needed for pango
+==> pango: Executing phase: 'autoreconf'
+==> pango: Executing phase: 'configure'
+==> pango: Executing phase: 'build'
+==> pango: Executing phase: 'install'
+==> pango: Successfully installed pango-1.42.0-wfre5r5n6hhads3a4vw3tuq36tettn6o
+  Fetch: 0.74s.  Build: 34.29s.  Total: 35.03s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/pango-1.42.0-wfre5r5n6hhads3a4vw3tuq36tettn6o
+==> Installing imagemagick-7.0.8-7-oxw3s3wp54cs5corzdpuivnyg7dpm43h
+==> No binary for imagemagick-7.0.8-7-oxw3s3wp54cs5corzdpuivnyg7dpm43h found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/fa/fadb36b59f310e9eee5249ecb2326b323a64da6cc716dd6d08ece8ea2c780b81.tar.gz
+==> No patches needed for imagemagick
+==> imagemagick: Executing phase: 'autoreconf'
+==> imagemagick: Executing phase: 'configure'
+==> imagemagick: Executing phase: 'build'
+==> imagemagick: Executing phase: 'install'
+==> imagemagick: Successfully installed imagemagick-7.0.8-7-oxw3s3wp54cs5corzdpuivnyg7dpm43h
+  Fetch: 0.90s.  Build: 2m 38.89s.  Total: 2m 39.79s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/imagemagick-7.0.8-7-oxw3s3wp54cs5corzdpuivnyg7dpm43h
+real 1386.88
+user 1586.93
+sys 401.66
+==> Regenerating lmod module files
+Submitted batch job 2407

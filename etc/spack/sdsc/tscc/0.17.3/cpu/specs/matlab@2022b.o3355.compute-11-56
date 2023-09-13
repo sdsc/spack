@@ -1,0 +1,16 @@
+1688009594 3355 bd39be588d7d4ff0afffe714de523476  /cm/shared/apps/spack/0.17.3/cpu/etc/spack/sdsc/tscc/0.17.3/cpu/specs/matlab@2022b.sh 
+
+
+Currently Loaded Modules:
+  1) slurm/slurm/22.05.9
+
+ 
+
+/cm/local/apps/slurm/var/spool/job03355/slurm_script: line 33: /cm/shared/apps/spack/0.17.3/cpu/share/spack/setup-env.sh/share/spack/setup-env.sh: Not a directory
+environment: line 89: spack: command not found
+environment: line 89: spack: command not found
+environment: line 89: spack: command not found
+environment: line 89: spack: command not found
+environment: line 89: spack: command not found
+environment: line 89: spack: command not found
+environment: line 89: spack: command not found
