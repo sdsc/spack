@@ -1,0 +1,797 @@
+1687974540 3280 e961a5775e289507edd68b8975c67f7a  /cm/shared/apps/spack/0.17.3/cpu/etc/spack/sdsc/tscc/0.17.3/gpu/specs/gcc@8.5.0/intel-mpi@2019.10.317/amber@22.sh 
+
+#!/usr/bin/env bash
+
+#SBATCH --job-name=amber@22
+#SBATCH --account=sys200
+#SBATCH --partition=hotel-gpu
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=1
+#SBATCH --cpus-per-task=8
+#SBATCH --time=03:00:00
+#SBATCH --output=%x.o%j.%N
+
+declare -xr LOCAL_TIME="$(date +'%Y%m%dT%H%M%S%z')"
+declare -xir UNIX_TIME="$(date +'%s')"
+
+declare -xr SYSTEM_NAME='tscc'
+
+declare -xr SPACK_VERSION='0.17.3'
+declare -xr SPACK_INSTANCE_NAME='gpu'
+declare -xr SPACK_INSTANCE_DIR="/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}"
+
+declare -xr SLURM_JOB_SCRIPT="$(scontrol show job ${SLURM_JOB_ID} | awk -F= '/Command=/{print $2}')"
+declare -xr SLURM_JOB_MD5SUM="$(md5sum ${SLURM_JOB_SCRIPT})"
+
+declare -xr SCHEDULER_MODULE='slurm'
+declare -xr COMPILER_MODULE='gcc/8.5.0'
+declare -xr MPI_MODULE='intel-mpi/2019.10.317'
+#declare -xr CUDA_MODULE='cuda/11.2.2'
+declare -xr CUDA_MODULE='cuda/10.2.89'
+declare -xr CMAKE_MODULE='cmake/3.21.4'
+
+echo "${UNIX_TIME} ${SLURM_JOB_ID} ${SLURM_JOB_MD5SUM} ${SLURM_JOB_DEPENDENCY}" 
+echo ""
+
+cat "${SLURM_JOB_SCRIPT}"
+
+module purge
+module load "${SCHEDULER_MODULE}"
+. "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
+module use "${SPACK_ROOT}/share/spack/lmod/linux-rocky8-x86_64/Core"
+module load $SPACK_INSTANCE_NAME
+module load "${COMPILER_MODULE}"
+module load "${MPI_MODULE}"
+module load "${CUDA_MODULE}"
+module load "${CMAKE_MODULE}"
+module list
+
+# 49387    [ 27%] Building CXX object AmberTools/src/cpptraj/src/CMakeFiles/
+#              cpptraj_common_obj.dir/Action_Box.cpp.o
+#  >> 49388    /home/mkandes/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-roc
+#              ky8-cascadelake/gcc-10.2.0/cuda-11.2.2-blza2psofa3wr2zumqrnh4je2f
+#              7ze3mx/include/thrust/detail/allocator/allocator_traits.h(245): e
+#              rror: class "thrust::detail::device_delete_allocator" has no memb
+#              er "value_type"
+#     49389              detected during:
+#     49390                instantiation of class "thrust::detail::allocator_tra
+#              its<Alloc> [with Alloc=thrust::detail::device_delete_allocator]"
+#     49391    (402): here
+#     49392                instantiation of class "thrust::detail::allocator_sys
+#              tem<Alloc> [with Alloc=thrust::detail::device_delete_allocator]"
+#     49393    /home/mkandes/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-roc
+#              ky8-cascadelake/gcc-10.2.0/cuda-11.2.2-blza2psofa3wr2zumqrnh4je2f
+#              7ze3mx/include/thrust/detail/allocator/destroy_range.inl(137): he
+#              re
+#
+# Fix? Use cuda/10.2.89?
+#
+# Currently Amber supports CUDA versions from 7.5 to 11.x inclusive (tested only up to 11.2). However, older
+# versions are less well tested and more likely to cause issues, and you may also run into trouble with the CUDA
+# SDK being incompatible with newer compilers on your machine.
+
+declare -xr SPACK_PACKAGE='amber@22'
+declare -xr SPACK_COMPILER='gcc@8.5.0'
+declare -xr SPACK_VARIANTS='+cuda cuda_cuda_arch=60,75 +mpi +openmp +update'
+declare -xr SPACK_DEPENDENCIES="^intel-mpi@2019.10.317 ^hdf5@1.10.7/$(spack find --format '{hash:7}' hdf5@1.10.7 % ${SPACK_COMPILER} +fortran  +hl +mpi ~szip ^intel-mpi@2019.10.317) ^netcdf-c@4.8.1/$(spack find --format '{hash:7}' netcdf-c@4.8.1 % ${SPACK_COMPILER} +parallel-netcdf +mpi ^intel-mpi@2019.10.317) ^netcdf-fortran@4.5.3/$(spack find --format '{hash:7}' netcdf-fortran@4.5.3 % ${SPACK_COMPILER} ^intel-mpi@2019.10.317) ^cuda@10.2.89/$(spack find --format '{hash:7}' cuda@10.2.89 % ${SPACK_COMPILER})"
+declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
+echo ${SPACK_SPEC} > spec.$$
+
+printenv
+
+spack config get compilers
+spack config get config  
+spack config get mirrors
+spack config get modules
+spack config get packages
+spack config get repos
+spack config get upstreams
+
+spack spec --long --namespaces --types `cat spec.$$`
+if [[ "${?}" -ne 0 ]]; then
+  echo 'ERROR: spack concretization failed.'
+  exit 1
+fi
+
+time -p spack install -v --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all `cat spec.$$`
+rm spec.$$
+if [[ "${?}" -ne 0 ]]; then
+  echo 'ERROR: spack install failed.'
+  exit 1
+fi
+
+spack module lmod refresh --delete-tree -y
+
+sbatch --dependency="afterok:${SLURM_JOB_ID}" ''
+
+sleep 20
+
+Currently Loaded Modules:
+  1) slurm/slurm/22.05.9   4) intel-mpi/2019.10.317-f7l5rk4
+  2) gpu/0.17.3            5) cuda/10.2.89-xebsu34
+  3) gcc/8.5.0-mf5bqu2     6) cmake/3.21.4-mdcgzjl
+
+ 
+
+SHELL=/bin/bash
+SLURM_JOB_USER=jpg
+SLURM_TASKS_PER_NODE=1
+SLURM_JOB_UID=422
+HISTCONTROL=ignoredups
+SLURM_JOB_MD5SUM=e961a5775e289507edd68b8975c67f7a  /cm/shared/apps/spack/0.17.3/cpu/etc/spack/sdsc/tscc/0.17.3/gpu/specs/gcc@8.5.0/intel-mpi@2019.10.317/amber@22.sh
+SLURM_TASK_PID=3231017
+LMOD_arch=x86_64
+__LMOD_REF_COUNT_CLASSPATH=/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-8.5.0/intel-mpi-2019.10.317-f7l5rk4xxssuwsoruzlap6qm3o6y4ugv/compilers_and_libraries_2020.4.317/linux/mpi/intel64/lib/mpi.jar:1
+SLURM_LOCALID=0
+SLURM_SUBMIT_DIR=/cm/shared/apps/spack/0.17.3/cpu/etc/spack/sdsc/tscc/0.17.3/gpu/specs/gcc@8.5.0/intel-mpi@2019.10.317
+HOSTNAME=gpu1
+HISTSIZE=1000
+SLURMD_NODENAME=gpu1
+FPATH=/usr/share/lmod/lmod/init/ksh_funcs
+_ModuleTable007_=L21vZHVsZWZpbGVzIiwiL3Vzci9zaGFyZS9Nb2R1bGVzL21vZHVsZWZpbGVzIix9LFsic3lzdGVtQmFzZU1QQVRIIl09Ii9jbS9sb2NhbC9tb2R1bGVmaWxlczovY20vc2hhcmVkL21vZHVsZWZpbGVzOi9ldGMvbW9kdWxlZmlsZXM6L3Vzci9zaGFyZS9tb2R1bGVmaWxlczovdXNyL3NoYXJlL01vZHVsZXMvbW9kdWxlZmlsZXMiLH0=
+MPI_MODULE=intel-mpi/2019.10.317
+MPICC=/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-8.5.0/intel-mpi-2019.10.317-f7l5rk4xxssuwsoruzlap6qm3o6y4ugv/compilers_and_libraries_2020.4.317/linux/mpi/intel64/bin/mpicc
+_ModuleTable002_=NCIsWyJ3ViJdPSIwMDAwMDAwMDMuMDAwMDAwMDIxLjAwMDAwMDAwNC4qbWRjZ3pqbC4qemZpbmFsIix9LGN1ZGE9e1siZm4iXT0iL2NtL3NoYXJlZC9hcHBzL3NwYWNrLzAuMTcuMy9ncHUvc2hhcmUvc3BhY2svbG1vZC9saW51eC1yb2NreTkteDg2XzY0L2djYy84LjUuMC9jdWRhLzEwLjIuODkteGVic3UzNC5sdWEiLFsiZnVsbE5hbWUiXT0iY3VkYS8xMC4yLjg5LXhlYnN1MzQiLFsibG9hZE9yZGVyIl09NSxwcm9wVD17fSxbInN0YWNrRGVwdGgiXT0wLFsic3RhdHVzIl09ImFjdGl2ZSIsWyJ1c2VyTmFtZSJdPSJjdWRhLzEwLjIuODkiLFsid1YiXT0iMDAwMDAwMDEwLjAwMDAwMDAwMi4wMDAwMDAwODkuKnhlYnN1LjAwMDAwMDAzNC4qemZpbmFsIix9LGdjYz17WyJmbiJd
+SPACK_LD_LIBRARY_PATH=/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-10.2.0-mqbpsxf6a5jhxi4vlwdtfyqe7q3yjgse/lib64:/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-10.2.0-mqbpsxf6a5jhxi4vlwdtfyqe7q3yjgse/lib:/cm/shared/apps/slurm/current/lib64/slurm:/cm/shared/apps/slurm/current/lib64
+__LMOD_REF_COUNT_MODULEPATH=/cm/shared/apps/spack/0.17.3/gpu/share/spack/lmod/linux-rocky9-x86_64/intel-mpi/2019.10.317-f7l5rk4/gcc/8.5.0:1;/cm/shared/apps/spack/0.17.3/gpu/share/spack/lmod/linux-rocky9-x86_64/gcc/8.5.0:1;/cm/shared/apps/spack/0.17.3/gpu/share/spack/lmod/linux-rocky9-x86_64/Core:1;/cm/shared/apps/spack/0.17.3/gpu/share/spack/lmod/linux-rocky8-x86_64/Core:1;/cm/shared/modulefiles:2;/cm/local/modulefiles:1;/etc/modulefiles:1;/usr/share/modulefiles:1;/usr/share/Modules/modulefiles:1
+_ModuleTable005_=OS4xMC4zMTciLFsid1YiXT0iMDAwMDAyMDE5LjAwMDAwMDAxMC4wMDAwMDAzMTcuKmYuMDAwMDAwMDA3LipsLjAwMDAwMDAwNS4qcmsuMDAwMDAwMDA0Lip6ZmluYWwiLH0sc2x1cm09e1siZm4iXT0iL2NtL2xvY2FsL21vZHVsZWZpbGVzL3NsdXJtL3NsdXJtLzIyLjA1LjkiLFsiZnVsbE5hbWUiXT0ic2x1cm0vc2x1cm0vMjIuMDUuOSIsWyJsb2FkT3JkZXIiXT0xLHByb3BUPXt9LFsic3RhY2tEZXB0aCJdPTAsWyJzdGF0dXMiXT0iYWN0aXZlIixbInVzZXJOYW1lIl09InNsdXJtIixbIndWIl09IipzbHVybS8wMDAwMDAwMjIuMDAwMDAwMDA1LjAwMDAwMDAwOS4qemZpbmFsIix9LH0sbXBhdGhBPXsiL2NtL3NoYXJlZC9hcHBzL3NwYWNrLzAuMTcuMy9ncHUvc2hhcmUvc3Bh
+SLURM_NODE_ALIASES=(null)
+__LMOD_REF_COUNT_ACLOCAL_PATH=/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-8.5.0/cmake-3.21.4-mdcgzjlvsqfz3vyjt3kzsfiqhcfy4py7/share/aclocal:1
+SLURM_CLUSTER_NAME=slurm
+SLURM_JOB_SCRIPT=/cm/shared/apps/spack/0.17.3/cpu/etc/spack/sdsc/tscc/0.17.3/gpu/specs/gcc@8.5.0/intel-mpi@2019.10.317/amber@22.sh
+COMPILER_MODULE=gcc/8.5.0
+SCHEDULER_MODULE=slurm
+SPACK_INSTANCE_NAME=gpu
+SLURM_CPUS_ON_NODE=8
+__LMOD_REF_COUNT__LMFILES_=/cm/local/modulefiles/slurm/slurm/22.05.9:1;/cm/shared/modulefiles/gpu/0.17.3.lua:1;/cm/shared/apps/spack/0.17.3/gpu/share/spack/lmod/linux-rocky9-x86_64/Core/gcc/8.5.0-mf5bqu2.lua:1;/cm/shared/apps/spack/0.17.3/gpu/share/spack/lmod/linux-rocky9-x86_64/gcc/8.5.0/intel-mpi/2019.10.317-f7l5rk4.lua:1;/cm/shared/apps/spack/0.17.3/gpu/share/spack/lmod/linux-rocky9-x86_64/gcc/8.5.0/cuda/10.2.89-xebsu34.lua:1;/cm/shared/apps/spack/0.17.3/gpu/share/spack/lmod/linux-rocky9-x86_64/gcc/8.5.0/cmake/3.21.4-mdcgzjl.lua:1
+SLURM_JOB_CPUS_PER_NODE=8
+SPACK_VARIANTS=+cuda cuda_cuda_arch=60,75 +mpi +openmp +update
+MPICXX=/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-8.5.0/intel-mpi-2019.10.317-f7l5rk4xxssuwsoruzlap6qm3o6y4ugv/compilers_and_libraries_2020.4.317/linux/mpi/intel64/bin/mpicxx
+LMOD_DIR=/usr/share/lmod/lmod/libexec
+MPIFC=/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-8.5.0/intel-mpi-2019.10.317-f7l5rk4xxssuwsoruzlap6qm3o6y4ugv/compilers_and_libraries_2020.4.317/linux/mpi/intel64/bin/mpif90
+SPACK_DEPENDENCIES=^intel-mpi@2019.10.317 ^hdf5@1.10.7/xjxzesg ^netcdf-c@4.8.1/hvamu3b ^netcdf-fortran@4.5.3/v7q2bht ^cuda@10.2.89/xebsu34
+PWD=/home/jpg/specs_gpu_0.17.3/gcc@8.5.0/intel-mpi@2019.10.317
+SLURM_GTIDS=0
+LOGNAME=jpg
+XDG_SESSION_TYPE=tty
+SLURM_JOB_PARTITION=hotel-gpu
+CMAKE_MODULE=cmake/3.21.4
+MODULESHOME=/usr/share/lmod/lmod
+MANPATH=/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-8.5.0/intel-mpi-2019.10.317-f7l5rk4xxssuwsoruzlap6qm3o6y4ugv/compilers_and_libraries_2020.4.317/linux/mpi/man:/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-8.5.0-mf5bqu2cwyzoxa5c7btqbbdxng3whbmf/share/man:/cm/shared/apps/slurm/current/man:/usr/share/lmod/lmod/share/man:/usr/local/share/man:/usr/share/man:/cm/local/apps/environment-modules/current/share/man::
+LMOD_PREPEND_BLOCK=normal
+SLURM_JOB_NUM_NODES=1
+CXX=/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-8.5.0-mf5bqu2cwyzoxa5c7btqbbdxng3whbmf/bin/g++
+SPACK_INSTANCE_DIR=/cm/shared/apps/spack/0.17.3/gpu
+SPACK_PYTHON=/usr/bin/python3
+__LMOD_REF_COUNT_CMAKE_PREFIX_PATH=/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-8.5.0/cmake-3.21.4-mdcgzjlvsqfz3vyjt3kzsfiqhcfy4py7:1;/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-8.5.0/cuda-10.2.89-xebsu34d7jfm66mf246za2wcritdqif7:1;/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-8.5.0/intel-mpi-2019.10.317-f7l5rk4xxssuwsoruzlap6qm3o6y4ugv:1;/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-8.5.0-mf5bqu2cwyzoxa5c7btqbbdxng3whbmf:1
+SLURM_JOBID=3280
+SLURM_JOB_QOS=normal
+MOTD_SHOWN=pam
+__LMOD_REF_COUNT_PATH=/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-8.5.0/cmake-3.21.4-mdcgzjlvsqfz3vyjt3kzsfiqhcfy4py7/bin:1;/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-8.5.0/cuda-10.2.89-xebsu34d7jfm66mf246za2wcritdqif7/bin:1;/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-8.5.0/intel-mpi-2019.10.317-f7l5rk4xxssuwsoruzlap6qm3o6y4ugv/compilers_and_libraries_2020.4.317/linux/mpi/intel64/libfabric/bin:1;/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-8.5.0/intel-mpi-2019.10.317-f7l5rk4xxssuwsoruzlap6qm3o6y4ugv/compilers_and_libraries_2020.4.317/linux/mpi/intel64/bin:1;/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-8.5.0/intel-mpi-2019.10.317-f7l5rk4xxssuwsoruzlap6qm3o6y4ugv/bin:1;/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-8.5.0-mf5bqu2cwyzoxa5c7btqbbdxng3whbmf/bin:1;/cm/shared/apps/spack/0.17.3/gpu/bin:2;/cm/shared/apps/slurm/current/sbin:1;/cm/shared/apps/slurm/current/bin:1;/home/jpg/usr/bin:2;/home/jpg/bin:3;/home/jpg/.local/bin:1;/usr/local/bin:1;/usr/bin:1;/usr/local/sbin:1;/usr/sbin:1
+HOME=/home/jpg
+_ModuleTable_Sz_=7
+__LMOD_REF_COUNT_LIBRARY_PATH=/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-8.5.0/intel-mpi-2019.10.317-f7l5rk4xxssuwsoruzlap6qm3o6y4ugv/compilers_and_libraries_2020.4.317/linux/mpi/intel64/libfabric/lib:2;/cm/shared/apps/slurm/current/lib64/slurm:2;/cm/shared/apps/slurm/current/lib64:2
+LANG=en_US.UTF-8
+__LMOD_REF_COUNT_LOADEDMODULES=slurm/slurm/22.05.9:1;gpu/0.17.3:1;gcc/8.5.0-mf5bqu2:1;intel-mpi/2019.10.317-f7l5rk4:1;cuda/10.2.89-xebsu34:1;cmake/3.21.4-mdcgzjl:1
+LS_COLORS=rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=01;37;41:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=01;36:*.au=01;36:*.flac=01;36:*.m4a=01;36:*.mid=01;36:*.midi=01;36:*.mka=01;36:*.mp3=01;36:*.mpc=01;36:*.ogg=01;36:*.ra=01;36:*.wav=01;36:*.oga=01;36:*.opus=01;36:*.spx=01;36:*.xspf=01;36:
+SLURM_PROCID=0
+MPIF90=/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-8.5.0/intel-mpi-2019.10.317-f7l5rk4xxssuwsoruzlap6qm3o6y4ugv/compilers_and_libraries_2020.4.317/linux/mpi/intel64/bin/mpif90
+__LMOD_REF_COUNT_CPATH=/cm/shared/apps/slurm/current/include:1
+LMOD_SETTARG_FULL_SUPPORT=no
+SPACK_COMPILER=gcc@8.5.0
+TMPDIR=/tmp
+CMAKE_PREFIX_PATH=/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-8.5.0/cmake-3.21.4-mdcgzjlvsqfz3vyjt3kzsfiqhcfy4py7:/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-8.5.0/cuda-10.2.89-xebsu34d7jfm66mf246za2wcritdqif7:/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-8.5.0/intel-mpi-2019.10.317-f7l5rk4xxssuwsoruzlap6qm3o6y4ugv:/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-8.5.0-mf5bqu2cwyzoxa5c7btqbbdxng3whbmf
+MPIF77=/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-8.5.0/intel-mpi-2019.10.317-f7l5rk4xxssuwsoruzlap6qm3o6y4ugv/compilers_and_libraries_2020.4.317/linux/mpi/intel64/bin/mpif77
+SLURM_CPUS_PER_TASK=8
+SLURM_NTASKS=1
+SLURM_TOPOLOGY_ADDR=gpu1
+LMOD_VERSION=8.5
+SSH_CONNECTION=174.195.134.161 4840 132.249.107.93 22
+SPACK_ROOT=/cm/shared/apps/spack/0.17.3/gpu
+_ModuleTable003_=PSIvY20vc2hhcmVkL2FwcHMvc3BhY2svMC4xNy4zL2dwdS9zaGFyZS9zcGFjay9sbW9kL2xpbnV4LXJvY2t5OS14ODZfNjQvQ29yZS9nY2MvOC41LjAtbWY1YnF1Mi5sdWEiLFsiZnVsbE5hbWUiXT0iZ2NjLzguNS4wLW1mNWJxdTIiLFsibG9hZE9yZGVyIl09Myxwcm9wVD17fSxbInN0YWNrRGVwdGgiXT0wLFsic3RhdHVzIl09ImFjdGl2ZSIsWyJ1c2VyTmFtZSJdPSJnY2MvOC41LjAiLFsid1YiXT0iMDAwMDAwMDA4LjAwMDAwMDAwNS4qbWYuMDAwMDAwMDA1LipicXUuMDAwMDAwMDAyLip6ZmluYWwiLH0sZ3B1PXtbImZuIl09Ii9jbS9zaGFyZWQvbW9kdWxlZmlsZXMvZ3B1LzAuMTcuMy5sdWEiLFsiZnVsbE5hbWUiXT0iZ3B1LzAuMTcuMyIsWyJsb2FkT3JkZXIiXT0yLHBy
+MODULEPATH_ROOT=/usr/share/modulefiles
+SDSC_SPACK_STACK=gpu
+SLURM_TOPOLOGY_ADDR_PATTERN=node
+XDG_SESSION_CLASS=user
+LMOD_PKG=/usr/share/lmod/lmod
+SLURM_WORKING_CLUSTER=slurm:mgr2:6817:9728:109
+TERM=xterm-256color
+F77=/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-8.5.0-mf5bqu2cwyzoxa5c7btqbbdxng3whbmf/bin/gfortran
+ACLOCAL_PATH=/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-8.5.0/cmake-3.21.4-mdcgzjlvsqfz3vyjt3kzsfiqhcfy4py7/share/aclocal
+LESSOPEN=||/usr/bin/lesspipe.sh %s
+USER=jpg
+LIBRARY_PATH=/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-8.5.0/intel-mpi-2019.10.317-f7l5rk4xxssuwsoruzlap6qm3o6y4ugv/compilers_and_libraries_2020.4.317/linux/mpi/intel64/libfabric/lib:/cm/shared/apps/slurm/current/lib64/slurm:/cm/shared/apps/slurm/current/lib64
+SLURM_NODELIST=gpu1
+ENVIRONMENT=BATCH
+LOADEDMODULES=slurm/slurm/22.05.9:gpu/0.17.3:gcc/8.5.0-mf5bqu2:intel-mpi/2019.10.317-f7l5rk4:cuda/10.2.89-xebsu34:cmake/3.21.4-mdcgzjl
+SPACK_SPEC=amber@22 % gcc@8.5.0 +cuda cuda_cuda_arch=60,75 +mpi +openmp +update ^intel-mpi@2019.10.317 ^hdf5@1.10.7/xjxzesg ^netcdf-c@4.8.1/hvamu3b ^netcdf-fortran@4.5.3/v7q2bht ^cuda@10.2.89/xebsu34
+SLURM_JOB_ACCOUNT=sys200
+SLURM_PRIO_PROCESS=0
+SLURM_NPROCS=1
+LMOD_ROOT=/usr/share/lmod
+LMOD_SETTARG_CMD=:
+SHLVL=2
+SLURM_NNODES=1
+BASH_ENV=/usr/share/lmod/lmod/init/bash
+_ModuleTable006_=Y2svbG1vZC9saW51eC1yb2NreTkteDg2XzY0L2ludGVsLW1waS8yMDE5LjEwLjMxNy1mN2w1cms0L2djYy84LjUuMCIsIi9jbS9zaGFyZWQvYXBwcy9zcGFjay8wLjE3LjMvZ3B1L3NoYXJlL3NwYWNrL2xtb2QvbGludXgtcm9ja3k5LXg4Nl82NC9nY2MvOC41LjAiLCIvY20vc2hhcmVkL2FwcHMvc3BhY2svMC4xNy4zL2dwdS9zaGFyZS9zcGFjay9sbW9kL2xpbnV4LXJvY2t5OS14ODZfNjQvQ29yZSIsIi9jbS9zaGFyZWQvYXBwcy9zcGFjay8wLjE3LjMvZ3B1L3NoYXJlL3NwYWNrL2xtb2QvbGludXgtcm9ja3k4LXg4Nl82NC9Db3JlIiwiL2NtL3NoYXJlZC9tb2R1bGVmaWxlcyIsIi9jbS9sb2NhbC9tb2R1bGVmaWxlcyIsIi9ldGMvbW9kdWxlZmlsZXMiLCIvdXNyL3NoYXJl
+LMOD_FULL_SETTARG_SUPPORT=no
+CUDA_MODULE=cuda/10.2.89
+LMOD_sys=Linux
+__LMOD_REF_COUNT_MANPATH=/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-8.5.0/intel-mpi-2019.10.317-f7l5rk4xxssuwsoruzlap6qm3o6y4ugv/compilers_and_libraries_2020.4.317/linux/mpi/man:2;/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-8.5.0-mf5bqu2cwyzoxa5c7btqbbdxng3whbmf/share/man:2;/cm/shared/apps/slurm/current/man:2;/usr/share/lmod/lmod/share/man:2;/usr/local/share/man:2;/usr/share/man:2;/cm/local/apps/environment-modules/current/share/man:2
+XDG_SESSION_ID=92014
+SLURM_SUBMIT_HOST=login1
+__LMOD_SET_FPATH=1
+_ModuleTable001_=X01vZHVsZVRhYmxlXz17WyJNVHZlcnNpb24iXT0zLFsiY19yZWJ1aWxkVGltZSJdPWZhbHNlLFsiY19zaG9ydFRpbWUiXT1mYWxzZSxkZXB0aFQ9e30sZmFtaWx5PXtbImNvbXBpbGVyIl09ImdjYyIsWyJtcGkiXT0iaW50ZWwtbXBpIix9LG1UPXtjbWFrZT17WyJmbiJdPSIvY20vc2hhcmVkL2FwcHMvc3BhY2svMC4xNy4zL2dwdS9zaGFyZS9zcGFjay9sbW9kL2xpbnV4LXJvY2t5OS14ODZfNjQvZ2NjLzguNS4wL2NtYWtlLzMuMjEuNC1tZGNnempsLmx1YSIsWyJmdWxsTmFtZSJdPSJjbWFrZS8zLjIxLjQtbWRjZ3pqbCIsWyJsb2FkT3JkZXIiXT02LHByb3BUPXt9LFsic3RhY2tEZXB0aCJdPTAsWyJzdGF0dXMiXT0iYWN0aXZlIixbInVzZXJOYW1lIl09ImNtYWtlLzMuMjEu
+SPACK_PACKAGE=amber@22
+CLASSPATH=/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-8.5.0/intel-mpi-2019.10.317-f7l5rk4xxssuwsoruzlap6qm3o6y4ugv/compilers_and_libraries_2020.4.317/linux/mpi/intel64/lib/mpi.jar
+LD_LIBRARY_PATH=/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-8.5.0/cuda-10.2.89-xebsu34d7jfm66mf246za2wcritdqif7/lib64:/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-8.5.0/intel-mpi-2019.10.317-f7l5rk4xxssuwsoruzlap6qm3o6y4ugv/compilers_and_libraries_2020.4.317/linux/mpi/intel64/libfabric/lib:/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-8.5.0/intel-mpi-2019.10.317-f7l5rk4xxssuwsoruzlap6qm3o6y4ugv/compilers_and_libraries_2020.4.317/linux/mpi/intel64/lib/release:/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-8.5.0/intel-mpi-2019.10.317-f7l5rk4xxssuwsoruzlap6qm3o6y4ugv/compilers_and_libraries_2020.4.317/linux/mpi/intel64/lib:/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-8.5.0-mf5bqu2cwyzoxa5c7btqbbdxng3whbmf/lib64:/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-8.5.0-mf5bqu2cwyzoxa5c7btqbbdxng3whbmf/lib:/cm/shared/apps/slurm/current/lib64/slurm:/cm/shared/apps/slurm/current/lib64
+LMOD_FAMILY_COMPILER=gcc
+XDG_RUNTIME_DIR=/run/user/422
+LMOD_COLORIZE=yes
+SLURM_JOB_ID=3280
+SLURM_NODEID=0
+_ModuleTable004_=b3BUPXt9LFsic3RhY2tEZXB0aCJdPTAsWyJzdGF0dXMiXT0iYWN0aXZlIixbInVzZXJOYW1lIl09ImdwdSIsWyJ3ViJdPSIwMDAwMDAwMDAuMDAwMDAwMDE3LjAwMDAwMDAwMy4qemZpbmFsIix9LFsiaW50ZWwtbXBpIl09e1siZm4iXT0iL2NtL3NoYXJlZC9hcHBzL3NwYWNrLzAuMTcuMy9ncHUvc2hhcmUvc3BhY2svbG1vZC9saW51eC1yb2NreTkteDg2XzY0L2djYy84LjUuMC9pbnRlbC1tcGkvMjAxOS4xMC4zMTctZjdsNXJrNC5sdWEiLFsiZnVsbE5hbWUiXT0iaW50ZWwtbXBpLzIwMTkuMTAuMzE3LWY3bDVyazQiLFsibG9hZE9yZGVyIl09NCxwcm9wVD17fSxbInN0YWNrRGVwdGgiXT0wLFsic3RhdHVzIl09ImFjdGl2ZSIsWyJ1c2VyTmFtZSJdPSJpbnRlbC1tcGkvMjAx
+S_COLORS=auto
+LMOD_FAMILY_MPI_VERSION=2019.10.317-f7l5rk4
+SSH_CLIENT=174.195.134.161 4840 22
+DEBUGINFOD_URLS=https://debuginfod.centos.org/ 
+CMD_WLM_CLUSTER_NAME=slurm
+LMOD_FAMILY_MPI=intel-mpi
+ENABLE_LMOD=1
+FC=/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-8.5.0-mf5bqu2cwyzoxa5c7btqbbdxng3whbmf/bin/gfortran
+which_declare=declare -f
+LMOD_FAMILY_COMPILER_VERSION=8.5.0-mf5bqu2
+CUDA_HOME=/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-8.5.0/cuda-10.2.89-xebsu34d7jfm66mf246za2wcritdqif7
+UNIX_TIME=1687974540
+__Init_Default_Modules=1
+SLURM_CONF=/cm/shared/apps/slurm/var/etc/slurm/slurm.conf
+PATH=/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-8.5.0/cmake-3.21.4-mdcgzjlvsqfz3vyjt3kzsfiqhcfy4py7/bin:/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-8.5.0/cuda-10.2.89-xebsu34d7jfm66mf246za2wcritdqif7/bin:/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-8.5.0/intel-mpi-2019.10.317-f7l5rk4xxssuwsoruzlap6qm3o6y4ugv/compilers_and_libraries_2020.4.317/linux/mpi/intel64/libfabric/bin:/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-8.5.0/intel-mpi-2019.10.317-f7l5rk4xxssuwsoruzlap6qm3o6y4ugv/compilers_and_libraries_2020.4.317/linux/mpi/intel64/bin:/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-8.5.0/intel-mpi-2019.10.317-f7l5rk4xxssuwsoruzlap6qm3o6y4ugv/bin:/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-8.5.0-mf5bqu2cwyzoxa5c7btqbbdxng3whbmf/bin:/cm/shared/apps/spack/0.17.3/gpu/bin:/cm/shared/apps/slurm/current/sbin:/cm/shared/apps/slurm/current/bin:/home/jpg/usr/bin:/home/jpg/bin:/home/jpg/.local/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin
+SLURM_JOB_NAME=amber@22
+LOCAL_TIME=20230628T104900-0700
+MODULEPATH=/cm/shared/apps/spack/0.17.3/gpu/share/spack/lmod/linux-rocky9-x86_64/intel-mpi/2019.10.317-f7l5rk4/gcc/8.5.0:/cm/shared/apps/spack/0.17.3/gpu/share/spack/lmod/linux-rocky9-x86_64/gcc/8.5.0:/cm/shared/apps/spack/0.17.3/gpu/share/spack/lmod/linux-rocky9-x86_64/Core:/cm/shared/apps/spack/0.17.3/gpu/share/spack/lmod/linux-rocky8-x86_64/Core:/cm/shared/modulefiles:/cm/local/modulefiles:/etc/modulefiles:/usr/share/modulefiles:/usr/share/Modules/modulefiles
+CC=/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-8.5.0-mf5bqu2cwyzoxa5c7btqbbdxng3whbmf/bin/gcc
+SLURM_NTASKS_PER_NODE=1
+_LMFILES_=/cm/local/modulefiles/slurm/slurm/22.05.9:/cm/shared/modulefiles/gpu/0.17.3.lua:/cm/shared/apps/spack/0.17.3/gpu/share/spack/lmod/linux-rocky9-x86_64/Core/gcc/8.5.0-mf5bqu2.lua:/cm/shared/apps/spack/0.17.3/gpu/share/spack/lmod/linux-rocky9-x86_64/gcc/8.5.0/intel-mpi/2019.10.317-f7l5rk4.lua:/cm/shared/apps/spack/0.17.3/gpu/share/spack/lmod/linux-rocky9-x86_64/gcc/8.5.0/cuda/10.2.89-xebsu34.lua:/cm/shared/apps/spack/0.17.3/gpu/share/spack/lmod/linux-rocky9-x86_64/gcc/8.5.0/cmake/3.21.4-mdcgzjl.lua
+SYSTEM_NAME=tscc
+DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/422/bus
+LMOD_CMD=/usr/share/lmod/lmod/libexec/lmod
+LMOD_MPI_VERSION=2019.10.317-f7l5rk4
+MAIL=/var/spool/mail/jpg
+SSH_TTY=/dev/pts/0
+__LMOD_REF_COUNT_LD_LIBRARY_PATH=/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-8.5.0/cuda-10.2.89-xebsu34d7jfm66mf246za2wcritdqif7/lib64:1;/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-8.5.0/intel-mpi-2019.10.317-f7l5rk4xxssuwsoruzlap6qm3o6y4ugv/compilers_and_libraries_2020.4.317/linux/mpi/intel64/libfabric/lib:1;/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-8.5.0/intel-mpi-2019.10.317-f7l5rk4xxssuwsoruzlap6qm3o6y4ugv/compilers_and_libraries_2020.4.317/linux/mpi/intel64/lib/release:1;/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-8.5.0/intel-mpi-2019.10.317-f7l5rk4xxssuwsoruzlap6qm3o6y4ugv/compilers_and_libraries_2020.4.317/linux/mpi/intel64/lib:1;/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-8.5.0-mf5bqu2cwyzoxa5c7btqbbdxng3whbmf/lib64:1;/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-8.5.0-mf5bqu2cwyzoxa5c7btqbbdxng3whbmf/lib:1;/cm/shared/apps/slurm/current/lib64/slurm:1;/cm/shared/apps/slurm/current/lib64:1
+LMOD_SYSTEM_DEFAULT_MODULES=DefaultModules
+SLURM_JOB_GID=7193
+CPATH=/cm/shared/apps/slurm/current/include
+LMOD_MPI_NAME=intel-mpi
+SPACK_VERSION=0.17.3
+OLDPWD=/home/jpg/specs_gpu_0.17.3/gcc@8.5.0
+SLURM_JOB_NODELIST=gpu1
+BASH_FUNC_ml%%=() {  eval $($LMOD_DIR/ml_cmd "$@")
+}
+BASH_FUNC_which%%=() {  ( alias;
+ eval ${which_declare} ) | /usr/bin/which --tty-only --read-alias --read-functions --show-tilde --show-dot $@
+}
+BASH_FUNC_module%%=() {  eval $($LMOD_CMD bash "$@") && eval $(${LMOD_SETTARG_CMD:-:} -s sh)
+}
+BASH_FUNC__spack_shell_wrapper%%=() {  for var in LD_LIBRARY_PATH DYLD_LIBRARY_PATH DYLD_FALLBACK_LIBRARY_PATH;
+ do
+ eval "if [ -n \"\${${var}-}\" ]; then export SPACK_$var=\${${var}}; fi";
+ done;
+ if [ -n "${ZSH_VERSION:-}" ]; then
+ emulate -L sh;
+ fi;
+ _sp_flags="";
+ while [ ! -z ${1+x} ] && [ "${1#-}" != "${1}" ]; do
+ _sp_flags="$_sp_flags $1";
+ shift;
+ done;
+ if [ -n "$_sp_flags" ] && [ "${_sp_flags#*h}" != "${_sp_flags}" ] || [ "${_sp_flags#*V}" != "${_sp_flags}" ]; then
+ command spack $_sp_flags "$@";
+ return;
+ fi;
+ _sp_subcommand="";
+ if [ ! -z ${1+x} ]; then
+ _sp_subcommand="$1";
+ shift;
+ fi;
+ case $_sp_subcommand in 
+ "cd")
+ _sp_arg="";
+ if [ -n "$1" ]; then
+ _sp_arg="$1";
+ shift;
+ fi;
+ if [ "$_sp_arg" = "-h" ] || [ "$_sp_arg" = "--help" ]; then
+ command spack cd -h;
+ else
+ LOC="$(spack location $_sp_arg "$@")";
+ if [ -d "$LOC" ]; then
+ cd "$LOC";
+ else
+ return 1;
+ fi;
+ fi;
+ return
+ ;;
+ "env")
+ _sp_arg="";
+ if [ -n "$1" ]; then
+ _sp_arg="$1";
+ shift;
+ fi;
+ if [ "$_sp_arg" = "-h" ] || [ "$_sp_arg" = "--help" ]; then
+ command spack env -h;
+ else
+ case $_sp_arg in 
+ activate)
+ _a=" $@";
+ if [ -z ${1+x} ] || [ "${_a#* --sh}" != "$_a" ] || [ "${_a#* --csh}" != "$_a" ] || [ "${_a#* -h}" != "$_a" ] || [ "${_a#* --help}" != "$_a" ]; then
+ command spack env activate "$@";
+ else
+ stdout="$(command spack $_sp_flags env activate --sh "$@")" || return;
+ eval "$stdout";
+ fi
+ ;;
+ deactivate)
+ _a=" $@";
+ if [ "${_a#* --sh}" != "$_a" ] || [ "${_a#* --csh}" != "$_a" ]; then
+ command spack env deactivate "$@";
+ else
+ if [ -n "$*" ]; then
+ command spack env deactivate -h;
+ else
+ stdout="$(command spack $_sp_flags env deactivate --sh)" || return;
+ eval "$stdout";
+ fi;
+ fi
+ ;;
+ *)
+ command spack env $_sp_arg "$@"
+ ;;
+ esac;
+ fi;
+ return
+ ;;
+ "load" | "unload")
+ _a=" $@";
+ if [ "${_a#* --sh}" != "$_a" ] || [ "${_a#* --csh}" != "$_a" ] || [ "${_a#* -h}" != "$_a" ] || [ "${_a#* --list}" != "$_a" ] || [ "${_a#* --help}" != "$_a" ]; then
+ command spack $_sp_flags $_sp_subcommand "$@";
+ else
+ stdout="$(command spack $_sp_flags $_sp_subcommand --sh "$@")" || return;
+ eval "$stdout";
+ fi
+ ;;
+ *)
+ command spack $_sp_flags $_sp_subcommand "$@"
+ ;;
+ esac
+}
+BASH_FUNC_spack%%=() {  : this is a shell function from: /cm/shared/apps/spack/0.17.3/gpu/share/spack/setup-env.sh;
+ : the real spack script is here: /cm/shared/apps/spack/0.17.3/gpu/bin/spack;
+ _spack_shell_wrapper "$@";
+ return $?
+}
+_=/usr/bin/printenv
+compilers:
+- compiler:
+    spec: gcc@11.3.1
+    paths:
+      cc: /usr/bin/gcc
+      cxx: /usr/bin/g++
+      f77: /usr/bin/gfortran
+      fc: /usr/bin/gfortran
+    flags: {}
+    operating_system: rocky9
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+- compiler:
+    spec: gcc@11.2.0
+    paths:
+      cc: /usr/bin/gcc
+      cxx: /usr/bin/g++
+      f77: /usr/bin/gfortran
+      fc: /usr/bin/gfortran
+    flags:
+      cflags: -O2 -march=native
+      cxxflags: -O2 -march=native
+      fflags: -O2 -march=native
+    operating_system: rocky9
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+- compiler:
+    spec: intel@19.1.1.217
+    paths:
+      cc: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/intel-19.1.1.217-7fcjggodrui3okoovfgtjf6gl5nf6nlv/bin/icc
+      cxx: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/intel-19.1.1.217-7fcjggodrui3okoovfgtjf6gl5nf6nlv/bin/icpc
+      f77: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/intel-19.1.1.217-7fcjggodrui3okoovfgtjf6gl5nf6nlv/bin/ifort
+      fc: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/intel-19.1.1.217-7fcjggodrui3okoovfgtjf6gl5nf6nlv/bin/ifort
+    flags:
+      cflags: -gcc-name=/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-8.5.0-mf5bqu2cwyzoxa5c7btqbbdxng3whbmf/bin/gcc
+      cxxflags: -gcc-name=/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-8.5.0-mf5bqu2cwyzoxa5c7btqbbdxng3whbmf/bin/gcc
+      fflags: -gcc-name=/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-8.5.0-mf5bqu2cwyzoxa5c7btqbbdxng3whbmf/bin/gcc
+    operating_system: rocky9
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+- compiler:
+    spec: gcc@10.2.0
+    paths:
+      cc: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-10.2.0-mqbpsxf6a5jhxi4vlwdtfyqe7q3yjgse/bin/gcc
+      cxx: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-10.2.0-mqbpsxf6a5jhxi4vlwdtfyqe7q3yjgse/bin/g++
+      f77: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-10.2.0-mqbpsxf6a5jhxi4vlwdtfyqe7q3yjgse/bin/gfortran
+      fc: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-10.2.0-mqbpsxf6a5jhxi4vlwdtfyqe7q3yjgse/bin/gfortran
+    flags: {}
+    operating_system: rocky9
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+- compiler:
+    spec: gcc@9.2.0
+    paths:
+      cc: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-9.2.0-nx6afhcfe2pccw7nla4fjmvdqvbhieh6/bin/gcc
+      cxx: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-9.2.0-nx6afhcfe2pccw7nla4fjmvdqvbhieh6/bin/g++
+      f77: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-9.2.0-nx6afhcfe2pccw7nla4fjmvdqvbhieh6/bin/gfortran
+      fc: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-9.2.0-nx6afhcfe2pccw7nla4fjmvdqvbhieh6/bin/gfortran
+    flags: {}
+    operating_system: rocky9
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+- compiler:
+    spec: gcc@8.5.0
+    paths:
+      cc: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-8.5.0-mf5bqu2cwyzoxa5c7btqbbdxng3whbmf/bin/gcc
+      cxx: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-8.5.0-mf5bqu2cwyzoxa5c7btqbbdxng3whbmf/bin/g++
+      f77: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-8.5.0-mf5bqu2cwyzoxa5c7btqbbdxng3whbmf/bin/gfortran
+      fc: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-8.5.0-mf5bqu2cwyzoxa5c7btqbbdxng3whbmf/bin/gfortran
+    flags: {}
+    operating_system: rocky9
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+- compiler:
+    spec: nvhpc@22.1
+    paths:
+      cc: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/nvhpc-22.1-rsks4ptuwyfjjxigybva7k53ihgacw3y/Linux_x86_64/22.1/compilers/bin/nvc
+      cxx: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/nvhpc-22.1-rsks4ptuwyfjjxigybva7k53ihgacw3y/Linux_x86_64/22.1/compilers/bin/nvc++
+      f77: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/nvhpc-22.1-rsks4ptuwyfjjxigybva7k53ihgacw3y/Linux_x86_64/22.1/compilers/bin/nvfortran
+      fc: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/nvhpc-22.1-rsks4ptuwyfjjxigybva7k53ihgacw3y/Linux_x86_64/22.1/compilers/bin/nvfortran
+    flags: {}
+    operating_system: rocky9
+    target: x86_64
+    modules: [nvhpc/22.1]
+    environment: {}
+    extra_rpaths: []
+config:
+  install_tree:
+    root: $spack/opt/spack
+    projections:
+      all: ${ARCHITECTURE}/${COMPILERNAME}-${COMPILERVER}/${PACKAGE}-${VERSION}-${HASH}
+  template_dirs:
+  - $spack/share/spack/templates
+
+  # Temporary locations Spack can try to use for builds.
+  #
+  # Recommended options are given below.
+  #
+  # Builds can be faster in temporary directories on some (e.g., HPC) systems.
+  # Specifying `$tempdir` will ensure use of the default temporary directory
+  # (i.e., ``$TMP` or ``$TMPDIR``).
+  #
+  # Another option that prevents conflicts and potential permission issues is
+  # to specify `$user_cache_path/stage`, which ensures each user builds in their
+  # home directory.
+  #
+  # A more traditional path uses the value of `$spack/var/spack/stage`, which
+  # builds directly inside Spack's instance without staging them in a
+  # temporary space.  Problems with specifying a path inside a Spack instance
+  # are that it precludes its use as a system package and its ability to be
+  # pip installable.
+  #
+  # In any case, if the username is not already in the path, Spack will append
+  # the value of `$user` in an attempt to avoid potential conflicts between
+  # users in shared temporary spaces.
+  #
+  # The build stage can be purged with `spack clean --stage` and
+  # `spack clean -a`, so it is important that the specified directory uniquely
+  # identifies Spack staging to avoid accidentally wiping out non-Spack work.
+  build_stage:
+  - $tempdir/$user/spack-stage
+  - $user_cache_path/stage
+  # - $spack/var/spack/stage
+
+  # Directory in which to run tests and store test results.
+  # Tests will be stored in directories named by date/time and package
+  # name/hash.
+  test_stage: $user_cache_path/test
+  source_cache: $spack/var/spack/cache
+  misc_cache: $user_cache_path/cache
+  connect_timeout: 10
+  verify_ssl: true
+  suppress_gpg_warnings: false
+  install_missing_compilers: false
+  checksum: true
+  deprecated: false
+  dirty: false
+  build_language: C
+  locks: true
+  url_fetch_method: urllib
+  ccache: false
+  concretizer: clingo
+  db_lock_timeout: 3
+  package_lock_timeout: null
+  shared_linking: rpath
+  allow_sgid: true
+  terminal_title: false
+  debug: false
+  build_jobs: 16
+mirrors:
+  spack-public: https://mirror.spack.io
+modules:
+  default:
+    'enable:':
+    - lmod
+    lmod:
+      core_compilers:
+      - gcc@11.2.0
+      hierarchy:
+      - mpi
+      hash_length: 7
+      blacklist_implicits: true
+      naming_scheme: '{name}/{version}'
+      projections:
+        all: '{name}/{version}'
+      adol-c:
+        suffixes:
+          +openmp: omp
+      amdblis:
+        suffixes:
+          threads=openmp: omp
+      fftw:
+        suffixes:
+          +openmp: omp
+      hpl:
+        suffixes:
+          +openmp: omp
+      hypre:
+        suffixes:
+          +openmp: omp
+      intel:
+        environment:
+          set:
+            INTEL_LICENSE_FILE: 40000@elprado.sdsc.edu:40100@elprado.sdsc.edu
+      kokkos:
+        suffixes:
+          +openmp: omp
+      intel-mkl:
+        suffixes:
+          threads=openmp: omp
+      openblas:
+        suffixes:
+          threads=openmp: omp
+          +ilp64: ilp64
+      'netlib-scalapack:':
+        suffixes:
+          ^openblas threads=openmp: omp
+      petsc:
+        suffixes:
+          +complex: cmplx
+      slepc:
+        suffixes:
+          ^petsc +complex: cmplx
+      ^python:
+        autoload: direct
+      ^ucx:
+        autoload: direct
+  prefix_inspections:
+    lib:
+    - LD_LIBRARY_PATH
+    lib64:
+    - LD_LIBRARY_PATH
+    bin:
+    - PATH
+    man:
+    - MANPATH
+    share/man:
+    - MANPATH
+    share/aclocal:
+    - ACLOCAL_PATH
+    lib/pkgconfig:
+    - PKG_CONFIG_PATH
+    lib64/pkgconfig:
+    - PKG_CONFIG_PATH
+    share/pkgconfig:
+    - PKG_CONFIG_PATH
+    ? ''
+    : - CMAKE_PREFIX_PATH
+
+  # These are configurations for the module set named "default"
+packages:
+  lustre:
+    externals:
+    - spec: lustre@2.15.2 % gcc@11.2.0 arch=linux-rocky9-broadwell
+      prefix: /usr
+    - spec: lustre@2.15.2 % gcc@10.2.0 arch=linux-rocky9-broadwell
+      prefix: /usr
+    - spec: lustre@2.15.2 % gcc@9.2.0 arch=linux-rocky9-broadwell
+      prefix: /usr
+    - spec: lustre@2.15.2 % gcc@8.5.0 arch=linux-rocky9-broadwell
+      prefix: /usr
+    - spec: lustre@2.15.2 % intel@19.1.1.217 arch=linux-rocky9-broadwell
+      prefix: /usr
+    - spec: lustre@2.15.2 % aocc@3.2.0 arch=linux-rocky9-broadwell
+      prefix: /usr
+    buildable: false
+  texlive:
+    externals:
+    - spec: texive@live % gcc@10.2.0 arch=linux-rocky9-broadwell
+      prefix: /usr
+    - spec: texive@live % gcc@9.2.0 arch=linux-rocky9-broadwell
+      prefix: /usr
+    - spec: texlive@live % intel@19.1.1.217 arch=linux-rocky9-broadwell
+      prefix: /usr
+    buildable: false
+  openmpi:
+    externals:
+    - spec: openmpi@4.0.5 % nvhpc@22.1 arch=linux-rocky9-broadwell
+      prefix: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/nvhpc-22.1-rsks4ptuwyfjjxigybva7k53ihgacw3y/Linux_x86_64/22.1/comm_libs/openmpi4/openmpi-4.0.5
+    buildable: true
+  qd:
+    externals:
+    - spec: qd@2.3.13 % nvhpc@22.1 arch=linux-rocky9-broadwell
+      prefix: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/nvhpc-22.1-rsks4ptuwyfjjxigybva7k53ihgacw3y/Linux_x86_64/22.1/compilers/extras/qd
+    buildable: false
+  openssl:
+    externals:
+    - spec: openssl@3.0.7 % gcc@11.2.0 arch=linux-rocky9-broadwell
+      prefix: /usr
+    - spec: openssl@3.0.7 % gcc@10.2.0 arch=linux-rocky9-broadwell
+      prefix: /usr
+    - spec: openssl@3.0.7 % gcc@9.2.0 arch=linux-rocky9-broadwell
+      prefix: /usr
+    - spec: openssl@3.0.7 % intel@19.1.1.217 arch=linux-rocky9-broadwell
+      prefix: /usr
+    buildable: false
+  rdma-core:
+    externals:
+    - spec: rdma-core@44.0 % gcc@10.2.0 arch=linux-rocky9-broadwell
+      prefix: /usr
+    - spec: rdma-core@44.0 % gcc@9.2.0 arch=linux-rocky9-broadwell
+      prefix: /usr
+    - spec: rdma-core@44.0 % intel@19.1.1.217 arch=linux-rocky9-broadwell
+      prefix: /usr
+    buildable: false
+  hcoll:
+    externals:
+    - spec: hcoll@4.4.2968 % gcc@10.2.0 arch=linux-rocky9-broadwell
+      prefix: /opt/mellanox/hcoll
+    - spec: hcoll@4.4.2968 % gcc@9.2.0 arch=linux-rocky9-broadwell
+      prefix: /opt/mellanox/hcoll
+    - spec: hcoll@4.4.2968 % intel@19.1.1.217 arch=linux-rocky9-broadwell
+      prefix: /opt/mellanox/hcoll
+    buildable: false
+  slurm:
+    externals:
+    - spec: slurm@22.05.9 % gcc@8.5.0 arch=linux-rocky9-broadwell
+      prefix: /cm/shared/apps/slurm/22.05.9
+    - spec: slurm@22.05.9 % gcc@11.2.0 arch=linux-rocky9-broadwell
+      prefix: /cm/shared/apps/slurm/22.05.9
+    - spec: slurm@22.05.9 % gcc@10.2.0 arch=linux-rocky9-broadwell
+      prefix: /cm/shared/apps/slurm/22.05.9
+    - spec: slurm@22.05.9 % gcc@9.2.0 arch=linux-rocky9-broadwell
+      prefix: /cm/shared/apps/slurm/22.05.9
+    - spec: slurm@22.05.9 % intel@19.1.1.217 arch=linux-rocky9-broadwell
+      prefix: /cm/shared/apps/slurm/22.05.9
+    buildable: false
+  librsvg:
+    externals:
+    - spec: librsvg@2.42.7 % gcc@10.2.0 arch=linux-rocky9-broadwell
+      prefix: /usr
+    - spec: librsvg@2.42.7 % gcc@9.2.0 arch=linux-rocky9-broadwell
+      prefix: /usr
+    - spec: librsvg@2.42.7 %  intel@19.1.1.217 arch=linux-rocky9-broadwell
+      prefix: /usr
+    buildable: false
+  ghostscript:
+    externals:
+    - spec: ghostscript@9.27 % gcc@10.2.0 arch=linux-rocky9-broadwell
+      prefix: /usr
+    buildable: false
+  vasp6:
+    permissions:
+      read: group
+      group: vasp-6
+  all:
+    compiler: [gcc, intel, pgi, clang, xl, nag, fj, aocc]
+    providers:
+      awk: [gawk]
+      blas: [openblas, amdblis]
+      D: [ldc]
+      daal: [intel-daal]
+      elf: [elfutils]
+      fftw-api: [fftw, amdfftw]
+      flame: [libflame, amdlibflame]
+      fuse: [libfuse]
+      gl: [mesa+opengl, mesa18, opengl]
+      glu: [mesa-glu, openglu]
+      glx: [mesa+glx, mesa18+glx, opengl]
+      golang: [gcc]
+      iconv: [libiconv]
+      ipp: [intel-ipp]
+      java: [openjdk, jdk, ibm-java]
+      jpeg: [libjpeg-turbo, libjpeg]
+      lapack: [openblas, amdlibflame]
+      lua-lang: [lua, lua-luajit]
+      mariadb-client: [mariadb-c-client, mariadb]
+      mkl: [intel-mkl]
+      mpe: [mpe2]
+      mpi: [openmpi, mpich]
+      mysql-client: [mysql, mariadb-c-client]
+      opencl: [pocl]
+      onedal: [intel-oneapi-dal]
+      osmesa: [mesa+osmesa, mesa18+osmesa]
+      pbs: [openpbs, torque]
+      pil: [py-pillow]
+      pkgconfig: [pkgconf, pkg-config]
+      rpc: [libtirpc]
+      scalapack: [netlib-scalapack, amdscalapack]
+      sycl: [hipsycl]
+      szip: [libaec, libszip]
+      tbb: [intel-tbb]
+      unwind: [libunwind]
+      uuid: [util-linux-uuid, libuuid]
+      xxd: [xxd-standalone, vim]
+      yacc: [bison, byacc]
+      ziglang: [zig]
+    permissions:
+      read: world
+      write: user
+repos:
+- $spack/var/spack/repos/sdsc
+- $spack/var/spack/repos/builtin
+upstreams: {}
+==> Error: trying to set variant "cuda_cuda_arch" in package "amber", but the package has no such variant [happened during concretization of amber@22%gcc@8.5.0+cuda+mpi+openmp+update cuda_cuda_arch=60,75 ^cuda@10.2.89%gcc@8.5.0~dev arch=linux-rocky9-broadwell ^hdf5@1.10.7%gcc@8.5.0+cxx+fortran+hl~ipo+java+mpi+shared~szip~threadsafe+tools api=default build_type=RelWithDebInfo arch=linux-rocky9-broadwell ^hdf5@1.10.7%gcc@8.5.0+cxx+fortran+hl~ipo+java+mpi+shared~szip~threadsafe+tools api=default build_type=RelWithDebInfo arch=linux-rocky9-broadwell ^hdf5@1.10.7%gcc@8.5.0+cxx+fortran+hl~ipo+java+mpi+shared~szip~threadsafe+tools api=default build_type=RelWithDebInfo arch=linux-rocky9-broadwell ^intel-mpi@2019.10.317%gcc@8.5.0 arch=linux-rocky9-broadwell ^intel-mpi@2019.10.317 ^intel-mpi@2019.10.317%gcc@8.5.0 arch=linux-rocky9-broadwell ^intel-mpi@2019.10.317%gcc@8.5.0 arch=linux-rocky9-broadwell ^libiconv@1.16%gcc@8.5.0 libs=shared,static arch=linux-rocky9-broadwell ^libxml2@2.9.12%gcc@8.5.0~python arch=linux-rocky9-broadwell ^netcdf-c@4.8.1%gcc@8.5.0~dap~fsync~hdf4~jna+mpi+parallel-netcdf+pic+shared arch=linux-rocky9-broadwell ^netcdf-c@4.8.1%gcc@8.5.0~dap~fsync~hdf4~jna+mpi+parallel-netcdf+pic+shared arch=linux-rocky9-broadwell ^netcdf-fortran@4.5.3%gcc@8.5.0~doc+pic+shared arch=linux-rocky9-broadwell ^numactl@2.0.14%gcc@8.5.0 patches=4e1d78cbbb85de625bad28705e748856033eaafab92a66dffd383a3d7e00cc94,62fc8a8bf7665a60e8f4c93ebbd535647cebf74198f7afafec4c085a8825c006,ff37630df599cfabf0740518b91ec8daaf18e8f288b19adaae5364dc1f6b2296 arch=linux-rocky9-broadwell ^numactl@2.0.14%gcc@8.5.0 patches=4e1d78cbbb85de625bad28705e748856033eaafab92a66dffd383a3d7e00cc94,62fc8a8bf7665a60e8f4c93ebbd535647cebf74198f7afafec4c085a8825c006,ff37630df599cfabf0740518b91ec8daaf18e8f288b19adaae5364dc1f6b2296 arch=linux-rocky9-broadwell ^numactl@2.0.14%gcc@8.5.0 patches=4e1d78cbbb85de625bad28705e748856033eaafab92a66dffd383a3d7e00cc94,62fc8a8bf7665a60e8f4c93ebbd535647cebf74198f7afafec4c085a8825c006,ff37630df599cfabf0740518b91ec8daaf18e8f288b19adaae5364dc1f6b2296 arch=linux-rocky9-broadwell ^openjdk@11.0.12_7%gcc@8.5.0 arch=linux-rocky9-broadwell ^openjdk@11.0.12_7%gcc@8.5.0 arch=linux-rocky9-broadwell ^openjdk@11.0.12_7%gcc@8.5.0 arch=linux-rocky9-broadwell ^parallel-netcdf@1.12.2%gcc@8.5.0~burstbuffer+cxx+fortran+pic+shared arch=linux-rocky9-broadwell ^parallel-netcdf@1.12.2%gcc@8.5.0~burstbuffer+cxx+fortran+pic+shared arch=linux-rocky9-broadwell ^pkgconf@1.8.0%gcc@8.5.0 arch=linux-rocky9-broadwell ^pkgconf@1.8.0%gcc@8.5.0 arch=linux-rocky9-broadwell ^pkgconf@1.8.0%gcc@8.5.0 arch=linux-rocky9-broadwell ^xz@5.2.5%gcc@8.5.0~pic libs=shared,static arch=linux-rocky9-broadwell ^zlib@1.2.11%gcc@8.5.0+optimize+pic+shared arch=linux-rocky9-broadwell ^zlib@1.2.11%gcc@8.5.0+optimize+pic+shared arch=linux-rocky9-broadwell ^zlib@1.2.11%gcc@8.5.0+optimize+pic+shared arch=linux-rocky9-broadwell ^zlib@1.2.11%gcc@8.5.0+optimize+pic+shared arch=linux-rocky9-broadwell]
+Input spec
+--------------------------------
+[    ]  .amber@22%gcc@8.5.0+cuda+mpi+openmp+update cuda_cuda_arch=60,75
+[    ]      ^builtin.cuda@10.2.89%gcc@8.5.0~dev arch=linux-rocky9-broadwell
+[bl  ]          ^builtin.libxml2@2.9.12%gcc@8.5.0~python arch=linux-rocky9-broadwell
+[bl  ]              ^builtin.libiconv@1.16%gcc@8.5.0 libs=shared,static arch=linux-rocky9-broadwell
+[bl  ]              ^builtin.xz@5.2.5%gcc@8.5.0~pic libs=shared,static arch=linux-rocky9-broadwell
+[bl  ]              ^builtin.zlib@1.2.11%gcc@8.5.0+optimize+pic+shared arch=linux-rocky9-broadwell
+[    ]      ^builtin.hdf5@1.10.7%gcc@8.5.0+cxx+fortran+hl~ipo+java+mpi+shared~szip~threadsafe+tools api=default build_type=RelWithDebInfo arch=linux-rocky9-broadwell
+[bl  ]          ^builtin.intel-mpi@2019.10.317%gcc@8.5.0 arch=linux-rocky9-broadwell
+[bl  ]          ^builtin.numactl@2.0.14%gcc@8.5.0 patches=4e1d78cbbb85de625bad28705e748856033eaafab92a66dffd383a3d7e00cc94,62fc8a8bf7665a60e8f4c93ebbd535647cebf74198f7afafec4c085a8825c006,ff37630df599cfabf0740518b91ec8daaf18e8f288b19adaae5364dc1f6b2296 arch=linux-rocky9-broadwell
+[b r ]          ^builtin.openjdk@11.0.12_7%gcc@8.5.0 arch=linux-rocky9-broadwell
+[  r ]          ^builtin.pkgconf@1.8.0%gcc@8.5.0 arch=linux-rocky9-broadwell
+[bl  ]          ^builtin.zlib@1.2.11%gcc@8.5.0+optimize+pic+shared arch=linux-rocky9-broadwell
+[    ]      ^.intel-mpi@2019.10.317
+[    ]      ^builtin.netcdf-c@4.8.1%gcc@8.5.0~dap~fsync~hdf4~jna+mpi+parallel-netcdf+pic+shared arch=linux-rocky9-broadwell
+[bl  ]          ^builtin.hdf5@1.10.7%gcc@8.5.0+cxx+fortran+hl~ipo+java+mpi+shared~szip~threadsafe+tools api=default build_type=RelWithDebInfo arch=linux-rocky9-broadwell
+[bl  ]              ^builtin.intel-mpi@2019.10.317%gcc@8.5.0 arch=linux-rocky9-broadwell
+[bl  ]              ^builtin.numactl@2.0.14%gcc@8.5.0 patches=4e1d78cbbb85de625bad28705e748856033eaafab92a66dffd383a3d7e00cc94,62fc8a8bf7665a60e8f4c93ebbd535647cebf74198f7afafec4c085a8825c006,ff37630df599cfabf0740518b91ec8daaf18e8f288b19adaae5364dc1f6b2296 arch=linux-rocky9-broadwell
+[b r ]              ^builtin.openjdk@11.0.12_7%gcc@8.5.0 arch=linux-rocky9-broadwell
+[  r ]              ^builtin.pkgconf@1.8.0%gcc@8.5.0 arch=linux-rocky9-broadwell
+[bl  ]              ^builtin.zlib@1.2.11%gcc@8.5.0+optimize+pic+shared arch=linux-rocky9-broadwell
+[bl  ]          ^builtin.parallel-netcdf@1.12.2%gcc@8.5.0~burstbuffer+cxx+fortran+pic+shared arch=linux-rocky9-broadwell
+[    ]      ^builtin.netcdf-fortran@4.5.3%gcc@8.5.0~doc+pic+shared arch=linux-rocky9-broadwell
+[bl  ]          ^builtin.netcdf-c@4.8.1%gcc@8.5.0~dap~fsync~hdf4~jna+mpi+parallel-netcdf+pic+shared arch=linux-rocky9-broadwell
+[bl  ]              ^builtin.hdf5@1.10.7%gcc@8.5.0+cxx+fortran+hl~ipo+java+mpi+shared~szip~threadsafe+tools api=default build_type=RelWithDebInfo arch=linux-rocky9-broadwell
+[bl  ]                  ^builtin.intel-mpi@2019.10.317%gcc@8.5.0 arch=linux-rocky9-broadwell
+[bl  ]                  ^builtin.numactl@2.0.14%gcc@8.5.0 patches=4e1d78cbbb85de625bad28705e748856033eaafab92a66dffd383a3d7e00cc94,62fc8a8bf7665a60e8f4c93ebbd535647cebf74198f7afafec4c085a8825c006,ff37630df599cfabf0740518b91ec8daaf18e8f288b19adaae5364dc1f6b2296 arch=linux-rocky9-broadwell
+[b r ]                  ^builtin.openjdk@11.0.12_7%gcc@8.5.0 arch=linux-rocky9-broadwell
+[  r ]                  ^builtin.pkgconf@1.8.0%gcc@8.5.0 arch=linux-rocky9-broadwell
+[bl  ]                  ^builtin.zlib@1.2.11%gcc@8.5.0+optimize+pic+shared arch=linux-rocky9-broadwell
+[bl  ]              ^builtin.parallel-netcdf@1.12.2%gcc@8.5.0~burstbuffer+cxx+fortran+pic+shared arch=linux-rocky9-broadwell
+
+Concretized
+--------------------------------
+ERROR: spack concretization failed.

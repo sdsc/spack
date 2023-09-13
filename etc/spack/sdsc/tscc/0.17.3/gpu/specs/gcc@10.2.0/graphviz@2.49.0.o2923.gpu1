@@ -1,0 +1,1093 @@
+1687831733 2923 29e746852ceac8bdbf4f1738a68ed605  /cm/shared/apps/spack/0.17.3/cpu/etc/spack/sdsc/tscc/0.17.3/gpu/specs/gcc@10.2.0/graphviz@2.49.0.sh afterok:2922
+
+#!/usr/bin/env bash
+
+#SBATCH --job-name=graphviz@2.49.0
+#SBATCH --account=sys200
+#SBATCH --partition=hotel-gpu
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=1
+#SBATCH --cpus-per-task=8
+#SBATCH -w gpu1
+#SBATCH --time=01:00:00
+#SBATCH --output=%x.o%j.%N
+
+declare -xr LOCAL_TIME="$(date +'%Y%m%dT%H%M%S%z')"
+declare -xir UNIX_TIME="$(date +'%s')"
+
+declare -xr SYSTEM_NAME='tscc'
+
+declare -xr SPACK_VERSION='0.17.3'
+declare -xr SPACK_INSTANCE_NAME='gpu'
+declare -xr SPACK_INSTANCE_DIR="/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}"
+
+declare -xr SLURM_JOB_SCRIPT="$(scontrol show job ${SLURM_JOB_ID} | awk -F= '/Command=/{print $2}')"
+declare -xr SLURM_JOB_MD5SUM="$(md5sum ${SLURM_JOB_SCRIPT})"
+
+declare -xr SCHEDULER_MODULE='slurm'
+
+echo "${UNIX_TIME} ${SLURM_JOB_ID} ${SLURM_JOB_MD5SUM} ${SLURM_JOB_DEPENDENCY}" 
+echo ""
+
+cat "${SLURM_JOB_SCRIPT}"
+
+module purge
+module load "${SCHEDULER_MODULE}"
+module list
+. "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
+
+declare -xr SPACK_PACKAGE='graphviz@2.49.0'
+declare -xr SPACK_COMPILER='gcc@10.2.0'
+declare -xr SPACK_VARIANTS='~doc ~expat ~ghostscript ~gtkplus ~gts ~java ~libgd ~pangocairo ~poppler ~qt ~quartz ~x' 
+declare -xr SPACK_DEPENDENCIES="^python@3.8.12/$(spack find --format '{hash:7}' python@3.8.12 % ${SPACK_COMPILER})"
+declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
+
+printenv
+
+spack config get compilers  
+spack config get config  
+spack config get mirrors
+spack config get modules
+spack config get packages
+spack config get repos
+spack config get upstreams
+
+spack spec --long --namespaces --types "${SPACK_SPEC}"
+if [[ "${?}" -ne 0 ]]; then
+  echo 'ERROR: spack concretization failed.'
+  exit 1
+fi
+
+time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all "${SPACK_SPEC}"
+if [[ "${?}" -ne 0 ]]; then
+  echo 'ERROR: spack install failed.'
+  exit 1
+fi
+
+spack -d module lmod refresh --delete-tree -y
+
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'eigen@3.4.0.sh'
+
+sleep 20
+
+Currently Loaded Modules:
+  1) slurm/slurm/22.05.9
+
+ 
+
+SHELL=/bin/bash
+SLURM_JOB_USER=jpg
+SLURM_TASKS_PER_NODE=1
+SLURM_JOB_UID=422
+HISTCONTROL=ignoredups
+SLURM_JOB_MD5SUM=29e746852ceac8bdbf4f1738a68ed605  /cm/shared/apps/spack/0.17.3/cpu/etc/spack/sdsc/tscc/0.17.3/gpu/specs/gcc@10.2.0/graphviz@2.49.0.sh
+SLURM_TASK_PID=2583993
+LMOD_arch=x86_64
+SLURM_LOCALID=0
+SLURM_SUBMIT_DIR=/cm/shared/apps/spack/0.17.3/cpu/etc/spack/sdsc/tscc/0.17.3/gpu/specs/gcc@10.2.0
+HOSTNAME=gpu1
+HISTSIZE=1000
+SLURMD_NODENAME=gpu1
+FPATH=/usr/share/lmod/lmod/init/ksh_funcs
+_ModuleTable002_=ZWZpbGVzIiwiL2V0Yy9tb2R1bGVmaWxlcyIsIi91c3Ivc2hhcmUvbW9kdWxlZmlsZXMiLCIvdXNyL3NoYXJlL01vZHVsZXMvbW9kdWxlZmlsZXMiLH0sWyJzeXN0ZW1CYXNlTVBBVEgiXT0iL2NtL2xvY2FsL21vZHVsZWZpbGVzOi9jbS9zaGFyZWQvbW9kdWxlZmlsZXM6L2V0Yy9tb2R1bGVmaWxlczovdXNyL3NoYXJlL21vZHVsZWZpbGVzOi91c3Ivc2hhcmUvTW9kdWxlcy9tb2R1bGVmaWxlcyIsfQ==
+SPACK_LD_LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:/cm/shared/apps/slurm/current/lib64
+__LMOD_REF_COUNT_MODULEPATH=/cm/shared/modulefiles:2;/cm/local/modulefiles:1;/etc/modulefiles:1;/usr/share/modulefiles:1;/usr/share/Modules/modulefiles:1
+SLURM_NODE_ALIASES=(null)
+SLURM_CLUSTER_NAME=slurm
+SLURM_JOB_SCRIPT=/cm/shared/apps/spack/0.17.3/cpu/etc/spack/sdsc/tscc/0.17.3/gpu/specs/gcc@10.2.0/graphviz@2.49.0.sh
+SCHEDULER_MODULE=slurm
+SPACK_INSTANCE_NAME=gpu
+SLURM_CPUS_ON_NODE=8
+__LMOD_REF_COUNT__LMFILES_=/cm/local/modulefiles/slurm/slurm/22.05.9:1
+SLURM_JOB_CPUS_PER_NODE=8
+SPACK_VARIANTS=~doc ~expat ~ghostscript ~gtkplus ~gts ~java ~libgd ~pangocairo ~poppler ~qt ~quartz ~x
+LMOD_DIR=/usr/share/lmod/lmod/libexec
+SPACK_DEPENDENCIES=^python@3.8.12/inx66sv
+PWD=/home/jpg/specs_gpu_0.17.3/gcc@10.2.0
+SLURM_GTIDS=0
+LOGNAME=jpg
+XDG_SESSION_TYPE=tty
+SLURM_JOB_PARTITION=hotel-gpu
+MODULESHOME=/usr/share/lmod/lmod
+MANPATH=/cm/shared/apps/slurm/current/man:/usr/share/lmod/lmod/share/man:/usr/local/share/man:/usr/share/man:/cm/local/apps/environment-modules/current/share/man
+LMOD_PREPEND_BLOCK=normal
+SLURM_JOB_NUM_NODES=1
+SPACK_INSTANCE_DIR=/cm/shared/apps/spack/0.17.3/gpu
+SPACK_PYTHON=/usr/bin/python3
+SLURM_JOBID=2923
+SLURM_JOB_QOS=normal
+MOTD_SHOWN=pam
+__LMOD_REF_COUNT_PATH=/cm/shared/apps/slurm/current/sbin:1;/cm/shared/apps/slurm/current/bin:1;/cm/shared/apps/spack/0.17.3/gpu/bin:1;/home/jpg/usr/bin:2;/home/jpg/bin:3;/home/jpg/.local/bin:1;/usr/local/bin:1;/usr/bin:1;/usr/local/sbin:1;/usr/sbin:1
+HOME=/home/jpg
+_ModuleTable_Sz_=2
+__LMOD_REF_COUNT_LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:1;/cm/shared/apps/slurm/current/lib64:1
+LANG=en_US.UTF-8
+SLURM_JOB_DEPENDENCY=afterok:2922
+__LMOD_REF_COUNT_LOADEDMODULES=slurm/slurm/22.05.9:1
+LS_COLORS=rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=01;37;41:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=01;36:*.au=01;36:*.flac=01;36:*.m4a=01;36:*.mid=01;36:*.midi=01;36:*.mka=01;36:*.mp3=01;36:*.mpc=01;36:*.ogg=01;36:*.ra=01;36:*.wav=01;36:*.oga=01;36:*.opus=01;36:*.spx=01;36:*.xspf=01;36:
+SLURM_PROCID=0
+__LMOD_REF_COUNT_CPATH=/cm/shared/apps/slurm/current/include:1
+LMOD_SETTARG_FULL_SUPPORT=no
+SPACK_COMPILER=gcc@10.2.0
+TMPDIR=/tmp
+SLURM_CPUS_PER_TASK=8
+SLURM_NTASKS=1
+SLURM_TOPOLOGY_ADDR=gpu1
+LMOD_VERSION=8.5
+SSH_CONNECTION=70.95.82.22 52458 132.249.107.93 22
+SPACK_ROOT=/cm/shared/apps/spack/0.17.3/gpu
+MODULEPATH_ROOT=/usr/share/modulefiles
+SLURM_TOPOLOGY_ADDR_PATTERN=node
+XDG_SESSION_CLASS=user
+LMOD_PKG=/usr/share/lmod/lmod
+SLURM_WORKING_CLUSTER=slurm:mgr2:6817:9728:109
+TERM=xterm-256color
+LESSOPEN=||/usr/bin/lesspipe.sh %s
+USER=jpg
+LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:/cm/shared/apps/slurm/current/lib64
+SLURM_NODELIST=gpu1
+ENVIRONMENT=BATCH
+LOADEDMODULES=slurm/slurm/22.05.9
+SPACK_SPEC=graphviz@2.49.0 % gcc@10.2.0 ~doc ~expat ~ghostscript ~gtkplus ~gts ~java ~libgd ~pangocairo ~poppler ~qt ~quartz ~x ^python@3.8.12/inx66sv
+SLURM_JOB_ACCOUNT=sys200
+SLURM_PRIO_PROCESS=0
+SLURM_NPROCS=1
+LMOD_ROOT=/usr/share/lmod
+LMOD_SETTARG_CMD=:
+SHLVL=24
+SLURM_NNODES=1
+BASH_ENV=/usr/share/lmod/lmod/init/bash
+LMOD_FULL_SETTARG_SUPPORT=no
+LMOD_sys=Linux
+__LMOD_REF_COUNT_MANPATH=/cm/shared/apps/slurm/current/man:1;/usr/share/lmod/lmod/share/man:1;/usr/local/share/man:1;/usr/share/man:1;/cm/local/apps/environment-modules/current/share/man:1
+XDG_SESSION_ID=89424
+SLURM_SUBMIT_HOST=gpu1
+__LMOD_SET_FPATH=1
+_ModuleTable001_=X01vZHVsZVRhYmxlXz17WyJNVHZlcnNpb24iXT0zLFsiY19yZWJ1aWxkVGltZSJdPWZhbHNlLFsiY19zaG9ydFRpbWUiXT1mYWxzZSxkZXB0aFQ9e30sZmFtaWx5PXt9LG1UPXtzbHVybT17WyJmbiJdPSIvY20vbG9jYWwvbW9kdWxlZmlsZXMvc2x1cm0vc2x1cm0vMjIuMDUuOSIsWyJmdWxsTmFtZSJdPSJzbHVybS9zbHVybS8yMi4wNS45IixbImxvYWRPcmRlciJdPTEscHJvcFQ9e30sWyJzdGFja0RlcHRoIl09MCxbInN0YXR1cyJdPSJhY3RpdmUiLFsidXNlck5hbWUiXT0ic2x1cm0iLFsid1YiXT0iKnNsdXJtLzAwMDAwMDAyMi4wMDAwMDAwMDUuMDAwMDAwMDA5Lip6ZmluYWwiLH0sfSxtcGF0aEE9eyIvY20vc2hhcmVkL21vZHVsZWZpbGVzIiwiL2NtL2xvY2FsL21vZHVs
+SPACK_PACKAGE=graphviz@2.49.0
+LD_LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:/cm/shared/apps/slurm/current/lib64
+XDG_RUNTIME_DIR=/run/user/422
+LMOD_COLORIZE=yes
+SLURM_JOB_ID=2923
+SLURM_NODEID=0
+S_COLORS=auto
+SSH_CLIENT=70.95.82.22 52458 22
+DEBUGINFOD_URLS=https://debuginfod.centos.org/ 
+CMD_WLM_CLUSTER_NAME=slurm
+ENABLE_LMOD=1
+which_declare=declare -f
+UNIX_TIME=1687831733
+__Init_Default_Modules=1
+SLURM_CONF=/cm/shared/apps/slurm/var/etc/slurm/slurm.conf
+PATH=/cm/shared/apps/slurm/current/sbin:/cm/shared/apps/slurm/current/bin:/cm/shared/apps/spack/0.17.3/gpu/bin:/home/jpg/usr/bin:/home/jpg/bin:/home/jpg/.local/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin
+SLURM_JOB_NAME=graphviz@2.49.0
+LOCAL_TIME=20230626T190853-0700
+MODULEPATH=/cm/shared/modulefiles:/cm/local/modulefiles:/etc/modulefiles:/usr/share/modulefiles:/usr/share/Modules/modulefiles
+SLURM_NTASKS_PER_NODE=1
+_LMFILES_=/cm/local/modulefiles/slurm/slurm/22.05.9
+SYSTEM_NAME=tscc
+DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/422/bus
+LMOD_CMD=/usr/share/lmod/lmod/libexec/lmod
+MAIL=/var/spool/mail/jpg
+SSH_TTY=/dev/pts/0
+__LMOD_REF_COUNT_LD_LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:1;/cm/shared/apps/slurm/current/lib64:1
+LMOD_SYSTEM_DEFAULT_MODULES=DefaultModules
+SLURM_JOB_GID=7193
+CPATH=/cm/shared/apps/slurm/current/include
+SPACK_VERSION=0.17.3
+OLDPWD=/home/jpg/specs_gpu_0.17.3
+SLURM_JOB_NODELIST=gpu1
+BASH_FUNC_ml%%=() {  eval $($LMOD_DIR/ml_cmd "$@")
+}
+BASH_FUNC_which%%=() {  ( alias;
+ eval ${which_declare} ) | /usr/bin/which --tty-only --read-alias --read-functions --show-tilde --show-dot $@
+}
+BASH_FUNC_module%%=() {  eval $($LMOD_CMD bash "$@") && eval $(${LMOD_SETTARG_CMD:-:} -s sh)
+}
+BASH_FUNC__spack_shell_wrapper%%=() {  for var in LD_LIBRARY_PATH DYLD_LIBRARY_PATH DYLD_FALLBACK_LIBRARY_PATH;
+ do
+ eval "if [ -n \"\${${var}-}\" ]; then export SPACK_$var=\${${var}}; fi";
+ done;
+ if [ -n "${ZSH_VERSION:-}" ]; then
+ emulate -L sh;
+ fi;
+ _sp_flags="";
+ while [ ! -z ${1+x} ] && [ "${1#-}" != "${1}" ]; do
+ _sp_flags="$_sp_flags $1";
+ shift;
+ done;
+ if [ -n "$_sp_flags" ] && [ "${_sp_flags#*h}" != "${_sp_flags}" ] || [ "${_sp_flags#*V}" != "${_sp_flags}" ]; then
+ command spack $_sp_flags "$@";
+ return;
+ fi;
+ _sp_subcommand="";
+ if [ ! -z ${1+x} ]; then
+ _sp_subcommand="$1";
+ shift;
+ fi;
+ case $_sp_subcommand in 
+ "cd")
+ _sp_arg="";
+ if [ -n "$1" ]; then
+ _sp_arg="$1";
+ shift;
+ fi;
+ if [ "$_sp_arg" = "-h" ] || [ "$_sp_arg" = "--help" ]; then
+ command spack cd -h;
+ else
+ LOC="$(spack location $_sp_arg "$@")";
+ if [ -d "$LOC" ]; then
+ cd "$LOC";
+ else
+ return 1;
+ fi;
+ fi;
+ return
+ ;;
+ "env")
+ _sp_arg="";
+ if [ -n "$1" ]; then
+ _sp_arg="$1";
+ shift;
+ fi;
+ if [ "$_sp_arg" = "-h" ] || [ "$_sp_arg" = "--help" ]; then
+ command spack env -h;
+ else
+ case $_sp_arg in 
+ activate)
+ _a=" $@";
+ if [ -z ${1+x} ] || [ "${_a#* --sh}" != "$_a" ] || [ "${_a#* --csh}" != "$_a" ] || [ "${_a#* -h}" != "$_a" ] || [ "${_a#* --help}" != "$_a" ]; then
+ command spack env activate "$@";
+ else
+ stdout="$(command spack $_sp_flags env activate --sh "$@")" || return;
+ eval "$stdout";
+ fi
+ ;;
+ deactivate)
+ _a=" $@";
+ if [ "${_a#* --sh}" != "$_a" ] || [ "${_a#* --csh}" != "$_a" ]; then
+ command spack env deactivate "$@";
+ else
+ if [ -n "$*" ]; then
+ command spack env deactivate -h;
+ else
+ stdout="$(command spack $_sp_flags env deactivate --sh)" || return;
+ eval "$stdout";
+ fi;
+ fi
+ ;;
+ *)
+ command spack env $_sp_arg "$@"
+ ;;
+ esac;
+ fi;
+ return
+ ;;
+ "load" | "unload")
+ _a=" $@";
+ if [ "${_a#* --sh}" != "$_a" ] || [ "${_a#* --csh}" != "$_a" ] || [ "${_a#* -h}" != "$_a" ] || [ "${_a#* --list}" != "$_a" ] || [ "${_a#* --help}" != "$_a" ]; then
+ command spack $_sp_flags $_sp_subcommand "$@";
+ else
+ stdout="$(command spack $_sp_flags $_sp_subcommand --sh "$@")" || return;
+ eval "$stdout";
+ fi
+ ;;
+ *)
+ command spack $_sp_flags $_sp_subcommand "$@"
+ ;;
+ esac
+}
+BASH_FUNC_spack%%=() {  : this is a shell function from: /cm/shared/apps/spack/0.17.3/gpu/share/spack/setup-env.sh;
+ : the real spack script is here: /cm/shared/apps/spack/0.17.3/gpu/bin/spack;
+ _spack_shell_wrapper "$@";
+ return $?
+}
+_=/usr/bin/printenv
+compilers:
+- compiler:
+    spec: gcc@11.2.0
+    paths:
+      cc: /usr/bin/gcc
+      cxx: /usr/bin/g++
+      f77: /usr/bin/gfortran
+      fc: /usr/bin/gfortran
+    flags:
+      cflags: -O2 -march=native
+      cxxflags: -O2 -march=native
+      fflags: -O2 -march=native
+    operating_system: rocky9
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+- compiler:
+    spec: intel@19.1.1.217
+    paths:
+      cc: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/intel-19.1.1.217-7fcjggodrui3okoovfgtjf6gl5nf6nlv/bin/icc
+      cxx: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/intel-19.1.1.217-7fcjggodrui3okoovfgtjf6gl5nf6nlv/bin/icpc
+      f77: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/intel-19.1.1.217-7fcjggodrui3okoovfgtjf6gl5nf6nlv/bin/ifort
+      fc: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/intel-19.1.1.217-7fcjggodrui3okoovfgtjf6gl5nf6nlv/bin/ifort
+    flags:
+      cflags: -gcc-name=/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-8.5.0-mf5bqu2cwyzoxa5c7btqbbdxng3whbmf/bin/gcc
+      cxxflags: -gcc-name=/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-8.5.0-mf5bqu2cwyzoxa5c7btqbbdxng3whbmf/bin/gcc
+      fflags: -gcc-name=/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-8.5.0-mf5bqu2cwyzoxa5c7btqbbdxng3whbmf/bin/gcc
+    operating_system: rocky9
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+- compiler:
+    spec: gcc@10.2.0
+    paths:
+      cc: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-10.2.0-mqbpsxf6a5jhxi4vlwdtfyqe7q3yjgse/bin/gcc
+      cxx: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-10.2.0-mqbpsxf6a5jhxi4vlwdtfyqe7q3yjgse/bin/g++
+      f77: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-10.2.0-mqbpsxf6a5jhxi4vlwdtfyqe7q3yjgse/bin/gfortran
+      fc: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-10.2.0-mqbpsxf6a5jhxi4vlwdtfyqe7q3yjgse/bin/gfortran
+    flags: {}
+    operating_system: rocky9
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+- compiler:
+    spec: gcc@9.2.0
+    paths:
+      cc: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-9.2.0-nx6afhcfe2pccw7nla4fjmvdqvbhieh6/bin/gcc
+      cxx: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-9.2.0-nx6afhcfe2pccw7nla4fjmvdqvbhieh6/bin/g++
+      f77: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-9.2.0-nx6afhcfe2pccw7nla4fjmvdqvbhieh6/bin/gfortran
+      fc: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-9.2.0-nx6afhcfe2pccw7nla4fjmvdqvbhieh6/bin/gfortran
+    flags: {}
+    operating_system: rocky9
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+- compiler:
+    spec: gcc@8.5.0
+    paths:
+      cc: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-8.5.0-mf5bqu2cwyzoxa5c7btqbbdxng3whbmf/bin/gcc
+      cxx: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-8.5.0-mf5bqu2cwyzoxa5c7btqbbdxng3whbmf/bin/g++
+      f77: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-8.5.0-mf5bqu2cwyzoxa5c7btqbbdxng3whbmf/bin/gfortran
+      fc: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-8.5.0-mf5bqu2cwyzoxa5c7btqbbdxng3whbmf/bin/gfortran
+    flags: {}
+    operating_system: rocky9
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+- compiler:
+    spec: nvhpc@22.1
+    paths:
+      cc: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/nvhpc-22.1-rsks4ptuwyfjjxigybva7k53ihgacw3y/Linux_x86_64/22.1/compilers/bin/nvc
+      cxx: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/nvhpc-22.1-rsks4ptuwyfjjxigybva7k53ihgacw3y/Linux_x86_64/22.1/compilers/bin/nvc++
+      f77: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/nvhpc-22.1-rsks4ptuwyfjjxigybva7k53ihgacw3y/Linux_x86_64/22.1/compilers/bin/nvfortran
+      fc: cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/nvhpc-22.1-rsks4ptuwyfjjxigybva7k53ihgacw3y/Linux_x86_64/22.1/compilers/bin/nvfortran
+    flags: {}
+    operating_system: rocky9
+    target: x86_64
+    modules: [nvhpc/22.1]
+    environment: {}
+    extra_rpaths: []
+config:
+  install_tree:
+    root: $spack/opt/spack
+    projections:
+      all: ${ARCHITECTURE}/${COMPILERNAME}-${COMPILERVER}/${PACKAGE}-${VERSION}-${HASH}
+  template_dirs:
+  - $spack/share/spack/templates
+
+  # Temporary locations Spack can try to use for builds.
+  #
+  # Recommended options are given below.
+  #
+  # Builds can be faster in temporary directories on some (e.g., HPC) systems.
+  # Specifying `$tempdir` will ensure use of the default temporary directory
+  # (i.e., ``$TMP` or ``$TMPDIR``).
+  #
+  # Another option that prevents conflicts and potential permission issues is
+  # to specify `$user_cache_path/stage`, which ensures each user builds in their
+  # home directory.
+  #
+  # A more traditional path uses the value of `$spack/var/spack/stage`, which
+  # builds directly inside Spack's instance without staging them in a
+  # temporary space.  Problems with specifying a path inside a Spack instance
+  # are that it precludes its use as a system package and its ability to be
+  # pip installable.
+  #
+  # In any case, if the username is not already in the path, Spack will append
+  # the value of `$user` in an attempt to avoid potential conflicts between
+  # users in shared temporary spaces.
+  #
+  # The build stage can be purged with `spack clean --stage` and
+  # `spack clean -a`, so it is important that the specified directory uniquely
+  # identifies Spack staging to avoid accidentally wiping out non-Spack work.
+  build_stage:
+  - $tempdir/$user/spack-stage
+  - $user_cache_path/stage
+  # - $spack/var/spack/stage
+
+  # Directory in which to run tests and store test results.
+  # Tests will be stored in directories named by date/time and package
+  # name/hash.
+  test_stage: $user_cache_path/test
+  source_cache: $spack/var/spack/cache
+  misc_cache: $user_cache_path/cache
+  connect_timeout: 10
+  verify_ssl: true
+  suppress_gpg_warnings: false
+  install_missing_compilers: false
+  checksum: true
+  deprecated: false
+  dirty: false
+  build_language: C
+  locks: true
+  url_fetch_method: urllib
+  ccache: false
+  concretizer: clingo
+  db_lock_timeout: 3
+  package_lock_timeout: null
+  shared_linking: rpath
+  allow_sgid: true
+  terminal_title: false
+  debug: false
+  build_jobs: 16
+mirrors:
+  spack-public: https://mirror.spack.io
+modules:
+  default:
+    'enable:':
+    - lmod
+    lmod:
+      core_compilers:
+      - gcc@11.2.0
+      hierarchy:
+      - mpi
+      hash_length: 7
+      blacklist_implicits: true
+      naming_scheme: '{name}/{version}'
+      projections:
+        all: '{name}/{version}'
+      adol-c:
+        suffixes:
+          +openmp: omp
+      amdblis:
+        suffixes:
+          threads=openmp: omp
+      fftw:
+        suffixes:
+          +openmp: omp
+      hpl:
+        suffixes:
+          +openmp: omp
+      hypre:
+        suffixes:
+          +openmp: omp
+      intel:
+        environment:
+          set:
+            INTEL_LICENSE_FILE: 40000@elprado.sdsc.edu:40100@elprado.sdsc.edu
+      kokkos:
+        suffixes:
+          +openmp: omp
+      intel-mkl:
+        suffixes:
+          threads=openmp: omp
+      openblas:
+        suffixes:
+          threads=openmp: omp
+          +ilp64: ilp64
+      'netlib-scalapack:':
+        suffixes:
+          ^openblas threads=openmp: omp
+      petsc:
+        suffixes:
+          +complex: cmplx
+      slepc:
+        suffixes:
+          ^petsc +complex: cmplx
+      ^python:
+        autoload: direct
+      ^ucx:
+        autoload: direct
+  prefix_inspections:
+    lib:
+    - LD_LIBRARY_PATH
+    lib64:
+    - LD_LIBRARY_PATH
+    bin:
+    - PATH
+    man:
+    - MANPATH
+    share/man:
+    - MANPATH
+    share/aclocal:
+    - ACLOCAL_PATH
+    lib/pkgconfig:
+    - PKG_CONFIG_PATH
+    lib64/pkgconfig:
+    - PKG_CONFIG_PATH
+    share/pkgconfig:
+    - PKG_CONFIG_PATH
+    ? ''
+    : - CMAKE_PREFIX_PATH
+
+  # These are configurations for the module set named "default"
+packages:
+  lustre:
+    externals:
+    - spec: lustre@2.15.2 % gcc@11.2.0 arch=linux-rocky9-broadwell
+      prefix: /usr
+    - spec: lustre@2.15.2 % gcc@10.2.0 arch=linux-rocky9-broadwell
+      prefix: /usr
+    - spec: lustre@2.15.2 % gcc@9.2.0 arch=linux-rocky9-broadwell
+      prefix: /usr
+    - spec: lustre@2.15.2 % gcc@8.5.0 arch=linux-rocky9-broadwell
+      prefix: /usr
+    - spec: lustre@2.15.2 % intel@19.1.1.217 arch=linux-rocky9-broadwell
+      prefix: /usr
+    - spec: lustre@2.15.2 % aocc@3.2.0 arch=linux-rocky9-broadwell
+      prefix: /usr
+    buildable: false
+  texlive:
+    externals:
+    - spec: texive@live % gcc@10.2.0 arch=linux-rocky9-broadwell
+      prefix: /usr
+    - spec: texive@live % gcc@9.2.0 arch=linux-rocky9-broadwell
+      prefix: /usr
+    - spec: texlive@live % intel@19.1.1.217 arch=linux-rocky9-broadwell
+      prefix: /usr
+    buildable: false
+  openmpi:
+    externals:
+    - spec: openmpi@4.0.5 % nvhpc@22.1 arch=linux-rocky9-broadwell
+      prefix: /home/jpg/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/nvhpc-22.1-rsks4ptuwyfjjxigybva7k53ihgacw3y/Linux_x86_64/22.1/comm_libs/openmpi4/openmpi-4.0.5
+    buildable: true
+  qd:
+    externals:
+    - spec: qd@2.3.13 % nvhpc@22.1 arch=linux-rocky9-broadwell
+      prefix: /home/jpg/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/nvhpc-22.1-rsks4ptuwyfjjxigybva7k53ihgacw3y/Linux_x86_64/22.1/compilers/extras/qd
+    buildable: false
+  openssl:
+    externals:
+    - spec: openssl@3.0.7 % gcc@11.2.0 arch=linux-rocky9-broadwell
+      prefix: /usr
+    - spec: openssl@3.0.7 % gcc@10.2.0 arch=linux-rocky9-broadwell
+      prefix: /usr
+    - spec: openssl@3.0.7 % gcc@9.2.0 arch=linux-rocky9-broadwell
+      prefix: /usr
+    - spec: openssl@3.0.7 % intel@19.1.1.217 arch=linux-rocky9-broadwell
+      prefix: /usr
+    buildable: false
+  rdma-core:
+    externals:
+    - spec: rdma-core@28.0 % gcc@10.2.0 arch=linux-rocky9-broadwell
+      prefix: /usr
+    - spec: rdma-core@28.0 % gcc@9.2.0 arch=linux-rocky9-broadwell
+      prefix: /usr
+    - spec: rdma-core@28.0 % intel@19.1.1.217 arch=linux-rocky9-broadwell
+      prefix: /usr
+    buildable: false
+  hcoll:
+    externals:
+    - spec: hcoll@4.4.2968 % gcc@10.2.0 arch=linux-rocky9-broadwell
+      prefix: /opt/mellanox/hcoll
+    - spec: hcoll@4.4.2968 % gcc@9.2.0 arch=linux-rocky9-broadwell
+      prefix: /opt/mellanox/hcoll
+    - spec: hcoll@4.4.2968 % intel@19.1.1.217 arch=linux-rocky9-broadwell
+      prefix: /opt/mellanox/hcoll
+    buildable: false
+  slurm:
+    externals:
+    - spec: slurm@22.05.9 % gcc@8.5.0 arch=linux-rocky9-broadwell
+      prefix: /cm/shared/apps/slurm/22.05.9
+    - spec: slurm@22.05.9 % gcc@11.2.0 arch=linux-rocky9-broadwell
+      prefix: /cm/shared/apps/slurm/22.05.9
+    - spec: slurm@22.05.9 % gcc@10.2.0 arch=linux-rocky9-broadwell
+      prefix: /cm/shared/apps/slurm/22.05.9
+    - spec: slurm@22.05.9 % gcc@9.2.0 arch=linux-rocky9-broadwell
+      prefix: /cm/shared/apps/slurm/22.05.9
+    - spec: slurm@22.05.9 % intel@19.1.1.217 arch=linux-rocky9-broadwell
+      prefix: /cm/shared/apps/slurm/22.05.9
+    buildable: false
+  librsvg:
+    externals:
+    - spec: librsvg@2.42.7 % gcc@10.2.0 arch=linux-rocky9-broadwell
+      prefix: /usr
+    - spec: librsvg@2.42.7 % gcc@9.2.0 arch=linux-rocky9-broadwell
+      prefix: /usr
+    - spec: librsvg@2.42.7 %  intel@19.1.1.217 arch=linux-rocky9-broadwell
+      prefix: /usr
+    buildable: false
+  ghostscript:
+    externals:
+    - spec: ghostscript@9.27 % gcc@10.2.0 arch=linux-rocky9-broadwell
+      prefix: /usr
+    buildable: false
+  gaussian:
+    permissions:
+      read: group
+      group: jpg
+  vasp6:
+    permissions:
+      read: group
+      group: vasp-6
+  all:
+    compiler: [gcc, intel, pgi, clang, xl, nag, fj, aocc]
+    providers:
+      awk: [gawk]
+      blas: [openblas, amdblis]
+      D: [ldc]
+      daal: [intel-daal]
+      elf: [elfutils]
+      fftw-api: [fftw, amdfftw]
+      flame: [libflame, amdlibflame]
+      fuse: [libfuse]
+      gl: [mesa+opengl, mesa18, opengl]
+      glu: [mesa-glu, openglu]
+      glx: [mesa+glx, mesa18+glx, opengl]
+      golang: [gcc]
+      iconv: [libiconv]
+      ipp: [intel-ipp]
+      java: [openjdk, jdk, ibm-java]
+      jpeg: [libjpeg-turbo, libjpeg]
+      lapack: [openblas, amdlibflame]
+      lua-lang: [lua, lua-luajit]
+      mariadb-client: [mariadb-c-client, mariadb]
+      mkl: [intel-mkl]
+      mpe: [mpe2]
+      mpi: [openmpi, mpich]
+      mysql-client: [mysql, mariadb-c-client]
+      opencl: [pocl]
+      onedal: [intel-oneapi-dal]
+      osmesa: [mesa+osmesa, mesa18+osmesa]
+      pbs: [openpbs, torque]
+      pil: [py-pillow]
+      pkgconfig: [pkgconf, pkg-config]
+      rpc: [libtirpc]
+      scalapack: [netlib-scalapack, amdscalapack]
+      sycl: [hipsycl]
+      szip: [libaec, libszip]
+      tbb: [intel-tbb]
+      unwind: [libunwind]
+      uuid: [util-linux-uuid, libuuid]
+      xxd: [xxd-standalone, vim]
+      yacc: [bison, byacc]
+      ziglang: [zig]
+    permissions:
+      read: world
+      write: user
+repos:
+- $spack/var/spack/repos/sdsc
+- $spack/var/spack/repos/builtin
+upstreams: {}
+Input spec
+--------------------------------
+[    ]  .graphviz@2.49.0%gcc@10.2.0~doc~expat~ghostscript~gtkplus~gts~java~libgd~pangocairo~poppler~qt~quartz~x
+[    ]      ^builtin.python@3.8.12%gcc@10.2.0+bz2+ctypes+dbm~debug+libxml2+lzma~nis+optimizations+pic+pyexpat+pythoncmd+readline+shared+sqlite3+ssl~tix~tkinter~ucs4+uuid+zlib patches=0d98e93189bc278fbc37a50ed7f183bd8aaf249a8e1670a465f0db6bb4f8cf87,4c2457325f2b608b1b6a2c63087df8c26e07db3e3d493caf36a56f0ecf6fb768,f2fd060afc4b4618fe8104c4c5d771f36dc55b1db5a4623785a4ea707ec72fb4 arch=linux-rocky9-broadwell
+[bl  ]          ^builtin.bzip2@1.0.8%gcc@10.2.0~debug~pic+shared arch=linux-rocky9-broadwell
+[bl  ]          ^builtin.expat@2.4.1%gcc@10.2.0+libbsd arch=linux-rocky9-broadwell
+[bl  ]              ^builtin.libbsd@0.11.3%gcc@10.2.0 arch=linux-rocky9-broadwell
+[bl  ]                  ^builtin.libmd@1.0.3%gcc@10.2.0 arch=linux-rocky9-broadwell
+[bl  ]          ^sdsc.gdbm@1.19%gcc@10.2.0 arch=linux-rocky9-broadwell
+[bl  ]              ^builtin.readline@8.1%gcc@10.2.0 arch=linux-rocky9-broadwell
+[bl  ]                  ^builtin.ncurses@6.2%gcc@10.2.0~symlinks+termlib abi=none arch=linux-rocky9-broadwell
+[bl  ]          ^builtin.gettext@0.21%gcc@10.2.0+bzip2+curses+git~libunistring+libxml2+tar+xz arch=linux-rocky9-broadwell
+[bl  ]              ^builtin.libiconv@1.16%gcc@10.2.0 libs=shared,static arch=linux-rocky9-broadwell
+[bl  ]              ^builtin.libxml2@2.9.12%gcc@10.2.0~python arch=linux-rocky9-broadwell
+[blr ]                  ^builtin.xz@5.2.5%gcc@10.2.0~pic libs=shared,static arch=linux-rocky9-broadwell
+[bl  ]                  ^builtin.zlib@1.2.11%gcc@10.2.0+optimize+pic+shared arch=linux-rocky9-broadwell
+[bl  ]              ^builtin.tar@1.34%gcc@10.2.0 arch=linux-rocky9-broadwell
+[bl  ]          ^builtin.libffi@3.3%gcc@10.2.0 patches=26f26c6f29a7ce9bf370ad3ab2610f99365b4bdd7b82e7c31df41a3370d685c0 arch=linux-rocky9-broadwell
+[bl  ]          ^builtin.openssl@3.0.7%gcc@10.2.0~docs certs=system arch=linux-rocky9-broadwell
+[bl  ]          ^builtin.sqlite@3.36.0%gcc@10.2.0+column_metadata+fts~functions~rtree arch=linux-rocky9-broadwell
+[bl  ]          ^builtin.util-linux-uuid@2.36.2%gcc@10.2.0 arch=linux-rocky9-broadwell
+
+Concretized
+--------------------------------
+w6jyh5y  [    ]  builtin.graphviz@2.49.0%gcc@10.2.0~doc~expat~ghostscript~gtkplus~gts~java~libgd~pangocairo~poppler~qt~quartz~x arch=linux-rocky9-broadwell
+27pem6k  [b   ]      ^builtin.autoconf@2.69%gcc@10.2.0 patches=35c449281546376449766f92d49fc121ca50e330e60fefcfc9be2af3253082c2,7793209b33013dc0f81208718c68440c5aae80e7a1c4b8d336e382525af791a7,a49dd5bac3b62daa0ff688ab4d508d71dbd2f4f8d7e2a02321926346161bf3ee arch=linux-rocky9-broadwell
+u3kd26l  [b r ]          ^builtin.m4@1.4.19%gcc@10.2.0+sigsegv patches=9dc5fbd0d5cb1037ab1e6d0ecc74a30df218d0a94bdd5a02759a97f62daca573,bfdffa7c2eb01021d5849b36972c069693654ad826c1a20b53534009a4ec7a89 arch=linux-rocky9-broadwell
+5njhf6h  [bl  ]              ^builtin.libsigsegv@2.13%gcc@10.2.0 arch=linux-rocky9-broadwell
+ozktzhy  [b r ]          ^sdsc.perl@5.32.0%gcc@10.2.0+cpanm+shared+threads arch=linux-rocky9-broadwell
+3c33nyi  [bl  ]              ^builtin.berkeley-db@18.1.40%gcc@10.2.0+cxx~docs+stl patches=b231fcc4d5cff05e5c3a4814f6a5af0e9a966428dc2176540d2c05aff41de522 arch=linux-rocky9-broadwell
+dh4hxop  [bl  ]              ^builtin.bzip2@1.0.8%gcc@10.2.0~debug~pic+shared arch=linux-rocky9-broadwell
+6ukzrku  [bl  ]              ^sdsc.gdbm@1.19%gcc@10.2.0 arch=linux-rocky9-broadwell
+wndvzcw  [bl  ]                  ^builtin.readline@8.1%gcc@10.2.0 arch=linux-rocky9-broadwell
+ovtvq7m  [bl  ]                      ^builtin.ncurses@6.2%gcc@10.2.0~symlinks+termlib abi=none arch=linux-rocky9-broadwell
+uezvqlh  [bl  ]              ^builtin.zlib@1.2.11%gcc@10.2.0+optimize+pic+shared arch=linux-rocky9-broadwell
+j5emzua  [b   ]      ^builtin.automake@1.16.3%gcc@10.2.0 arch=linux-rocky9-broadwell
+l4cfz7a  [b   ]      ^builtin.bison@3.8.2%gcc@10.2.0 arch=linux-rocky9-broadwell
+wbewze2  [b   ]          ^builtin.diffutils@3.8%gcc@10.2.0 arch=linux-rocky9-broadwell
+r7u3li4  [bl  ]              ^builtin.libiconv@1.16%gcc@10.2.0 libs=shared,static arch=linux-rocky9-broadwell
+smybzwv  [b   ]      ^builtin.flex@2.6.3%gcc@10.2.0+lex~nls arch=linux-rocky9-broadwell
+3lz3bz5  [b   ]          ^builtin.findutils@4.8.0%gcc@10.2.0 arch=linux-rocky9-broadwell
+jmlifan  [b   ]      ^builtin.libtool@2.4.6%gcc@10.2.0 arch=linux-rocky9-broadwell
+rps4kpp  [b   ]      ^builtin.pkgconf@1.8.0%gcc@10.2.0 arch=linux-rocky9-broadwell
+inx66sv  [b   ]      ^builtin.python@3.8.12%gcc@10.2.0+bz2+ctypes+dbm~debug+libxml2+lzma~nis+optimizations+pic+pyexpat+pythoncmd+readline+shared+sqlite3+ssl~tix~tkinter~ucs4+uuid+zlib patches=0d98e93189bc278fbc37a50ed7f183bd8aaf249a8e1670a465f0db6bb4f8cf87,4c2457325f2b608b1b6a2c63087df8c26e07db3e3d493caf36a56f0ecf6fb768,f2fd060afc4b4618fe8104c4c5d771f36dc55b1db5a4623785a4ea707ec72fb4 arch=linux-rocky9-broadwell
+ppow2vp  [bl  ]          ^builtin.expat@2.4.1%gcc@10.2.0+libbsd arch=linux-rocky9-broadwell
+aur3lqv  [bl  ]              ^builtin.libbsd@0.11.3%gcc@10.2.0 arch=linux-rocky9-broadwell
+vmorxax  [bl  ]                  ^builtin.libmd@1.0.3%gcc@10.2.0 arch=linux-rocky9-broadwell
+r6ujx4y  [bl  ]          ^builtin.gettext@0.21%gcc@10.2.0+bzip2+curses+git~libunistring+libxml2+tar+xz arch=linux-rocky9-broadwell
+egosf32  [bl  ]              ^builtin.libxml2@2.9.12%gcc@10.2.0~python arch=linux-rocky9-broadwell
+bnvpjjz  [blr ]                  ^builtin.xz@5.2.5%gcc@10.2.0~pic libs=shared,static arch=linux-rocky9-broadwell
+lo6rmhe  [bl  ]              ^builtin.tar@1.34%gcc@10.2.0 arch=linux-rocky9-broadwell
+rxt5der  [bl  ]          ^builtin.libffi@3.3%gcc@10.2.0 patches=26f26c6f29a7ce9bf370ad3ab2610f99365b4bdd7b82e7c31df41a3370d685c0 arch=linux-rocky9-broadwell
+pu3y3pq  [bl  ]          ^builtin.openssl@3.0.7%gcc@10.2.0~docs certs=system arch=linux-rocky9-broadwell
+v36qrof  [bl  ]          ^builtin.sqlite@3.36.0%gcc@10.2.0+column_metadata+fts~functions~rtree arch=linux-rocky9-broadwell
+nj7akxi  [bl  ]          ^builtin.util-linux-uuid@2.36.2%gcc@10.2.0 arch=linux-rocky9-broadwell
+v6pgzah  [b   ]      ^builtin.sed@4.2.2%gcc@10.2.0 arch=linux-rocky9-broadwell
+
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/libsigsegv-2.13-5njhf6hv2qx36i2fya2tk3xpe3m67xht
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/berkeley-db-18.1.40-3c33nyicjq4uf6hzzr6gqwvijyipyqom
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/bzip2-1.0.8-dh4hxopngewrvpy5mcg3cm7wajypuh7w
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/ncurses-6.2-ovtvq7mr7iyw7ir5zbyj4kurazz4rb2o
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/zlib-1.2.11-uezvqlhoqd7uhf3zwg55teiitoyu7sbu
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/libiconv-1.16-r7u3li4glgayxnqacdw7m4wp3gfijpeq
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/findutils-4.8.0-3lz3bz5lgolfsth5zql7ga25ikhm3tgx
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/pkgconf-1.8.0-rps4kpplhmz2xn2cl4xwobgejiokatx2
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/libmd-1.0.3-vmorxaxjxrs3ofrxxplqrzxoaut64uv2
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/xz-5.2.5-bnvpjjzuqqaesn3fsv3w2ttqxbhmy2mf
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/libffi-3.3-rxt5dern5zniozejs7mafwanun2iyszt
+[+] /usr (external openssl-3.0.7-pu3y3pqej3bq67wxn2gm3uae32l4nf55)
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/util-linux-uuid-2.36.2-nj7akxi4jfeknflxqnnki4n3lvgu3qpa
+==> Installing sed-4.2.2-v6pgzaho7kp3r6uc54xyxgftpoypui5g
+==> No binary for sed-4.2.2-v6pgzaho7kp3r6uc54xyxgftpoypui5g found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/f0/f048d1838da284c8bc9753e4506b85a1e0cc1ea8999d36f6995bcb9460cddbd7.tar.bz2
+==> No patches needed for sed
+==> sed: Executing phase: 'autoreconf'
+==> sed: Executing phase: 'configure'
+==> sed: Executing phase: 'build'
+==> sed: Executing phase: 'install'
+==> sed: Successfully installed sed-4.2.2-v6pgzaho7kp3r6uc54xyxgftpoypui5g
+  Fetch: 0.66s.  Build: 28.42s.  Total: 29.08s.
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/sed-4.2.2-v6pgzaho7kp3r6uc54xyxgftpoypui5g
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/m4-1.4.19-u3kd26lcrsx4ol5qed64rrqw6ouzyoqb
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/readline-8.1-wndvzcwt35ddbcuu2vsdf6bdtksvxx6j
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/tar-1.34-lo6rmhewo2vkhysdbbd74xoe6tqnz5y5
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/diffutils-3.8-wbewze2uiugpn4dmlvipimhcn32ncjqc
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/libbsd-0.11.3-aur3lqvmfctcgiowem3kuby2af3ptxld
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/libxml2-2.9.12-egosf32loqwemuf3bhpzcmndudvf6ovi
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/libtool-2.4.6-jmlifanobral6btvyzutciuzkmezy3bm
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/gdbm-1.19-6ukzrkuxtju3f4272ns4etuhtcxbikjs
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/sqlite-3.36.0-v36qrofqwobsa5vmaa7toof6i2ccmvwz
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/expat-2.4.1-ppow2vpit3lloenthcxmoaew3dqyu5p4
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/gettext-0.21-r6ujx4ysqbvw2g2iln72sqaqalc2i3em
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/perl-5.32.0-ozktzhyz6kkfapjxt3dtpblzctrjok6z
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/python-3.8.12-inx66svinrzmo2rcei33cwmfhkuoosgw
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/autoconf-2.69-27pem6km2hs7lpsnljrpmqjjvgoccrtp
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/bison-3.8.2-l4cfz7atwe2fnsc7gztgfi5zl6aj2mmp
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/automake-1.16.3-j5emzualyowp75sgdglt2a63ywnpakpt
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/flex-2.6.3-smybzwvq6iwegohf6bele5e5ocsah46d
+==> Installing graphviz-2.49.0-w6jyh5yrmkfgc7z3fsbbifwdvdx6kbrx
+==> No binary for graphviz-2.49.0-w6jyh5yrmkfgc7z3fsbbifwdvdx6kbrx found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/b1/b129555743bb9bfb7b63c55825da51763b2f1ee7c0eaa6234a42a61a3aff6cc9.tar.bz2
+==> No patches needed for graphviz
+==> graphviz: Executing phase: 'autoreconf'
+==> graphviz: Executing phase: 'configure'
+==> graphviz: Executing phase: 'build'
+==> graphviz: Executing phase: 'install'
+==> graphviz: Successfully installed graphviz-2.49.0-w6jyh5yrmkfgc7z3fsbbifwdvdx6kbrx
+  Fetch: 1.15s.  Build: 1m 39.64s.  Total: 1m 40.79s.
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/graphviz-2.49.0-w6jyh5yrmkfgc7z3fsbbifwdvdx6kbrx
+real 150.25
+user 147.87
+sys 51.94
+==> [2023-06-26-19:11:38.123596] Imported module from built-in commands
+==> [2023-06-26-19:11:38.128471] Imported module from built-in commands
+==> [2023-06-26-19:11:38.130027] Reading config file /cm/shared/apps/spack/0.17.3/gpu/etc/spack/defaults/config.yaml
+==> [2023-06-26-19:11:38.151597] Reading config file /cm/shared/apps/spack/0.17.3/gpu/etc/spack/defaults/bootstrap.yaml
+==> [2023-06-26-19:11:38.160371] DATABASE LOCK TIMEOUT: 3s
+==> [2023-06-26-19:11:38.160488] PACKAGE LOCK TIMEOUT: No timeout
+==> [2023-06-26-19:11:38.188599] Reading config file /cm/shared/apps/spack/0.17.3/gpu/etc/spack/defaults/repos.yaml
+==> [2023-06-26-19:11:38.191362] Reading config file /cm/shared/apps/spack/0.17.3/gpu/etc/spack/repos.yaml
+==> [2023-06-26-19:11:38.327108] Reading config file /cm/shared/apps/spack/0.17.3/gpu/etc/spack/defaults/modules.yaml
+==> [2023-06-26-19:11:38.336975] Reading config file /cm/shared/apps/spack/0.17.3/gpu/etc/spack/defaults/linux/modules.yaml
+==> [2023-06-26-19:11:38.340454] Reading config file /cm/shared/apps/spack/0.17.3/gpu/etc/spack/modules.yaml
+==> [2023-06-26-19:11:45.619830] 	BLACKLISTED_AS_IMPLICIT : alsa-lib@1.2.3.2%gcc@10.2.0~python arch=linux-rocky9-broadwell/ucsdh7i
+==> [2023-06-26-19:11:45.643765] 	BLACKLISTED_AS_IMPLICIT : autoconf@2.69%gcc@10.2.0 patches=35c449281546376449766f92d49fc121ca50e330e60fefcfc9be2af3253082c2,7793209b33013dc0f81208718c68440c5aae80e7a1c4b8d336e382525af791a7,a49dd5bac3b62daa0ff688ab4d508d71dbd2f4f8d7e2a02321926346161bf3ee arch=linux-rocky9-broadwell/27pem6k
+==> [2023-06-26-19:11:45.650188] 	BLACKLISTED_AS_IMPLICIT : autoconf@2.69%gcc@11.2.0 patches=35c449281546376449766f92d49fc121ca50e330e60fefcfc9be2af3253082c2,7793209b33013dc0f81208718c68440c5aae80e7a1c4b8d336e382525af791a7,a49dd5bac3b62daa0ff688ab4d508d71dbd2f4f8d7e2a02321926346161bf3ee arch=linux-rocky9-broadwell/z7rcq4y
+==> [2023-06-26-19:11:45.656388] 	BLACKLISTED_AS_IMPLICIT : autoconf-archive@2019.01.06%gcc@11.2.0 arch=linux-rocky9-broadwell/oayj7j7
+==> [2023-06-26-19:11:45.662601] 	BLACKLISTED_AS_IMPLICIT : automake@1.16.3%gcc@10.2.0 arch=linux-rocky9-broadwell/j5emzua
+==> [2023-06-26-19:11:45.668904] 	BLACKLISTED_AS_IMPLICIT : automake@1.16.3%gcc@11.2.0 arch=linux-rocky9-broadwell/62sxpey
+==> [2023-06-26-19:11:45.675212] 	BLACKLISTED_AS_IMPLICIT : bdftopcf@1.0.5%gcc@10.2.0 arch=linux-rocky9-broadwell/ym5xn4d
+==> [2023-06-26-19:11:45.681370] 	BLACKLISTED_AS_IMPLICIT : berkeley-db@18.1.40%gcc@10.2.0+cxx~docs+stl patches=b231fcc4d5cff05e5c3a4814f6a5af0e9a966428dc2176540d2c05aff41de522 arch=linux-rocky9-broadwell/3c33nyi
+==> [2023-06-26-19:11:45.687528] 	BLACKLISTED_AS_IMPLICIT : berkeley-db@18.1.40%gcc@11.2.0+cxx~docs+stl patches=b231fcc4d5cff05e5c3a4814f6a5af0e9a966428dc2176540d2c05aff41de522 arch=linux-rocky9-broadwell/f3in6m2
+==> [2023-06-26-19:11:45.693850] 	BLACKLISTED_AS_IMPLICIT : bison@3.8.2%gcc@10.2.0 arch=linux-rocky9-broadwell/l4cfz7a
+==> [2023-06-26-19:11:45.700190] 	BLACKLISTED_AS_IMPLICIT : bzip2@1.0.8%gcc@10.2.0~debug~pic+shared arch=linux-rocky9-broadwell/dh4hxop
+==> [2023-06-26-19:11:45.706646] 	BLACKLISTED_AS_IMPLICIT : bzip2@1.0.8%gcc@11.2.0~debug~pic+shared arch=linux-rocky9-broadwell/56oqmm4
+==> [2023-06-26-19:11:45.713021] 	BLACKLISTED_AS_IMPLICIT : c-ares@1.15.0%gcc@11.2.0~ipo build_type=RelWithDebInfo arch=linux-rocky9-broadwell/omib5ys
+==> [2023-06-26-19:11:45.719493] 	BLACKLISTED_AS_IMPLICIT : cairo@1.16.0%gcc@10.2.0~X+fc+ft+gobject+pdf~png~svg patches=7c4da77767fe9feb03f8051def0832f0c67f99162913275cfa127a88df19cf51 arch=linux-rocky9-broadwell/r543osb
+==> [2023-06-26-19:11:45.732021] 	BLACKLISTED_AS_IMPLICIT : cmake@3.21.4%gcc@11.2.0~doc+ncurses+openssl+ownlibs~qt build_type=Release arch=linux-rocky9-broadwell/j2ucdds
+==> [2023-06-26-19:11:45.750327] 	BLACKLISTED_AS_IMPLICIT : curl@7.79.0%gcc@11.2.0~gssapi~ldap~libidn2~librtmp~libssh~libssh2~nghttp2 tls=openssl arch=linux-rocky9-broadwell/ymzncmp
+==> [2023-06-26-19:11:45.756487] 	BLACKLISTED_AS_IMPLICIT : diffutils@3.8%gcc@10.2.0 arch=linux-rocky9-broadwell/wbewze2
+==> [2023-06-26-19:11:45.762953] 	BLACKLISTED_AS_IMPLICIT : diffutils@3.8%gcc@11.2.0 arch=linux-rocky9-broadwell/w3vyxd4
+==> [2023-06-26-19:11:45.775591] 	BLACKLISTED_AS_IMPLICIT : expat@2.4.1%gcc@10.2.0+libbsd arch=linux-rocky9-broadwell/ppow2vp
+==> [2023-06-26-19:11:45.781952] 	BLACKLISTED_AS_IMPLICIT : expat@2.4.1%gcc@11.2.0+libbsd arch=linux-rocky9-broadwell/wcrbdsj
+==> [2023-06-26-19:11:45.793848] 	BLACKLISTED_AS_IMPLICIT : findutils@4.8.0%gcc@10.2.0 arch=linux-rocky9-broadwell/3lz3bz5
+==> [2023-06-26-19:11:45.800008] 	BLACKLISTED_AS_IMPLICIT : flex@2.6.3%gcc@10.2.0+lex~nls arch=linux-rocky9-broadwell/smybzwv
+==> [2023-06-26-19:11:45.806634] 	BLACKLISTED_AS_IMPLICIT : font-util@1.3.2%gcc@10.2.0 fonts=encodings,font-adobe-100dpi,font-adobe-75dpi,font-adobe-utopia-100dpi,font-adobe-utopia-75dpi,font-adobe-utopia-type1,font-alias,font-arabic-misc,font-bh-100dpi,font-bh-75dpi,font-bh-lucidatypewriter-100dpi,font-bh-lucidatypewriter-75dpi,font-bh-type1,font-bitstream-100dpi,font-bitstream-75dpi,font-bitstream-speedo,font-bitstream-type1,font-cronyx-cyrillic,font-cursor-misc,font-daewoo-misc,font-dec-misc,font-ibm-type1,font-isas-misc,font-jis-misc,font-micro-misc,font-misc-cyrillic,font-misc-ethiopic,font-misc-meltho,font-misc-misc,font-mutt-misc,font-schumacher-misc,font-screen-cyrillic,font-sun-misc,font-winitzki-cyrillic,font-xfree86-type1 arch=linux-rocky9-broadwell/s3w2eru
+==> [2023-06-26-19:11:45.813012] 	BLACKLISTED_AS_IMPLICIT : fontconfig@2.13.94%gcc@10.2.0 arch=linux-rocky9-broadwell/5f2is3h
+==> [2023-06-26-19:11:45.819282] 	BLACKLISTED_AS_IMPLICIT : fontsproto@2.1.3%gcc@10.2.0 arch=linux-rocky9-broadwell/yk3ghp5
+==> [2023-06-26-19:11:45.825746] 	BLACKLISTED_AS_IMPLICIT : freetype@2.11.0%gcc@10.2.0 arch=linux-rocky9-broadwell/4v7vtlk
+==> [2023-06-26-19:11:45.832158] 	BLACKLISTED_AS_IMPLICIT : fribidi@1.0.5%gcc@10.2.0 arch=linux-rocky9-broadwell/rwndlrl
+==> [2023-06-26-19:11:45.838551] 	BLACKLISTED_AS_IMPLICIT : gawk@5.1.0%gcc@11.2.0 arch=linux-rocky9-broadwell/wfabkpl
+==> [2023-06-26-19:11:45.868121] 	BLACKLISTED_AS_IMPLICIT : gdbm@1.19%gcc@10.2.0 arch=linux-rocky9-broadwell/6ukzrku
+==> [2023-06-26-19:11:45.874282] 	BLACKLISTED_AS_IMPLICIT : gdbm@1.19%gcc@11.2.0 arch=linux-rocky9-broadwell/3rjkkrc
+==> [2023-06-26-19:11:45.880677] 	BLACKLISTED_AS_IMPLICIT : gettext@0.21%gcc@10.2.0+bzip2+curses+git~libunistring+libxml2+tar+xz arch=linux-rocky9-broadwell/r6ujx4y
+==> [2023-06-26-19:11:45.886993] 	BLACKLISTED_AS_IMPLICIT : gettext@0.21%gcc@11.2.0+bzip2+curses+git~libunistring+libxml2+tar+xz arch=linux-rocky9-broadwell/f6hx3qa
+==> [2023-06-26-19:11:45.899548] 	BLACKLISTED_AS_IMPLICIT : ghostscript@9.27%gcc@10.2.0~tesseract arch=linux-rocky9-broadwell/tqiqzj3
+==> [2023-06-26-19:11:45.905823] 	BLACKLISTED_AS_IMPLICIT : ghostscript-fonts@8.11%gcc@10.2.0 arch=linux-rocky9-broadwell/fm4bmjg
+==> [2023-06-26-19:11:45.923777] 	BLACKLISTED_AS_IMPLICIT : glib@2.70.0%gcc@10.2.0~libmount patches=8547954e50d0a720fa9794b84c31569df6a7419319b95ac9de0ed861d8969ffd tracing=none arch=linux-rocky9-broadwell/ppe76te
+==> [2023-06-26-19:11:45.929973] 	BLACKLISTED_AS_IMPLICIT : gmp@6.2.1%gcc@10.2.0 arch=linux-rocky9-broadwell/gknd6ly
+==> [2023-06-26-19:11:45.936337] 	BLACKLISTED_AS_IMPLICIT : gmp@6.2.1%gcc@11.2.0 arch=linux-rocky9-broadwell/26ekipq
+==> [2023-06-26-19:11:45.948691] 	BLACKLISTED_AS_IMPLICIT : go@1.17.2%gcc@11.2.0 arch=linux-rocky9-broadwell/6ijrvmv
+==> [2023-06-26-19:11:45.954940] 	BLACKLISTED_AS_IMPLICIT : go-bootstrap@1.4-bootstrap-20171003%gcc@11.2.0 arch=linux-rocky9-broadwell/55g4m6y
+==> [2023-06-26-19:11:45.961516] 	BLACKLISTED_AS_IMPLICIT : gobject-introspection@1.56.1%gcc@10.2.0 patches=6f90bb267efa043ed70b900b4b8e2faf9e8133afae311893b01060356ea81bba,7700828b638c85255c87fcc317ea7e9572ff443f65c86648796528885e5b4cea arch=linux-rocky9-broadwell/cyrxqzk
+==> [2023-06-26-19:11:45.967799] 	BLACKLISTED_AS_IMPLICIT : gperf@3.1%gcc@10.2.0 arch=linux-rocky9-broadwell/kchrbn5
+==> [2023-06-26-19:11:45.980103] 	BLACKLISTED_AS_IMPLICIT : harfbuzz@2.6.8%gcc@10.2.0~graphite2 arch=linux-rocky9-broadwell/ocjd456
+==> [2023-06-26-19:11:45.986484] 	BLACKLISTED_AS_IMPLICIT : icu4c@67.1%gcc@10.2.0 cxxstd=11 arch=linux-rocky9-broadwell/2ya37qq
+==> [2023-06-26-19:11:45.998771] 	BLACKLISTED_AS_IMPLICIT : inputproto@2.3.2%gcc@10.2.0 arch=linux-rocky9-broadwell/b2njn4r
+==> [2023-06-26-19:11:46.011404] 	BLACKLISTED_AS_IMPLICIT : kbproto@1.0.7%gcc@10.2.0 arch=linux-rocky9-broadwell/4razqa2
+==> [2023-06-26-19:11:46.017807] 	BLACKLISTED_AS_IMPLICIT : libbsd@0.11.3%gcc@10.2.0 arch=linux-rocky9-broadwell/aur3lqv
+==> [2023-06-26-19:11:46.024008] 	BLACKLISTED_AS_IMPLICIT : libbsd@0.11.3%gcc@11.2.0 arch=linux-rocky9-broadwell/zivzyhv
+==> [2023-06-26-19:11:46.030621] 	BLACKLISTED_AS_IMPLICIT : libcerf@1.3%gcc@10.2.0 arch=linux-rocky9-broadwell/xzx6gko
+==> [2023-06-26-19:11:46.036626] 	BLACKLISTED_AS_IMPLICIT : libedit@3.1-20210216%gcc@11.2.0 arch=linux-rocky9-broadwell/xh7meoc
+==> [2023-06-26-19:11:46.042898] 	BLACKLISTED_AS_IMPLICIT : libffi@3.3%gcc@10.2.0 patches=26f26c6f29a7ce9bf370ad3ab2610f99365b4bdd7b82e7c31df41a3370d685c0 arch=linux-rocky9-broadwell/rxt5der
+==> [2023-06-26-19:11:46.049318] 	BLACKLISTED_AS_IMPLICIT : libffi@3.3%gcc@11.2.0 patches=26f26c6f29a7ce9bf370ad3ab2610f99365b4bdd7b82e7c31df41a3370d685c0 arch=linux-rocky9-broadwell/gpxn4ii
+==> [2023-06-26-19:11:46.055572] 	BLACKLISTED_AS_IMPLICIT : libfontenc@1.1.3%gcc@10.2.0 arch=linux-rocky9-broadwell/n6osiiu
+==> [2023-06-26-19:11:46.061654] 	BLACKLISTED_AS_IMPLICIT : libgcrypt@1.9.3%gcc@11.2.0 arch=linux-rocky9-broadwell/ygodq7h
+==> [2023-06-26-19:11:46.067986] 	BLACKLISTED_AS_IMPLICIT : libgd@2.2.4%gcc@10.2.0 arch=linux-rocky9-broadwell/nl5wnsn
+==> [2023-06-26-19:11:46.074214] 	BLACKLISTED_AS_IMPLICIT : libgpg-error@1.42%gcc@11.2.0 arch=linux-rocky9-broadwell/nab4g4g
+==> [2023-06-26-19:11:46.080377] 	BLACKLISTED_AS_IMPLICIT : libice@1.0.9%gcc@10.2.0 arch=linux-rocky9-broadwell/azfm7tt
+==> [2023-06-26-19:11:46.086627] 	BLACKLISTED_AS_IMPLICIT : libiconv@1.16%gcc@10.2.0 libs=shared,static arch=linux-rocky9-broadwell/r7u3li4
+==> [2023-06-26-19:11:46.093075] 	BLACKLISTED_AS_IMPLICIT : libiconv@1.16%gcc@11.2.0 libs=shared,static arch=linux-rocky9-broadwell/yzeufvl
+==> [2023-06-26-19:11:46.099305] 	BLACKLISTED_AS_IMPLICIT : libidn2@2.3.0%gcc@11.2.0 arch=linux-rocky9-broadwell/4eklg3b
+==> [2023-06-26-19:11:46.105895] 	BLACKLISTED_AS_IMPLICIT : libjpeg-turbo@2.1.0%gcc@10.2.0 arch=linux-rocky9-broadwell/7rlpvrn
+==> [2023-06-26-19:11:46.112418] 	BLACKLISTED_AS_IMPLICIT : libmd@1.0.3%gcc@10.2.0 arch=linux-rocky9-broadwell/vmorxax
+==> [2023-06-26-19:11:46.118788] 	BLACKLISTED_AS_IMPLICIT : libmd@1.0.3%gcc@11.2.0 arch=linux-rocky9-broadwell/fqev3cg
+==> [2023-06-26-19:11:46.125211] 	BLACKLISTED_AS_IMPLICIT : libpng@1.6.37%gcc@10.2.0 arch=linux-rocky9-broadwell/7tywqyc
+==> [2023-06-26-19:11:46.131526] 	BLACKLISTED_AS_IMPLICIT : libpthread-stubs@0.4%gcc@10.2.0 arch=linux-rocky9-broadwell/6erd75n
+==> [2023-06-26-19:11:46.137998] 	BLACKLISTED_AS_IMPLICIT : libsigsegv@2.13%gcc@10.2.0 arch=linux-rocky9-broadwell/5njhf6h
+==> [2023-06-26-19:11:46.144132] 	BLACKLISTED_AS_IMPLICIT : libsigsegv@2.13%gcc@11.2.0 arch=linux-rocky9-broadwell/mzifopl
+==> [2023-06-26-19:11:46.150251] 	BLACKLISTED_AS_IMPLICIT : libsm@1.2.3%gcc@10.2.0 arch=linux-rocky9-broadwell/t3pizwi
+==> [2023-06-26-19:11:46.156398] 	BLACKLISTED_AS_IMPLICIT : libssh2@1.8.0%gcc@11.2.0~ipo+shared build_type=RelWithDebInfo arch=linux-rocky9-broadwell/b3d7czh
+==> [2023-06-26-19:11:46.162989] 	BLACKLISTED_AS_IMPLICIT : libtiff@4.3.0%gcc@10.2.0~jbig~jpeg~jpeg12~lerc~libdeflate~lzma~old-jpeg~pixarlog~webp~zlib~zstd arch=linux-rocky9-broadwell/uwv2ioj
+==> [2023-06-26-19:11:46.169363] 	BLACKLISTED_AS_IMPLICIT : libtool@2.4.6%gcc@10.2.0 arch=linux-rocky9-broadwell/jmlifan
+==> [2023-06-26-19:11:46.175764] 	BLACKLISTED_AS_IMPLICIT : libtool@2.4.6%gcc@11.2.0 arch=linux-rocky9-broadwell/2msbgh7
+==> [2023-06-26-19:11:46.181914] 	BLACKLISTED_AS_IMPLICIT : libunistring@0.9.10%gcc@11.2.0 arch=linux-rocky9-broadwell/bou4chz
+==> [2023-06-26-19:11:46.188050] 	BLACKLISTED_AS_IMPLICIT : libx11@1.7.0%gcc@10.2.0 arch=linux-rocky9-broadwell/u2kx4oh
+==> [2023-06-26-19:11:46.194506] 	BLACKLISTED_AS_IMPLICIT : libxau@1.0.8%gcc@10.2.0 arch=linux-rocky9-broadwell/weuumm6
+==> [2023-06-26-19:11:46.200866] 	BLACKLISTED_AS_IMPLICIT : libxcb@1.14%gcc@10.2.0 arch=linux-rocky9-broadwell/z6wh2fb
+==> [2023-06-26-19:11:46.207249] 	BLACKLISTED_AS_IMPLICIT : libxdmcp@1.1.2%gcc@10.2.0 arch=linux-rocky9-broadwell/6nzbue3
+==> [2023-06-26-19:11:46.213896] 	BLACKLISTED_AS_IMPLICIT : libxfont@1.5.2%gcc@10.2.0 arch=linux-rocky9-broadwell/r4pirnt
+==> [2023-06-26-19:11:46.220164] 	BLACKLISTED_AS_IMPLICIT : libxml2@2.9.12%gcc@10.2.0~python arch=linux-rocky9-broadwell/egosf32
+==> [2023-06-26-19:11:46.226609] 	BLACKLISTED_AS_IMPLICIT : libxml2@2.9.12%gcc@11.2.0~python arch=linux-rocky9-broadwell/6bz5pvy
+==> [2023-06-26-19:11:46.232818] 	BLACKLISTED_AS_IMPLICIT : libxpm@3.5.12%gcc@10.2.0 arch=linux-rocky9-broadwell/5yfe4z2
+==> [2023-06-26-19:11:46.239173] 	BLACKLISTED_AS_IMPLICIT : m4@1.4.19%gcc@10.2.0+sigsegv patches=9dc5fbd0d5cb1037ab1e6d0ecc74a30df218d0a94bdd5a02759a97f62daca573,bfdffa7c2eb01021d5849b36972c069693654ad826c1a20b53534009a4ec7a89 arch=linux-rocky9-broadwell/u3kd26l
+==> [2023-06-26-19:11:46.245820] 	BLACKLISTED_AS_IMPLICIT : m4@1.4.19%gcc@11.2.0+sigsegv patches=9dc5fbd0d5cb1037ab1e6d0ecc74a30df218d0a94bdd5a02759a97f62daca573,bfdffa7c2eb01021d5849b36972c069693654ad826c1a20b53534009a4ec7a89 arch=linux-rocky9-broadwell/2mlzkeq
+==> [2023-06-26-19:11:46.264023] 	BLACKLISTED_AS_IMPLICIT : mkfontdir@1.0.7%gcc@10.2.0 arch=linux-rocky9-broadwell/7pszcdu
+==> [2023-06-26-19:11:46.283135] 	BLACKLISTED_AS_IMPLICIT : mkfontscale@1.1.2%gcc@10.2.0 arch=linux-rocky9-broadwell/bqnv5wd
+==> [2023-06-26-19:11:46.289526] 	BLACKLISTED_AS_IMPLICIT : mpc@1.1.0%gcc@11.2.0 arch=linux-rocky9-broadwell/bm6k5m7
+==> [2023-06-26-19:11:46.295813] 	BLACKLISTED_AS_IMPLICIT : mpc@1.1.0%gcc@11.2.0 arch=linux-rocky9-broadwell/kjb2b7q
+==> [2023-06-26-19:11:46.301994] 	BLACKLISTED_AS_IMPLICIT : mpfr@3.1.6%gcc@11.2.0 patches=7a6dd71bcda4803d6b89612706a17b8816e1acd5dd9bf1bec29cf748f3b60008 arch=linux-rocky9-broadwell/iqckyxa
+==> [2023-06-26-19:11:46.308395] 	BLACKLISTED_AS_IMPLICIT : mpfr@4.1.0%gcc@11.2.0 arch=linux-rocky9-broadwell/yfojo55
+==> [2023-06-26-19:11:46.314668] 	BLACKLISTED_AS_IMPLICIT : nasm@2.15.05%gcc@10.2.0 arch=linux-rocky9-broadwell/wallncx
+==> [2023-06-26-19:11:46.326919] 	BLACKLISTED_AS_IMPLICIT : ncurses@6.2%gcc@10.2.0~symlinks+termlib abi=none arch=linux-rocky9-broadwell/ovtvq7m
+==> [2023-06-26-19:11:46.333155] 	BLACKLISTED_AS_IMPLICIT : ncurses@6.2%gcc@11.2.0~symlinks+termlib abi=none arch=linux-rocky9-broadwell/fayqttl
+==> [2023-06-26-19:11:46.362858] 	BLACKLISTED_AS_IMPLICIT : openssh@8.7p1%gcc@11.2.0 arch=linux-rocky9-broadwell/wrvb6js
+==> [2023-06-26-19:11:46.369160] 	BLACKLISTED_AS_IMPLICIT : openssl@3.0.7%gcc@10.2.0~docs certs=system arch=linux-rocky9-broadwell/pu3y3pq
+==> [2023-06-26-19:11:46.375640] 	BLACKLISTED_AS_IMPLICIT : openssl@3.0.7%gcc@11.2.0~docs certs=system arch=linux-rocky9-broadwell/ifgpx3o
+==> [2023-06-26-19:11:46.382066] 	BLACKLISTED_AS_IMPLICIT : pango@1.42.0%gcc@10.2.0~X arch=linux-rocky9-broadwell/rcpnoii
+==> [2023-06-26-19:11:46.394285] 	BLACKLISTED_AS_IMPLICIT : pcre@8.44%gcc@10.2.0~jit+multibyte+utf arch=linux-rocky9-broadwell/gcnkq3z
+==> [2023-06-26-19:11:46.400757] 	BLACKLISTED_AS_IMPLICIT : pcre2@10.36%gcc@11.2.0~jit+multibyte arch=linux-rocky9-broadwell/qnnxihv
+==> [2023-06-26-19:11:46.413276] 	BLACKLISTED_AS_IMPLICIT : perl@5.32.0%gcc@11.2.0+cpanm+shared+threads arch=linux-rocky9-broadwell/rccpzkg
+==> [2023-06-26-19:11:46.419684] 	BLACKLISTED_AS_IMPLICIT : perl-encode-locale@1.05%gcc@11.2.0 arch=linux-rocky9-broadwell/4covzun
+==> [2023-06-26-19:11:46.425654] 	BLACKLISTED_AS_IMPLICIT : perl-extutils-config@0.008%gcc@11.2.0 arch=linux-rocky9-broadwell/lcqjwgg
+==> [2023-06-26-19:11:46.431932] 	BLACKLISTED_AS_IMPLICIT : perl-extutils-helpers@0.026%gcc@11.2.0 arch=linux-rocky9-broadwell/zyyrjak
+==> [2023-06-26-19:11:46.437957] 	BLACKLISTED_AS_IMPLICIT : perl-extutils-installpaths@0.012%gcc@11.2.0 arch=linux-rocky9-broadwell/a242b67
+==> [2023-06-26-19:11:46.444062] 	BLACKLISTED_AS_IMPLICIT : perl-file-listing@6.04%gcc@11.2.0 arch=linux-rocky9-broadwell/qjlas6m
+==> [2023-06-26-19:11:46.450073] 	BLACKLISTED_AS_IMPLICIT : perl-html-parser@3.72%gcc@11.2.0 arch=linux-rocky9-broadwell/35bqi2w
+==> [2023-06-26-19:11:46.456168] 	BLACKLISTED_AS_IMPLICIT : perl-html-tagset@3.20%gcc@11.2.0 arch=linux-rocky9-broadwell/2jga4eu
+==> [2023-06-26-19:11:46.462366] 	BLACKLISTED_AS_IMPLICIT : perl-http-cookies@6.04%gcc@11.2.0 arch=linux-rocky9-broadwell/uj3whq7
+==> [2023-06-26-19:11:46.468827] 	BLACKLISTED_AS_IMPLICIT : perl-http-daemon@6.01%gcc@11.2.0 arch=linux-rocky9-broadwell/ehrzqix
+==> [2023-06-26-19:11:46.474768] 	BLACKLISTED_AS_IMPLICIT : perl-http-date@6.02%gcc@11.2.0 arch=linux-rocky9-broadwell/e5l7qv6
+==> [2023-06-26-19:11:46.481157] 	BLACKLISTED_AS_IMPLICIT : perl-http-message@6.13%gcc@11.2.0 arch=linux-rocky9-broadwell/g6vxu5j
+==> [2023-06-26-19:11:46.487258] 	BLACKLISTED_AS_IMPLICIT : perl-http-negotiate@6.01%gcc@11.2.0 arch=linux-rocky9-broadwell/usqqm5p
+==> [2023-06-26-19:11:46.493507] 	BLACKLISTED_AS_IMPLICIT : perl-io-html@1.001%gcc@11.2.0 arch=linux-rocky9-broadwell/r6qzbqi
+==> [2023-06-26-19:11:46.499848] 	BLACKLISTED_AS_IMPLICIT : perl-io-socket-ssl@2.052%gcc@11.2.0 arch=linux-rocky9-broadwell/usxwyre
+==> [2023-06-26-19:11:46.505724] 	BLACKLISTED_AS_IMPLICIT : perl-libwww-perl@6.33%gcc@11.2.0 arch=linux-rocky9-broadwell/ofr7tr6
+==> [2023-06-26-19:11:46.511779] 	BLACKLISTED_AS_IMPLICIT : perl-lwp-mediatypes@6.02%gcc@11.2.0 arch=linux-rocky9-broadwell/ak2vi33
+==> [2023-06-26-19:11:46.518106] 	BLACKLISTED_AS_IMPLICIT : perl-lwp-protocol-https@6.04%gcc@11.2.0 arch=linux-rocky9-broadwell/w5pbpka
+==> [2023-06-26-19:11:46.523949] 	BLACKLISTED_AS_IMPLICIT : perl-module-build@0.4224%gcc@11.2.0 arch=linux-rocky9-broadwell/f76umy2
+==> [2023-06-26-19:11:46.530426] 	BLACKLISTED_AS_IMPLICIT : perl-module-build-tiny@0.039%gcc@11.2.0 arch=linux-rocky9-broadwell/uwcxlnv
+==> [2023-06-26-19:11:46.536629] 	BLACKLISTED_AS_IMPLICIT : perl-mozilla-ca@20160104%gcc@11.2.0 arch=linux-rocky9-broadwell/7lsouxf
+==> [2023-06-26-19:11:46.542785] 	BLACKLISTED_AS_IMPLICIT : perl-net-http@6.17%gcc@11.2.0 arch=linux-rocky9-broadwell/d75eszz
+==> [2023-06-26-19:11:46.549063] 	BLACKLISTED_AS_IMPLICIT : perl-net-ssleay@1.85%gcc@11.2.0 arch=linux-rocky9-broadwell/gm4rfhe
+==> [2023-06-26-19:11:46.555360] 	BLACKLISTED_AS_IMPLICIT : perl-test-needs@0.002005%gcc@11.2.0 arch=linux-rocky9-broadwell/aej2viv
+==> [2023-06-26-19:11:46.561690] 	BLACKLISTED_AS_IMPLICIT : perl-test-requiresinternet@0.05%gcc@11.2.0 arch=linux-rocky9-broadwell/tz3dtau
+==> [2023-06-26-19:11:46.567691] 	BLACKLISTED_AS_IMPLICIT : perl-try-tiny@0.28%gcc@11.2.0 arch=linux-rocky9-broadwell/4kuczlm
+==> [2023-06-26-19:11:46.573821] 	BLACKLISTED_AS_IMPLICIT : perl-uri@1.72%gcc@11.2.0 arch=linux-rocky9-broadwell/7vcyje5
+==> [2023-06-26-19:11:46.580386] 	BLACKLISTED_AS_IMPLICIT : perl-www-robotrules@6.02%gcc@11.2.0 arch=linux-rocky9-broadwell/ugjcbvs
+==> [2023-06-26-19:11:46.586650] 	BLACKLISTED_AS_IMPLICIT : perl-xml-parser@2.44%gcc@11.2.0 arch=linux-rocky9-broadwell/xb25nbb
+==> [2023-06-26-19:11:46.592760] 	BLACKLISTED_AS_IMPLICIT : perl-xml-simple@2.24%gcc@11.2.0 arch=linux-rocky9-broadwell/53qv755
+==> [2023-06-26-19:11:46.604481] 	BLACKLISTED_AS_IMPLICIT : pixman@0.40.0%gcc@10.2.0 arch=linux-rocky9-broadwell/yblwjjw
+==> [2023-06-26-19:11:46.610743] 	BLACKLISTED_AS_IMPLICIT : pkgconf@1.8.0%gcc@10.2.0 arch=linux-rocky9-broadwell/rps4kpp
+==> [2023-06-26-19:11:46.617024] 	BLACKLISTED_AS_IMPLICIT : pkgconf@1.8.0%gcc@11.2.0 arch=linux-rocky9-broadwell/brrsknt
+==> [2023-06-26-19:11:46.623562] 	BLACKLISTED_AS_IMPLICIT : py-certifi@2021.10.8%gcc@11.2.0 arch=linux-rocky9-broadwell/p5atw43
+==> [2023-06-26-19:11:46.635478] 	BLACKLISTED_AS_IMPLICIT : py-docutils@0.18%gcc@11.2.0 arch=linux-rocky9-broadwell/sp6g3de
+==> [2023-06-26-19:11:46.647991] 	BLACKLISTED_AS_IMPLICIT : py-pygments@2.10.0%gcc@11.2.0 arch=linux-rocky9-broadwell/5tixy4f
+==> [2023-06-26-19:11:46.660569] 	BLACKLISTED_AS_IMPLICIT : py-setuptools@58.2.0%gcc@11.2.0 arch=linux-rocky9-broadwell/x2go3tz
+==> [2023-06-26-19:11:46.672671] 	BLACKLISTED_AS_IMPLICIT : python@3.8.12%gcc@11.2.0+bz2+ctypes+dbm~debug+libxml2+lzma~nis~optimizations+pic+pyexpat+pythoncmd+readline+shared+sqlite3+ssl~tix~tkinter~ucs4+uuid+zlib patches=0d98e93189bc278fbc37a50ed7f183bd8aaf249a8e1670a465f0db6bb4f8cf87,4c2457325f2b608b1b6a2c63087df8c26e07db3e3d493caf36a56f0ecf6fb768,f2fd060afc4b4618fe8104c4c5d771f36dc55b1db5a4623785a4ea707ec72fb4 arch=linux-rocky9-broadwell/h36q3cz
+==> [2023-06-26-19:11:46.690595] 	BLACKLISTED_AS_IMPLICIT : rdma-core@28.0%gcc@10.2.0~ipo build_type=RelWithDebInfo arch=linux-rocky9-broadwell/mt2b6b7
+==> [2023-06-26-19:11:46.696548] 	BLACKLISTED_AS_IMPLICIT : readline@8.1%gcc@10.2.0 arch=linux-rocky9-broadwell/wndvzcw
+==> [2023-06-26-19:11:46.702808] 	BLACKLISTED_AS_IMPLICIT : readline@8.1%gcc@11.2.0 arch=linux-rocky9-broadwell/i2k7fjg
+==> [2023-06-26-19:11:46.709123] 	BLACKLISTED_AS_IMPLICIT : sed@4.2.2%gcc@10.2.0 arch=linux-rocky9-broadwell/v6pgzah
+==> [2023-06-26-19:11:46.721398] 	BLACKLISTED_AS_IMPLICIT : sqlite@3.36.0%gcc@11.2.0+column_metadata+fts~functions~rtree arch=linux-rocky9-broadwell/5lsys55
+==> [2023-06-26-19:11:46.733489] 	BLACKLISTED_AS_IMPLICIT : tar@1.34%gcc@10.2.0 arch=linux-rocky9-broadwell/lo6rmhe
+==> [2023-06-26-19:11:46.739535] 	BLACKLISTED_AS_IMPLICIT : tar@1.34%gcc@11.2.0 arch=linux-rocky9-broadwell/eaokit3
+==> [2023-06-26-19:11:46.757714] 	BLACKLISTED_AS_IMPLICIT : texinfo@6.5%gcc@10.2.0 patches=12f6edb0c6b270b8c8dba2ce17998c580db01182d871ee32b7b6e4129bd1d23a,1732115f651cff98989cb0215d8f64da5e0f7911ebf0c13b064920f088f2ffe1 arch=linux-rocky9-broadwell/lwxzjs2
+==> [2023-06-26-19:11:46.763908] 	BLACKLISTED_AS_IMPLICIT : texinfo@6.5%gcc@11.2.0 patches=12f6edb0c6b270b8c8dba2ce17998c580db01182d871ee32b7b6e4129bd1d23a,1732115f651cff98989cb0215d8f64da5e0f7911ebf0c13b064920f088f2ffe1 arch=linux-rocky9-broadwell/gcn3evd
+==> [2023-06-26-19:11:46.770034] 	BLACKLISTED_AS_IMPLICIT : util-linux-uuid@2.36.2%gcc@10.2.0 arch=linux-rocky9-broadwell/nj7akxi
+==> [2023-06-26-19:11:46.776275] 	BLACKLISTED_AS_IMPLICIT : util-linux-uuid@2.36.2%gcc@11.2.0 arch=linux-rocky9-broadwell/6ga5tqy
+==> [2023-06-26-19:11:46.782831] 	BLACKLISTED_AS_IMPLICIT : util-macros@1.19.3%gcc@10.2.0 arch=linux-rocky9-broadwell/i6u7kmg
+==> [2023-06-26-19:11:46.788945] 	BLACKLISTED_AS_IMPLICIT : xcb-proto@1.14.1%gcc@10.2.0 arch=linux-rocky9-broadwell/pffjfci
+==> [2023-06-26-19:11:46.795065] 	BLACKLISTED_AS_IMPLICIT : xextproto@7.3.0%gcc@10.2.0 arch=linux-rocky9-broadwell/mhzverw
+==> [2023-06-26-19:11:46.801533] 	BLACKLISTED_AS_IMPLICIT : xproto@7.0.31%gcc@10.2.0 arch=linux-rocky9-broadwell/gr2zbfj
+==> [2023-06-26-19:11:46.807605] 	BLACKLISTED_AS_IMPLICIT : xtrans@1.3.5%gcc@10.2.0 arch=linux-rocky9-broadwell/rb4vslw
+==> [2023-06-26-19:11:46.813827] 	BLACKLISTED_AS_IMPLICIT : xz@5.2.5%gcc@10.2.0~pic libs=shared,static arch=linux-rocky9-broadwell/bnvpjjz
+==> [2023-06-26-19:11:46.820006] 	BLACKLISTED_AS_IMPLICIT : xz@5.2.5%gcc@11.2.0~pic libs=shared,static arch=linux-rocky9-broadwell/rotpn7w
+==> [2023-06-26-19:11:46.826387] 	BLACKLISTED_AS_IMPLICIT : yasm@1.3.0%gcc@10.2.0 arch=linux-rocky9-broadwell/x5xjlcl
+==> [2023-06-26-19:11:46.832626] 	BLACKLISTED_AS_IMPLICIT : zlib@1.2.11%gcc@10.2.0+optimize+pic+shared arch=linux-rocky9-broadwell/uezvqlh
+==> [2023-06-26-19:11:46.838790] 	BLACKLISTED_AS_IMPLICIT : zlib@1.2.11%gcc@11.2.0+optimize+pic+shared arch=linux-rocky9-broadwell/d5vrjbq
+==> [2023-06-26-19:11:46.844990] 	BLACKLISTED_AS_IMPLICIT : zstd@1.5.0%gcc@11.2.0~programs arch=linux-rocky9-broadwell/jnu2b4f
+==> [2023-06-26-19:11:47.613162] 	WRITE: anaconda3@2021.05%gcc@11.2.0 arch=linux-rocky9-broadwell/ftcozky [/cm/shared/apps/spack/0.17.3/gpu/share/spack/lmod/linux-rocky9-x86_64/Core/anaconda3/2021.05-ftcozky.lua]
+==> [2023-06-26-19:11:47.775932] Reading config file /cm/shared/apps/spack/0.17.3/gpu/etc/spack/compilers.yaml
+==> [2023-06-26-19:11:47.842038] Reading config file /cm/shared/apps/spack/0.17.3/gpu/etc/spack/defaults/packages.yaml
+==> [2023-06-26-19:11:47.870303] Reading config file /cm/shared/apps/spack/0.17.3/gpu/etc/spack/packages.yaml
+==> [2023-06-26-19:11:47.938242] 	WRITE: ant@1.10.7%gcc@10.2.0 arch=linux-rocky9-broadwell/6sck4wi [/cm/shared/apps/spack/0.17.3/gpu/share/spack/lmod/linux-rocky9-x86_64/gcc/10.2.0/ant/1.10.7-6sck4wi.lua]
+==> [2023-06-26-19:11:48.074313] 	WRITE: aria2@1.35.0%gcc@11.2.0 arch=linux-rocky9-broadwell/cgtojrr [/cm/shared/apps/spack/0.17.3/gpu/share/spack/lmod/linux-rocky9-x86_64/Core/aria2/1.35.0-cgtojrr.lua]
+==> [2023-06-26-19:11:48.272844] 	WRITE: cmake@3.21.4%gcc@10.2.0~doc+ncurses+openssl+ownlibs~qt build_type=Release arch=linux-rocky9-broadwell/765fkmw [/cm/shared/apps/spack/0.17.3/gpu/share/spack/lmod/linux-rocky9-x86_64/gcc/10.2.0/cmake/3.21.4-765fkmw.lua]
+==> [2023-06-26-19:11:48.408533] 	WRITE: cuda@11.2.2%gcc@10.2.0~dev arch=linux-rocky9-broadwell/ptou5u3 [/cm/shared/apps/spack/0.17.3/gpu/share/spack/lmod/linux-rocky9-x86_64/gcc/10.2.0/cuda/11.2.2-ptou5u3.lua]
+==> [2023-06-26-19:11:48.550157] 	WRITE: cudnn@8.1.1.33-11.2%gcc@10.2.0 arch=linux-rocky9-broadwell/ykgkoks [/cm/shared/apps/spack/0.17.3/gpu/share/spack/lmod/linux-rocky9-x86_64/gcc/10.2.0/cudnn/8.1.1.33-11.2-ykgkoks.lua]
+==> [2023-06-26-19:11:48.690306] 	WRITE: entrezdirect@10.7.20190114%gcc@11.2.0 arch=linux-rocky9-broadwell/eo2a54i [/cm/shared/apps/spack/0.17.3/gpu/share/spack/lmod/linux-rocky9-x86_64/Core/entrezdirect/10.7.20190114-eo2a54i.lua]
+==> [2023-06-26-19:11:49.153799] 	WRITE: ffmpeg@4.3.2%gcc@10.2.0~X~avresample+bzlib~drawtext+gpl~libaom~libmp3lame~libopenjpeg~libopus~libsnappy~libspeex~libssh~libvorbis~libvpx~libwebp~libzmq~lzma~nonfree~openssl~sdl2+shared+version3 arch=linux-rocky9-broadwell/rmrqnwu [/cm/shared/apps/spack/0.17.3/gpu/share/spack/lmod/linux-rocky9-x86_64/gcc/10.2.0/ffmpeg/4.3.2-rmrqnwu.lua]
+==> [2023-06-26-19:11:49.324757] 	WRITE: gcc@8.5.0%gcc@11.2.0~binutils~bootstrap~graphite~nvptx~piclibs~strip languages=c,c++,fortran patches=b48e48736062e64a6da7cbe7e21a6c1c89422d1f49ef547c73b479a3f3f4935f arch=linux-rocky9-broadwell/mf5bqu2 [/cm/shared/apps/spack/0.17.3/gpu/share/spack/lmod/linux-rocky9-x86_64/Core/gcc/8.5.0-mf5bqu2.lua]
+==> [2023-06-26-19:11:49.554041] 	WRITE: gcc@9.2.0%gcc@11.2.0~binutils~bootstrap~graphite~nvptx~piclibs~strip languages=c,c++,fortran patches=49341f7807b12a89750c010a20707598f83121da9829150d4049ed3a1a140564,b48e48736062e64a6da7cbe7e21a6c1c89422d1f49ef547c73b479a3f3f4935f,dc1ca240b7fb70112ae6cc47cd86925adf78d29ed9d0c26b0c51d52e40ceca0e arch=linux-rocky9-broadwell/nx6afhc [/cm/shared/apps/spack/0.17.3/gpu/share/spack/lmod/linux-rocky9-x86_64/Core/gcc/9.2.0-nx6afhc.lua]
+==> [2023-06-26-19:11:49.721200] 	WRITE: gcc@10.2.0%gcc@11.2.0~binutils~bootstrap~graphite~nvptx~piclibs~strip languages=c,c++,fortran patches=28c5ab3b564d83dd7e6e35b9c683141a4cb57ee886c5367e54a0828538b3c789,2c18531a23623596e1daf6f0dd963cf72c208945ecad90515640c3ab23991159,eaa00c91e08a5e767f023911a49bc1b2d1a3eea38703b745ab260f90e8da41aa arch=linux-rocky9-broadwell/mqbpsxf [/cm/shared/apps/spack/0.17.3/gpu/share/spack/lmod/linux-rocky9-x86_64/Core/gcc/10.2.0-mqbpsxf.lua]
+==> [2023-06-26-19:11:49.896697] 	WRITE: gdb@11.1%gcc@10.2.0~gold~ld~lto~python~quad~source-highlight~tui+xz patches=7590c95c3a621b731cf80f26fc480e9d2584770b8e2f689a22f6d23316fba899 arch=linux-rocky9-broadwell/ujk3cox [/cm/shared/apps/spack/0.17.3/gpu/share/spack/lmod/linux-rocky9-x86_64/gcc/10.2.0/gdb/11.1-ujk3cox.lua]
+==> [2023-06-26-19:11:50.008827] 	WRITE: gh@2.0.0%gcc@11.2.0 arch=linux-rocky9-broadwell/x3mgr5t [/cm/shared/apps/spack/0.17.3/gpu/share/spack/lmod/linux-rocky9-x86_64/Core/gh/2.0.0-x3mgr5t.lua]
+==> [2023-06-26-19:11:50.110364] 	WRITE: git@2.31.1%gcc@11.2.0+man+nls+perl~svn~tcltk arch=linux-rocky9-broadwell/7yli2t2 [/cm/shared/apps/spack/0.17.3/gpu/share/spack/lmod/linux-rocky9-x86_64/Core/git/2.31.1-7yli2t2.lua]
+==> [2023-06-26-19:11:50.414749] 	WRITE: git-lfs@2.11.0%gcc@11.2.0 arch=linux-rocky9-broadwell/biv4i32 [/cm/shared/apps/spack/0.17.3/gpu/share/spack/lmod/linux-rocky9-x86_64/Core/git-lfs/2.11.0-biv4i32.lua]
+==> [2023-06-26-19:11:50.607493] 	WRITE: gnuplot@5.4.2%gcc@10.2.0~X+cairo+gd+libcerf~pbm~qt~wx patches=ad89f23815fd925889ae78009ba22e6f9e4b12fea389280040cef519deafb052 arch=linux-rocky9-broadwell/yxqjspk [/cm/shared/apps/spack/0.17.3/gpu/share/spack/lmod/linux-rocky9-x86_64/gcc/10.2.0/gnuplot/5.4.2-yxqjspk.lua]
+==> [2023-06-26-19:11:50.882277] '/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/python-3.8.12-inx66svinrzmo2rcei33cwmfhkuoosgw/bin/python3.8' '-c' '
+import json
+from distutils.sysconfig import (
+    get_config_vars,
+    get_config_h_filename,
+    get_makefile_filename,
+    get_python_inc,
+    get_python_lib,
+)
+
+config = get_config_vars()
+config['"'"'config_h_filename'"'"'] = get_config_h_filename()
+config['"'"'makefile_filename'"'"'] = get_makefile_filename()
+config['"'"'python_inc'"'"'] = {}
+config['"'"'python_lib'"'"'] = {}
+
+for plat_specific in [True, False]:
+    plat_key = str(plat_specific).lower()
+    config['"'"'python_inc'"'"'][plat_key] = get_python_inc(plat_specific, prefix='"'"''"'"')
+    config['"'"'python_lib'"'"'][plat_key] = {}
+    for standard_lib in [True, False]:
+        lib_key = str(standard_lib).lower()
+        config['"'"'python_lib'"'"'][plat_key][lib_key] = get_python_lib(
+            plat_specific, standard_lib, prefix='"'"''"'"'
+        )
+
+print(json.dumps(config))
+'
+==> [2023-06-26-19:11:51.217964] 	BLACKLISTED_AS_IMPLICIT : cairo@1.16.0%gcc@10.2.0~X+fc+ft+gobject+pdf~png~svg patches=7c4da77767fe9feb03f8051def0832f0c67f99162913275cfa127a88df19cf51 arch=linux-rocky9-broadwell/r543osb
+==> [2023-06-26-19:11:51.231462] 	BLACKLISTED_AS_IMPLICIT : libcerf@1.3%gcc@10.2.0 arch=linux-rocky9-broadwell/xzx6gko
+==> [2023-06-26-19:11:51.245363] 	BLACKLISTED_AS_IMPLICIT : libgd@2.2.4%gcc@10.2.0 arch=linux-rocky9-broadwell/nl5wnsn
+==> [2023-06-26-19:11:51.258430] 	BLACKLISTED_AS_IMPLICIT : libiconv@1.16%gcc@10.2.0 libs=shared,static arch=linux-rocky9-broadwell/r7u3li4
+==> [2023-06-26-19:11:51.273090] 	BLACKLISTED_AS_IMPLICIT : libxpm@3.5.12%gcc@10.2.0 arch=linux-rocky9-broadwell/5yfe4z2
+==> [2023-06-26-19:11:51.292039] 	BLACKLISTED_AS_IMPLICIT : pango@1.42.0%gcc@10.2.0~X arch=linux-rocky9-broadwell/rcpnoii
+==> [2023-06-26-19:11:51.305034] 	BLACKLISTED_AS_IMPLICIT : readline@8.1%gcc@10.2.0 arch=linux-rocky9-broadwell/wndvzcw
+==> [2023-06-26-19:11:51.433966] 	WRITE: graphviz@2.49.0%gcc@10.2.0~doc~expat~ghostscript~gtkplus~gts~java~libgd~pangocairo~poppler~qt~quartz~x arch=linux-rocky9-broadwell/w6jyh5y [/cm/shared/apps/spack/0.17.3/gpu/share/spack/lmod/linux-rocky9-x86_64/gcc/10.2.0/graphviz/2.49.0-w6jyh5y.lua]
+==> [2023-06-26-19:11:51.548520] 	WRITE: imagemagick@7.0.8-7%gcc@10.2.0 arch=linux-rocky9-broadwell/souu5j2 [/cm/shared/apps/spack/0.17.3/gpu/share/spack/lmod/linux-rocky9-x86_64/gcc/10.2.0/imagemagick/7.0.8-7-souu5j2.lua]
+==> [2023-06-26-19:11:51.862687] 	BLACKLISTED_AS_IMPLICIT : fontconfig@2.13.94%gcc@10.2.0 arch=linux-rocky9-broadwell/5f2is3h
+==> [2023-06-26-19:11:51.876513] 	BLACKLISTED_AS_IMPLICIT : freetype@2.11.0%gcc@10.2.0 arch=linux-rocky9-broadwell/4v7vtlk
+==> [2023-06-26-19:11:51.889933] 	BLACKLISTED_AS_IMPLICIT : ghostscript@9.27%gcc@10.2.0~tesseract arch=linux-rocky9-broadwell/tqiqzj3
+==> [2023-06-26-19:11:51.902989] 	BLACKLISTED_AS_IMPLICIT : ghostscript-fonts@8.11%gcc@10.2.0 arch=linux-rocky9-broadwell/fm4bmjg
+==> [2023-06-26-19:11:51.916309] 	BLACKLISTED_AS_IMPLICIT : libjpeg-turbo@2.1.0%gcc@10.2.0 arch=linux-rocky9-broadwell/7rlpvrn
+==> [2023-06-26-19:11:51.929727] 	BLACKLISTED_AS_IMPLICIT : libpng@1.6.37%gcc@10.2.0 arch=linux-rocky9-broadwell/7tywqyc
+==> [2023-06-26-19:11:51.943343] 	BLACKLISTED_AS_IMPLICIT : libsm@1.2.3%gcc@10.2.0 arch=linux-rocky9-broadwell/t3pizwi
+==> [2023-06-26-19:11:51.956331] 	BLACKLISTED_AS_IMPLICIT : libtiff@4.3.0%gcc@10.2.0~jbig~jpeg~jpeg12~lerc~libdeflate~lzma~old-jpeg~pixarlog~webp~zlib~zstd arch=linux-rocky9-broadwell/uwv2ioj
+==> [2023-06-26-19:11:51.969261] 	BLACKLISTED_AS_IMPLICIT : libtool@2.4.6%gcc@10.2.0 arch=linux-rocky9-broadwell/jmlifan
+==> [2023-06-26-19:11:51.988591] 	BLACKLISTED_AS_IMPLICIT : pango@1.42.0%gcc@10.2.0~X arch=linux-rocky9-broadwell/rcpnoii
+==> [2023-06-26-19:11:52.115038] 	WRITE: intel@19.1.1.217%gcc@11.2.0+rpath auto_dispatch=none arch=linux-rocky9-broadwell/7fcjggo [/cm/shared/apps/spack/0.17.3/gpu/share/spack/lmod/linux-rocky9-x86_64/Core/intel/19.1.1.217-7fcjggo.lua]
+==> [2023-06-26-19:11:52.213182] normalize_path.normalize_suite_dir:	trying /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/intel-19.1.1.217-7fcjggodrui3okoovfgtjf6gl5nf6nlv/compilers_and_libraries_19.1.1.217
+==> [2023-06-26-19:11:52.213823] normalize_path.normalize_suite_dir:	trying /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/intel-19.1.1.217-7fcjggodrui3okoovfgtjf6gl5nf6nlv/compilers_and_libraries_2019.1.*
+==> [2023-06-26-19:11:52.215094] normalize_path.normalize_suite_dir:	trying /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/intel-19.1.1.217-7fcjggodrui3okoovfgtjf6gl5nf6nlv/compilers_and_libraries_*.*.*
+==> [2023-06-26-19:11:52.216417] normalize_path.normalize_suite_dir:	found 1:
+  ['/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/intel-19.1.1.217-7fcjggodrui3okoovfgtjf6gl5nf6nlv/compilers_and_libraries_2020.1.217']
+==> [2023-06-26-19:11:52.217019] normalize_path.normalize_suite_dir:	/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/intel-19.1.1.217-7fcjggodrui3okoovfgtjf6gl5nf6nlv/compilers_and_libraries_2020.1.217
+==> [2023-06-26-19:11:52.217705] file_to_source.normalize_path:	/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/intel-19.1.1.217-7fcjggodrui3okoovfgtjf6gl5nf6nlv/compilers_and_libraries_2020.1.217/linux/bin/compilervars.sh
+==> [2023-06-26-19:11:52.217748] sourcing /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/intel-19.1.1.217-7fcjggodrui3okoovfgtjf6gl5nf6nlv/compilers_and_libraries_2020.1.217/linux/bin/compilervars.sh
+==> [2023-06-26-19:11:52.217787] EnvironmentModifications.from_sourcing_file: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/intel-19.1.1.217-7fcjggodrui3okoovfgtjf6gl5nf6nlv/compilers_and_libraries_2020.1.217/linux/bin/compilervars.sh
+==> [2023-06-26-19:11:52.219020] '/bin/bash' '-c' 'source /dev/null &> /dev/null && /usr/bin/python3 -E -c "import os, json; print(json.dumps(dict(os.environ)))"'
+==> [2023-06-26-19:11:52.259584] '/bin/bash' '-c' 'source /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/intel-19.1.1.217-7fcjggodrui3okoovfgtjf6gl5nf6nlv/compilers_and_libraries_2020.1.217/linux/bin/compilervars.sh intel64 &> /dev/null && /usr/bin/python3 -E -c "import os, json; print(json.dumps(dict(os.environ)))"'
+==> [2023-06-26-19:11:52.403701] 	WRITE: mercurial@5.8%gcc@11.2.0 arch=linux-rocky9-broadwell/wjdumxh [/cm/shared/apps/spack/0.17.3/gpu/share/spack/lmod/linux-rocky9-x86_64/Core/mercurial/5.8-wjdumxh.lua]
+==> [2023-06-26-19:11:52.517275] '/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/python-3.8.12-h36q3czt7vlswdt5r36jy4ikmgdeejdd/bin/python3.8' '-c' '
+import json
+from distutils.sysconfig import (
+    get_config_vars,
+    get_config_h_filename,
+    get_makefile_filename,
+    get_python_inc,
+    get_python_lib,
+)
+
+config = get_config_vars()
+config['"'"'config_h_filename'"'"'] = get_config_h_filename()
+config['"'"'makefile_filename'"'"'] = get_makefile_filename()
+config['"'"'python_inc'"'"'] = {}
+config['"'"'python_lib'"'"'] = {}
+
+for plat_specific in [True, False]:
+    plat_key = str(plat_specific).lower()
+    config['"'"'python_inc'"'"'][plat_key] = get_python_inc(plat_specific, prefix='"'"''"'"')
+    config['"'"'python_lib'"'"'][plat_key] = {}
+    for standard_lib in [True, False]:
+        lib_key = str(standard_lib).lower()
+        config['"'"'python_lib'"'"'][plat_key][lib_key] = get_python_lib(
+            plat_specific, standard_lib, prefix='"'"''"'"'
+        )
+
+print(json.dumps(config))
+'
+==> [2023-06-26-19:11:52.679409] 	BLACKLISTED_AS_IMPLICIT : py-certifi@2021.10.8%gcc@11.2.0 arch=linux-rocky9-broadwell/p5atw43
+==> [2023-06-26-19:11:52.696786] 	BLACKLISTED_AS_IMPLICIT : py-pygments@2.10.0%gcc@11.2.0 arch=linux-rocky9-broadwell/5tixy4f
+==> [2023-06-26-19:11:52.711603] 	BLACKLISTED_AS_IMPLICIT : python@3.8.12%gcc@11.2.0+bz2+ctypes+dbm~debug+libxml2+lzma~nis~optimizations+pic+pyexpat+pythoncmd+readline+shared+sqlite3+ssl~tix~tkinter~ucs4+uuid+zlib patches=0d98e93189bc278fbc37a50ed7f183bd8aaf249a8e1670a465f0db6bb4f8cf87,4c2457325f2b608b1b6a2c63087df8c26e07db3e3d493caf36a56f0ecf6fb768,f2fd060afc4b4618fe8104c4c5d771f36dc55b1db5a4623785a4ea707ec72fb4 arch=linux-rocky9-broadwell/h36q3cz
+==> [2023-06-26-19:11:52.817140] 	WRITE: meson@0.60.0%gcc@10.2.0 patches=aa6c50d5a2aeb1a487d16f6712be4357fefb923aae37ab830699b07338388287 arch=linux-rocky9-broadwell/l7ly2ew [/cm/shared/apps/spack/0.17.3/gpu/share/spack/lmod/linux-rocky9-x86_64/gcc/10.2.0/meson/0.60.0-l7ly2ew.lua]
+==> [2023-06-26-19:11:53.076234] 	WRITE: nccl@2.8.4-1%gcc@10.2.0+cuda cuda_arch=60,75,80,86 arch=linux-rocky9-broadwell/k4ja2gm [/cm/shared/apps/spack/0.17.3/gpu/share/spack/lmod/linux-rocky9-x86_64/gcc/10.2.0/nccl/2.8.4-1-k4ja2gm.lua]
+==> [2023-06-26-19:11:53.216522] 	WRITE: ninja@1.10.2%gcc@10.2.0 arch=linux-rocky9-broadwell/3b725n3 [/cm/shared/apps/spack/0.17.3/gpu/share/spack/lmod/linux-rocky9-x86_64/gcc/10.2.0/ninja/1.10.2-3b725n3.lua]
+==> [2023-06-26-19:11:53.309552] 	WRITE: nvhpc@22.1%gcc@11.2.0+blas+lapack+mpi install_type=single arch=linux-rocky9-broadwell/rsks4pt [/cm/shared/apps/spack/0.17.3/gpu/share/spack/lmod/linux-rocky9-x86_64/Core/nvhpc/22.1-rsks4pt.lua]
+==> [2023-06-26-19:11:53.417493] 	WRITE: openjdk@1.8.0_265-b01%gcc@10.2.0 arch=linux-rocky9-broadwell/jrw47hc [/cm/shared/apps/spack/0.17.3/gpu/share/spack/lmod/linux-rocky9-x86_64/gcc/10.2.0/openjdk/1.8.0_265-b01-jrw47hc.lua]
+==> [2023-06-26-19:11:53.503337] 	WRITE: openjdk@11.0.12_7%gcc@10.2.0 arch=linux-rocky9-broadwell/n3q25pz [/cm/shared/apps/spack/0.17.3/gpu/share/spack/lmod/linux-rocky9-x86_64/gcc/10.2.0/openjdk/11.0.12_7-n3q25pz.lua]
+==> [2023-06-26-19:11:53.592561] 	WRITE: parallel@20210922%gcc@11.2.0 arch=linux-rocky9-broadwell/hzmc3me [/cm/shared/apps/spack/0.17.3/gpu/share/spack/lmod/linux-rocky9-x86_64/Core/parallel/20210922-hzmc3me.lua]
+==> [2023-06-26-19:11:53.723302] 	WRITE: perl@5.32.0%gcc@10.2.0+cpanm+shared+threads arch=linux-rocky9-broadwell/ozktzhy [/cm/shared/apps/spack/0.17.3/gpu/share/spack/lmod/linux-rocky9-x86_64/gcc/10.2.0/perl/5.32.0-ozktzhy.lua]
+==> [2023-06-26-19:11:53.838735] 	WRITE: pigz@2.6%gcc@11.2.0 arch=linux-rocky9-broadwell/stfhmjy [/cm/shared/apps/spack/0.17.3/gpu/share/spack/lmod/linux-rocky9-x86_64/Core/pigz/2.6-stfhmjy.lua]
+==> [2023-06-26-19:11:53.953148] 	WRITE: py-cython@0.29.24%gcc@10.2.0 arch=linux-rocky9-broadwell/3tkerpd [/cm/shared/apps/spack/0.17.3/gpu/share/spack/lmod/linux-rocky9-x86_64/gcc/10.2.0/py-cython/0.29.24-3tkerpd.lua]
+==> [2023-06-26-19:11:54.221405] 	WRITE: py-pip@21.1.2%gcc@10.2.0 arch=linux-rocky9-broadwell/mw7rgfa [/cm/shared/apps/spack/0.17.3/gpu/share/spack/lmod/linux-rocky9-x86_64/gcc/10.2.0/py-pip/21.1.2-mw7rgfa.lua]
+==> [2023-06-26-19:11:54.456241] 	WRITE: py-setuptools@58.2.0%gcc@10.2.0 arch=linux-rocky9-broadwell/nhub4gi [/cm/shared/apps/spack/0.17.3/gpu/share/spack/lmod/linux-rocky9-x86_64/gcc/10.2.0/py-setuptools/58.2.0-nhub4gi.lua]
+==> [2023-06-26-19:11:54.649949] 	WRITE: py-virtualenv@16.7.6%gcc@10.2.0 arch=linux-rocky9-broadwell/qzcn75r [/cm/shared/apps/spack/0.17.3/gpu/share/spack/lmod/linux-rocky9-x86_64/gcc/10.2.0/py-virtualenv/16.7.6-qzcn75r.lua]
+==> [2023-06-26-19:11:54.863617] 	WRITE: python@3.8.12%gcc@10.2.0+bz2+ctypes+dbm~debug+libxml2+lzma~nis+optimizations+pic+pyexpat+pythoncmd+readline+shared+sqlite3+ssl~tix~tkinter~ucs4+uuid+zlib patches=0d98e93189bc278fbc37a50ed7f183bd8aaf249a8e1670a465f0db6bb4f8cf87,4c2457325f2b608b1b6a2c63087df8c26e07db3e3d493caf36a56f0ecf6fb768,f2fd060afc4b4618fe8104c4c5d771f36dc55b1db5a4623785a4ea707ec72fb4 arch=linux-rocky9-broadwell/inx66sv [/cm/shared/apps/spack/0.17.3/gpu/share/spack/lmod/linux-rocky9-x86_64/gcc/10.2.0/python/3.8.12-inx66sv.lua]
+==> [2023-06-26-19:11:55.021374] 	WRITE: rclone@1.56.2%gcc@11.2.0 arch=linux-rocky9-broadwell/yh5jqok [/cm/shared/apps/spack/0.17.3/gpu/share/spack/lmod/linux-rocky9-x86_64/Core/rclone/1.56.2-yh5jqok.lua]
+==> [2023-06-26-19:11:55.117180] 	WRITE: sqlite@3.36.0%gcc@10.2.0+column_metadata+fts~functions~rtree arch=linux-rocky9-broadwell/v36qrof [/cm/shared/apps/spack/0.17.3/gpu/share/spack/lmod/linux-rocky9-x86_64/gcc/10.2.0/sqlite/3.36.0-v36qrof.lua]
+==> [2023-06-26-19:11:55.225926] 	WRITE: sratoolkit@2.10.9%gcc@11.2.0 arch=linux-rocky9-broadwell/7cirw25 [/cm/shared/apps/spack/0.17.3/gpu/share/spack/lmod/linux-rocky9-x86_64/Core/sratoolkit/2.10.9-7cirw25.lua]
+==> [2023-06-26-19:11:55.322933] 	WRITE: tcl@8.5.9%gcc@10.2.0 arch=linux-rocky9-broadwell/bvbvbqs [/cm/shared/apps/spack/0.17.3/gpu/share/spack/lmod/linux-rocky9-x86_64/gcc/10.2.0/tcl/8.5.9-bvbvbqs.lua]
+==> [2023-06-26-19:11:55.498594] 	WRITE: tcl@8.6.11%gcc@10.2.0 arch=linux-rocky9-broadwell/zwnvx5q [/cm/shared/apps/spack/0.17.3/gpu/share/spack/lmod/linux-rocky9-x86_64/gcc/10.2.0/tcl/8.6.11-zwnvx5q.lua]
+==> [2023-06-26-19:11:46.988582] Regenerating lmod module files
+Submitted batch job 2924

@@ -1,0 +1,826 @@
+1687818640 2885 6ef24cc494849c113614e228e77d60fd  /cm/shared/apps/spack/0.17.3/cpu/etc/spack/sdsc/tscc/0.17.3/gpu/specs/git@2.31.1.sh 
+
+#!/usr/bin/env bash
+
+#SBATCH --job-name=git@2.31.1
+#SBATCH --account=sys200
+#SBATCH --partition=hotel-gpu
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=1
+#SBATCH --cpus-per-task=8
+#SBATCH --time=00:30:00
+#SBATCH --output=%x.o%j.%N
+
+declare -xr LOCAL_TIME="$(date +'%Y%m%dT%H%M%S%z')"
+declare -xir UNIX_TIME="$(date +'%s')"
+
+declare -xr SYSTEM_NAME='tscc'
+
+declare -xr SPACK_VERSION='0.17.3'
+declare -xr SPACK_INSTANCE_NAME='gpu'
+declare -xr SPACK_INSTANCE_DIR="/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}"
+
+declare -xr SLURM_JOB_SCRIPT="$(scontrol show job ${SLURM_JOB_ID} | awk -F= '/Command=/{print $2}')"
+declare -xr SLURM_JOB_MD5SUM="$(md5sum ${SLURM_JOB_SCRIPT})"
+
+declare -xr SCHEDULER_MODULE='slurm'
+
+echo "${UNIX_TIME} ${SLURM_JOB_ID} ${SLURM_JOB_MD5SUM} ${SLURM_JOB_DEPENDENCY}" 
+echo ""
+
+cat "${SLURM_JOB_SCRIPT}"
+
+module purge
+module load "${SCHEDULER_MODULE}"
+module load "${SPACK_INSTANCE_NAME}"
+module list
+
+. "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
+
+declare -xr SPACK_PACKAGE='git@2.31.1'
+declare -xr SPACK_COMPILER='gcc@11.2.0'
+declare -xr SPACK_VARIANTS='~tcltk'
+declare -xr SPACK_DEPENDENCIES=''
+declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
+
+printenv
+
+spack config get compilers  
+spack config get config  
+spack config get mirrors
+spack config get modules
+spack config get packages
+spack config get repos
+spack config get upstreams
+
+spack spec --long --namespaces --types "${SPACK_SPEC}"
+if [[ "${?}" -ne 0 ]]; then
+  echo 'ERROR: spack concretization failed.'
+  exit 1
+fi
+
+time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all "${SPACK_SPEC}"
+if [[ "${?}" -ne 0 ]]; then
+  echo 'ERROR: spack install failed.'
+  exit 1
+fi
+
+spack module lmod refresh --delete-tree -y
+
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'git-lfs@2.11.0.sh'
+
+sleep 20
+
+Currently Loaded Modules:
+  1) slurm/slurm/22.05.9   2) gpu/0.17.3
+
+ 
+
+SHELL=/bin/bash
+SLURM_JOB_USER=jpg
+SLURM_TASKS_PER_NODE=1
+SLURM_JOB_UID=422
+HISTCONTROL=ignoredups
+SLURM_JOB_MD5SUM=6ef24cc494849c113614e228e77d60fd  /cm/shared/apps/spack/0.17.3/cpu/etc/spack/sdsc/tscc/0.17.3/gpu/specs/git@2.31.1.sh
+SLURM_TASK_PID=1192970
+LMOD_arch=x86_64
+SLURM_LOCALID=0
+SLURM_SUBMIT_DIR=/cm/shared/apps/spack/0.17.3/cpu/etc/spack/sdsc/tscc/0.17.3/gpu/specs
+HOSTNAME=gpu1
+HISTSIZE=1000
+SLURMD_NODENAME=gpu1
+FPATH=/usr/share/lmod/lmod/init/ksh_funcs
+_ModuleTable002_=cm0vc2x1cm0vMjIuMDUuOSIsWyJsb2FkT3JkZXIiXT0xLHByb3BUPXt9LFsic3RhY2tEZXB0aCJdPTAsWyJzdGF0dXMiXT0iYWN0aXZlIixbInVzZXJOYW1lIl09InNsdXJtIixbIndWIl09IipzbHVybS8wMDAwMDAwMjIuMDAwMDAwMDA1LjAwMDAwMDAwOS4qemZpbmFsIix9LH0sbXBhdGhBPXsiL2NtL3NoYXJlZC9hcHBzL3NwYWNrLzAuMTcuMy9ncHUvc2hhcmUvc3BhY2svbG1vZC9saW51eC1yb2NreTkteDg2XzY0L0NvcmUiLCIvY20vc2hhcmVkL21vZHVsZWZpbGVzIiwiL2NtL2xvY2FsL21vZHVsZWZpbGVzIiwiL2V0Yy9tb2R1bGVmaWxlcyIsIi91c3Ivc2hhcmUvbW9kdWxlZmlsZXMiLCIvdXNyL3NoYXJlL01vZHVsZXMvbW9kdWxlZmlsZXMiLH0sWyJzeXN0ZW1CYXNl
+SPACK_LD_LIBRARY_PATH=/cm/local/apps/gcc/11.2.0/lib:/cm/local/apps/gcc/11.2.0/lib64:/cm/local/apps/gcc/11.2.0/lib32:/cm/shared/apps/slurm/current/lib64/slurm:/cm/shared/apps/slurm/current/lib64
+__LMOD_REF_COUNT_MODULEPATH=/cm/shared/apps/spack/0.17.3/gpu/share/spack/lmod/linux-rocky9-x86_64/Core:1;/cm/shared/modulefiles:2;/cm/local/modulefiles:1;/etc/modulefiles:1;/usr/share/modulefiles:1;/usr/share/Modules/modulefiles:1
+SLURM_NODE_ALIASES=(null)
+SLURM_CLUSTER_NAME=slurm
+SLURM_JOB_SCRIPT=/cm/shared/apps/spack/0.17.3/cpu/etc/spack/sdsc/tscc/0.17.3/gpu/specs/git@2.31.1.sh
+SCHEDULER_MODULE=slurm
+SPACK_INSTANCE_NAME=gpu
+SLURM_CPUS_ON_NODE=8
+__LMOD_REF_COUNT__LMFILES_=/cm/local/modulefiles/slurm/slurm/22.05.9:1;/cm/shared/modulefiles/gpu/0.17.3.lua:1
+SLURM_JOB_CPUS_PER_NODE=8
+SPACK_VARIANTS=~tcltk
+LMOD_DIR=/usr/share/lmod/lmod/libexec
+SPACK_DEPENDENCIES=
+PWD=/home/jpg/specs_gpu_0.17.3
+SLURM_GTIDS=0
+LOGNAME=jpg
+XDG_SESSION_TYPE=tty
+SLURM_JOB_PARTITION=hotel-gpu
+MODULESHOME=/usr/share/lmod/lmod
+MANPATH=/cm/shared/apps/slurm/current/man:/usr/share/lmod/lmod/share/man:/usr/local/share/man:/usr/share/man:/cm/local/apps/environment-modules/current/share/man
+LMOD_PREPEND_BLOCK=normal
+SLURM_JOB_NUM_NODES=1
+SPACK_INSTANCE_DIR=/cm/shared/apps/spack/0.17.3/gpu
+SPACK_PYTHON=/usr/bin/python3
+SLURM_JOBID=2885
+SLURM_JOB_QOS=normal
+MOTD_SHOWN=pam
+__LMOD_REF_COUNT_PATH=/cm/shared/apps/spack/0.17.3/gpu/bin:1;/cm/shared/apps/slurm/current/sbin:1;/cm/shared/apps/slurm/current/bin:1;/home/jpg/usr/bin:2;/home/jpg/bin:3;/home/jpg/.local/bin:1;/usr/local/bin:1;/usr/bin:1;/usr/local/sbin:1;/usr/sbin:1
+HOME=/home/jpg
+_ModuleTable_Sz_=3
+__LMOD_REF_COUNT_LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:1;/cm/shared/apps/slurm/current/lib64:1
+LANG=en_US.UTF-8
+__LMOD_REF_COUNT_LOADEDMODULES=slurm/slurm/22.05.9:1;gpu/0.17.3:1
+LS_COLORS=rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=01;37;41:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=01;36:*.au=01;36:*.flac=01;36:*.m4a=01;36:*.mid=01;36:*.midi=01;36:*.mka=01;36:*.mp3=01;36:*.mpc=01;36:*.ogg=01;36:*.ra=01;36:*.wav=01;36:*.oga=01;36:*.opus=01;36:*.spx=01;36:*.xspf=01;36:
+SLURM_PROCID=0
+__LMOD_REF_COUNT_CPATH=/cm/shared/apps/slurm/current/include:1
+LMOD_SETTARG_FULL_SUPPORT=no
+SPACK_COMPILER=gcc@11.2.0
+TMPDIR=/tmp
+SLURM_CPUS_PER_TASK=8
+SLURM_NTASKS=1
+SLURM_TOPOLOGY_ADDR=gpu1
+LMOD_VERSION=8.5
+SSH_CONNECTION=70.95.82.22 52349 132.249.107.93 22
+SPACK_ROOT=/cm/shared/apps/spack/0.17.3/gpu
+_ModuleTable003_=TVBBVEgiXT0iL2NtL2xvY2FsL21vZHVsZWZpbGVzOi9jbS9zaGFyZWQvbW9kdWxlZmlsZXM6L2V0Yy9tb2R1bGVmaWxlczovdXNyL3NoYXJlL21vZHVsZWZpbGVzOi91c3Ivc2hhcmUvTW9kdWxlcy9tb2R1bGVmaWxlcyIsfQ==
+MODULEPATH_ROOT=/usr/share/modulefiles
+SDSC_SPACK_STACK=gpu
+SLURM_TOPOLOGY_ADDR_PATTERN=node
+XDG_SESSION_CLASS=user
+LMOD_PKG=/usr/share/lmod/lmod
+SLURM_WORKING_CLUSTER=slurm:mgr2:6817:9728:109
+TERM=xterm-256color
+LESSOPEN=||/usr/bin/lesspipe.sh %s
+USER=jpg
+LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:/cm/shared/apps/slurm/current/lib64
+SLURM_NODELIST=gpu1
+ENVIRONMENT=BATCH
+LOADEDMODULES=slurm/slurm/22.05.9:gpu/0.17.3
+SPACK_SPEC=git@2.31.1 % gcc@11.2.0 ~tcltk 
+SLURM_JOB_ACCOUNT=sys200
+SLURM_PRIO_PROCESS=0
+SLURM_NPROCS=1
+LMOD_ROOT=/usr/share/lmod
+LMOD_SETTARG_CMD=:
+SHLVL=2
+SLURM_NNODES=1
+BASH_ENV=/usr/share/lmod/lmod/init/bash
+LMOD_FULL_SETTARG_SUPPORT=no
+LMOD_sys=Linux
+__LMOD_REF_COUNT_MANPATH=/cm/shared/apps/slurm/current/man:1;/usr/share/lmod/lmod/share/man:1;/usr/local/share/man:1;/usr/share/man:1;/cm/local/apps/environment-modules/current/share/man:1
+XDG_SESSION_ID=89405
+SLURM_SUBMIT_HOST=login1
+__LMOD_SET_FPATH=1
+_ModuleTable001_=X01vZHVsZVRhYmxlXz17WyJNVHZlcnNpb24iXT0zLFsiY19yZWJ1aWxkVGltZSJdPWZhbHNlLFsiY19zaG9ydFRpbWUiXT1mYWxzZSxkZXB0aFQ9e30sZmFtaWx5PXt9LG1UPXtncHU9e1siZm4iXT0iL2NtL3NoYXJlZC9tb2R1bGVmaWxlcy9ncHUvMC4xNy4zLmx1YSIsWyJmdWxsTmFtZSJdPSJncHUvMC4xNy4zIixbImxvYWRPcmRlciJdPTIscHJvcFQ9e30sWyJzdGFja0RlcHRoIl09MCxbInN0YXR1cyJdPSJhY3RpdmUiLFsidXNlck5hbWUiXT0iZ3B1IixbIndWIl09IjAwMDAwMDAwMC4wMDAwMDAwMTcuMDAwMDAwMDAzLip6ZmluYWwiLH0sc2x1cm09e1siZm4iXT0iL2NtL2xvY2FsL21vZHVsZWZpbGVzL3NsdXJtL3NsdXJtLzIyLjA1LjkiLFsiZnVsbE5hbWUiXT0ic2x1
+SPACK_PACKAGE=git@2.31.1
+LD_LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:/cm/shared/apps/slurm/current/lib64
+XDG_RUNTIME_DIR=/run/user/422
+LMOD_COLORIZE=yes
+SLURM_JOB_ID=2885
+SLURM_NODEID=0
+S_COLORS=auto
+SSH_CLIENT=70.95.82.22 52349 22
+DEBUGINFOD_URLS=https://debuginfod.centos.org/ 
+CMD_WLM_CLUSTER_NAME=slurm
+ENABLE_LMOD=1
+which_declare=declare -f
+UNIX_TIME=1687818640
+__Init_Default_Modules=1
+SLURM_CONF=/cm/shared/apps/slurm/var/etc/slurm/slurm.conf
+PATH=/cm/shared/apps/spack/0.17.3/gpu/bin:/cm/shared/apps/slurm/current/sbin:/cm/shared/apps/slurm/current/bin:/home/jpg/usr/bin:/home/jpg/bin:/home/jpg/.local/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin
+SLURM_JOB_NAME=git@2.31.1
+LOCAL_TIME=20230626T153040-0700
+MODULEPATH=/cm/shared/apps/spack/0.17.3/gpu/share/spack/lmod/linux-rocky9-x86_64/Core:/cm/shared/modulefiles:/cm/local/modulefiles:/etc/modulefiles:/usr/share/modulefiles:/usr/share/Modules/modulefiles
+SLURM_NTASKS_PER_NODE=1
+_LMFILES_=/cm/local/modulefiles/slurm/slurm/22.05.9:/cm/shared/modulefiles/gpu/0.17.3.lua
+SYSTEM_NAME=tscc
+DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/422/bus
+LMOD_CMD=/usr/share/lmod/lmod/libexec/lmod
+MAIL=/var/spool/mail/jpg
+SSH_TTY=/dev/pts/0
+__LMOD_REF_COUNT_LD_LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:1;/cm/shared/apps/slurm/current/lib64:1
+LMOD_SYSTEM_DEFAULT_MODULES=DefaultModules
+SLURM_JOB_GID=7193
+CPATH=/cm/shared/apps/slurm/current/include
+SPACK_VERSION=0.17.3
+OLDPWD=/home/jpg
+SLURM_JOB_NODELIST=gpu1
+BASH_FUNC_ml%%=() {  eval $($LMOD_DIR/ml_cmd "$@")
+}
+BASH_FUNC_which%%=() {  ( alias;
+ eval ${which_declare} ) | /usr/bin/which --tty-only --read-alias --read-functions --show-tilde --show-dot $@
+}
+BASH_FUNC_module%%=() {  eval $($LMOD_CMD bash "$@") && eval $(${LMOD_SETTARG_CMD:-:} -s sh)
+}
+BASH_FUNC__spack_shell_wrapper%%=() {  for var in LD_LIBRARY_PATH DYLD_LIBRARY_PATH DYLD_FALLBACK_LIBRARY_PATH;
+ do
+ eval "if [ -n \"\${${var}-}\" ]; then export SPACK_$var=\${${var}}; fi";
+ done;
+ if [ -n "${ZSH_VERSION:-}" ]; then
+ emulate -L sh;
+ fi;
+ _sp_flags="";
+ while [ ! -z ${1+x} ] && [ "${1#-}" != "${1}" ]; do
+ _sp_flags="$_sp_flags $1";
+ shift;
+ done;
+ if [ -n "$_sp_flags" ] && [ "${_sp_flags#*h}" != "${_sp_flags}" ] || [ "${_sp_flags#*V}" != "${_sp_flags}" ]; then
+ command spack $_sp_flags "$@";
+ return;
+ fi;
+ _sp_subcommand="";
+ if [ ! -z ${1+x} ]; then
+ _sp_subcommand="$1";
+ shift;
+ fi;
+ case $_sp_subcommand in 
+ "cd")
+ _sp_arg="";
+ if [ -n "$1" ]; then
+ _sp_arg="$1";
+ shift;
+ fi;
+ if [ "$_sp_arg" = "-h" ] || [ "$_sp_arg" = "--help" ]; then
+ command spack cd -h;
+ else
+ LOC="$(spack location $_sp_arg "$@")";
+ if [ -d "$LOC" ]; then
+ cd "$LOC";
+ else
+ return 1;
+ fi;
+ fi;
+ return
+ ;;
+ "env")
+ _sp_arg="";
+ if [ -n "$1" ]; then
+ _sp_arg="$1";
+ shift;
+ fi;
+ if [ "$_sp_arg" = "-h" ] || [ "$_sp_arg" = "--help" ]; then
+ command spack env -h;
+ else
+ case $_sp_arg in 
+ activate)
+ _a=" $@";
+ if [ -z ${1+x} ] || [ "${_a#* --sh}" != "$_a" ] || [ "${_a#* --csh}" != "$_a" ] || [ "${_a#* -h}" != "$_a" ] || [ "${_a#* --help}" != "$_a" ]; then
+ command spack env activate "$@";
+ else
+ stdout="$(command spack $_sp_flags env activate --sh "$@")" || return;
+ eval "$stdout";
+ fi
+ ;;
+ deactivate)
+ _a=" $@";
+ if [ "${_a#* --sh}" != "$_a" ] || [ "${_a#* --csh}" != "$_a" ]; then
+ command spack env deactivate "$@";
+ else
+ if [ -n "$*" ]; then
+ command spack env deactivate -h;
+ else
+ stdout="$(command spack $_sp_flags env deactivate --sh)" || return;
+ eval "$stdout";
+ fi;
+ fi
+ ;;
+ *)
+ command spack env $_sp_arg "$@"
+ ;;
+ esac;
+ fi;
+ return
+ ;;
+ "load" | "unload")
+ _a=" $@";
+ if [ "${_a#* --sh}" != "$_a" ] || [ "${_a#* --csh}" != "$_a" ] || [ "${_a#* -h}" != "$_a" ] || [ "${_a#* --list}" != "$_a" ] || [ "${_a#* --help}" != "$_a" ]; then
+ command spack $_sp_flags $_sp_subcommand "$@";
+ else
+ stdout="$(command spack $_sp_flags $_sp_subcommand --sh "$@")" || return;
+ eval "$stdout";
+ fi
+ ;;
+ *)
+ command spack $_sp_flags $_sp_subcommand "$@"
+ ;;
+ esac
+}
+BASH_FUNC_spack%%=() {  : this is a shell function from: /cm/shared/apps/spack/0.17.3/gpu/share/spack/setup-env.sh;
+ : the real spack script is here: /cm/shared/apps/spack/0.17.3/gpu/bin/spack;
+ _spack_shell_wrapper "$@";
+ return $?
+}
+_=/usr/bin/printenv
+compilers:
+- compiler:
+    spec: gcc@11.2.0
+    paths:
+      cc: /usr/bin/gcc
+      cxx: /usr/bin/g++
+      f77: /usr/bin/gfortran
+      fc: /usr/bin/gfortran
+    flags:
+      cflags: -O2 -march=native
+      cxxflags: -O2 -march=native
+      fflags: -O2 -march=native
+    operating_system: rocky9
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+config:
+  install_tree:
+    root: $spack/opt/spack
+    projections:
+      all: ${ARCHITECTURE}/${COMPILERNAME}-${COMPILERVER}/${PACKAGE}-${VERSION}-${HASH}
+  template_dirs:
+  - $spack/share/spack/templates
+
+  # Temporary locations Spack can try to use for builds.
+  #
+  # Recommended options are given below.
+  #
+  # Builds can be faster in temporary directories on some (e.g., HPC) systems.
+  # Specifying `$tempdir` will ensure use of the default temporary directory
+  # (i.e., ``$TMP` or ``$TMPDIR``).
+  #
+  # Another option that prevents conflicts and potential permission issues is
+  # to specify `$user_cache_path/stage`, which ensures each user builds in their
+  # home directory.
+  #
+  # A more traditional path uses the value of `$spack/var/spack/stage`, which
+  # builds directly inside Spack's instance without staging them in a
+  # temporary space.  Problems with specifying a path inside a Spack instance
+  # are that it precludes its use as a system package and its ability to be
+  # pip installable.
+  #
+  # In any case, if the username is not already in the path, Spack will append
+  # the value of `$user` in an attempt to avoid potential conflicts between
+  # users in shared temporary spaces.
+  #
+  # The build stage can be purged with `spack clean --stage` and
+  # `spack clean -a`, so it is important that the specified directory uniquely
+  # identifies Spack staging to avoid accidentally wiping out non-Spack work.
+  build_stage:
+  - $tempdir/$user/spack-stage
+  - $user_cache_path/stage
+  # - $spack/var/spack/stage
+
+  # Directory in which to run tests and store test results.
+  # Tests will be stored in directories named by date/time and package
+  # name/hash.
+  test_stage: $user_cache_path/test
+  source_cache: $spack/var/spack/cache
+  misc_cache: $user_cache_path/cache
+  connect_timeout: 10
+  verify_ssl: true
+  suppress_gpg_warnings: false
+  install_missing_compilers: false
+  checksum: true
+  deprecated: false
+  dirty: false
+  build_language: C
+  locks: true
+  url_fetch_method: urllib
+  ccache: false
+  concretizer: clingo
+  db_lock_timeout: 3
+  package_lock_timeout: null
+  shared_linking: rpath
+  allow_sgid: true
+  terminal_title: false
+  debug: false
+  build_jobs: 16
+mirrors:
+  spack-public: https://mirror.spack.io
+modules:
+  default:
+    'enable:':
+    - lmod
+    lmod:
+      core_compilers:
+      - gcc@11.2.0
+      hierarchy:
+      - mpi
+      hash_length: 7
+      blacklist_implicits: true
+      naming_scheme: '{name}/{version}'
+      projections:
+        all: '{name}/{version}'
+      adol-c:
+        suffixes:
+          +openmp: omp
+      amdblis:
+        suffixes:
+          threads=openmp: omp
+      fftw:
+        suffixes:
+          +openmp: omp
+      hpl:
+        suffixes:
+          +openmp: omp
+      hypre:
+        suffixes:
+          +openmp: omp
+      intel:
+        environment:
+          set:
+            INTEL_LICENSE_FILE: 40000@elprado.sdsc.edu:40100@elprado.sdsc.edu
+      kokkos:
+        suffixes:
+          +openmp: omp
+      intel-mkl:
+        suffixes:
+          threads=openmp: omp
+      openblas:
+        suffixes:
+          threads=openmp: omp
+          +ilp64: ilp64
+      'netlib-scalapack:':
+        suffixes:
+          ^openblas threads=openmp: omp
+      petsc:
+        suffixes:
+          +complex: cmplx
+      slepc:
+        suffixes:
+          ^petsc +complex: cmplx
+      ^python:
+        autoload: direct
+      ^ucx:
+        autoload: direct
+  prefix_inspections:
+    lib:
+    - LD_LIBRARY_PATH
+    lib64:
+    - LD_LIBRARY_PATH
+    bin:
+    - PATH
+    man:
+    - MANPATH
+    share/man:
+    - MANPATH
+    share/aclocal:
+    - ACLOCAL_PATH
+    lib/pkgconfig:
+    - PKG_CONFIG_PATH
+    lib64/pkgconfig:
+    - PKG_CONFIG_PATH
+    share/pkgconfig:
+    - PKG_CONFIG_PATH
+    ? ''
+    : - CMAKE_PREFIX_PATH
+
+  # These are configurations for the module set named "default"
+packages:
+  lustre:
+    externals:
+    - spec: lustre@2.15.2 % gcc@11.2.0 arch=linux-rocky9-broadwell
+      prefix: /usr
+    - spec: lustre@2.15.2 % gcc@10.2.0 arch=linux-rocky9-broadwell
+      prefix: /usr
+    - spec: lustre@2.15.2 % gcc@9.2.0 arch=linux-rocky9-broadwell
+      prefix: /usr
+    - spec: lustre@2.15.2 % gcc@8.5.0 arch=linux-rocky9-broadwell
+      prefix: /usr
+    - spec: lustre@2.15.2 % intel@19.1.1.217 arch=linux-rocky9-broadwell
+      prefix: /usr
+    - spec: lustre@2.15.2 % aocc@3.2.0 arch=linux-rocky9-broadwell
+      prefix: /usr
+    buildable: false
+  texlive:
+    externals:
+    - spec: texive@live % gcc@10.2.0 arch=linux-rocky9-broadwell
+      prefix: /usr
+    - spec: texive@live % gcc@9.2.0 arch=linux-rocky9-broadwell
+      prefix: /usr
+    - spec: texlive@live % intel@19.1.1.217 arch=linux-rocky9-broadwell
+      prefix: /usr
+    buildable: false
+  openmpi:
+    externals:
+    - spec: openmpi@4.0.5 % nvhpc@22.1 arch=linux-rocky9-broadwell
+      prefix: /home/jpg/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/nvhpc-22.1-rsks4ptuwyfjjxigybva7k53ihgacw3y/Linux_x86_64/22.1/comm_libs/openmpi4/openmpi-4.0.5
+    buildable: true
+  qd:
+    externals:
+    - spec: qd@2.3.13 % nvhpc@22.1 arch=linux-rocky9-broadwell
+      prefix: /home/jpg/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/nvhpc-22.1-rsks4ptuwyfjjxigybva7k53ihgacw3y/Linux_x86_64/22.1/compilers/extras/qd
+    buildable: false
+  openssl:
+    externals:
+    - spec: openssl@3.0.7 % gcc@11.2.0 arch=linux-rocky9-broadwell
+      prefix: /usr
+    - spec: openssl@3.0.7 % gcc@10.2.0 arch=linux-rocky9-broadwell
+      prefix: /usr
+    - spec: openssl@3.0.7 % gcc@9.2.0 arch=linux-rocky9-broadwell
+      prefix: /usr
+    - spec: openssl@3.0.7 % intel@19.1.1.217 arch=linux-rocky9-broadwell
+      prefix: /usr
+    buildable: false
+  rdma-core:
+    externals:
+    - spec: rdma-core@28.0 % gcc@10.2.0 arch=linux-rocky9-broadwell
+      prefix: /usr
+    - spec: rdma-core@28.0 % gcc@9.2.0 arch=linux-rocky9-broadwell
+      prefix: /usr
+    - spec: rdma-core@28.0 % intel@19.1.1.217 arch=linux-rocky9-broadwell
+      prefix: /usr
+    buildable: false
+  hcoll:
+    externals:
+    - spec: hcoll@4.4.2968 % gcc@10.2.0 arch=linux-rocky9-broadwell
+      prefix: /opt/mellanox/hcoll
+    - spec: hcoll@4.4.2968 % gcc@9.2.0 arch=linux-rocky9-broadwell
+      prefix: /opt/mellanox/hcoll
+    - spec: hcoll@4.4.2968 % intel@19.1.1.217 arch=linux-rocky9-broadwell
+      prefix: /opt/mellanox/hcoll
+    buildable: false
+  slurm:
+    externals:
+    - spec: slurm@22.05.9 % gcc@8.5.0 arch=linux-rocky9-broadwell
+      prefix: /cm/shared/apps/slurm/22.05.9
+    - spec: slurm@22.05.9 % gcc@11.2.0 arch=linux-rocky9-broadwell
+      prefix: /cm/shared/apps/slurm/22.05.9
+    - spec: slurm@22.05.9 % gcc@10.2.0 arch=linux-rocky9-broadwell
+      prefix: /cm/shared/apps/slurm/22.05.9
+    - spec: slurm@22.05.9 % gcc@9.2.0 arch=linux-rocky9-broadwell
+      prefix: /cm/shared/apps/slurm/22.05.9
+    - spec: slurm@22.05.9 % intel@19.1.1.217 arch=linux-rocky9-broadwell
+      prefix: /cm/shared/apps/slurm/22.05.9
+    buildable: false
+  librsvg:
+    externals:
+    - spec: librsvg@2.42.7 % gcc@10.2.0 arch=linux-rocky9-broadwell
+      prefix: /usr
+    - spec: librsvg@2.42.7 % gcc@9.2.0 arch=linux-rocky9-broadwell
+      prefix: /usr
+    - spec: librsvg@2.42.7 %  intel@19.1.1.217 arch=linux-rocky9-broadwell
+      prefix: /usr
+    buildable: false
+  ghostscript:
+    externals:
+    - spec: ghostscript@9.27 % gcc@10.2.0 arch=linux-rocky9-broadwell
+      prefix: /usr
+    buildable: false
+  gaussian:
+    permissions:
+      read: group
+      group: jpg
+  vasp6:
+    permissions:
+      read: group
+      group: vasp-6
+  all:
+    compiler: [gcc, intel, pgi, clang, xl, nag, fj, aocc]
+    providers:
+      awk: [gawk]
+      blas: [openblas, amdblis]
+      D: [ldc]
+      daal: [intel-daal]
+      elf: [elfutils]
+      fftw-api: [fftw, amdfftw]
+      flame: [libflame, amdlibflame]
+      fuse: [libfuse]
+      gl: [mesa+opengl, mesa18, opengl]
+      glu: [mesa-glu, openglu]
+      glx: [mesa+glx, mesa18+glx, opengl]
+      golang: [gcc]
+      iconv: [libiconv]
+      ipp: [intel-ipp]
+      java: [openjdk, jdk, ibm-java]
+      jpeg: [libjpeg-turbo, libjpeg]
+      lapack: [openblas, amdlibflame]
+      lua-lang: [lua, lua-luajit]
+      mariadb-client: [mariadb-c-client, mariadb]
+      mkl: [intel-mkl]
+      mpe: [mpe2]
+      mpi: [openmpi, mpich]
+      mysql-client: [mysql, mariadb-c-client]
+      opencl: [pocl]
+      onedal: [intel-oneapi-dal]
+      osmesa: [mesa+osmesa, mesa18+osmesa]
+      pbs: [openpbs, torque]
+      pil: [py-pillow]
+      pkgconfig: [pkgconf, pkg-config]
+      rpc: [libtirpc]
+      scalapack: [netlib-scalapack, amdscalapack]
+      sycl: [hipsycl]
+      szip: [libaec, libszip]
+      tbb: [intel-tbb]
+      unwind: [libunwind]
+      uuid: [util-linux-uuid, libuuid]
+      xxd: [xxd-standalone, vim]
+      yacc: [bison, byacc]
+      ziglang: [zig]
+    permissions:
+      read: world
+      write: user
+repos:
+- $spack/var/spack/repos/sdsc
+- $spack/var/spack/repos/builtin
+upstreams: {}
+Input spec
+--------------------------------
+[    ]  .git@2.31.1%gcc@11.2.0~tcltk
+
+Concretized
+--------------------------------
+7yli2t2  [    ]  builtin.git@2.31.1%gcc@11.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +man+nls+perl~svn~tcltk arch=linux-rocky9-broadwell
+z7rcq4y  [b   ]      ^builtin.autoconf@2.69%gcc@11.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  patches=35c449281546376449766f92d49fc121ca50e330e60fefcfc9be2af3253082c2,7793209b33013dc0f81208718c68440c5aae80e7a1c4b8d336e382525af791a7,a49dd5bac3b62daa0ff688ab4d508d71dbd2f4f8d7e2a02321926346161bf3ee arch=linux-rocky9-broadwell
+2mlzkeq  [b r ]          ^builtin.m4@1.4.19%gcc@11.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +sigsegv patches=9dc5fbd0d5cb1037ab1e6d0ecc74a30df218d0a94bdd5a02759a97f62daca573,bfdffa7c2eb01021d5849b36972c069693654ad826c1a20b53534009a4ec7a89 arch=linux-rocky9-broadwell
+mzifopl  [bl  ]              ^builtin.libsigsegv@2.13%gcc@11.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky9-broadwell
+rccpzkg  [blr ]          ^sdsc.perl@5.32.0%gcc@11.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +cpanm+shared+threads arch=linux-rocky9-broadwell
+f3in6m2  [bl  ]              ^builtin.berkeley-db@18.1.40%gcc@11.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +cxx~docs+stl patches=b231fcc4d5cff05e5c3a4814f6a5af0e9a966428dc2176540d2c05aff41de522 arch=linux-rocky9-broadwell
+56oqmm4  [bl  ]              ^builtin.bzip2@1.0.8%gcc@11.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~debug~pic+shared arch=linux-rocky9-broadwell
+w3vyxd4  [b   ]                  ^builtin.diffutils@3.8%gcc@11.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky9-broadwell
+yzeufvl  [bl  ]                      ^builtin.libiconv@1.16%gcc@11.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  libs=shared,static arch=linux-rocky9-broadwell
+3rjkkrc  [bl  ]              ^sdsc.gdbm@1.19%gcc@11.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky9-broadwell
+i2k7fjg  [bl  ]                  ^builtin.readline@8.1%gcc@11.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky9-broadwell
+fayqttl  [bl  ]                      ^builtin.ncurses@6.2%gcc@11.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~symlinks+termlib abi=none arch=linux-rocky9-broadwell
+brrsknt  [b   ]                          ^builtin.pkgconf@1.8.0%gcc@11.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky9-broadwell
+d5vrjbq  [bl  ]              ^builtin.zlib@1.2.11%gcc@11.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +optimize+pic+shared arch=linux-rocky9-broadwell
+62sxpey  [b   ]      ^builtin.automake@1.16.3%gcc@11.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky9-broadwell
+ymzncmp  [bl  ]      ^builtin.curl@7.79.0%gcc@11.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~gssapi~ldap~libidn2~librtmp~libssh~libssh2~nghttp2 tls=openssl arch=linux-rocky9-broadwell
+ifgpx3o  [bl  ]          ^builtin.openssl@3.0.7%gcc@11.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~docs certs=system arch=linux-rocky9-broadwell
+wcrbdsj  [bl  ]      ^builtin.expat@2.4.1%gcc@11.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +libbsd arch=linux-rocky9-broadwell
+zivzyhv  [bl  ]          ^builtin.libbsd@0.11.3%gcc@11.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky9-broadwell
+fqev3cg  [bl  ]              ^builtin.libmd@1.0.3%gcc@11.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky9-broadwell
+f6hx3qa  [bl  ]      ^builtin.gettext@0.21%gcc@11.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +bzip2+curses+git~libunistring+libxml2+tar+xz arch=linux-rocky9-broadwell
+6bz5pvy  [bl  ]          ^builtin.libxml2@2.9.12%gcc@11.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~python arch=linux-rocky9-broadwell
+rotpn7w  [blr ]              ^builtin.xz@5.2.5%gcc@11.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~pic libs=shared,static arch=linux-rocky9-broadwell
+eaokit3  [bl  ]          ^builtin.tar@1.34%gcc@11.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky9-broadwell
+4eklg3b  [bl  ]      ^builtin.libidn2@2.3.0%gcc@11.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky9-broadwell
+bou4chz  [bl  ]          ^builtin.libunistring@0.9.10%gcc@11.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky9-broadwell
+2msbgh7  [b   ]      ^builtin.libtool@2.4.6%gcc@11.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky9-broadwell
+wrvb6js  [  r ]      ^builtin.openssh@8.7p1%gcc@11.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky9-broadwell
+xh7meoc  [bl  ]          ^builtin.libedit@3.1-20210216%gcc@11.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky9-broadwell
+qnnxihv  [bl  ]      ^builtin.pcre2@10.36%gcc@11.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~jit+multibyte arch=linux-rocky9-broadwell
+
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/libsigsegv-2.13-mzifoplqptesq44xipsdcl3hh4j455mg
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/berkeley-db-18.1.40-f3in6m2ghwnypyapshdrso3pujuqn5ll
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/libiconv-1.16-yzeufvlscix43nlwc4xmjvoioyd3u676
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/pkgconf-1.8.0-brrsknt2h7ikyec6hwcmkxkpkaw5rbr3
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/zlib-1.2.11-d5vrjbqy4clsgux2z3psmh5fp7j2viis
+[+] /usr (external openssl-3.0.7-ifgpx3ow5hg4g2ehfqrxnyzxoxaybzvg)
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/libmd-1.0.3-fqev3cg2ff3umpwvwlhmn6v4sh2wj6l2
+==> Installing xz-5.2.5-rotpn7w4uuzt4mjxqn7ldluss22gwlty
+==> No binary for xz-5.2.5-rotpn7w4uuzt4mjxqn7ldluss22gwlty found: installing from source
+==> Using cached archive: /cm/shared/apps/spack/0.17.3/gpu/var/spack/cache/_source-cache/archive/51/5117f930900b341493827d63aa910ff5e011e0b994197c3b71c08a20228a42df.tar.bz2
+==> No patches needed for xz
+==> xz: Executing phase: 'autoreconf'
+==> xz: Executing phase: 'configure'
+==> xz: Executing phase: 'build'
+==> xz: Executing phase: 'install'
+==> xz: Successfully installed xz-5.2.5-rotpn7w4uuzt4mjxqn7ldluss22gwlty
+  Fetch: 0.01s.  Build: 16.61s.  Total: 16.62s.
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/xz-5.2.5-rotpn7w4uuzt4mjxqn7ldluss22gwlty
+==> Installing pcre2-10.36-qnnxihvvmy2qdsfsykyjy6op35kx4cbp
+==> No binary for pcre2-10.36-qnnxihvvmy2qdsfsykyjy6op35kx4cbp found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/a9/a9ef39278113542968c7c73a31cfcb81aca1faa64690f400b907e8ab6b4a665c.tar.bz2
+==> No patches needed for pcre2
+==> pcre2: Executing phase: 'autoreconf'
+==> pcre2: Executing phase: 'configure'
+==> pcre2: Executing phase: 'build'
+==> pcre2: Executing phase: 'install'
+==> pcre2: Successfully installed pcre2-10.36-qnnxihvvmy2qdsfsykyjy6op35kx4cbp
+  Fetch: 0.30s.  Build: 22.26s.  Total: 22.56s.
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/pcre2-10.36-qnnxihvvmy2qdsfsykyjy6op35kx4cbp
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/m4-1.4.19-2mlzkeqummad3ihsqqfj3jzwestvunml
+==> Installing tar-1.34-eaokit366edr7j4blglbgcc4ioo2m5zc
+==> No binary for tar-1.34-eaokit366edr7j4blglbgcc4ioo2m5zc found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/03/03d908cf5768cfe6b7ad588c921c6ed21acabfb2b79b788d1330453507647aed.tar.gz
+==> No patches needed for tar
+==> tar: Executing phase: 'autoreconf'
+==> tar: Executing phase: 'configure'
+==> tar: Executing phase: 'build'
+==> tar: Executing phase: 'install'
+==> tar: Successfully installed tar-1.34-eaokit366edr7j4blglbgcc4ioo2m5zc
+  Fetch: 0.19s.  Build: 41.50s.  Total: 41.69s.
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/tar-1.34-eaokit366edr7j4blglbgcc4ioo2m5zc
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/diffutils-3.8-w3vyxd4ime4yigetvwpvzjvchys5ukpv
+==> Installing libunistring-0.9.10-bou4chzm3xa5i5dlsqod75gnfjpbdfu5
+==> No binary for libunistring-0.9.10-bou4chzm3xa5i5dlsqod75gnfjpbdfu5 found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/eb/eb8fb2c3e4b6e2d336608377050892b54c3c983b646c561836550863003c05d7.tar.xz
+==> Ran patch() for libunistring
+==> libunistring: Executing phase: 'autoreconf'
+==> libunistring: Executing phase: 'configure'
+==> libunistring: Executing phase: 'build'
+==> libunistring: Executing phase: 'install'
+==> libunistring: Successfully installed libunistring-0.9.10-bou4chzm3xa5i5dlsqod75gnfjpbdfu5
+  Fetch: 0.31s.  Build: 1m 33.61s.  Total: 1m 33.91s.
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/libunistring-0.9.10-bou4chzm3xa5i5dlsqod75gnfjpbdfu5
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/ncurses-6.2-fayqttluo4h2rfasxamwg5docu24nwzf
+==> Installing curl-7.79.0-ymzncmpouf6fe2urygj5mj4azzudtwxn
+==> No binary for curl-7.79.0-ymzncmpouf6fe2urygj5mj4azzudtwxn found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/d6/d607a677f473f79f96c964100327125a6204a39d835dc00dab7fc0129b959f42.tar.bz2
+==> No patches needed for curl
+==> curl: Executing phase: 'autoreconf'
+==> curl: Executing phase: 'configure'
+==> curl: Executing phase: 'build'
+==> curl: Executing phase: 'install'
+==> curl: Successfully installed curl-7.79.0-ymzncmpouf6fe2urygj5mj4azzudtwxn
+  Fetch: 0.32s.  Build: 1m 5.74s.  Total: 1m 6.06s.
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/curl-7.79.0-ymzncmpouf6fe2urygj5mj4azzudtwxn
+==> Installing libbsd-0.11.3-zivzyhv6wlgo6bnwwdaqsph3phbmkp4w
+==> No binary for libbsd-0.11.3-zivzyhv6wlgo6bnwwdaqsph3phbmkp4w found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/ff/ff95cf8184151dacae4247832f8d4ea8800fa127dbd15033ecfe839f285b42a1.tar.xz
+==> Ran patch() for libbsd
+==> libbsd: Executing phase: 'autoreconf'
+==> libbsd: Executing phase: 'configure'
+==> libbsd: Executing phase: 'build'
+==> libbsd: Executing phase: 'install'
+==> libbsd: Successfully installed libbsd-0.11.3-zivzyhv6wlgo6bnwwdaqsph3phbmkp4w
+  Fetch: 0.29s.  Build: 27.16s.  Total: 27.45s.
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/libbsd-0.11.3-zivzyhv6wlgo6bnwwdaqsph3phbmkp4w
+==> Installing libxml2-2.9.12-6bz5pvyxcdxj5ea6p6p3udcc6gnqdrxz
+==> No binary for libxml2-2.9.12-6bz5pvyxcdxj5ea6p6p3udcc6gnqdrxz found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/c8/c8d6681e38c56f172892c85ddc0852e1fd4b53b4209e7f4ebf17f7e2eae71d92.tar.gz
+==> Fetching https://mirror.spack.io/_source-cache/archive/96/96151685cec997e1f9f3387e3626d61e6284d4d6e66e0e440c209286c03e9cc7.tar.gz
+==> Moving resource stage
+	source: /tmp/jpg/spack-stage/resource-xmlts-6bz5pvyxcdxj5ea6p6p3udcc6gnqdrxz/spack-src/
+	destination: /tmp/jpg/spack-stage/spack-stage-libxml2-2.9.12-6bz5pvyxcdxj5ea6p6p3udcc6gnqdrxz/spack-src/xmlconf
+==> Ran patch() for libxml2
+==> libxml2: Executing phase: 'autoreconf'
+==> libxml2: Executing phase: 'configure'
+==> libxml2: Executing phase: 'build'
+==> libxml2: Executing phase: 'install'
+==> libxml2: Successfully installed libxml2-2.9.12-6bz5pvyxcdxj5ea6p6p3udcc6gnqdrxz
+  Fetch: 0.49s.  Build: 37.49s.  Total: 37.98s.
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/libxml2-2.9.12-6bz5pvyxcdxj5ea6p6p3udcc6gnqdrxz
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/libtool-2.4.6-2msbgh7gepy7v5gtamlhe6tf3t4gs34t
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/bzip2-1.0.8-56oqmm45hdi3vwrd54m3cypjj7nqg2wi
+==> Installing libidn2-2.3.0-4eklg3bmvk4lknpzvsjetsjq6a24zkib
+==> No binary for libidn2-2.3.0-4eklg3bmvk4lknpzvsjetsjq6a24zkib found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/e1/e1cb1db3d2e249a6a3eb6f0946777c2e892d5c5dc7bd91c74394fc3a01cab8b5.tar.gz
+==> No patches needed for libidn2
+==> libidn2: Executing phase: 'autoreconf'
+==> libidn2: Executing phase: 'configure'
+==> libidn2: Executing phase: 'build'
+==> libidn2: Executing phase: 'install'
+==> libidn2: Successfully installed libidn2-2.3.0-4eklg3bmvk4lknpzvsjetsjq6a24zkib
+  Fetch: 0.31s.  Build: 24.30s.  Total: 24.62s.
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/libidn2-2.3.0-4eklg3bmvk4lknpzvsjetsjq6a24zkib
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/readline-8.1-i2k7fjgcv5zlb3hdxngik3rdxx7bixpi
+==> Installing libedit-3.1-20210216-xh7meocurivhxnwch6kqn7wku2qnbzji
+==> No binary for libedit-3.1-20210216-xh7meocurivhxnwch6kqn7wku2qnbzji found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/22/2283f741d2aab935c8c52c04b57bf952d02c2c02e651172f8ac811f77b1fc77a.tar.gz
+==> No patches needed for libedit
+==> libedit: Executing phase: 'autoreconf'
+==> libedit: Executing phase: 'configure'
+==> libedit: Executing phase: 'build'
+==> libedit: Executing phase: 'install'
+==> libedit: Successfully installed libedit-3.1-20210216-xh7meocurivhxnwch6kqn7wku2qnbzji
+  Fetch: 0.16s.  Build: 11.56s.  Total: 11.72s.
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/libedit-3.1-20210216-xh7meocurivhxnwch6kqn7wku2qnbzji
+==> Installing expat-2.4.1-wcrbdsj3pmmu6onnypn6uhw3c4tvohx6
+==> No binary for expat-2.4.1-wcrbdsj3pmmu6onnypn6uhw3c4tvohx6 found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/2f/2f9b6a580b94577b150a7d5617ad4643a4301a6616ff459307df3e225bcfbf40.tar.bz2
+==> No patches needed for expat
+==> expat: Executing phase: 'autoreconf'
+==> expat: Executing phase: 'configure'
+==> expat: Executing phase: 'build'
+==> expat: Executing phase: 'install'
+==> expat: Successfully installed expat-2.4.1-wcrbdsj3pmmu6onnypn6uhw3c4tvohx6
+  Fetch: 0.29s.  Build: 12.54s.  Total: 12.83s.
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/expat-2.4.1-wcrbdsj3pmmu6onnypn6uhw3c4tvohx6
+==> Installing gettext-0.21-f6hx3qar5z6yxvnjo6p5hxkoaz4y3eho
+==> No binary for gettext-0.21-f6hx3qar5z6yxvnjo6p5hxkoaz4y3eho found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/d2/d20fcbb537e02dcf1383197ba05bd0734ef7bf5db06bdb241eb69b7d16b73192.tar.xz
+==> No patches needed for gettext
+==> gettext: Executing phase: 'autoreconf'
+==> gettext: Executing phase: 'configure'
+==> gettext: Executing phase: 'build'
+==> gettext: Executing phase: 'install'
+==> gettext: Successfully installed gettext-0.21-f6hx3qar5z6yxvnjo6p5hxkoaz4y3eho
+  Fetch: 0.23s.  Build: 6m 12.05s.  Total: 6m 12.28s.
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gettext-0.21-f6hx3qar5z6yxvnjo6p5hxkoaz4y3eho
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gdbm-1.19-3rjkkrccvniiuc7cejvztox4cznl3btc
+==> Installing openssh-8.7p1-wrvb6jsf5yr77b6fk4f4tnffh7tfokqp
+==> No binary for openssh-8.7p1-wrvb6jsf5yr77b6fk4f4tnffh7tfokqp found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/7c/7ca34b8bb24ae9e50f33792b7091b3841d7e1b440ff57bc9fabddf01e2ed1e24.tar.gz
+==> No patches needed for openssh
+==> openssh: Executing phase: 'autoreconf'
+==> openssh: Executing phase: 'configure'
+==> openssh: Executing phase: 'build'
+==> openssh: Executing phase: 'install'
+==> openssh: Successfully installed openssh-8.7p1-wrvb6jsf5yr77b6fk4f4tnffh7tfokqp
+  Fetch: 0.30s.  Build: 47.93s.  Total: 48.23s.
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/openssh-8.7p1-wrvb6jsf5yr77b6fk4f4tnffh7tfokqp
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/perl-5.32.0-rccpzkghuimsnenzicj4fw33jyyksymr
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/autoconf-2.69-z7rcq4yuuuyvzqs47r7tqo6e2zmpf6as
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/automake-1.16.3-62sxpeywjjg3dy2ad626jrrsmqcqv7dd
+==> Installing git-2.31.1-7yli2t2x3ovwyy2mdzx64gqwm4oukzlv
+==> No binary for git-2.31.1-7yli2t2x3ovwyy2mdzx64gqwm4oukzlv found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/46/46d37c229e9d786510e0c53b60065704ce92d5aedc16f2c5111e3ed35093bfa7.tar.gz
+==> Fetching https://mirror.spack.io/_source-cache/archive/d3/d330498aaaea6928b0abbbbb896f6f605efd8d35f23cbbb2de38c87a737d4543.tar.gz
+==> Moving resource stage
+	source: /tmp/jpg/spack-stage/resource-git-manpages-7yli2t2x3ovwyy2mdzx64gqwm4oukzlv/spack-src/
+	destination: /tmp/jpg/spack-stage/spack-stage-git-2.31.1-7yli2t2x3ovwyy2mdzx64gqwm4oukzlv/spack-src/git-manpages
+==> Ran patch() for git
+==> git: Executing phase: 'autoreconf'
+==> git: Executing phase: 'configure'
+==> git: Executing phase: 'build'
+==> git: Executing phase: 'install'
+==> git: Successfully installed git-2.31.1-7yli2t2x3ovwyy2mdzx64gqwm4oukzlv
+  Fetch: 0.66s.  Build: 1m 2.08s.  Total: 1m 2.75s.
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/git-2.31.1-7yli2t2x3ovwyy2mdzx64gqwm4oukzlv
+real 940.50
+user 921.69
+sys 287.78
+==> Regenerating lmod module files
+Submitted batch job 2887
