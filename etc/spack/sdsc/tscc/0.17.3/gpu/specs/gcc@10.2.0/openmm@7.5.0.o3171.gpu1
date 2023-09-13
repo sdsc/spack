@@ -1,0 +1,1729 @@
+1687915664 3171 c03f563a48aeb8ac23f71e399baf4e0d  /cm/shared/apps/spack/0.17.3/cpu/etc/spack/sdsc/tscc/0.17.3/gpu/specs/gcc@10.2.0/openmm@7.5.0.sh afterok:3170
+
+#!/usr/bin/env bash
+
+#SBATCH --job-name=openmm@7.5.0
+#SBATCH --account=sys200
+#SBATCH --partition=hotel-gpu
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=1
+#SBATCH --cpus-per-task=8
+#SBATCH -w gpu1
+#SBATCH --time=00:30:00
+#SBATCH --output=%x.o%j.%N
+
+declare -xr LOCAL_TIME="$(date +'%Y%m%dT%H%M%S%z')"
+declare -xir UNIX_TIME="$(date +'%s')"
+
+declare -xr SYSTEM_NAME='tscc'
+
+declare -xr SPACK_VERSION='0.17.3'
+declare -xr SPACK_INSTANCE_NAME='gpu'
+declare -xr SPACK_INSTANCE_DIR="/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}"
+
+declare -xr SLURM_JOB_SCRIPT="$(scontrol show job ${SLURM_JOB_ID} | awk -F= '/Command=/{print $2}')"
+declare -xr SLURM_JOB_MD5SUM="$(md5sum ${SLURM_JOB_SCRIPT})"
+
+declare -xr SCHEDULER_MODULE='slurm'
+declare -xr COMPILER_MODULE='gcc/10.2.0'
+declare -xr CUDA_MODULE='cuda/11.2.2'
+
+echo "${UNIX_TIME} ${SLURM_JOB_ID} ${SLURM_JOB_MD5SUM} ${SLURM_JOB_DEPENDENCY}" 
+echo ""
+
+cat "${SLURM_JOB_SCRIPT}"
+
+module purge
+module load "${SCHEDULER_MODULE}"
+. "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
+module use "${SPACK_ROOT}/share/spack/lmod/linux-rocky8-x86_64/Core"
+module load "${COMPILER_MODULE}"
+module load "${CUDA_MODULE}"
+module list
+
+# 1 error found in build log:
+#     43      cmake_modules/FindOpenCL.cmake:86 (find_package_handle_standard_ar
+#           gs)
+#     44      CMakeLists.txt:338 (FIND_PACKAGE)
+#     45    This warning is for project developers.  Use -Wno-dev to suppress it
+#           .
+#     46    
+#     47    -- Found OPENCL: /home/mkandes/cm/shared/apps/spack/0.17.3/gpu/opt/s
+#           pack/linux-rocky8-cascadelake/gcc-10.2.0/cuda-11.2.2-blza2psofa3wr2z
+#           umqrnh4je2f7ze3mx/lib64/libOpenCL.so
+#     48    -- Configuring done
+#  >> 49    CMake Error: The following variables are used in this project, but t
+#           hey are set to NOTFOUND.
+#     50    Please set them or make sure they are set and tested correctly in th
+#           e CMake files:
+#     51    CUDA_CUDA_LIBRARY (ADVANCED)
+#     52        linked by target "OpenMMCUDA" in directory /tmp/mkandes/spack-st
+#           age/spack-stage-openmm-7.5.0-fjiqzymyngtbtisos5koguvos4c3urjv/spack-
+#           src/platforms/cuda/sharedTarget
+#     53    
+#     54    -- Generating done
+#     55    CMake Generate step failed.  Build files cannot be regenerated corre
+#           ctly.
+#
+# FIX: https://github.com/floydhub/dl-docker/pull/48
+declare -xr CUDA_CUDA_LIBRARY='/cm/local/apps/cuda/libs/current/lib64'
+declare -xr CMAKE_LIBRARY_PATH="${CUDA_CUDA_LIBRARY}"
+
+# /tmp/mkandes/spack-stage/spack-stage-openmm-7.5.0-fjiqzymyngtbtisos5koguvos4c3urjv/spack-build-fjiqzym/wrappers/OpenMMCWrapper.h:389:41: error: conflicting declaration of C function 'OpenMM_StringArray OpenMM_Platform_getPluginLoadFailures()'
+#  389 | extern OPENMM_EXPORT OpenMM_StringArray OpenMM_Platform_getPluginLoadFailures();
+#      |                                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# /tmp/mkandes/spack-stage/spack-stage-openmm-7.5.0-fjiqzymyngtbtisos5koguvos4c3urjv/spack-build-fjiqzym/wrappers/OpenMMCWrapper.h:163:42: note: previous declaration 'OpenMM_StringArray* OpenMM_Platform_getPluginLoadFailures()'
+#  163 | extern OPENMM_EXPORT OpenMM_StringArray* OpenMM_Platform_getPluginLoadFailures();
+#      |                                          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#
+# Fix? https://github.com/openmm/openmm/issues/3656
+declare -xr OPENMM_PLUGIN_DIR='/tmp/mkandes/spack-stage/spack-stage-openmm-7.5.0-fjiqzymyngtbtisos5koguvos4c3urjv/spack-src/plugins'
+
+declare -xr SPACK_PACKAGE='openmm@7.5.0'
+declare -xr SPACK_COMPILER='gcc@10.2.0'
+declare -xr SPACK_VARIANTS='+cuda cuda_arch=60,75,80,86 ~ipo'
+declare -xr SPACK_DEPENDENCIES="^cuda@11.2.2/$(spack find --format '{hash:7}' cuda@11.2.2 % ${SPACK_COMPILER}) ^py-numpy@1.20.3/$(spack find --format '{hash:7}' py-numpy@1.20.3 % ${SPACK_COMPILER}) ^openblas@0.3.17/$(spack find --format '{hash:7}' openblas@0.3.17 % ${SPACK_COMPILER} ~ilp64 threads=none) ^fftw@3.3.10/$(spack find --format '{hash:7}' fftw@3.3.10 % ${SPACK_COMPILER} ~mpi ~openmp)"
+declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
+
+printenv
+
+spack config get compilers  
+spack config get config  
+spack config get mirrors
+spack config get modules
+spack config get packages
+spack config get repos
+spack config get upstreams
+
+spack spec --long --namespaces --types openmm@7.5.0 % gcc@10.2.0 +cuda cuda_arch=60,75,80,86 ~ipo "${SPACK_DEPENDENCIES}"
+if [[ "${?}" -ne 0 ]]; then
+  echo 'ERROR: spack concretization failed.'
+  exit 1
+fi
+
+time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all openmm@7.5.0 % gcc@10.2.0 +cuda cuda_arch=60,75,80,86 ~ipo "${SPACK_DEPENDENCIES}"
+if [[ "${?}" -ne 0 ]]; then
+  echo 'ERROR: spack install failed.'
+  exit 1
+fi
+
+spack module lmod refresh --delete-tree -y
+
+#sbatch --dependency="afterok:${SLURM_JOB_ID}" ''
+
+sleep 20
+Lmod has detected the following error: The following module(s) are unknown:
+"gcc/10.2.0"
+
+Please check the spelling or version number. Also try "module spider ..."
+It is also possible your cache file is out-of-date; it may help to try:
+  $ module --ignore_cache load "gcc/10.2.0"
+
+Also make sure that all modulefiles written in TCL start with the string
+#%Module
+
+
+
+Lmod has detected the following error: The following module(s) are unknown:
+"cuda/11.2.2"
+
+Please check the spelling or version number. Also try "module spider ..."
+It is also possible your cache file is out-of-date; it may help to try:
+  $ module --ignore_cache load "cuda/11.2.2"
+
+Also make sure that all modulefiles written in TCL start with the string
+#%Module
+
+
+
+
+Currently Loaded Modules:
+  1) slurm/slurm/22.05.9
+
+ 
+
+SHELL=/bin/bash
+SLURM_JOB_USER=jpg
+SLURM_TASKS_PER_NODE=1
+SLURM_JOB_UID=422
+HISTCONTROL=ignoredups
+SLURM_JOB_MD5SUM=c03f563a48aeb8ac23f71e399baf4e0d  /cm/shared/apps/spack/0.17.3/cpu/etc/spack/sdsc/tscc/0.17.3/gpu/specs/gcc@10.2.0/openmm@7.5.0.sh
+SLURM_TASK_PID=1309809
+LMOD_arch=x86_64
+SLURM_LOCALID=0
+SLURM_SUBMIT_DIR=/cm/shared/apps/spack/0.17.3/cpu/etc/spack/sdsc/tscc/0.17.3/gpu/specs/gcc@10.2.0
+HISTSIZE=1000
+HOSTNAME=gpu1
+SLURMD_NODENAME=gpu1
+FPATH=/usr/share/lmod/lmod/init/ksh_funcs
+_ModuleTable002_=L2dwdS9zaGFyZS9zcGFjay9sbW9kL2xpbnV4LXJvY2t5OC14ODZfNjQvQ29yZSIsIi9jbS9zaGFyZWQvbW9kdWxlZmlsZXMiLCIvY20vbG9jYWwvbW9kdWxlZmlsZXMiLCIvZXRjL21vZHVsZWZpbGVzIiwiL3Vzci9zaGFyZS9tb2R1bGVmaWxlcyIsIi91c3Ivc2hhcmUvTW9kdWxlcy9tb2R1bGVmaWxlcyIsfSxbInN5c3RlbUJhc2VNUEFUSCJdPSIvY20vbG9jYWwvbW9kdWxlZmlsZXM6L2NtL3NoYXJlZC9tb2R1bGVmaWxlczovZXRjL21vZHVsZWZpbGVzOi91c3Ivc2hhcmUvbW9kdWxlZmlsZXM6L3Vzci9zaGFyZS9Nb2R1bGVzL21vZHVsZWZpbGVzIix9
+SPACK_LD_LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:/cm/shared/apps/slurm/current/lib64
+__LMOD_REF_COUNT_MODULEPATH=/cm/shared/apps/spack/0.17.3/gpu/share/spack/lmod/linux-rocky8-x86_64/Core:1;/cm/shared/modulefiles:2;/cm/local/modulefiles:1;/etc/modulefiles:1;/usr/share/modulefiles:1;/usr/share/Modules/modulefiles:1
+SLURM_NODE_ALIASES=(null)
+SLURM_CLUSTER_NAME=slurm
+SLURM_JOB_SCRIPT=/cm/shared/apps/spack/0.17.3/cpu/etc/spack/sdsc/tscc/0.17.3/gpu/specs/gcc@10.2.0/openmm@7.5.0.sh
+COMPILER_MODULE=gcc/10.2.0
+SLURM_CPUS_ON_NODE=8
+SPACK_INSTANCE_NAME=gpu
+SCHEDULER_MODULE=slurm
+__LMOD_REF_COUNT__LMFILES_=/cm/local/modulefiles/slurm/slurm/22.05.9:1
+SLURM_JOB_CPUS_PER_NODE=8
+SPACK_VARIANTS=+cuda cuda_arch=60,75,80,86 ~ipo
+LMOD_DIR=/usr/share/lmod/lmod/libexec
+SPACK_DEPENDENCIES=^cuda@11.2.2/ptou5u3 ^py-numpy@1.20.3/56wtshk ^openblas@0.3.17/xmdkrna ^fftw@3.3.10/ej2lqo7
+PWD=/home/jpg/specs_gpu_0.17.3/gcc@10.2.0
+SLURM_GTIDS=0
+LOGNAME=jpg
+XDG_SESSION_TYPE=tty
+SLURM_JOB_PARTITION=hotel-gpu
+MODULESHOME=/usr/share/lmod/lmod
+MANPATH=/cm/shared/apps/slurm/current/man:/usr/share/lmod/lmod/share/man:/usr/local/share/man:/usr/share/man:/cm/local/apps/environment-modules/current/share/man
+LMOD_PREPEND_BLOCK=normal
+SLURM_JOB_NUM_NODES=1
+OPENMM_PLUGIN_DIR=/tmp/mkandes/spack-stage/spack-stage-openmm-7.5.0-fjiqzymyngtbtisos5koguvos4c3urjv/spack-src/plugins
+SPACK_INSTANCE_DIR=/cm/shared/apps/spack/0.17.3/gpu
+SPACK_PYTHON=/usr/bin/python3
+SLURM_JOBID=3171
+SLURM_JOB_QOS=normal
+MOTD_SHOWN=pam
+CUDA_CUDA_LIBRARY=/cm/local/apps/cuda/libs/current/lib64
+__LMOD_REF_COUNT_PATH=/cm/shared/apps/slurm/current/sbin:1;/cm/shared/apps/slurm/current/bin:1;/cm/shared/apps/spack/0.17.3/gpu/bin:1;/home/jpg/usr/bin:2;/home/jpg/bin:3;/home/jpg/.local/bin:1;/usr/local/bin:1;/usr/bin:1;/usr/local/sbin:1;/usr/sbin:1
+HOME=/home/jpg
+_ModuleTable_Sz_=2
+__LMOD_REF_COUNT_LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:1;/cm/shared/apps/slurm/current/lib64:1
+LANG=en_US.UTF-8
+SLURM_JOB_DEPENDENCY=afterok:3170
+__LMOD_REF_COUNT_LOADEDMODULES=slurm/slurm/22.05.9:1
+LS_COLORS=rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=01;37;41:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=01;36:*.au=01;36:*.flac=01;36:*.m4a=01;36:*.mid=01;36:*.midi=01;36:*.mka=01;36:*.mp3=01;36:*.mpc=01;36:*.ogg=01;36:*.ra=01;36:*.wav=01;36:*.oga=01;36:*.opus=01;36:*.spx=01;36:*.xspf=01;36:
+SLURM_PROCID=0
+__LMOD_REF_COUNT_CPATH=/cm/shared/apps/slurm/current/include:1
+LMOD_SETTARG_FULL_SUPPORT=no
+SPACK_COMPILER=gcc@10.2.0
+TMPDIR=/tmp
+SLURM_CPUS_PER_TASK=8
+SLURM_NTASKS=1
+SLURM_TOPOLOGY_ADDR=gpu1
+LMOD_VERSION=8.5
+SSH_CONNECTION=70.95.82.22 51468 132.249.107.93 22
+SPACK_ROOT=/cm/shared/apps/spack/0.17.3/gpu
+_ModuleTable003_=XT0iZ3B1IixbIndWIl09IjAwMDAwMDAwMC4wMDAwMDAwMTcuMDAwMDAwMDAzLip6ZmluYWwiLH0sc2RzYz17WyJmbiJdPSIvY20vc2hhcmVkL21vZHVsZWZpbGVzL3Nkc2MvMS4wLmx1YSIsWyJmdWxsTmFtZSJdPSJzZHNjLzEuMCIsWyJsb2FkT3JkZXIiXT0yLHByb3BUPXt9LFsic3RhY2tEZXB0aCJdPTEsWyJzdGF0dXMiXT0iYWN0aXZlIixbInVzZXJOYW1lIl09InNkc2MiLFsid1YiXT0iMDAwMDAwMDAxLip6ZmluYWwiLH0sc2hhcmVkPXtbImZuIl09Ii9jbS9sb2NhbC9tb2R1bGVmaWxlcy9zaGFyZWQiLFsiZnVsbE5hbWUiXT0ic2hhcmVkIixbImxvYWRPcmRlciJdPTEscHJvcFQ9e30sWyJzdGFja0RlcHRoIl09MSxbInN0YXR1cyJdPSJhY3RpdmUiLFsidXNlck5hbWUi
+MODULEPATH_ROOT=/usr/share/modulefiles
+SLURM_TOPOLOGY_ADDR_PATTERN=node
+XDG_SESSION_CLASS=user
+LMOD_PKG=/usr/share/lmod/lmod
+SLURM_WORKING_CLUSTER=slurm:mgr2:6817:9728:109
+TERM=xterm-256color
+LESSOPEN=||/usr/bin/lesspipe.sh %s
+USER=jpg
+LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:/cm/shared/apps/slurm/current/lib64
+SLURM_NODELIST=gpu1
+ENVIRONMENT=BATCH
+LOADEDMODULES=slurm/slurm/22.05.9
+SPACK_SPEC=openmm@7.5.0 % gcc@10.2.0 +cuda cuda_arch=60,75,80,86 ~ipo ^cuda@11.2.2/ptou5u3 ^py-numpy@1.20.3/56wtshk ^openblas@0.3.17/xmdkrna ^fftw@3.3.10/ej2lqo7
+SLURM_JOB_ACCOUNT=sys200
+SLURM_PRIO_PROCESS=0
+SLURM_NPROCS=1
+LMOD_ROOT=/usr/share/lmod
+LMOD_SETTARG_CMD=:
+SHLVL=7
+SLURM_NNODES=1
+BASH_ENV=/usr/share/lmod/lmod/init/bash
+LMOD_FULL_SETTARG_SUPPORT=no
+CUDA_MODULE=cuda/11.2.2
+LMOD_sys=Linux
+__LMOD_REF_COUNT_MANPATH=/cm/shared/apps/slurm/current/man:1;/usr/share/lmod/lmod/share/man:1;/usr/local/share/man:1;/usr/share/man:1;/cm/local/apps/environment-modules/current/share/man:1
+XDG_SESSION_ID=90890
+SLURM_SUBMIT_HOST=gpu1
+__LMOD_SET_FPATH=1
+_ModuleTable001_=X01vZHVsZVRhYmxlXz17WyJNVHZlcnNpb24iXT0zLFsiY19yZWJ1aWxkVGltZSJdPTcyMDAuMCxbImNfc2hvcnRUaW1lIl09MC41MTcwMzcxNTMyNDQwMixkZXB0aFQ9e30sZmFtaWx5PXt9LG1UPXtzbHVybT17WyJmbiJdPSIvY20vbG9jYWwvbW9kdWxlZmlsZXMvc2x1cm0vc2x1cm0vMjIuMDUuOSIsWyJmdWxsTmFtZSJdPSJzbHVybS9zbHVybS8yMi4wNS45IixbImxvYWRPcmRlciJdPTEscHJvcFQ9e30sWyJzdGFja0RlcHRoIl09MCxbInN0YXR1cyJdPSJhY3RpdmUiLFsidXNlck5hbWUiXT0ic2x1cm0iLFsid1YiXT0iKnNsdXJtLzAwMDAwMDAyMi4wMDAwMDAwMDUuMDAwMDAwMDA5Lip6ZmluYWwiLH0sfSxtcGF0aEE9eyIvY20vc2hhcmVkL2FwcHMvc3BhY2svMC4xNy4z
+SPACK_PACKAGE=openmm@7.5.0
+LD_LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:/cm/shared/apps/slurm/current/lib64
+LMOD_COLORIZE=yes
+XDG_RUNTIME_DIR=/run/user/422
+SLURM_JOB_ID=3171
+SLURM_NODEID=0
+S_COLORS=auto
+SSH_CLIENT=70.95.82.22 51468 22
+DEBUGINFOD_URLS=https://debuginfod.centos.org/ 
+CMD_WLM_CLUSTER_NAME=slurm
+ENABLE_LMOD=1
+which_declare=declare -f
+UNIX_TIME=1687915664
+__Init_Default_Modules=1
+SLURM_CONF=/cm/shared/apps/slurm/var/etc/slurm/slurm.conf
+PATH=/cm/shared/apps/slurm/current/sbin:/cm/shared/apps/slurm/current/bin:/cm/shared/apps/spack/0.17.3/gpu/bin:/home/jpg/usr/bin:/home/jpg/bin:/home/jpg/.local/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin
+SLURM_JOB_NAME=openmm@7.5.0
+LOCAL_TIME=20230627T182744-0700
+MODULEPATH=/cm/shared/apps/spack/0.17.3/gpu/share/spack/lmod/linux-rocky8-x86_64/Core:/cm/shared/modulefiles:/cm/local/modulefiles:/etc/modulefiles:/usr/share/modulefiles:/usr/share/Modules/modulefiles
+SLURM_NTASKS_PER_NODE=1
+_LMFILES_=/cm/local/modulefiles/slurm/slurm/22.05.9
+DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/422/bus
+SYSTEM_NAME=tscc
+LMOD_CMD=/usr/share/lmod/lmod/libexec/lmod
+MAIL=/var/spool/mail/jpg
+SSH_TTY=/dev/pts/0
+__LMOD_REF_COUNT_LD_LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:1;/cm/shared/apps/slurm/current/lib64:1
+LMOD_SYSTEM_DEFAULT_MODULES=DefaultModules
+SLURM_JOB_GID=7193
+CPATH=/cm/shared/apps/slurm/current/include
+SPACK_VERSION=0.17.3
+OLDPWD=/home/jpg/specs_gpu_0.17.3/gcc@10.2.0/openmpi@4.1.3
+CMAKE_LIBRARY_PATH=/cm/local/apps/cuda/libs/current/lib64
+SLURM_JOB_NODELIST=gpu1
+BASH_FUNC_ml%%=() {  eval $($LMOD_DIR/ml_cmd "$@")
+}
+BASH_FUNC_which%%=() {  ( alias;
+ eval ${which_declare} ) | /usr/bin/which --tty-only --read-alias --read-functions --show-tilde --show-dot $@
+}
+BASH_FUNC_module%%=() {  eval $($LMOD_CMD bash "$@") && eval $(${LMOD_SETTARG_CMD:-:} -s sh)
+}
+BASH_FUNC__spack_shell_wrapper%%=() {  for var in LD_LIBRARY_PATH DYLD_LIBRARY_PATH DYLD_FALLBACK_LIBRARY_PATH;
+ do
+ eval "if [ -n \"\${${var}-}\" ]; then export SPACK_$var=\${${var}}; fi";
+ done;
+ if [ -n "${ZSH_VERSION:-}" ]; then
+ emulate -L sh;
+ fi;
+ _sp_flags="";
+ while [ ! -z ${1+x} ] && [ "${1#-}" != "${1}" ]; do
+ _sp_flags="$_sp_flags $1";
+ shift;
+ done;
+ if [ -n "$_sp_flags" ] && [ "${_sp_flags#*h}" != "${_sp_flags}" ] || [ "${_sp_flags#*V}" != "${_sp_flags}" ]; then
+ command spack $_sp_flags "$@";
+ return;
+ fi;
+ _sp_subcommand="";
+ if [ ! -z ${1+x} ]; then
+ _sp_subcommand="$1";
+ shift;
+ fi;
+ case $_sp_subcommand in 
+ "cd")
+ _sp_arg="";
+ if [ -n "$1" ]; then
+ _sp_arg="$1";
+ shift;
+ fi;
+ if [ "$_sp_arg" = "-h" ] || [ "$_sp_arg" = "--help" ]; then
+ command spack cd -h;
+ else
+ LOC="$(spack location $_sp_arg "$@")";
+ if [ -d "$LOC" ]; then
+ cd "$LOC";
+ else
+ return 1;
+ fi;
+ fi;
+ return
+ ;;
+ "env")
+ _sp_arg="";
+ if [ -n "$1" ]; then
+ _sp_arg="$1";
+ shift;
+ fi;
+ if [ "$_sp_arg" = "-h" ] || [ "$_sp_arg" = "--help" ]; then
+ command spack env -h;
+ else
+ case $_sp_arg in 
+ activate)
+ _a=" $@";
+ if [ -z ${1+x} ] || [ "${_a#* --sh}" != "$_a" ] || [ "${_a#* --csh}" != "$_a" ] || [ "${_a#* -h}" != "$_a" ] || [ "${_a#* --help}" != "$_a" ]; then
+ command spack env activate "$@";
+ else
+ stdout="$(command spack $_sp_flags env activate --sh "$@")" || return;
+ eval "$stdout";
+ fi
+ ;;
+ deactivate)
+ _a=" $@";
+ if [ "${_a#* --sh}" != "$_a" ] || [ "${_a#* --csh}" != "$_a" ]; then
+ command spack env deactivate "$@";
+ else
+ if [ -n "$*" ]; then
+ command spack env deactivate -h;
+ else
+ stdout="$(command spack $_sp_flags env deactivate --sh)" || return;
+ eval "$stdout";
+ fi;
+ fi
+ ;;
+ *)
+ command spack env $_sp_arg "$@"
+ ;;
+ esac;
+ fi;
+ return
+ ;;
+ "load" | "unload")
+ _a=" $@";
+ if [ "${_a#* --sh}" != "$_a" ] || [ "${_a#* --csh}" != "$_a" ] || [ "${_a#* -h}" != "$_a" ] || [ "${_a#* --list}" != "$_a" ] || [ "${_a#* --help}" != "$_a" ]; then
+ command spack $_sp_flags $_sp_subcommand "$@";
+ else
+ stdout="$(command spack $_sp_flags $_sp_subcommand --sh "$@")" || return;
+ eval "$stdout";
+ fi
+ ;;
+ *)
+ command spack $_sp_flags $_sp_subcommand "$@"
+ ;;
+ esac
+}
+BASH_FUNC_spack%%=() {  : this is a shell function from: /cm/shared/apps/spack/0.17.3/gpu/share/spack/setup-env.sh;
+ : the real spack script is here: /cm/shared/apps/spack/0.17.3/gpu/bin/spack;
+ _spack_shell_wrapper "$@";
+ return $?
+}
+_=/usr/bin/printenv
+compilers:
+- compiler:
+    spec: gcc@11.3.1
+    paths:
+      cc: /usr/bin/gcc
+      cxx: /usr/bin/g++
+      f77: /usr/bin/gfortran
+      fc: /usr/bin/gfortran
+    flags: {}
+    operating_system: rocky9
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+- compiler:
+    spec: gcc@11.2.0
+    paths:
+      cc: /usr/bin/gcc
+      cxx: /usr/bin/g++
+      f77: /usr/bin/gfortran
+      fc: /usr/bin/gfortran
+    flags:
+      cflags: -O2 -march=native
+      cxxflags: -O2 -march=native
+      fflags: -O2 -march=native
+    operating_system: rocky9
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+- compiler:
+    spec: intel@19.1.1.217
+    paths:
+      cc: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/intel-19.1.1.217-7fcjggodrui3okoovfgtjf6gl5nf6nlv/bin/icc
+      cxx: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/intel-19.1.1.217-7fcjggodrui3okoovfgtjf6gl5nf6nlv/bin/icpc
+      f77: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/intel-19.1.1.217-7fcjggodrui3okoovfgtjf6gl5nf6nlv/bin/ifort
+      fc: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/intel-19.1.1.217-7fcjggodrui3okoovfgtjf6gl5nf6nlv/bin/ifort
+    flags:
+      cflags: -gcc-name=/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-8.5.0-mf5bqu2cwyzoxa5c7btqbbdxng3whbmf/bin/gcc
+      cxxflags: -gcc-name=/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-8.5.0-mf5bqu2cwyzoxa5c7btqbbdxng3whbmf/bin/gcc
+      fflags: -gcc-name=/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-8.5.0-mf5bqu2cwyzoxa5c7btqbbdxng3whbmf/bin/gcc
+    operating_system: rocky9
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+- compiler:
+    spec: gcc@10.2.0
+    paths:
+      cc: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-10.2.0-mqbpsxf6a5jhxi4vlwdtfyqe7q3yjgse/bin/gcc
+      cxx: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-10.2.0-mqbpsxf6a5jhxi4vlwdtfyqe7q3yjgse/bin/g++
+      f77: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-10.2.0-mqbpsxf6a5jhxi4vlwdtfyqe7q3yjgse/bin/gfortran
+      fc: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-10.2.0-mqbpsxf6a5jhxi4vlwdtfyqe7q3yjgse/bin/gfortran
+    flags: {}
+    operating_system: rocky9
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+- compiler:
+    spec: gcc@9.2.0
+    paths:
+      cc: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-9.2.0-nx6afhcfe2pccw7nla4fjmvdqvbhieh6/bin/gcc
+      cxx: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-9.2.0-nx6afhcfe2pccw7nla4fjmvdqvbhieh6/bin/g++
+      f77: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-9.2.0-nx6afhcfe2pccw7nla4fjmvdqvbhieh6/bin/gfortran
+      fc: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-9.2.0-nx6afhcfe2pccw7nla4fjmvdqvbhieh6/bin/gfortran
+    flags: {}
+    operating_system: rocky9
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+- compiler:
+    spec: gcc@8.5.0
+    paths:
+      cc: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-8.5.0-mf5bqu2cwyzoxa5c7btqbbdxng3whbmf/bin/gcc
+      cxx: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-8.5.0-mf5bqu2cwyzoxa5c7btqbbdxng3whbmf/bin/g++
+      f77: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-8.5.0-mf5bqu2cwyzoxa5c7btqbbdxng3whbmf/bin/gfortran
+      fc: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-8.5.0-mf5bqu2cwyzoxa5c7btqbbdxng3whbmf/bin/gfortran
+    flags: {}
+    operating_system: rocky9
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+- compiler:
+    spec: nvhpc@22.1
+    paths:
+      cc: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/nvhpc-22.1-rsks4ptuwyfjjxigybva7k53ihgacw3y/Linux_x86_64/22.1/compilers/bin/nvc
+      cxx: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/nvhpc-22.1-rsks4ptuwyfjjxigybva7k53ihgacw3y/Linux_x86_64/22.1/compilers/bin/nvc++
+      f77: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/nvhpc-22.1-rsks4ptuwyfjjxigybva7k53ihgacw3y/Linux_x86_64/22.1/compilers/bin/nvfortran
+      fc: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/nvhpc-22.1-rsks4ptuwyfjjxigybva7k53ihgacw3y/Linux_x86_64/22.1/compilers/bin/nvfortran
+    flags: {}
+    operating_system: rocky9
+    target: x86_64
+    modules: [nvhpc/22.1]
+    environment: {}
+    extra_rpaths: []
+config:
+  install_tree:
+    root: $spack/opt/spack
+    projections:
+      all: ${ARCHITECTURE}/${COMPILERNAME}-${COMPILERVER}/${PACKAGE}-${VERSION}-${HASH}
+  template_dirs:
+  - $spack/share/spack/templates
+
+  # Temporary locations Spack can try to use for builds.
+  #
+  # Recommended options are given below.
+  #
+  # Builds can be faster in temporary directories on some (e.g., HPC) systems.
+  # Specifying `$tempdir` will ensure use of the default temporary directory
+  # (i.e., ``$TMP` or ``$TMPDIR``).
+  #
+  # Another option that prevents conflicts and potential permission issues is
+  # to specify `$user_cache_path/stage`, which ensures each user builds in their
+  # home directory.
+  #
+  # A more traditional path uses the value of `$spack/var/spack/stage`, which
+  # builds directly inside Spack's instance without staging them in a
+  # temporary space.  Problems with specifying a path inside a Spack instance
+  # are that it precludes its use as a system package and its ability to be
+  # pip installable.
+  #
+  # In any case, if the username is not already in the path, Spack will append
+  # the value of `$user` in an attempt to avoid potential conflicts between
+  # users in shared temporary spaces.
+  #
+  # The build stage can be purged with `spack clean --stage` and
+  # `spack clean -a`, so it is important that the specified directory uniquely
+  # identifies Spack staging to avoid accidentally wiping out non-Spack work.
+  build_stage:
+  - $tempdir/$user/spack-stage
+  - $user_cache_path/stage
+  # - $spack/var/spack/stage
+
+  # Directory in which to run tests and store test results.
+  # Tests will be stored in directories named by date/time and package
+  # name/hash.
+  test_stage: $user_cache_path/test
+  source_cache: $spack/var/spack/cache
+  misc_cache: $user_cache_path/cache
+  connect_timeout: 10
+  verify_ssl: true
+  suppress_gpg_warnings: false
+  install_missing_compilers: false
+  checksum: true
+  deprecated: false
+  dirty: false
+  build_language: C
+  locks: true
+  url_fetch_method: urllib
+  ccache: false
+  concretizer: clingo
+  db_lock_timeout: 3
+  package_lock_timeout: null
+  shared_linking: rpath
+  allow_sgid: true
+  terminal_title: false
+  debug: false
+  build_jobs: 16
+mirrors:
+  spack-public: https://mirror.spack.io
+modules:
+  default:
+    'enable:':
+    - lmod
+    lmod:
+      core_compilers:
+      - gcc@11.2.0
+      hierarchy:
+      - mpi
+      hash_length: 7
+      blacklist_implicits: true
+      naming_scheme: '{name}/{version}'
+      projections:
+        all: '{name}/{version}'
+      adol-c:
+        suffixes:
+          +openmp: omp
+      amdblis:
+        suffixes:
+          threads=openmp: omp
+      fftw:
+        suffixes:
+          +openmp: omp
+      hpl:
+        suffixes:
+          +openmp: omp
+      hypre:
+        suffixes:
+          +openmp: omp
+      intel:
+        environment:
+          set:
+            INTEL_LICENSE_FILE: 40000@elprado.sdsc.edu:40100@elprado.sdsc.edu
+      kokkos:
+        suffixes:
+          +openmp: omp
+      intel-mkl:
+        suffixes:
+          threads=openmp: omp
+      openblas:
+        suffixes:
+          threads=openmp: omp
+          +ilp64: ilp64
+      'netlib-scalapack:':
+        suffixes:
+          ^openblas threads=openmp: omp
+      petsc:
+        suffixes:
+          +complex: cmplx
+      slepc:
+        suffixes:
+          ^petsc +complex: cmplx
+      ^python:
+        autoload: direct
+      ^ucx:
+        autoload: direct
+  prefix_inspections:
+    lib:
+    - LD_LIBRARY_PATH
+    lib64:
+    - LD_LIBRARY_PATH
+    bin:
+    - PATH
+    man:
+    - MANPATH
+    share/man:
+    - MANPATH
+    share/aclocal:
+    - ACLOCAL_PATH
+    lib/pkgconfig:
+    - PKG_CONFIG_PATH
+    lib64/pkgconfig:
+    - PKG_CONFIG_PATH
+    share/pkgconfig:
+    - PKG_CONFIG_PATH
+    ? ''
+    : - CMAKE_PREFIX_PATH
+
+  # These are configurations for the module set named "default"
+packages:
+  lustre:
+    externals:
+    - spec: lustre@2.15.2 % gcc@11.2.0 arch=linux-rocky9-broadwell
+      prefix: /usr
+    - spec: lustre@2.15.2 % gcc@10.2.0 arch=linux-rocky9-broadwell
+      prefix: /usr
+    - spec: lustre@2.15.2 % gcc@9.2.0 arch=linux-rocky9-broadwell
+      prefix: /usr
+    - spec: lustre@2.15.2 % gcc@8.5.0 arch=linux-rocky9-broadwell
+      prefix: /usr
+    - spec: lustre@2.15.2 % intel@19.1.1.217 arch=linux-rocky9-broadwell
+      prefix: /usr
+    - spec: lustre@2.15.2 % aocc@3.2.0 arch=linux-rocky9-broadwell
+      prefix: /usr
+    buildable: false
+  texlive:
+    externals:
+    - spec: texive@live % gcc@10.2.0 arch=linux-rocky9-broadwell
+      prefix: /usr
+    - spec: texive@live % gcc@9.2.0 arch=linux-rocky9-broadwell
+      prefix: /usr
+    - spec: texlive@live % intel@19.1.1.217 arch=linux-rocky9-broadwell
+      prefix: /usr
+    buildable: false
+  openmpi:
+    externals:
+    - spec: openmpi@4.0.5 % nvhpc@22.1 arch=linux-rocky9-broadwell
+      prefix: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/nvhpc-22.1-rsks4ptuwyfjjxigybva7k53ihgacw3y/Linux_x86_64/22.1/comm_libs/openmpi4/openmpi-4.0.5
+    buildable: true
+  qd:
+    externals:
+    - spec: qd@2.3.13 % nvhpc@22.1 arch=linux-rocky9-broadwell
+      prefix: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/nvhpc-22.1-rsks4ptuwyfjjxigybva7k53ihgacw3y/Linux_x86_64/22.1/compilers/extras/qd
+    buildable: false
+  openssl:
+    externals:
+    - spec: openssl@3.0.7 % gcc@11.2.0 arch=linux-rocky9-broadwell
+      prefix: /usr
+    - spec: openssl@3.0.7 % gcc@10.2.0 arch=linux-rocky9-broadwell
+      prefix: /usr
+    - spec: openssl@3.0.7 % gcc@9.2.0 arch=linux-rocky9-broadwell
+      prefix: /usr
+    - spec: openssl@3.0.7 % intel@19.1.1.217 arch=linux-rocky9-broadwell
+      prefix: /usr
+    buildable: false
+  rdma-core:
+    externals:
+    - spec: rdma-core@44.0 % gcc@10.2.0 arch=linux-rocky9-broadwell
+      prefix: /usr
+    - spec: rdma-core@44.0 % gcc@9.2.0 arch=linux-rocky9-broadwell
+      prefix: /usr
+    - spec: rdma-core@44.0 % intel@19.1.1.217 arch=linux-rocky9-broadwell
+      prefix: /usr
+    buildable: false
+  hcoll:
+    externals:
+    - spec: hcoll@4.4.2968 % gcc@10.2.0 arch=linux-rocky9-broadwell
+      prefix: /opt/mellanox/hcoll
+    - spec: hcoll@4.4.2968 % gcc@9.2.0 arch=linux-rocky9-broadwell
+      prefix: /opt/mellanox/hcoll
+    - spec: hcoll@4.4.2968 % intel@19.1.1.217 arch=linux-rocky9-broadwell
+      prefix: /opt/mellanox/hcoll
+    buildable: false
+  slurm:
+    externals:
+    - spec: slurm@22.05.9 % gcc@8.5.0 arch=linux-rocky9-broadwell
+      prefix: /cm/shared/apps/slurm/22.05.9
+    - spec: slurm@22.05.9 % gcc@11.2.0 arch=linux-rocky9-broadwell
+      prefix: /cm/shared/apps/slurm/22.05.9
+    - spec: slurm@22.05.9 % gcc@10.2.0 arch=linux-rocky9-broadwell
+      prefix: /cm/shared/apps/slurm/22.05.9
+    - spec: slurm@22.05.9 % gcc@9.2.0 arch=linux-rocky9-broadwell
+      prefix: /cm/shared/apps/slurm/22.05.9
+    - spec: slurm@22.05.9 % intel@19.1.1.217 arch=linux-rocky9-broadwell
+      prefix: /cm/shared/apps/slurm/22.05.9
+    buildable: false
+  librsvg:
+    externals:
+    - spec: librsvg@2.42.7 % gcc@10.2.0 arch=linux-rocky9-broadwell
+      prefix: /usr
+    - spec: librsvg@2.42.7 % gcc@9.2.0 arch=linux-rocky9-broadwell
+      prefix: /usr
+    - spec: librsvg@2.42.7 %  intel@19.1.1.217 arch=linux-rocky9-broadwell
+      prefix: /usr
+    buildable: false
+  ghostscript:
+    externals:
+    - spec: ghostscript@9.27 % gcc@10.2.0 arch=linux-rocky9-broadwell
+      prefix: /usr
+    buildable: false
+  vasp6:
+    permissions:
+      read: group
+      group: vasp-6
+  all:
+    compiler: [gcc, intel, pgi, clang, xl, nag, fj, aocc]
+    providers:
+      awk: [gawk]
+      blas: [openblas, amdblis]
+      D: [ldc]
+      daal: [intel-daal]
+      elf: [elfutils]
+      fftw-api: [fftw, amdfftw]
+      flame: [libflame, amdlibflame]
+      fuse: [libfuse]
+      gl: [mesa+opengl, mesa18, opengl]
+      glu: [mesa-glu, openglu]
+      glx: [mesa+glx, mesa18+glx, opengl]
+      golang: [gcc]
+      iconv: [libiconv]
+      ipp: [intel-ipp]
+      java: [openjdk, jdk, ibm-java]
+      jpeg: [libjpeg-turbo, libjpeg]
+      lapack: [openblas, amdlibflame]
+      lua-lang: [lua, lua-luajit]
+      mariadb-client: [mariadb-c-client, mariadb]
+      mkl: [intel-mkl]
+      mpe: [mpe2]
+      mpi: [openmpi, mpich]
+      mysql-client: [mysql, mariadb-c-client]
+      opencl: [pocl]
+      onedal: [intel-oneapi-dal]
+      osmesa: [mesa+osmesa, mesa18+osmesa]
+      pbs: [openpbs, torque]
+      pil: [py-pillow]
+      pkgconfig: [pkgconf, pkg-config]
+      rpc: [libtirpc]
+      scalapack: [netlib-scalapack, amdscalapack]
+      sycl: [hipsycl]
+      szip: [libaec, libszip]
+      tbb: [intel-tbb]
+      unwind: [libunwind]
+      uuid: [util-linux-uuid, libuuid]
+      xxd: [xxd-standalone, vim]
+      yacc: [bison, byacc]
+      ziglang: [zig]
+    permissions:
+      read: world
+      write: user
+repos:
+- $spack/var/spack/repos/sdsc
+- $spack/var/spack/repos/builtin
+upstreams: {}
+Input spec
+--------------------------------
+[    ]  .openmm@7.5.0%gcc@10.2.0+cuda~ipo cuda_arch=60,75,80,86
+[    ]      ^builtin.cuda@11.2.2%gcc@10.2.0~dev arch=linux-rocky9-broadwell
+[bl  ]          ^builtin.libxml2@2.9.12%gcc@10.2.0~python arch=linux-rocky9-broadwell
+[bl  ]              ^builtin.libiconv@1.16%gcc@10.2.0 libs=shared,static arch=linux-rocky9-broadwell
+[bl  ]              ^builtin.xz@5.2.5%gcc@10.2.0~pic libs=shared,static arch=linux-rocky9-broadwell
+[bl  ]              ^builtin.zlib@1.2.11%gcc@10.2.0+optimize+pic+shared arch=linux-rocky9-broadwell
+[    ]      ^builtin.fftw@3.3.10%gcc@10.2.0~mpi~openmp~pfft_patches precision=double,float arch=linux-rocky9-broadwell
+[    ]      ^sdsc.openblas@0.3.17%gcc@10.2.0~bignuma~consistent_fpcsr~ilp64+locking+pic+shared threads=none arch=linux-rocky9-broadwell
+[    ]      ^builtin.py-numpy@1.20.3%gcc@10.2.0+blas+lapack patches=873745d7b547857fcfec9cae90b09c133b42a4f0c23b6c2d84cf37e2dd816604 arch=linux-rocky9-broadwell
+[bl  ]          ^sdsc.openblas@0.3.17%gcc@10.2.0~bignuma~consistent_fpcsr~ilp64+locking+pic+shared threads=none arch=linux-rocky9-broadwell
+[b r ]          ^builtin.py-setuptools@58.2.0%gcc@10.2.0 arch=linux-rocky9-broadwell
+[blr ]              ^builtin.python@3.8.12%gcc@10.2.0+bz2+ctypes+dbm~debug+libxml2+lzma~nis+optimizations+pic+pyexpat+pythoncmd+readline+shared+sqlite3+ssl~tix~tkinter~ucs4+uuid+zlib patches=0d98e93189bc278fbc37a50ed7f183bd8aaf249a8e1670a465f0db6bb4f8cf87,4c2457325f2b608b1b6a2c63087df8c26e07db3e3d493caf36a56f0ecf6fb768,f2fd060afc4b4618fe8104c4c5d771f36dc55b1db5a4623785a4ea707ec72fb4 arch=linux-rocky9-broadwell
+[bl  ]                  ^builtin.bzip2@1.0.8%gcc@10.2.0~debug~pic+shared arch=linux-rocky9-broadwell
+[bl  ]                  ^builtin.expat@2.4.1%gcc@10.2.0+libbsd arch=linux-rocky9-broadwell
+[bl  ]                      ^builtin.libbsd@0.11.3%gcc@10.2.0 arch=linux-rocky9-broadwell
+[bl  ]                          ^builtin.libmd@1.0.3%gcc@10.2.0 arch=linux-rocky9-broadwell
+[bl  ]                  ^sdsc.gdbm@1.19%gcc@10.2.0 arch=linux-rocky9-broadwell
+[bl  ]                      ^builtin.readline@8.1%gcc@10.2.0 arch=linux-rocky9-broadwell
+[bl  ]                          ^builtin.ncurses@6.2%gcc@10.2.0~symlinks+termlib abi=none arch=linux-rocky9-broadwell
+[bl  ]                  ^builtin.gettext@0.21%gcc@10.2.0+bzip2+curses+git~libunistring+libxml2+tar+xz arch=linux-rocky9-broadwell
+[bl  ]                      ^builtin.libiconv@1.16%gcc@10.2.0 libs=shared,static arch=linux-rocky9-broadwell
+[bl  ]                      ^builtin.libxml2@2.9.12%gcc@10.2.0~python arch=linux-rocky9-broadwell
+[blr ]                          ^builtin.xz@5.2.5%gcc@10.2.0~pic libs=shared,static arch=linux-rocky9-broadwell
+[bl  ]                          ^builtin.zlib@1.2.11%gcc@10.2.0+optimize+pic+shared arch=linux-rocky9-broadwell
+[bl  ]                      ^builtin.tar@1.34%gcc@10.2.0 arch=linux-rocky9-broadwell
+[bl  ]                  ^builtin.libffi@3.3%gcc@10.2.0 patches=26f26c6f29a7ce9bf370ad3ab2610f99365b4bdd7b82e7c31df41a3370d685c0 arch=linux-rocky9-broadwell
+[bl  ]                  ^builtin.openssl@3.0.7%gcc@10.2.0~docs certs=system arch=linux-rocky9-broadwell
+[bl  ]                  ^builtin.sqlite@3.36.0%gcc@10.2.0+column_metadata+fts~functions~rtree arch=linux-rocky9-broadwell
+[bl  ]                  ^builtin.util-linux-uuid@2.36.2%gcc@10.2.0 arch=linux-rocky9-broadwell
+
+Concretized
+--------------------------------
+htag5xb  [    ]  builtin.openmm@7.5.0%gcc@10.2.0+cuda~ipo build_type=RelWithDebInfo cuda_arch=60,75,80,86 arch=linux-rocky9-broadwell
+765fkmw  [b   ]      ^builtin.cmake@3.21.4%gcc@10.2.0~doc+ncurses+openssl+ownlibs~qt build_type=Release arch=linux-rocky9-broadwell
+ovtvq7m  [bl  ]          ^builtin.ncurses@6.2%gcc@10.2.0~symlinks+termlib abi=none arch=linux-rocky9-broadwell
+pu3y3pq  [bl  ]          ^builtin.openssl@3.0.7%gcc@10.2.0~docs certs=system arch=linux-rocky9-broadwell
+ptou5u3  [blr ]      ^builtin.cuda@11.2.2%gcc@10.2.0~dev arch=linux-rocky9-broadwell
+egosf32  [bl  ]          ^builtin.libxml2@2.9.12%gcc@10.2.0~python arch=linux-rocky9-broadwell
+r7u3li4  [bl  ]              ^builtin.libiconv@1.16%gcc@10.2.0 libs=shared,static arch=linux-rocky9-broadwell
+bnvpjjz  [blr ]              ^builtin.xz@5.2.5%gcc@10.2.0~pic libs=shared,static arch=linux-rocky9-broadwell
+uezvqlh  [bl  ]              ^builtin.zlib@1.2.11%gcc@10.2.0+optimize+pic+shared arch=linux-rocky9-broadwell
+4t27spl  [b   ]      ^builtin.doxygen@1.9.2%gcc@10.2.0~graphviz~ipo~mscgen build_type=RelWithDebInfo arch=linux-rocky9-broadwell
+l4cfz7a  [b   ]          ^builtin.bison@3.8.2%gcc@10.2.0 arch=linux-rocky9-broadwell
+wbewze2  [b   ]              ^builtin.diffutils@3.8%gcc@10.2.0 arch=linux-rocky9-broadwell
+u3kd26l  [b r ]              ^builtin.m4@1.4.19%gcc@10.2.0+sigsegv patches=9dc5fbd0d5cb1037ab1e6d0ecc74a30df218d0a94bdd5a02759a97f62daca573,bfdffa7c2eb01021d5849b36972c069693654ad826c1a20b53534009a4ec7a89 arch=linux-rocky9-broadwell
+5njhf6h  [bl  ]                  ^builtin.libsigsegv@2.13%gcc@10.2.0 arch=linux-rocky9-broadwell
+ozktzhy  [b   ]              ^sdsc.perl@5.32.0%gcc@10.2.0+cpanm+shared+threads arch=linux-rocky9-broadwell
+3c33nyi  [bl  ]                  ^builtin.berkeley-db@18.1.40%gcc@10.2.0+cxx~docs+stl patches=b231fcc4d5cff05e5c3a4814f6a5af0e9a966428dc2176540d2c05aff41de522 arch=linux-rocky9-broadwell
+dh4hxop  [bl  ]                  ^builtin.bzip2@1.0.8%gcc@10.2.0~debug~pic+shared arch=linux-rocky9-broadwell
+6ukzrku  [bl  ]                  ^sdsc.gdbm@1.19%gcc@10.2.0 arch=linux-rocky9-broadwell
+wndvzcw  [bl  ]                      ^builtin.readline@8.1%gcc@10.2.0 arch=linux-rocky9-broadwell
+smybzwv  [b   ]          ^builtin.flex@2.6.3%gcc@10.2.0+lex~nls arch=linux-rocky9-broadwell
+3lz3bz5  [b   ]              ^builtin.findutils@4.8.0%gcc@10.2.0 arch=linux-rocky9-broadwell
+inx66sv  [blr ]          ^builtin.python@3.8.12%gcc@10.2.0+bz2+ctypes+dbm~debug+libxml2+lzma~nis+optimizations+pic+pyexpat+pythoncmd+readline+shared+sqlite3+ssl~tix~tkinter~ucs4+uuid+zlib patches=0d98e93189bc278fbc37a50ed7f183bd8aaf249a8e1670a465f0db6bb4f8cf87,4c2457325f2b608b1b6a2c63087df8c26e07db3e3d493caf36a56f0ecf6fb768,f2fd060afc4b4618fe8104c4c5d771f36dc55b1db5a4623785a4ea707ec72fb4 arch=linux-rocky9-broadwell
+ppow2vp  [bl  ]              ^builtin.expat@2.4.1%gcc@10.2.0+libbsd arch=linux-rocky9-broadwell
+aur3lqv  [bl  ]                  ^builtin.libbsd@0.11.3%gcc@10.2.0 arch=linux-rocky9-broadwell
+vmorxax  [bl  ]                      ^builtin.libmd@1.0.3%gcc@10.2.0 arch=linux-rocky9-broadwell
+r6ujx4y  [bl  ]              ^builtin.gettext@0.21%gcc@10.2.0+bzip2+curses+git~libunistring+libxml2+tar+xz arch=linux-rocky9-broadwell
+lo6rmhe  [bl  ]                  ^builtin.tar@1.34%gcc@10.2.0 arch=linux-rocky9-broadwell
+rxt5der  [bl  ]              ^builtin.libffi@3.3%gcc@10.2.0 patches=26f26c6f29a7ce9bf370ad3ab2610f99365b4bdd7b82e7c31df41a3370d685c0 arch=linux-rocky9-broadwell
+v36qrof  [bl  ]              ^builtin.sqlite@3.36.0%gcc@10.2.0+column_metadata+fts~functions~rtree arch=linux-rocky9-broadwell
+nj7akxi  [bl  ]              ^builtin.util-linux-uuid@2.36.2%gcc@10.2.0 arch=linux-rocky9-broadwell
+ej2lqo7  [bl  ]      ^builtin.fftw@3.3.10%gcc@10.2.0~mpi~openmp~pfft_patches precision=double,float arch=linux-rocky9-broadwell
+3tkerpd  [b   ]      ^builtin.py-cython@0.29.24%gcc@10.2.0 arch=linux-rocky9-broadwell
+nhub4gi  [b r ]          ^builtin.py-setuptools@58.2.0%gcc@10.2.0 arch=linux-rocky9-broadwell
+56wtshk  [b r ]      ^builtin.py-numpy@1.20.3%gcc@10.2.0+blas+lapack patches=873745d7b547857fcfec9cae90b09c133b42a4f0c23b6c2d84cf37e2dd816604 arch=linux-rocky9-broadwell
+xmdkrna  [bl  ]          ^sdsc.openblas@0.3.17%gcc@10.2.0~bignuma~consistent_fpcsr~ilp64+locking+pic+shared threads=none arch=linux-rocky9-broadwell
+mfjsjnf  [b   ]      ^builtin.swig@4.0.2%gcc@10.2.0 arch=linux-rocky9-broadwell
+gcnkq3z  [bl  ]          ^builtin.pcre@8.44%gcc@10.2.0~jit+multibyte+utf arch=linux-rocky9-broadwell
+rps4kpp  [b   ]          ^builtin.pkgconf@1.8.0%gcc@10.2.0 arch=linux-rocky9-broadwell
+
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/ncurses-6.2-ovtvq7mr7iyw7ir5zbyj4kurazz4rb2o
+[+] /usr (external openssl-3.0.7-pu3y3pqej3bq67wxn2gm3uae32l4nf55)
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/libiconv-1.16-r7u3li4glgayxnqacdw7m4wp3gfijpeq
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/xz-5.2.5-bnvpjjzuqqaesn3fsv3w2ttqxbhmy2mf
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/zlib-1.2.11-uezvqlhoqd7uhf3zwg55teiitoyu7sbu
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/libsigsegv-2.13-5njhf6hv2qx36i2fya2tk3xpe3m67xht
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/berkeley-db-18.1.40-3c33nyicjq4uf6hzzr6gqwvijyipyqom
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/bzip2-1.0.8-dh4hxopngewrvpy5mcg3cm7wajypuh7w
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/findutils-4.8.0-3lz3bz5lgolfsth5zql7ga25ikhm3tgx
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/libmd-1.0.3-vmorxaxjxrs3ofrxxplqrzxoaut64uv2
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/libffi-3.3-rxt5dern5zniozejs7mafwanun2iyszt
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/util-linux-uuid-2.36.2-nj7akxi4jfeknflxqnnki4n3lvgu3qpa
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/fftw-3.3.10-ej2lqo7dme4fh7bew6btlmpyqgjllg4z
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/openblas-0.3.17-xmdkrnatcs2nmmz7odhjob7dzodwphy2
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/pcre-8.44-gcnkq3zc433gldf475nn4lu63nzkgrzt
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/pkgconf-1.8.0-rps4kpplhmz2xn2cl4xwobgejiokatx2
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/readline-8.1-wndvzcwt35ddbcuu2vsdf6bdtksvxx6j
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/cmake-3.21.4-765fkmw6ldmne4jhge6kmyxofk3ah6uq
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/tar-1.34-lo6rmhewo2vkhysdbbd74xoe6tqnz5y5
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/diffutils-3.8-wbewze2uiugpn4dmlvipimhcn32ncjqc
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/libxml2-2.9.12-egosf32loqwemuf3bhpzcmndudvf6ovi
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/m4-1.4.19-u3kd26lcrsx4ol5qed64rrqw6ouzyoqb
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/libbsd-0.11.3-aur3lqvmfctcgiowem3kuby2af3ptxld
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/swig-4.0.2-mfjsjnfyed3eknuljmezzskzov5ieeda
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/gdbm-1.19-6ukzrkuxtju3f4272ns4etuhtcxbikjs
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/sqlite-3.36.0-v36qrofqwobsa5vmaa7toof6i2ccmvwz
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/gettext-0.21-r6ujx4ysqbvw2g2iln72sqaqalc2i3em
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/cuda-11.2.2-ptou5u366ko3xf4fvtik2jsmm6oyy4t3
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/expat-2.4.1-ppow2vpit3lloenthcxmoaew3dqyu5p4
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/perl-5.32.0-ozktzhyz6kkfapjxt3dtpblzctrjok6z
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/python-3.8.12-inx66svinrzmo2rcei33cwmfhkuoosgw
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/bison-3.8.2-l4cfz7atwe2fnsc7gztgfi5zl6aj2mmp
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/py-setuptools-58.2.0-nhub4giqnth2e2zulzssiccxdx2br5pz
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/flex-2.6.3-smybzwvq6iwegohf6bele5e5ocsah46d
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/py-numpy-1.20.3-56wtshkldrk2dg2xvkmirakhvlrrbhhj
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/py-cython-0.29.24-3tkerpdf7dfpnvdzm3aqcffiav52rn2g
+==> Installing doxygen-1.9.2-4t27splwvvrwsxvumyqw5i3vc6kqz4vb
+==> No binary for doxygen-1.9.2-4t27splwvvrwsxvumyqw5i3vc6kqz4vb found: installing from source
+==> Ran patch() for doxygen
+==> doxygen: Executing phase: 'cmake'
+==> doxygen: Executing phase: 'build'
+==> doxygen: Executing phase: 'install'
+==> doxygen: Successfully installed doxygen-1.9.2-4t27splwvvrwsxvumyqw5i3vc6kqz4vb
+  Fetch: 7.04s.  Build: 2m 11.69s.  Total: 2m 18.73s.
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/doxygen-1.9.2-4t27splwvvrwsxvumyqw5i3vc6kqz4vb
+==> Installing openmm-7.5.0-htag5xbwjkuxm563jhwblthm3t6e5qhx
+==> No binary for openmm-7.5.0-htag5xbwjkuxm563jhwblthm3t6e5qhx found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/51/516748b4f1ae936c4d70cc6401174fc9384244c65cd3aef27bc2c53eac6d6de5.tar.gz
+==> Ran patch() for openmm
+==> openmm: Executing phase: 'cmake'
+==> openmm: Executing phase: 'build'
+==> Error: ProcessError: Command exited with status 2:
+    'make' '-j8'
+
+34 errors found in build log:
+     11160    /cm/shared/apps/spack/0.17.3/gpu/lib/spack/env/gcc/g++ -DOPENMM_B
+              UILD_VERSION=0 -DOPENMM_LIBRARY_NAME=OpenMM -DOPENMM_MAJOR_VERSIO
+              N=7 -DOPENMM_MINOR_VERSION=5 -DOpenMM_EXPORTS -I/tmp/jpg/spack-st
+              age/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhwblthm3t6e5qhx/spa
+              ck-src/src -I/tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5x
+              bwjkuxm563jhwblthm3t6e5qhx/spack-src/libraries/asmjit -I/tmp/jpg/
+              spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhwblthm3t6e
+              5qhx/spack-src/libraries/vecmath/include -I/tmp/jpg/spack-stage/s
+              pack-stage-openmm-7.5.0-htag5xbwjkuxm563jhwblthm3t6e5qhx/spack-sr
+              c/libraries/irrxml/include -I/tmp/jpg/spack-stage/spack-stage-ope
+              nmm-7.5.0-htag5xbwjkuxm563jhwblthm3t6e5qhx/spack-src/serializatio
+              n/include -I/tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xb
+              wjkuxm563jhwblthm3t6e5qhx/spack-src/platforms/reference/include -
+              I/tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jh
+              wblthm3t6e5qhx/spack-src/libraries/csha1/include -I/tmp/jpg/spack
+              -stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhwblthm3t6e5qhx/
+              spack-src/libraries/hilbert/include -I/tmp/jpg/spack-stage/spack-
+              stage-openmm-7.5.0-htag5xbwjkuxm563jhwblthm3t6e5qhx/spack-src/lib
+              raries/lbfgs/include -I/tmp/jpg/spack-stage/spack-stage-openmm-7.
+              5.0-htag5xbwjkuxm563jhwblthm3t6e5qhx/spack-src/libraries/sfmt/inc
+              lude -I/tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkux
+              m563jhwblthm3t6e5qhx/spack-src/libraries/lepton/include -I/tmp/jp
+              g/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhwblthm3t
+              6e5qhx/spack-src/libraries/quern/include -I/tmp/jpg/spack-stage/s
+              pack-stage-openmm-7.5.0-htag5xbwjkuxm563jhwblthm3t6e5qhx/spack-sr
+              c/libraries/jama/include -I/tmp/jpg/spack-stage/spack-stage-openm
+              m-7.5.0-htag5xbwjkuxm563jhwblthm3t6e5qhx/spack-src/olla/include -
+              I/tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jh
+              wblthm3t6e5qhx/spack-src/openmmapi/include -I/tmp/jpg/spack-stage
+              /spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhwblthm3t6e5qhx/spack-
+              src/./include -I/tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-hta
+              g5xbwjkuxm563jhwblthm3t6e5qhx/spack-src/tests -O2 -g -DNDEBUG -fP
+              IC -msse2 -DLEPTON_USE_JIT -DOPENMM_BUILDING_SHARED_LIBRARY -DLEP
+              TON_BUILDING_SHARED_LIBRARY -DPTHREAD_BUILDING_SHARED_LIBRARY -st
+              d=gnu++11 -MD -MT CMakeFiles/OpenMM.dir/libraries/asmjit/x86/x86r
+              egalloc.cpp.o -MF CMakeFiles/OpenMM.dir/libraries/asmjit/x86/x86r
+              egalloc.cpp.o.d -o CMakeFiles/OpenMM.dir/libraries/asmjit/x86/x86
+              regalloc.cpp.o -c /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-h
+              tag5xbwjkuxm563jhwblthm3t6e5qhx/spack-src/libraries/asmjit/x86/x8
+              6regalloc.cpp
+     11161    [ 43%] Building CXX object CMakeFiles/OpenMM.dir/wrappers/OpenMMC
+              Wrapper.cpp.o
+     11162    /cm/shared/apps/spack/0.17.3/gpu/lib/spack/env/gcc/g++ -DOPENMM_B
+              UILD_VERSION=0 -DOPENMM_LIBRARY_NAME=OpenMM -DOPENMM_MAJOR_VERSIO
+              N=7 -DOPENMM_MINOR_VERSION=5 -DOpenMM_EXPORTS -I/tmp/jpg/spack-st
+              age/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhwblthm3t6e5qhx/spa
+              ck-src/src -I/tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5x
+              bwjkuxm563jhwblthm3t6e5qhx/spack-src/libraries/asmjit -I/tmp/jpg/
+              spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhwblthm3t6e
+              5qhx/spack-src/libraries/vecmath/include -I/tmp/jpg/spack-stage/s
+              pack-stage-openmm-7.5.0-htag5xbwjkuxm563jhwblthm3t6e5qhx/spack-sr
+              c/libraries/irrxml/include -I/tmp/jpg/spack-stage/spack-stage-ope
+              nmm-7.5.0-htag5xbwjkuxm563jhwblthm3t6e5qhx/spack-src/serializatio
+              n/include -I/tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xb
+              wjkuxm563jhwblthm3t6e5qhx/spack-src/platforms/reference/include -
+              I/tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jh
+              wblthm3t6e5qhx/spack-src/libraries/csha1/include -I/tmp/jpg/spack
+              -stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhwblthm3t6e5qhx/
+              spack-src/libraries/hilbert/include -I/tmp/jpg/spack-stage/spack-
+              stage-openmm-7.5.0-htag5xbwjkuxm563jhwblthm3t6e5qhx/spack-src/lib
+              raries/lbfgs/include -I/tmp/jpg/spack-stage/spack-stage-openmm-7.
+              5.0-htag5xbwjkuxm563jhwblthm3t6e5qhx/spack-src/libraries/sfmt/inc
+              lude -I/tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkux
+              m563jhwblthm3t6e5qhx/spack-src/libraries/lepton/include -I/tmp/jp
+              g/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhwblthm3t
+              6e5qhx/spack-src/libraries/quern/include -I/tmp/jpg/spack-stage/s
+              pack-stage-openmm-7.5.0-htag5xbwjkuxm563jhwblthm3t6e5qhx/spack-sr
+              c/libraries/jama/include -I/tmp/jpg/spack-stage/spack-stage-openm
+              m-7.5.0-htag5xbwjkuxm563jhwblthm3t6e5qhx/spack-src/olla/include -
+              I/tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jh
+              wblthm3t6e5qhx/spack-src/openmmapi/include -I/tmp/jpg/spack-stage
+              /spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhwblthm3t6e5qhx/spack-
+              src/./include -I/tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-hta
+              g5xbwjkuxm563jhwblthm3t6e5qhx/spack-src/tests -O2 -g -DNDEBUG -fP
+              IC -msse2 -DLEPTON_USE_JIT -DOPENMM_BUILDING_SHARED_LIBRARY -DLEP
+              TON_BUILDING_SHARED_LIBRARY -DPTHREAD_BUILDING_SHARED_LIBRARY -st
+              d=gnu++11 -MD -MT CMakeFiles/OpenMM.dir/wrappers/OpenMMCWrapper.c
+              pp.o -MF CMakeFiles/OpenMM.dir/wrappers/OpenMMCWrapper.cpp.o.d -o
+               CMakeFiles/OpenMM.dir/wrappers/OpenMMCWrapper.cpp.o -c /tmp/jpg/
+              spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhwblthm3t6e
+              5qhx/spack-build-htag5xb/wrappers/OpenMMCWrapper.cpp
+     11163    [ 43%] Building CXX object CMakeFiles/OpenMM.dir/wrappers/OpenMMF
+              ortranWrapper.cpp.o
+     11164    /cm/shared/apps/spack/0.17.3/gpu/lib/spack/env/gcc/g++ -DOPENMM_B
+              UILD_VERSION=0 -DOPENMM_LIBRARY_NAME=OpenMM -DOPENMM_MAJOR_VERSIO
+              N=7 -DOPENMM_MINOR_VERSION=5 -DOpenMM_EXPORTS -I/tmp/jpg/spack-st
+              age/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhwblthm3t6e5qhx/spa
+              ck-src/src -I/tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5x
+              bwjkuxm563jhwblthm3t6e5qhx/spack-src/libraries/asmjit -I/tmp/jpg/
+              spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhwblthm3t6e
+              5qhx/spack-src/libraries/vecmath/include -I/tmp/jpg/spack-stage/s
+              pack-stage-openmm-7.5.0-htag5xbwjkuxm563jhwblthm3t6e5qhx/spack-sr
+              c/libraries/irrxml/include -I/tmp/jpg/spack-stage/spack-stage-ope
+              nmm-7.5.0-htag5xbwjkuxm563jhwblthm3t6e5qhx/spack-src/serializatio
+              n/include -I/tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xb
+              wjkuxm563jhwblthm3t6e5qhx/spack-src/platforms/reference/include -
+              I/tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jh
+              wblthm3t6e5qhx/spack-src/libraries/csha1/include -I/tmp/jpg/spack
+              -stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhwblthm3t6e5qhx/
+              spack-src/libraries/hilbert/include -I/tmp/jpg/spack-stage/spack-
+              stage-openmm-7.5.0-htag5xbwjkuxm563jhwblthm3t6e5qhx/spack-src/lib
+              raries/lbfgs/include -I/tmp/jpg/spack-stage/spack-stage-openmm-7.
+              5.0-htag5xbwjkuxm563jhwblthm3t6e5qhx/spack-src/libraries/sfmt/inc
+              lude -I/tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkux
+              m563jhwblthm3t6e5qhx/spack-src/libraries/lepton/include -I/tmp/jp
+              g/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhwblthm3t
+              6e5qhx/spack-src/libraries/quern/include -I/tmp/jpg/spack-stage/s
+              pack-stage-openmm-7.5.0-htag5xbwjkuxm563jhwblthm3t6e5qhx/spack-sr
+              c/libraries/jama/include -I/tmp/jpg/spack-stage/spack-stage-openm
+              m-7.5.0-htag5xbwjkuxm563jhwblthm3t6e5qhx/spack-src/olla/include -
+              I/tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jh
+              wblthm3t6e5qhx/spack-src/openmmapi/include -I/tmp/jpg/spack-stage
+              /spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhwblthm3t6e5qhx/spack-
+              src/./include -I/tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-hta
+              g5xbwjkuxm563jhwblthm3t6e5qhx/spack-src/tests -O2 -g -DNDEBUG -fP
+              IC -msse2 -DLEPTON_USE_JIT -DOPENMM_BUILDING_SHARED_LIBRARY -DLEP
+              TON_BUILDING_SHARED_LIBRARY -DPTHREAD_BUILDING_SHARED_LIBRARY -st
+              d=gnu++11 -MD -MT CMakeFiles/OpenMM.dir/wrappers/OpenMMFortranWra
+              pper.cpp.o -MF CMakeFiles/OpenMM.dir/wrappers/OpenMMFortranWrappe
+              r.cpp.o.d -o CMakeFiles/OpenMM.dir/wrappers/OpenMMFortranWrapper.
+              cpp.o -c /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjk
+              uxm563jhwblthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMFortran
+              Wrapper.cpp
+     11165    In file included from /tmp/jpg/spack-stage/spack-stage-openmm-7.5
+              .0-htag5xbwjkuxm563jhwblthm3t6e5qhx/spack-build-htag5xb/wrappers/
+              OpenMMCWrapper.cpp:3:
+  >> 11166    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMCWrapper.h:1074:
+              41: error: conflicting declaration of C function 'OpenMM_StringAr
+              ray OpenMM_Platform_getPluginLoadFailures()'
+     11167     1074 | extern OPENMM_EXPORT OpenMM_StringArray OpenMM_Platform_g
+              etPluginLoadFailures();
+     11168          |                                         ^~~~~~~~~~~~~~~~~
+              ~~~~~~~~~~~~~~~~~~~~
+     11169    In file included from /tmp/jpg/spack-stage/spack-stage-openmm-7.5
+              .0-htag5xbwjkuxm563jhwblthm3t6e5qhx/spack-build-htag5xb/wrappers/
+              OpenMMCWrapper.cpp:3:
+     11170    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMCWrapper.h:163:4
+              2: note: previous declaration 'OpenMM_StringArray* OpenMM_Platfor
+              m_getPluginLoadFailures()'
+     11171      163 | extern OPENMM_EXPORT OpenMM_StringArray* OpenMM_Platform_
+              getPluginLoadFailures();
+     11172          |                                          ^~~~~~~~~~~~~~~~
+              ~~~~~~~~~~~~~~~~~~~~~
+     11173    In file included from /tmp/jpg/spack-stage/spack-stage-openmm-7.5
+              .0-htag5xbwjkuxm563jhwblthm3t6e5qhx/spack-build-htag5xb/wrappers/
+              OpenMMCWrapper.cpp:3:
+  >> 11174    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMCWrapper.h:1078:
+              41: error: conflicting declaration of C function 'OpenMM_StringAr
+              ray OpenMM_Platform_loadPluginsFromDirectory(const char*)'
+     11175     1078 | extern OPENMM_EXPORT OpenMM_StringArray OpenMM_Platform_l
+              oadPluginsFromDirectory(const char* directory);
+     11176          |                                         ^~~~~~~~~~~~~~~~~
+              ~~~~~~~~~~~~~~~~~~~~~~~
+     11177    In file included from /tmp/jpg/spack-stage/spack-stage-openmm-7.5
+              .0-htag5xbwjkuxm563jhwblthm3t6e5qhx/spack-build-htag5xb/wrappers/
+              OpenMMCWrapper.cpp:3:
+     11178    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMCWrapper.h:162:4
+              2: note: previous declaration 'OpenMM_StringArray* OpenMM_Platfor
+              m_loadPluginsFromDirectory(const char*)'
+     11179      162 | extern OPENMM_EXPORT OpenMM_StringArray* OpenMM_Platform_
+              loadPluginsFromDirectory(const char* directory);
+     11180          |                                          ^~~~~~~~~~~~~~~~
+              ~~~~~~~~~~~~~~~~~~~~~~~~
+  >> 11181    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMCWrapper.cpp:185
+              :35: error: conflicting declaration of C function 'OpenMM_StringA
+              rray* OpenMM_Platform_loadPluginsFromDirectory(const char*)'
+     11182      185 | OPENMM_EXPORT OpenMM_StringArray* OpenMM_Platform_loadPlu
+              ginsFromDirectory(const char* directory) {
+     11183          |                                   ^~~~~~~~~~~~~~~~~~~~~~~
+              ~~~~~~~~~~~~~~~~~
+     11184    In file included from /tmp/jpg/spack-stage/spack-stage-openmm-7.5
+              .0-htag5xbwjkuxm563jhwblthm3t6e5qhx/spack-build-htag5xb/wrappers/
+              OpenMMCWrapper.cpp:3:
+     11185    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMCWrapper.h:1078:
+              41: note: previous declaration 'OpenMM_StringArray OpenMM_Platfor
+              m_loadPluginsFromDirectory(const char*)'
+     11186     1078 | extern OPENMM_EXPORT OpenMM_StringArray OpenMM_Platform_l
+              oadPluginsFromDirectory(const char* directory);
+     11187          |                                         ^~~~~~~~~~~~~~~~~
+              ~~~~~~~~~~~~~~~~~~~~~~~
+  >> 11188    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMCWrapper.cpp:189
+              :35: error: conflicting declaration of C function 'OpenMM_StringA
+              rray* OpenMM_Platform_getPluginLoadFailures()'
+     11189      189 | OPENMM_EXPORT OpenMM_StringArray* OpenMM_Platform_getPlug
+              inLoadFailures() {
+     11190          |                                   ^~~~~~~~~~~~~~~~~~~~~~~
+              ~~~~~~~~~~~~~~
+     11191    In file included from /tmp/jpg/spack-stage/spack-stage-openmm-7.5
+              .0-htag5xbwjkuxm563jhwblthm3t6e5qhx/spack-build-htag5xb/wrappers/
+              OpenMMCWrapper.cpp:3:
+     11192    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMCWrapper.h:1074:
+              41: note: previous declaration 'OpenMM_StringArray OpenMM_Platfor
+              m_getPluginLoadFailures()'
+     11193     1074 | extern OPENMM_EXPORT OpenMM_StringArray OpenMM_Platform_g
+              etPluginLoadFailures();
+     11194          |                                         ^~~~~~~~~~~~~~~~~
+              ~~~~~~~~~~~~~~~~~~~~
+  >> 11195    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMCWrapper.cpp:284
+              7:117: error: return type 'OpenMM_DoubleArray' {aka 'struct OpenM
+              M_DoubleArray_struct'} is incomplete
+     11196     2847 | OPENMM_EXPORT OpenMM_DoubleArray OpenMM_NoseHooverChain_g
+              etYoshidaSuzukiWeights(const OpenMM_NoseHooverChain* target) {
+     11197          |                                                          
+                                                                         ^
+  >> 11198    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMCWrapper.cpp:284
+              7:34: error: conflicting declaration of C function 'void OpenMM_N
+              oseHooverChain_getYoshidaSuzukiWeights(const OpenMM_NoseHooverCha
+              in*)'
+     11199     2847 | OPENMM_EXPORT OpenMM_DoubleArray OpenMM_NoseHooverChain_g
+              etYoshidaSuzukiWeights(const OpenMM_NoseHooverChain* target) {
+     11200          |                                  ^~~~~~~~~~~~~~~~~~~~~~~~
+              ~~~~~~~~~~~~~~~~~~~~~~
+     11201    In file included from /tmp/jpg/spack-stage/spack-stage-openmm-7.5
+              .0-htag5xbwjkuxm563jhwblthm3t6e5qhx/spack-build-htag5xb/wrappers/
+              OpenMMCWrapper.cpp:3:
+     11202    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMCWrapper.h:1019:
+              41: note: previous declaration 'OpenMM_DoubleArray OpenMM_NoseHoo
+              verChain_getYoshidaSuzukiWeights(const OpenMM_NoseHooverChain*)'
+     11203     1019 | extern OPENMM_EXPORT OpenMM_DoubleArray OpenMM_NoseHoover
+              Chain_getYoshidaSuzukiWeights(const OpenMM_NoseHooverChain* targe
+              t);
+     11204          |                                         ^~~~~~~~~~~~~~~~~
+              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     11205    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMCWrapper.cpp: In
+               function 'void OpenMM_NoseHooverChain_getYoshidaSuzukiWeights(co
+              nst OpenMM_NoseHooverChain*)':
+  >> 11206    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMCWrapper.cpp:284
+              9:50: error: invalid use of incomplete type 'OpenMM_DoubleArray' 
+              {aka 'struct OpenMM_DoubleArray_struct'}
+     11207     2849 |     return static_cast<OpenMM_DoubleArray>(result);
+     11208          |                                                  ^
+     11209    In file included from /tmp/jpg/spack-stage/spack-stage-openmm-7.5
+              .0-htag5xbwjkuxm563jhwblthm3t6e5qhx/spack-build-htag5xb/wrappers/
+              OpenMMCWrapper.cpp:3:
+     11210    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMCWrapper.h:85:16
+              : note: forward declaration of 'OpenMM_DoubleArray' {aka 'struct 
+              OpenMM_DoubleArray_struct'}
+     11211       85 | typedef struct OpenMM_DoubleArray_struct OpenMM_DoubleArr
+              ay;
+     11212          |                ^~~~~~~~~~~~~~~~~~~~~~~~~
+     11213    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMCWrapper.cpp: At
+               global scope:
+  >> 11214    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMCWrapper.cpp:301
+              6:72: error: return type 'OpenMM_StringArray' {aka 'struct OpenMM
+              _StringArray_struct'} is incomplete
+     11215     3016 | OPENMM_EXPORT OpenMM_StringArray OpenMM_Platform_getPlugi
+              nLoadFailures() {
+     11216          |                                                          
+                            ^
+  >> 11217    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMCWrapper.cpp:301
+              6:34: error: conflicting declaration of C function 'void OpenMM_P
+              latform_getPluginLoadFailures()'
+     11218     3016 | OPENMM_EXPORT OpenMM_StringArray OpenMM_Platform_getPlugi
+              nLoadFailures() {
+     11219          |                                  ^~~~~~~~~~~~~~~~~~~~~~~~
+              ~~~~~~~~~~~~~
+     11220    In file included from /tmp/jpg/spack-stage/spack-stage-openmm-7.5
+              .0-htag5xbwjkuxm563jhwblthm3t6e5qhx/spack-build-htag5xb/wrappers/
+              OpenMMCWrapper.cpp:3:
+     11221    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMCWrapper.h:1074:
+              41: note: previous declaration 'OpenMM_StringArray OpenMM_Platfor
+              m_getPluginLoadFailures()'
+     11222     1074 | extern OPENMM_EXPORT OpenMM_StringArray OpenMM_Platform_g
+              etPluginLoadFailures();
+     11223          |                                         ^~~~~~~~~~~~~~~~~
+              ~~~~~~~~~~~~~~~~~~~~
+  >> 11224    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMCWrapper.cpp:301
+              6:34: error: conflicting declaration of C function 'void OpenMM_P
+              latform_getPluginLoadFailures()'
+     11225     3016 | OPENMM_EXPORT OpenMM_StringArray OpenMM_Platform_getPlugi
+              nLoadFailures() {
+     11226          |                                  ^~~~~~~~~~~~~~~~~~~~~~~~
+              ~~~~~~~~~~~~~
+     11227    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMCWrapper.cpp:189
+              :35: note: previous declaration 'OpenMM_StringArray* OpenMM_Platf
+              orm_getPluginLoadFailures()'
+     11228      189 | OPENMM_EXPORT OpenMM_StringArray* OpenMM_Platform_getPlug
+              inLoadFailures() {
+     11229          |                                   ^~~~~~~~~~~~~~~~~~~~~~~
+              ~~~~~~~~~~~~~~
+     11230    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMCWrapper.cpp: In
+               function 'void OpenMM_Platform_getPluginLoadFailures()':
+  >> 11231    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMCWrapper.cpp:301
+              8:50: error: invalid use of incomplete type 'OpenMM_StringArray' 
+              {aka 'struct OpenMM_StringArray_struct'}
+     11232     3018 |     return static_cast<OpenMM_StringArray>(result);
+     11233          |                                                  ^
+     11234    In file included from /tmp/jpg/spack-stage/spack-stage-openmm-7.5
+              .0-htag5xbwjkuxm563jhwblthm3t6e5qhx/spack-build-htag5xb/wrappers/
+              OpenMMCWrapper.cpp:3:
+     11235    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMCWrapper.h:81:16
+              : note: forward declaration of 'OpenMM_StringArray' {aka 'struct 
+              OpenMM_StringArray_struct'}
+     11236       81 | typedef struct OpenMM_StringArray_struct OpenMM_StringArr
+              ay;
+     11237          |                ^~~~~~~~~~~~~~~~~~~~~~~~~
+     11238    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMCWrapper.cpp: At
+               global scope:
+  >> 11239    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMCWrapper.cpp:303
+              1:96: error: return type 'OpenMM_StringArray' {aka 'struct OpenMM
+              _StringArray_struct'} is incomplete
+     11240     3031 | OPENMM_EXPORT OpenMM_StringArray OpenMM_Platform_loadPlug
+              insFromDirectory(const char* directory) {
+     11241          |                                                          
+                                                    ^
+  >> 11242    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMCWrapper.cpp:303
+              1:34: error: conflicting declaration of C function 'void OpenMM_P
+              latform_loadPluginsFromDirectory(const char*)'
+     11243     3031 | OPENMM_EXPORT OpenMM_StringArray OpenMM_Platform_loadPlug
+              insFromDirectory(const char* directory) {
+     11244          |                                  ^~~~~~~~~~~~~~~~~~~~~~~~
+              ~~~~~~~~~~~~~~~~
+     11245    In file included from /tmp/jpg/spack-stage/spack-stage-openmm-7.5
+              .0-htag5xbwjkuxm563jhwblthm3t6e5qhx/spack-build-htag5xb/wrappers/
+              OpenMMCWrapper.cpp:3:
+     11246    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMCWrapper.h:1078:
+              41: note: previous declaration 'OpenMM_StringArray OpenMM_Platfor
+              m_loadPluginsFromDirectory(const char*)'
+     11247     1078 | extern OPENMM_EXPORT OpenMM_StringArray OpenMM_Platform_l
+              oadPluginsFromDirectory(const char* directory);
+     11248          |                                         ^~~~~~~~~~~~~~~~~
+              ~~~~~~~~~~~~~~~~~~~~~~~
+  >> 11249    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMCWrapper.cpp:303
+              1:34: error: conflicting declaration of C function 'void OpenMM_P
+              latform_loadPluginsFromDirectory(const char*)'
+     11250     3031 | OPENMM_EXPORT OpenMM_StringArray OpenMM_Platform_loadPlug
+              insFromDirectory(const char* directory) {
+     11251          |                                  ^~~~~~~~~~~~~~~~~~~~~~~~
+              ~~~~~~~~~~~~~~~~
+     11252    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMCWrapper.cpp:185
+              :35: note: previous declaration 'OpenMM_StringArray* OpenMM_Platf
+              orm_loadPluginsFromDirectory(const char*)'
+     11253      185 | OPENMM_EXPORT OpenMM_StringArray* OpenMM_Platform_loadPlu
+              ginsFromDirectory(const char* directory) {
+     11254          |                                   ^~~~~~~~~~~~~~~~~~~~~~~
+              ~~~~~~~~~~~~~~~~~
+     11255    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMCWrapper.cpp: In
+               function 'void OpenMM_Platform_loadPluginsFromDirectory(const ch
+              ar*)':
+  >> 11256    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMCWrapper.cpp:303
+              3:50: error: invalid use of incomplete type 'OpenMM_StringArray' 
+              {aka 'struct OpenMM_StringArray_struct'}
+     11257     3033 |     return static_cast<OpenMM_StringArray>(result);
+     11258          |                                                  ^
+     11259    In file included from /tmp/jpg/spack-stage/spack-stage-openmm-7.5
+              .0-htag5xbwjkuxm563jhwblthm3t6e5qhx/spack-build-htag5xb/wrappers/
+              OpenMMCWrapper.cpp:3:
+     11260    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMCWrapper.h:81:16
+              : note: forward declaration of 'OpenMM_StringArray' {aka 'struct 
+              OpenMM_StringArray_struct'}
+     11261       81 | typedef struct OpenMM_StringArray_struct OpenMM_StringArr
+              ay;
+     11262          |                ^~~~~~~~~~~~~~~~~~~~~~~~~
+     11263    In file included from /tmp/jpg/spack-stage/spack-stage-openmm-7.5
+              .0-htag5xbwjkuxm563jhwblthm3t6e5qhx/spack-build-htag5xb/wrappers/
+              OpenMMFortranWrapper.cpp:3:
+  >> 11264    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMCWrapper.h:1074:
+              41: error: conflicting declaration of C function 'OpenMM_StringAr
+              ray OpenMM_Platform_getPluginLoadFailures()'
+     11265     1074 | extern OPENMM_EXPORT OpenMM_StringArray OpenMM_Platform_g
+              etPluginLoadFailures();
+     11266          |                                         ^~~~~~~~~~~~~~~~~
+              ~~~~~~~~~~~~~~~~~~~~
+     11267    In file included from /tmp/jpg/spack-stage/spack-stage-openmm-7.5
+              .0-htag5xbwjkuxm563jhwblthm3t6e5qhx/spack-build-htag5xb/wrappers/
+              OpenMMFortranWrapper.cpp:3:
+     11268    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMCWrapper.h:163:4
+              2: note: previous declaration 'OpenMM_StringArray* OpenMM_Platfor
+              m_getPluginLoadFailures()'
+     11269      163 | extern OPENMM_EXPORT OpenMM_StringArray* OpenMM_Platform_
+              getPluginLoadFailures();
+     11270          |                                          ^~~~~~~~~~~~~~~~
+              ~~~~~~~~~~~~~~~~~~~~~
+     11271    In file included from /tmp/jpg/spack-stage/spack-stage-openmm-7.5
+              .0-htag5xbwjkuxm563jhwblthm3t6e5qhx/spack-build-htag5xb/wrappers/
+              OpenMMFortranWrapper.cpp:3:
+  >> 11272    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMCWrapper.h:1078:
+              41: error: conflicting declaration of C function 'OpenMM_StringAr
+              ray OpenMM_Platform_loadPluginsFromDirectory(const char*)'
+     11273     1078 | extern OPENMM_EXPORT OpenMM_StringArray OpenMM_Platform_l
+              oadPluginsFromDirectory(const char* directory);
+     11274          |                                         ^~~~~~~~~~~~~~~~~
+              ~~~~~~~~~~~~~~~~~~~~~~~
+     11275    In file included from /tmp/jpg/spack-stage/spack-stage-openmm-7.5
+              .0-htag5xbwjkuxm563jhwblthm3t6e5qhx/spack-build-htag5xb/wrappers/
+              OpenMMFortranWrapper.cpp:3:
+     11276    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMCWrapper.h:162:4
+              2: note: previous declaration 'OpenMM_StringArray* OpenMM_Platfor
+              m_loadPluginsFromDirectory(const char*)'
+     11277      162 | extern OPENMM_EXPORT OpenMM_StringArray* OpenMM_Platform_
+              loadPluginsFromDirectory(const char* directory);
+     11278          |                                          ^~~~~~~~~~~~~~~~
+              ~~~~~~~~~~~~~~~~~~~~~~~~
+     11279    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMFortranWrapper.c
+              pp: In function 'void openmm_platform_loadpluginsfromdirectory_(c
+              onst char*, OpenMM_StringArray*&, int)':
+  >> 11280    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMFortranWrapper.c
+              pp:347:92: error: call of overloaded 'OpenMM_Platform_loadPlugins
+              FromDirectory(const char*)' is ambiguous
+     11281      347 |     result = OpenMM_Platform_loadPluginsFromDirectory(mak
+              eString(directory, length).c_str());
+     11282          |                                                          
+                                                ^
+     11283    In file included from /tmp/jpg/spack-stage/spack-stage-openmm-7.5
+              .0-htag5xbwjkuxm563jhwblthm3t6e5qhx/spack-build-htag5xb/wrappers/
+              OpenMMFortranWrapper.cpp:3:
+     11284    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMCWrapper.h:162:4
+              2: note: candidate: 'OpenMM_StringArray* OpenMM_Platform_loadPlug
+              insFromDirectory(const char*)'
+     11285      162 | extern OPENMM_EXPORT OpenMM_StringArray* OpenMM_Platform_
+              loadPluginsFromDirectory(const char* directory);
+     11286          |                                          ^~~~~~~~~~~~~~~~
+              ~~~~~~~~~~~~~~~~~~~~~~~~
+     11287    In file included from /tmp/jpg/spack-stage/spack-stage-openmm-7.5
+              .0-htag5xbwjkuxm563jhwblthm3t6e5qhx/spack-build-htag5xb/wrappers/
+              OpenMMFortranWrapper.cpp:3:
+     11288    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMCWrapper.h:1078:
+              41: note: candidate: 'OpenMM_StringArray OpenMM_Platform_loadPlug
+              insFromDirectory(const char*)'
+     11289     1078 | extern OPENMM_EXPORT OpenMM_StringArray OpenMM_Platform_l
+              oadPluginsFromDirectory(const char* directory);
+     11290          |                                         ^~~~~~~~~~~~~~~~~
+              ~~~~~~~~~~~~~~~~~~~~~~~
+     11291    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMFortranWrapper.c
+              pp: In function 'void OPENMM_PLATFORM_LOADPLUGINSFROMDIRECTORY(co
+              nst char*, OpenMM_StringArray*&, int)':
+  >> 11292    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMFortranWrapper.c
+              pp:350:92: error: call of overloaded 'OpenMM_Platform_loadPlugins
+              FromDirectory(const char*)' is ambiguous
+     11293      350 |     result = OpenMM_Platform_loadPluginsFromDirectory(mak
+              eString(directory, length).c_str());
+     11294          |                                                          
+                                                ^
+     11295    In file included from /tmp/jpg/spack-stage/spack-stage-openmm-7.5
+              .0-htag5xbwjkuxm563jhwblthm3t6e5qhx/spack-build-htag5xb/wrappers/
+              OpenMMFortranWrapper.cpp:3:
+     11296    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMCWrapper.h:162:4
+              2: note: candidate: 'OpenMM_StringArray* OpenMM_Platform_loadPlug
+              insFromDirectory(const char*)'
+     11297      162 | extern OPENMM_EXPORT OpenMM_StringArray* OpenMM_Platform_
+              loadPluginsFromDirectory(const char* directory);
+     11298          |                                          ^~~~~~~~~~~~~~~~
+              ~~~~~~~~~~~~~~~~~~~~~~~~
+     11299    In file included from /tmp/jpg/spack-stage/spack-stage-openmm-7.5
+              .0-htag5xbwjkuxm563jhwblthm3t6e5qhx/spack-build-htag5xb/wrappers/
+              OpenMMFortranWrapper.cpp:3:
+     11300    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMCWrapper.h:1078:
+              41: note: candidate: 'OpenMM_StringArray OpenMM_Platform_loadPlug
+              insFromDirectory(const char*)'
+     11301     1078 | extern OPENMM_EXPORT OpenMM_StringArray OpenMM_Platform_l
+              oadPluginsFromDirectory(const char* directory);
+     11302          |                                         ^~~~~~~~~~~~~~~~~
+              ~~~~~~~~~~~~~~~~~~~~~~~
+     11303    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMFortranWrapper.c
+              pp: In function 'void openmm_platform_getpluginloadfailures_(Open
+              MM_StringArray*&)':
+  >> 11304    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMFortranWrapper.c
+              pp:353:52: error: call of overloaded 'OpenMM_Platform_getPluginLo
+              adFailures()' is ambiguous
+     11305      353 |     result = OpenMM_Platform_getPluginLoadFailures();
+     11306          |                                                    ^
+     11307    In file included from /tmp/jpg/spack-stage/spack-stage-openmm-7.5
+              .0-htag5xbwjkuxm563jhwblthm3t6e5qhx/spack-build-htag5xb/wrappers/
+              OpenMMFortranWrapper.cpp:3:
+     11308    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMCWrapper.h:163:4
+              2: note: candidate: 'OpenMM_StringArray* OpenMM_Platform_getPlugi
+              nLoadFailures()'
+     11309      163 | extern OPENMM_EXPORT OpenMM_StringArray* OpenMM_Platform_
+              getPluginLoadFailures();
+     11310          |                                          ^~~~~~~~~~~~~~~~
+              ~~~~~~~~~~~~~~~~~~~~~
+     11311    In file included from /tmp/jpg/spack-stage/spack-stage-openmm-7.5
+              .0-htag5xbwjkuxm563jhwblthm3t6e5qhx/spack-build-htag5xb/wrappers/
+              OpenMMFortranWrapper.cpp:3:
+     11312    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMCWrapper.h:1074:
+              41: note: candidate: 'OpenMM_StringArray OpenMM_Platform_getPlugi
+              nLoadFailures()'
+     11313     1074 | extern OPENMM_EXPORT OpenMM_StringArray OpenMM_Platform_g
+              etPluginLoadFailures();
+     11314          |                                         ^~~~~~~~~~~~~~~~~
+              ~~~~~~~~~~~~~~~~~~~~
+     11315    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMFortranWrapper.c
+              pp: In function 'void OPENMM_PLATFORM_GETPLUGINLOADFAILURES(OpenM
+              M_StringArray*&)':
+  >> 11316    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMFortranWrapper.c
+              pp:356:52: error: call of overloaded 'OpenMM_Platform_getPluginLo
+              adFailures()' is ambiguous
+     11317      356 |     result = OpenMM_Platform_getPluginLoadFailures();
+     11318          |                                                    ^
+     11319    In file included from /tmp/jpg/spack-stage/spack-stage-openmm-7.5
+              .0-htag5xbwjkuxm563jhwblthm3t6e5qhx/spack-build-htag5xb/wrappers/
+              OpenMMFortranWrapper.cpp:3:
+     11320    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMCWrapper.h:163:4
+              2: note: candidate: 'OpenMM_StringArray* OpenMM_Platform_getPlugi
+              nLoadFailures()'
+     11321      163 | extern OPENMM_EXPORT OpenMM_StringArray* OpenMM_Platform_
+              getPluginLoadFailures();
+     11322          |                                          ^~~~~~~~~~~~~~~~
+              ~~~~~~~~~~~~~~~~~~~~~
+     11323    In file included from /tmp/jpg/spack-stage/spack-stage-openmm-7.5
+              .0-htag5xbwjkuxm563jhwblthm3t6e5qhx/spack-build-htag5xb/wrappers/
+              OpenMMFortranWrapper.cpp:3:
+     11324    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMCWrapper.h:1074:
+              41: note: candidate: 'OpenMM_StringArray OpenMM_Platform_getPlugi
+              nLoadFailures()'
+     11325     1074 | extern OPENMM_EXPORT OpenMM_StringArray OpenMM_Platform_g
+              etPluginLoadFailures();
+     11326          |                                         ^~~~~~~~~~~~~~~~~
+              ~~~~~~~~~~~~~~~~~~~~
+     11327    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMFortranWrapper.c
+              pp: In function 'void openmm_nosehooverchain_getyoshidasuzukiweig
+              hts_(const OpenMM_NoseHooverChain*&, OpenMM_DoubleArray&)':
+  >> 11328    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMFortranWrapper.c
+              pp:5019:67: error: invalid use of incomplete type 'OpenMM_DoubleA
+              rray' {aka 'struct OpenMM_DoubleArray_struct'}
+     11329     5019 |     result = OpenMM_NoseHooverChain_getYoshidaSuzukiWeigh
+              ts(target);
+     11330          |                                                          
+                       ^
+     11331    In file included from /tmp/jpg/spack-stage/spack-stage-openmm-7.5
+              .0-htag5xbwjkuxm563jhwblthm3t6e5qhx/spack-build-htag5xb/wrappers/
+              OpenMMFortranWrapper.cpp:3:
+     11332    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMCWrapper.h:85:16
+              : note: forward declaration of 'OpenMM_DoubleArray' {aka 'struct 
+              OpenMM_DoubleArray_struct'}
+     11333       85 | typedef struct OpenMM_DoubleArray_struct OpenMM_DoubleArr
+              ay;
+     11334          |                ^~~~~~~~~~~~~~~~~~~~~~~~~
+     11335    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMFortranWrapper.c
+              pp: In function 'void OPENMM_NOSEHOOVERCHAIN_GETYOSHIDASUZUKIWEIG
+              HTS(const OpenMM_NoseHooverChain*&, OpenMM_DoubleArray&)':
+  >> 11336    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMFortranWrapper.c
+              pp:5022:67: error: invalid use of incomplete type 'OpenMM_DoubleA
+              rray' {aka 'struct OpenMM_DoubleArray_struct'}
+     11337     5022 |     result = OpenMM_NoseHooverChain_getYoshidaSuzukiWeigh
+              ts(target);
+     11338          |                                                          
+                       ^
+     11339    In file included from /tmp/jpg/spack-stage/spack-stage-openmm-7.5
+              .0-htag5xbwjkuxm563jhwblthm3t6e5qhx/spack-build-htag5xb/wrappers/
+              OpenMMFortranWrapper.cpp:3:
+     11340    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMCWrapper.h:85:16
+              : note: forward declaration of 'OpenMM_DoubleArray' {aka 'struct 
+              OpenMM_DoubleArray_struct'}
+     11341       85 | typedef struct OpenMM_DoubleArray_struct OpenMM_DoubleArr
+              ay;
+     11342          |                ^~~~~~~~~~~~~~~~~~~~~~~~~
+     11343    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMFortranWrapper.c
+              pp: At global scope:
+  >> 11344    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMFortranWrapper.c
+              pp:5310:20: error: conflicting declaration of C function 'void op
+              enmm_platform_getpluginloadfailures_(OpenMM_StringArray&)'
+     11345     5310 | OPENMM_EXPORT void openmm_platform_getpluginloadfailures_
+              (OpenMM_StringArray& result) {
+     11346          |                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     11347    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMFortranWrapper.c
+              pp:352:20: note: previous declaration 'void openmm_platform_getpl
+              uginloadfailures_(OpenMM_StringArray*&)'
+     11348      352 | OPENMM_EXPORT void openmm_platform_getpluginloadfailures_
+              (OpenMM_StringArray*& result) {
+     11349          |                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     11350    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMFortranWrapper.c
+              pp: In function 'void openmm_platform_getpluginloadfailures_(Open
+              MM_StringArray&)':
+  >> 11351    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMFortranWrapper.c
+              pp:5311:52: error: call of overloaded 'OpenMM_Platform_getPluginL
+              oadFailures()' is ambiguous
+     11352     5311 |     result = OpenMM_Platform_getPluginLoadFailures();
+     11353          |                                                    ^
+     11354    In file included from /tmp/jpg/spack-stage/spack-stage-openmm-7.5
+              .0-htag5xbwjkuxm563jhwblthm3t6e5qhx/spack-build-htag5xb/wrappers/
+              OpenMMFortranWrapper.cpp:3:
+     11355    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMCWrapper.h:163:4
+              2: note: candidate: 'OpenMM_StringArray* OpenMM_Platform_getPlugi
+              nLoadFailures()'
+     11356      163 | extern OPENMM_EXPORT OpenMM_StringArray* OpenMM_Platform_
+              getPluginLoadFailures();
+     11357          |                                          ^~~~~~~~~~~~~~~~
+              ~~~~~~~~~~~~~~~~~~~~~
+     11358    In file included from /tmp/jpg/spack-stage/spack-stage-openmm-7.5
+              .0-htag5xbwjkuxm563jhwblthm3t6e5qhx/spack-build-htag5xb/wrappers/
+              OpenMMFortranWrapper.cpp:3:
+     11359    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMCWrapper.h:1074:
+              41: note: candidate: 'OpenMM_StringArray OpenMM_Platform_getPlugi
+              nLoadFailures()'
+     11360     1074 | extern OPENMM_EXPORT OpenMM_StringArray OpenMM_Platform_g
+              etPluginLoadFailures();
+     11361          |                                         ^~~~~~~~~~~~~~~~~
+              ~~~~~~~~~~~~~~~~~~~~
+     11362    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMFortranWrapper.c
+              pp: At global scope:
+  >> 11363    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMFortranWrapper.c
+              pp:5313:20: error: conflicting declaration of C function 'void OP
+              ENMM_PLATFORM_GETPLUGINLOADFAILURES(OpenMM_StringArray&)'
+     11364     5313 | OPENMM_EXPORT void OPENMM_PLATFORM_GETPLUGINLOADFAILURES(
+              OpenMM_StringArray& result) {
+     11365          |                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     11366    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMFortranWrapper.c
+              pp:355:20: note: previous declaration 'void OPENMM_PLATFORM_GETPL
+              UGINLOADFAILURES(OpenMM_StringArray*&)'
+     11367      355 | OPENMM_EXPORT void OPENMM_PLATFORM_GETPLUGINLOADFAILURES(
+              OpenMM_StringArray*& result) {
+     11368          |                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     11369    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMFortranWrapper.c
+              pp: In function 'void OPENMM_PLATFORM_GETPLUGINLOADFAILURES(OpenM
+              M_StringArray&)':
+  >> 11370    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMFortranWrapper.c
+              pp:5314:52: error: call of overloaded 'OpenMM_Platform_getPluginL
+              oadFailures()' is ambiguous
+     11371     5314 |     result = OpenMM_Platform_getPluginLoadFailures();
+     11372          |                                                    ^
+     11373    In file included from /tmp/jpg/spack-stage/spack-stage-openmm-7.5
+              .0-htag5xbwjkuxm563jhwblthm3t6e5qhx/spack-build-htag5xb/wrappers/
+              OpenMMFortranWrapper.cpp:3:
+     11374    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMCWrapper.h:163:4
+              2: note: candidate: 'OpenMM_StringArray* OpenMM_Platform_getPlugi
+              nLoadFailures()'
+     11375      163 | extern OPENMM_EXPORT OpenMM_StringArray* OpenMM_Platform_
+              getPluginLoadFailures();
+     11376          |                                          ^~~~~~~~~~~~~~~~
+              ~~~~~~~~~~~~~~~~~~~~~
+     11377    In file included from /tmp/jpg/spack-stage/spack-stage-openmm-7.5
+              .0-htag5xbwjkuxm563jhwblthm3t6e5qhx/spack-build-htag5xb/wrappers/
+              OpenMMFortranWrapper.cpp:3:
+     11378    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMCWrapper.h:1074:
+              41: note: candidate: 'OpenMM_StringArray OpenMM_Platform_getPlugi
+              nLoadFailures()'
+     11379     1074 | extern OPENMM_EXPORT OpenMM_StringArray OpenMM_Platform_g
+              etPluginLoadFailures();
+     11380          |                                         ^~~~~~~~~~~~~~~~~
+              ~~~~~~~~~~~~~~~~~~~~
+     11381    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMFortranWrapper.c
+              pp: At global scope:
+  >> 11382    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMFortranWrapper.c
+              pp:5334:20: error: conflicting declaration of C function 'void op
+              enmm_platform_loadpluginsfromdirectory_(const char*, OpenMM_Strin
+              gArray&, int)'
+     11383     5334 | OPENMM_EXPORT void openmm_platform_loadpluginsfromdirecto
+              ry_(const char* directory, OpenMM_StringArray& result, int direct
+              ory_length) {
+     11384          |                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+              ~~~
+     11385    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMFortranWrapper.c
+              pp:346:20: note: previous declaration 'void openmm_platform_loadp
+              luginsfromdirectory_(const char*, OpenMM_StringArray*&, int)'
+     11386      346 | OPENMM_EXPORT void openmm_platform_loadpluginsfromdirecto
+              ry_(const char* directory, OpenMM_StringArray*& result, int lengt
+              h) {
+     11387          |                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+              ~~~
+     11388    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMFortranWrapper.c
+              pp: In function 'void openmm_platform_loadpluginsfromdirectory_(c
+              onst char*, OpenMM_StringArray&, int)':
+  >> 11389    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMFortranWrapper.c
+              pp:5335:102: error: call of overloaded 'OpenMM_Platform_loadPlugi
+              nsFromDirectory(const char*)' is ambiguous
+     11390     5335 |     result = OpenMM_Platform_loadPluginsFromDirectory(mak
+              eString(directory, directory_length).c_str());
+     11391          |                                                          
+                                                          ^
+     11392    In file included from /tmp/jpg/spack-stage/spack-stage-openmm-7.5
+              .0-htag5xbwjkuxm563jhwblthm3t6e5qhx/spack-build-htag5xb/wrappers/
+              OpenMMFortranWrapper.cpp:3:
+     11393    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMCWrapper.h:162:4
+              2: note: candidate: 'OpenMM_StringArray* OpenMM_Platform_loadPlug
+              insFromDirectory(const char*)'
+     11394      162 | extern OPENMM_EXPORT OpenMM_StringArray* OpenMM_Platform_
+              loadPluginsFromDirectory(const char* directory);
+     11395          |                                          ^~~~~~~~~~~~~~~~
+              ~~~~~~~~~~~~~~~~~~~~~~~~
+     11396    In file included from /tmp/jpg/spack-stage/spack-stage-openmm-7.5
+              .0-htag5xbwjkuxm563jhwblthm3t6e5qhx/spack-build-htag5xb/wrappers/
+              OpenMMFortranWrapper.cpp:3:
+     11397    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMCWrapper.h:1078:
+              41: note: candidate: 'OpenMM_StringArray OpenMM_Platform_loadPlug
+              insFromDirectory(const char*)'
+     11398     1078 | extern OPENMM_EXPORT OpenMM_StringArray OpenMM_Platform_l
+              oadPluginsFromDirectory(const char* directory);
+     11399          |                                         ^~~~~~~~~~~~~~~~~
+              ~~~~~~~~~~~~~~~~~~~~~~~
+     11400    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMFortranWrapper.c
+              pp: At global scope:
+  >> 11401    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMFortranWrapper.c
+              pp:5337:20: error: conflicting declaration of C function 'void OP
+              ENMM_PLATFORM_LOADPLUGINSFROMDIRECTORY(const char*, OpenMM_String
+              Array&, int)'
+     11402     5337 | OPENMM_EXPORT void OPENMM_PLATFORM_LOADPLUGINSFROMDIRECTO
+              RY(const char* directory, OpenMM_StringArray& result, int directo
+              ry_length) {
+     11403          |                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+              ~~
+     11404    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMFortranWrapper.c
+              pp:349:20: note: previous declaration 'void OPENMM_PLATFORM_LOADP
+              LUGINSFROMDIRECTORY(const char*, OpenMM_StringArray*&, int)'
+     11405      349 | OPENMM_EXPORT void OPENMM_PLATFORM_LOADPLUGINSFROMDIRECTO
+              RY(const char* directory, OpenMM_StringArray*& result, int length
+              ) {
+     11406          |                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+              ~~
+     11407    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMFortranWrapper.c
+              pp: In function 'void OPENMM_PLATFORM_LOADPLUGINSFROMDIRECTORY(co
+              nst char*, OpenMM_StringArray&, int)':
+  >> 11408    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMFortranWrapper.c
+              pp:5338:102: error: call of overloaded 'OpenMM_Platform_loadPlugi
+              nsFromDirectory(const char*)' is ambiguous
+     11409     5338 |     result = OpenMM_Platform_loadPluginsFromDirectory(mak
+              eString(directory, directory_length).c_str());
+     11410          |                                                          
+                                                          ^
+     11411    In file included from /tmp/jpg/spack-stage/spack-stage-openmm-7.5
+              .0-htag5xbwjkuxm563jhwblthm3t6e5qhx/spack-build-htag5xb/wrappers/
+              OpenMMFortranWrapper.cpp:3:
+     11412    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMCWrapper.h:162:4
+              2: note: candidate: 'OpenMM_StringArray* OpenMM_Platform_loadPlug
+              insFromDirectory(const char*)'
+     11413      162 | extern OPENMM_EXPORT OpenMM_StringArray* OpenMM_Platform_
+              loadPluginsFromDirectory(const char* directory);
+     11414          |                                          ^~~~~~~~~~~~~~~~
+              ~~~~~~~~~~~~~~~~~~~~~~~~
+     11415    In file included from /tmp/jpg/spack-stage/spack-stage-openmm-7.5
+              .0-htag5xbwjkuxm563jhwblthm3t6e5qhx/spack-build-htag5xb/wrappers/
+              OpenMMFortranWrapper.cpp:3:
+     11416    /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhw
+              blthm3t6e5qhx/spack-build-htag5xb/wrappers/OpenMMCWrapper.h:1078:
+              41: note: candidate: 'OpenMM_StringArray OpenMM_Platform_loadPlug
+              insFromDirectory(const char*)'
+     11417     1078 | extern OPENMM_EXPORT OpenMM_StringArray OpenMM_Platform_l
+              oadPluginsFromDirectory(const char* directory);
+     11418          |                                         ^~~~~~~~~~~~~~~~~
+              ~~~~~~~~~~~~~~~~~~~~~~~
+  >> 11419    make[2]: *** [CMakeFiles/OpenMM.dir/build.make:3173: CMakeFiles/O
+              penMM.dir/wrappers/OpenMMFortranWrapper.cpp.o] Error 1
+     11420    make[2]: *** Waiting for unfinished jobs....
+  >> 11421    make[2]: *** [CMakeFiles/OpenMM.dir/build.make:3159: CMakeFiles/O
+              penMM.dir/wrappers/OpenMMCWrapper.cpp.o] Error 1
+     11422    make[2]: Leaving directory '/tmp/jpg/spack-stage/spack-stage-open
+              mm-7.5.0-htag5xbwjkuxm563jhwblthm3t6e5qhx/spack-build-htag5xb'
+  >> 11423    make[1]: *** [CMakeFiles/Makefile2:2035: CMakeFiles/OpenMM.dir/al
+              l] Error 2
+     11424    make[1]: Leaving directory '/tmp/jpg/spack-stage/spack-stage-open
+              mm-7.5.0-htag5xbwjkuxm563jhwblthm3t6e5qhx/spack-build-htag5xb'
+     11425    make: *** [Makefile:149: all] Error 2
+
+See build log for details:
+  /tmp/jpg/spack-stage/spack-stage-openmm-7.5.0-htag5xbwjkuxm563jhwblthm3t6e5qhx/spack-build-out.txt
+
+==> Error: Terminating after first install failure: ProcessError: Command exited with status 2:
+    'make' '-j8'
+real 276.17
+user 1540.95
+sys 86.00
+ERROR: spack install failed.

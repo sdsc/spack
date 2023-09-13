@@ -1,0 +1,852 @@
+1687497103 2408 ff671157d98557a54b3b1493bca43de1  /cm/shared/apps/spack/0.17.3/cpu/etc/spack/sdsc/tscc/0.17.3/cpu/specs/gcc@10.2.0/gnuplot@5.4.2.sh 
+
+#!/usr/bin/env bash
+# real 234.30
+
+#SBATCH --job-name=gnuplot@5.4.2
+#SBATCH --account=sys200
+#SBATCH --partition=hotel
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=1
+#SBATCH --cpus-per-task=8
+#SBATCH --time=00:30:00
+#SBATCH --output=%x.o%j.%N
+
+declare -xr LOCAL_TIME="$(date +'%Y%m%dT%H%M%S%z')"
+declare -xir UNIX_TIME="$(date +'%s')"
+
+declare -xr SYSTEM_NAME='tscc'
+
+declare -xr SPACK_VERSION='0.17.3'
+declare -xr SPACK_INSTANCE_NAME='cpu'
+declare -xr SPACK_INSTANCE_DIR="/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}"
+
+declare -xr SLURM_JOB_SCRIPT="$(scontrol show job ${SLURM_JOB_ID} | awk -F= '/Command=/{print $2}')"
+declare -xr SLURM_JOB_MD5SUM="$(md5sum ${SLURM_JOB_SCRIPT})"
+
+declare -xr SCHEDULER_MODULE='slurm'
+
+echo "${UNIX_TIME} ${SLURM_JOB_ID} ${SLURM_JOB_MD5SUM} ${SLURM_JOB_DEPENDENCY}" 
+echo ""
+
+cat "${SLURM_JOB_SCRIPT}"
+
+module purge
+module load "${SCHEDULER_MODULE}"
+module list
+. "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
+
+declare -xr SPACK_PACKAGE='gnuplot@5.4.2'
+declare -xr SPACK_COMPILER='gcc@10.2.0'
+declare -xr SPACK_VARIANTS='~X +cairo +gd +libcerf ~pbm ~qt ~wx'
+declare -xr SPACK_DEPENDENCIES="^python@3.8.12/$(spack find --format '{hash:7}' python@3.8.12 % ${SPACK_COMPILER})"
+declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
+
+printenv
+
+spack config get compilers  
+spack config get config  
+spack config get mirrors
+spack config get modules
+spack config get packages
+spack config get repos
+spack config get upstreams
+
+spack spec --long --namespaces --types "${SPACK_SPEC}"
+if [[ "${?}" -ne 0 ]]; then
+  echo 'ERROR: spack concretization failed.'
+  exit 1
+fi
+
+time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all "${SPACK_SPEC}"
+if [[ "${?}" -ne 0 ]]; then
+  echo 'ERROR: spack install failed.'
+  exit 1
+fi
+
+spack module lmod refresh --delete-tree -y
+
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'eigen@3.4.0.sh'
+
+sleep 60
+
+Currently Loaded Modules:
+  1) slurm/slurm/22.05.9
+
+ 
+
+SHELL=/bin/bash
+SLURM_JOB_USER=jpg
+SLURM_TASKS_PER_NODE=1
+SLURM_JOB_UID=422
+HISTCONTROL=ignoredups
+SLURM_JOB_MD5SUM=ff671157d98557a54b3b1493bca43de1  /cm/shared/apps/spack/0.17.3/cpu/etc/spack/sdsc/tscc/0.17.3/cpu/specs/gcc@10.2.0/gnuplot@5.4.2.sh
+SLURM_TASK_PID=1947011
+LMOD_arch=x86_64
+SLURM_LOCALID=0
+SLURM_SUBMIT_DIR=/cm/shared/apps/spack/0.17.3/cpu/etc/spack/sdsc/tscc/0.17.3/cpu/specs/gcc@10.2.0
+HOSTNAME=compute-11-56
+HISTSIZE=1000
+SLURMD_NODENAME=compute-11-56
+FPATH=/usr/share/lmod/lmod/init/ksh_funcs
+_ModuleTable002_=IiwiL3Vzci9zaGFyZS9tb2R1bGVmaWxlcyIsIi91c3Ivc2hhcmUvTW9kdWxlcy9tb2R1bGVmaWxlcyIsIi9jbS9zaGFyZWQvbW9kdWxlZmlsZXMiLH0sWyJzeXN0ZW1CYXNlTVBBVEgiXT0iL2NtL2xvY2FsL21vZHVsZWZpbGVzOi9jbS9zaGFyZWQvbW9kdWxlZmlsZXM6L2V0Yy9tb2R1bGVmaWxlczovdXNyL3NoYXJlL21vZHVsZWZpbGVzOi91c3Ivc2hhcmUvTW9kdWxlcy9tb2R1bGVmaWxlcyIsfQ==
+SPACK_LD_LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:/cm/shared/apps/slurm/current/lib64
+__LMOD_REF_COUNT_MODULEPATH=/cm/local/modulefiles:2;/etc/modulefiles:1;/usr/share/modulefiles:1;/usr/share/Modules/modulefiles:1;/cm/shared/modulefiles:1
+SLURM_NODE_ALIASES=(null)
+SLURM_CLUSTER_NAME=slurm
+SLURM_JOB_SCRIPT=/cm/shared/apps/spack/0.17.3/cpu/etc/spack/sdsc/tscc/0.17.3/cpu/specs/gcc@10.2.0/gnuplot@5.4.2.sh
+SCHEDULER_MODULE=slurm
+SPACK_INSTANCE_NAME=cpu
+SLURM_CPUS_ON_NODE=8
+__LMOD_REF_COUNT__LMFILES_=/cm/local/modulefiles/slurm/slurm/22.05.9:1
+SLURM_JOB_CPUS_PER_NODE=8
+SPACK_VARIANTS=~X +cairo +gd +libcerf ~pbm ~qt ~wx
+LMOD_DIR=/usr/share/lmod/lmod/libexec
+SPACK_DEPENDENCIES=^python@3.8.12/zbtfzsi
+PWD=/home/jpg/specs_cpu_0.17.3/gcc@10.2.0
+SLURM_GTIDS=0
+LOGNAME=jpg
+XDG_SESSION_TYPE=tty
+SLURM_JOB_PARTITION=hotel
+MODULESHOME=/usr/share/lmod/lmod
+MANPATH=/cm/shared/apps/slurm/current/man:/usr/share/lmod/lmod/share/man:/usr/local/share/man:/usr/share/man:/cm/local/apps/environment-modules/current/share/man
+LMOD_PREPEND_BLOCK=normal
+SLURM_JOB_NUM_NODES=1
+SPACK_INSTANCE_DIR=/cm/shared/apps/spack/0.17.3/cpu
+SPACK_PYTHON=/usr/bin/python3
+SLURM_JOBID=2408
+SLURM_JOB_QOS=normal
+MOTD_SHOWN=pam
+__LMOD_REF_COUNT_PATH=/cm/shared/apps/slurm/current/sbin:1;/cm/shared/apps/slurm/current/bin:1;/home/jpg/usr/bin:2;/home/jpg/bin:3;/home/jpg/.local/bin:1;/usr/local/bin:1;/usr/bin:1;/usr/local/sbin:1;/usr/sbin:1
+HOME=/home/jpg
+_ModuleTable_Sz_=2
+__LMOD_REF_COUNT_LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:1;/cm/shared/apps/slurm/current/lib64:1
+LANG=en_US.UTF-8
+__LMOD_REF_COUNT_LOADEDMODULES=slurm/slurm/22.05.9:1
+LS_COLORS=rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=01;37;41:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=01;36:*.au=01;36:*.flac=01;36:*.m4a=01;36:*.mid=01;36:*.midi=01;36:*.mka=01;36:*.mp3=01;36:*.mpc=01;36:*.ogg=01;36:*.ra=01;36:*.wav=01;36:*.oga=01;36:*.opus=01;36:*.spx=01;36:*.xspf=01;36:
+SLURM_PROCID=0
+__LMOD_REF_COUNT_CPATH=/cm/shared/apps/slurm/current/include:1
+LMOD_SETTARG_FULL_SUPPORT=no
+SPACK_COMPILER=gcc@10.2.0
+TMPDIR=/tmp
+SLURM_CPUS_PER_TASK=8
+SLURM_NTASKS=1
+SLURM_TOPOLOGY_ADDR=compute-11-56
+LMOD_VERSION=8.5
+SSH_CONNECTION=70.95.82.22 58238 132.249.107.93 22
+SPACK_ROOT=/cm/shared/apps/spack/0.17.3/cpu
+MODULEPATH_ROOT=/usr/share/modulefiles
+SLURM_TOPOLOGY_ADDR_PATTERN=node
+XDG_SESSION_CLASS=user
+LMOD_PKG=/usr/share/lmod/lmod
+SLURM_WORKING_CLUSTER=slurm:mgr2:6817:9728:109
+TERM=xterm-256color
+LESSOPEN=||/usr/bin/lesspipe.sh %s
+USER=jpg
+LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:/cm/shared/apps/slurm/current/lib64
+SLURM_NODELIST=compute-11-56
+ENVIRONMENT=BATCH
+LOADEDMODULES=slurm/slurm/22.05.9
+SPACK_SPEC=gnuplot@5.4.2 % gcc@10.2.0 ~X +cairo +gd +libcerf ~pbm ~qt ~wx ^python@3.8.12/zbtfzsi
+SLURM_JOB_ACCOUNT=sys200
+SLURM_PRIO_PROCESS=0
+SLURM_NPROCS=1
+LMOD_ROOT=/usr/share/lmod
+LMOD_SETTARG_CMD=:
+SHLVL=2
+SLURM_NNODES=1
+BASH_ENV=/usr/share/lmod/lmod/init/bash
+LMOD_FULL_SETTARG_SUPPORT=no
+LMOD_sys=Linux
+__LMOD_REF_COUNT_MANPATH=/cm/shared/apps/slurm/current/man:1;/usr/share/lmod/lmod/share/man:1;/usr/local/share/man:1;/usr/share/man:1;/cm/local/apps/environment-modules/current/share/man:1
+XDG_SESSION_ID=83895
+SLURM_SUBMIT_HOST=login1
+__LMOD_SET_FPATH=1
+_ModuleTable001_=X01vZHVsZVRhYmxlXz17WyJNVHZlcnNpb24iXT0zLFsiY19yZWJ1aWxkVGltZSJdPWZhbHNlLFsiY19zaG9ydFRpbWUiXT1mYWxzZSxkZXB0aFQ9e30sZmFtaWx5PXt9LG1UPXtzbHVybT17WyJmbiJdPSIvY20vbG9jYWwvbW9kdWxlZmlsZXMvc2x1cm0vc2x1cm0vMjIuMDUuOSIsWyJmdWxsTmFtZSJdPSJzbHVybS9zbHVybS8yMi4wNS45IixbImxvYWRPcmRlciJdPTEscHJvcFQ9e30sWyJzdGFja0RlcHRoIl09MCxbInN0YXR1cyJdPSJhY3RpdmUiLFsidXNlck5hbWUiXT0ic2x1cm0iLFsid1YiXT0iKnNsdXJtLzAwMDAwMDAyMi4wMDAwMDAwMDUuMDAwMDAwMDA5Lip6ZmluYWwiLH0sfSxtcGF0aEE9eyIvY20vbG9jYWwvbW9kdWxlZmlsZXMiLCIvZXRjL21vZHVsZWZpbGVz
+SPACK_PACKAGE=gnuplot@5.4.2
+LD_LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:/cm/shared/apps/slurm/current/lib64
+XDG_RUNTIME_DIR=/run/user/422
+LMOD_COLORIZE=yes
+SLURM_JOB_ID=2408
+SLURM_NODEID=0
+S_COLORS=auto
+SSH_CLIENT=70.95.82.22 58238 22
+DEBUGINFOD_URLS=https://debuginfod.centos.org/ 
+CMD_WLM_CLUSTER_NAME=slurm
+ENABLE_LMOD=1
+which_declare=declare -f
+UNIX_TIME=1687497103
+__Init_Default_Modules=1
+SLURM_CONF=/cm/shared/apps/slurm/var/etc/slurm/slurm.conf
+PATH=/cm/shared/apps/spack/0.17.3/cpu/bin:/cm/shared/apps/slurm/current/sbin:/cm/shared/apps/slurm/current/bin:/home/jpg/usr/bin:/home/jpg/bin:/home/jpg/.local/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin
+SLURM_JOB_NAME=gnuplot@5.4.2
+LOCAL_TIME=20230622T221143-0700
+MODULEPATH=/cm/local/modulefiles:/etc/modulefiles:/usr/share/modulefiles:/usr/share/Modules/modulefiles:/cm/shared/modulefiles
+SLURM_NTASKS_PER_NODE=1
+_LMFILES_=/cm/local/modulefiles/slurm/slurm/22.05.9
+SYSTEM_NAME=tscc
+DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/422/bus
+LMOD_CMD=/usr/share/lmod/lmod/libexec/lmod
+MAIL=/var/spool/mail/jpg
+SSH_TTY=/dev/pts/0
+__LMOD_REF_COUNT_LD_LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:1;/cm/shared/apps/slurm/current/lib64:1
+LMOD_SYSTEM_DEFAULT_MODULES=DefaultModules
+SLURM_JOB_GID=7193
+CPATH=/cm/shared/apps/slurm/current/include
+SPACK_VERSION=0.17.3
+OLDPWD=/home/jpg/specs_cpu_0.17.3
+SLURM_JOB_NODELIST=compute-11-56
+BASH_FUNC_ml%%=() {  eval $($LMOD_DIR/ml_cmd "$@")
+}
+BASH_FUNC_which%%=() {  ( alias;
+ eval ${which_declare} ) | /usr/bin/which --tty-only --read-alias --read-functions --show-tilde --show-dot $@
+}
+BASH_FUNC_module%%=() {  eval $($LMOD_CMD bash "$@") && eval $(${LMOD_SETTARG_CMD:-:} -s sh)
+}
+BASH_FUNC__spack_shell_wrapper%%=() {  for var in LD_LIBRARY_PATH DYLD_LIBRARY_PATH DYLD_FALLBACK_LIBRARY_PATH;
+ do
+ eval "if [ -n \"\${${var}-}\" ]; then export SPACK_$var=\${${var}}; fi";
+ done;
+ if [ -n "${ZSH_VERSION:-}" ]; then
+ emulate -L sh;
+ fi;
+ _sp_flags="";
+ while [ ! -z ${1+x} ] && [ "${1#-}" != "${1}" ]; do
+ _sp_flags="$_sp_flags $1";
+ shift;
+ done;
+ if [ -n "$_sp_flags" ] && [ "${_sp_flags#*h}" != "${_sp_flags}" ] || [ "${_sp_flags#*V}" != "${_sp_flags}" ]; then
+ command spack $_sp_flags "$@";
+ return;
+ fi;
+ _sp_subcommand="";
+ if [ ! -z ${1+x} ]; then
+ _sp_subcommand="$1";
+ shift;
+ fi;
+ case $_sp_subcommand in 
+ "cd")
+ _sp_arg="";
+ if [ -n "$1" ]; then
+ _sp_arg="$1";
+ shift;
+ fi;
+ if [ "$_sp_arg" = "-h" ] || [ "$_sp_arg" = "--help" ]; then
+ command spack cd -h;
+ else
+ LOC="$(spack location $_sp_arg "$@")";
+ if [ -d "$LOC" ]; then
+ cd "$LOC";
+ else
+ return 1;
+ fi;
+ fi;
+ return
+ ;;
+ "env")
+ _sp_arg="";
+ if [ -n "$1" ]; then
+ _sp_arg="$1";
+ shift;
+ fi;
+ if [ "$_sp_arg" = "-h" ] || [ "$_sp_arg" = "--help" ]; then
+ command spack env -h;
+ else
+ case $_sp_arg in 
+ activate)
+ _a=" $@";
+ if [ -z ${1+x} ] || [ "${_a#* --sh}" != "$_a" ] || [ "${_a#* --csh}" != "$_a" ] || [ "${_a#* -h}" != "$_a" ] || [ "${_a#* --help}" != "$_a" ]; then
+ command spack env activate "$@";
+ else
+ stdout="$(command spack $_sp_flags env activate --sh "$@")" || return;
+ eval "$stdout";
+ fi
+ ;;
+ deactivate)
+ _a=" $@";
+ if [ "${_a#* --sh}" != "$_a" ] || [ "${_a#* --csh}" != "$_a" ]; then
+ command spack env deactivate "$@";
+ else
+ if [ -n "$*" ]; then
+ command spack env deactivate -h;
+ else
+ stdout="$(command spack $_sp_flags env deactivate --sh)" || return;
+ eval "$stdout";
+ fi;
+ fi
+ ;;
+ *)
+ command spack env $_sp_arg "$@"
+ ;;
+ esac;
+ fi;
+ return
+ ;;
+ "load" | "unload")
+ _a=" $@";
+ if [ "${_a#* --sh}" != "$_a" ] || [ "${_a#* --csh}" != "$_a" ] || [ "${_a#* -h}" != "$_a" ] || [ "${_a#* --list}" != "$_a" ] || [ "${_a#* --help}" != "$_a" ]; then
+ command spack $_sp_flags $_sp_subcommand "$@";
+ else
+ stdout="$(command spack $_sp_flags $_sp_subcommand --sh "$@")" || return;
+ eval "$stdout";
+ fi
+ ;;
+ *)
+ command spack $_sp_flags $_sp_subcommand "$@"
+ ;;
+ esac
+}
+BASH_FUNC_spack%%=() {  : this is a shell function from: /cm/shared/apps/spack/0.17.3/cpu/share/spack/setup-env.sh;
+ : the real spack script is here: /cm/shared/apps/spack/0.17.3/cpu/bin/spack;
+ _spack_shell_wrapper "$@";
+ return $?
+}
+_=/usr/bin/printenv
+compilers:
+- compiler:
+    spec: gcc@11.2.0
+    paths:
+      cc: /usr/bin/gcc
+      cxx: /usr/bin/g++
+      f77: /usr/bin/gfortran
+      fc: /usr/bin/gfortran
+    flags:
+      cflags: -O2 -march=native
+      cxxflags: -O2 -march=native
+      fflags: -O2 -march=native
+    operating_system: rocky9
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+- compiler:
+    spec: gcc@10.2.0
+    paths:
+      cc: /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-10.2.0-2ml3m2ltzeohnaco3bxthfprl6dr5gfi/bin/gcc
+      cxx: /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-10.2.0-2ml3m2ltzeohnaco3bxthfprl6dr5gfi/bin/g++
+      f77: /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-10.2.0-2ml3m2ltzeohnaco3bxthfprl6dr5gfi/bin/gfortran
+      fc: /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-10.2.0-2ml3m2ltzeohnaco3bxthfprl6dr5gfi/bin/gfortran
+    flags: {}
+    operating_system: rocky9
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+config:
+  install_tree:
+    root: $spack/opt/spack
+    projections:
+      all: ${ARCHITECTURE}/${COMPILERNAME}-${COMPILERVER}/${PACKAGE}-${VERSION}-${HASH}
+  template_dirs:
+  - $spack/share/spack/templates
+
+  # Temporary locations Spack can try to use for builds.
+  #
+  # Recommended options are given below.
+  #
+  # Builds can be faster in temporary directories on some (e.g., HPC) systems.
+  # Specifying `$tempdir` will ensure use of the default temporary directory
+  # (i.e., ``$TMP` or ``$TMPDIR``).
+  #
+  # Another option that prevents conflicts and potential permission issues is
+  # to specify `$user_cache_path/stage`, which ensures each user builds in their
+  # home directory.
+  #
+  # A more traditional path uses the value of `$spack/var/spack/stage`, which
+  # builds directly inside Spack's instance without staging them in a
+  # temporary space.  Problems with specifying a path inside a Spack instance
+  # are that it precludes its use as a system package and its ability to be
+  # pip installable.
+  #
+  # In any case, if the username is not already in the path, Spack will append
+  # the value of `$user` in an attempt to avoid potential conflicts between
+  # users in shared temporary spaces.
+  #
+  # The build stage can be purged with `spack clean --stage` and
+  # `spack clean -a`, so it is important that the specified directory uniquely
+  # identifies Spack staging to avoid accidentally wiping out non-Spack work.
+  build_stage:
+  - $tempdir/$user/spack-stage
+  - $user_cache_path/stage
+  # - $spack/var/spack/stage
+
+  # Directory in which to run tests and store test results.
+  # Tests will be stored in directories named by date/time and package
+  # name/hash.
+  test_stage: $user_cache_path/test
+  source_cache: $spack/var/spack/cache
+  misc_cache: $user_cache_path/cache
+  connect_timeout: 10
+  verify_ssl: true
+  suppress_gpg_warnings: false
+  install_missing_compilers: false
+  checksum: true
+  deprecated: false
+  dirty: false
+  build_language: C
+  locks: true
+  url_fetch_method: urllib
+  ccache: false
+  concretizer: clingo
+  db_lock_timeout: 3
+  package_lock_timeout: null
+  shared_linking: rpath
+  allow_sgid: true
+  terminal_title: false
+  debug: false
+  build_jobs: 16
+mirrors:
+  spack-public: https://mirror.spack.io
+modules:
+  default:
+    lmod:
+      core_compilers:
+      - gcc@11.2.0
+      hierarchy:
+      - mpi
+      hash_length: 7
+      blacklist_implicits: true
+      naming_scheme: '{name}/{version}'
+      projections:
+        all: '{name}/{version}'
+      adol-c:
+        suffixes:
+          +openmp: omp
+      amdblis:
+        suffixes:
+          threads=openmp: omp
+      fftw:
+        suffixes:
+          +openmp: omp
+      hpl:
+        suffixes:
+          +openmp: omp
+      hypre:
+        suffixes:
+          +openmp: omp
+      intel:
+        environment:
+          set:
+            INTEL_LICENSE_FILE: 40000@elprado.sdsc.edu:40100@elprado.sdsc.edu
+      kokkos:
+        suffixes:
+          +openmp: omp
+      openblas:
+        suffixes:
+          threads=openmp: omp
+          +ilp64: ilp64
+      'netlib-scalapack:':
+        suffixes:
+          ^openblas threads=openmp: omp
+      petsc:
+        suffixes:
+          +complex: cmplx
+      slepc:
+        suffixes:
+          ^petsc +complex: cmplx
+      ^python:
+        autoload: direct
+      ^ucx:
+        autoload: direct
+    'enable:':
+    - lmod
+  prefix_inspections:
+    lib:
+    - LD_LIBRARY_PATH
+    lib64:
+    - LD_LIBRARY_PATH
+    bin:
+    - PATH
+    man:
+    - MANPATH
+    share/man:
+    - MANPATH
+    share/aclocal:
+    - ACLOCAL_PATH
+    lib/pkgconfig:
+    - PKG_CONFIG_PATH
+    lib64/pkgconfig:
+    - PKG_CONFIG_PATH
+    share/pkgconfig:
+    - PKG_CONFIG_PATH
+    ? ''
+    : - CMAKE_PREFIX_PATH
+
+  # These are configurations for the module set named "default"
+packages:
+  lustre:
+    externals:
+    - spec: lustre@2.15.2 % gcc@10.2.0 arch=linux-rocky9-cascadelake
+      prefix: /usr
+    - spec: lustre@2.15.2 % gcc@11.2.0 arch=linux-rocky9-cascadelake
+      prefix: /usr
+    - spec: lustre@2.15.2 % intel@19.1.1.217 arch=linux-rocky9-cascadelake
+      prefix: /usr
+    buildable: false
+  texlive:
+    externals:
+    - spec: texlive@live % gcc@10.2.0  arch=linux-rocky9-cascadelake
+      prefix: /usr
+    - spec: texlive@live % gcc@11.2.0  arch=linux-rocky9-cascadelake
+      prefix: /usr
+    - spec: texlive@live % intel@19.1.1.217  arch=linux-rocky9-cascadelake
+      prefix: /usr
+    buildable: false
+  openssl:
+    externals:
+    - spec: openssl@3.0.1 % gcc@10.2.0 arch=linux-rocky9-cascadelake
+      prefix: /usr
+    - spec: openssl@3.0.1 % gcc@11.2.0 arch=linux-rocky9-cascadelake
+      prefix: /usr
+    - spec: openssl@3.0.1 % intel@19.1.1.217 arch=linux-rocky9-cascadelake
+      prefix: /usr
+    buildable: false
+  rdma-core:
+    externals:
+    - spec: rdma-core@41.0 % gcc@11.2.0 arch=linux-rocky9-cascadelake
+      prefix: /usr
+    - spec: rdma-core@41.0 % gcc@10.2.0 arch=linux-rocky9-cascadelake
+      prefix: /usr
+    - spec: rdma-core@41.0 % intel@19.1.1.217 arch=linux-rocky9-cascadelake
+      prefix: /usr
+    buildable: false
+  slurm:
+    externals:
+    - spec: slurm@22.05.9 % gcc@11.2.0 arch=linux-rocky9-cascadelake
+      prefix: /cm/shared/apps/slurm/22.05.9
+    - spec: slurm@22.05.8 % gcc@10.2.0 arch=linux-rocky9-cascadelake
+      prefix: /cm/shared/apps/slurm/22.05.9
+    - spec: slurm@22.05.8 % intel@19.1.1.217 arch=linux-rocky9-cascadelake
+      prefix: /cm/shared/apps/slurm/22.05.9
+    buildable: false
+  librsvg:
+    externals:
+    - spec: librsvg@2.42.7 % gcc@10.2.0 arch=linux-rocky9-cascadelake
+      prefix: /usr
+    - spec: librsvg@2.42.7 % gcc@11.2.0 arch=linux-rocky9-cascadelake
+      prefix: /usr
+    - spec: librsvg@2.42.7 % intel@19.1.1.217 arch=linux-rocky9-cascadelake
+      prefix: /usr
+    buildable: false
+  ghostscript:
+    externals:
+    - spec: ghostscript@9.27 % gcc@10.2.0 arch=linux-rocky9-cascadelake
+      prefix: /usr
+    - spec: ghostscript@9.27 % gcc@11.2.0 arch=linux-rocky9-cascadelake
+      prefix: /usr
+    - spec: ghostscript@9.27 % intel@19.1.1.217 arch=linux-rocky9-cascadelake
+      prefix: /usr
+    buildable: false
+  gaussian:
+    permissions:
+      read: group
+      group: jpg
+  vasp6:
+    permissions:
+      read: group
+      group: vasp-6
+  all:
+    compiler: [gcc, intel, pgi, clang, xl, nag, fj, aocc]
+    providers:
+      awk: [gawk]
+      blas: [openblas, amdblis]
+      D: [ldc]
+      daal: [intel-daal]
+      elf: [elfutils]
+      fftw-api: [fftw, amdfftw]
+      flame: [libflame, amdlibflame]
+      fuse: [libfuse]
+      gl: [mesa+opengl, mesa18, opengl]
+      glu: [mesa-glu, openglu]
+      glx: [mesa+glx, mesa18+glx, opengl]
+      golang: [gcc]
+      iconv: [libiconv]
+      ipp: [intel-ipp]
+      java: [openjdk, jdk, ibm-java]
+      jpeg: [libjpeg-turbo, libjpeg]
+      lapack: [openblas, amdlibflame]
+      lua-lang: [lua, lua-luajit]
+      mariadb-client: [mariadb-c-client, mariadb]
+      mkl: [intel-mkl]
+      mpe: [mpe2]
+      mpi: [openmpi, mpich]
+      mysql-client: [mysql, mariadb-c-client]
+      opencl: [pocl]
+      onedal: [intel-oneapi-dal]
+      osmesa: [mesa+osmesa, mesa18+osmesa]
+      pbs: [openpbs, torque]
+      pil: [py-pillow]
+      pkgconfig: [pkgconf, pkg-config]
+      rpc: [libtirpc]
+      scalapack: [netlib-scalapack, amdscalapack]
+      sycl: [hipsycl]
+      szip: [libaec, libszip]
+      tbb: [intel-tbb]
+      unwind: [libunwind]
+      uuid: [util-linux-uuid, libuuid]
+      xxd: [xxd-standalone, vim]
+      yacc: [bison, byacc]
+      ziglang: [zig]
+    permissions:
+      read: world
+      write: user
+repos:
+- $spack/var/spack/repos/sdsc
+- $spack/var/spack/repos/builtin
+upstreams: {}
+Input spec
+--------------------------------
+[    ]  .gnuplot@5.4.2%gcc@10.2.0~X+cairo+gd+libcerf~pbm~qt~wx
+[    ]      ^builtin.python@3.8.12%gcc@10.2.0+bz2+ctypes+dbm~debug+libxml2+lzma~nis+optimizations+pic+pyexpat+pythoncmd+readline+shared+sqlite3+ssl~tix~tkinter~ucs4+uuid+zlib patches=0d98e93189bc278fbc37a50ed7f183bd8aaf249a8e1670a465f0db6bb4f8cf87,4c2457325f2b608b1b6a2c63087df8c26e07db3e3d493caf36a56f0ecf6fb768,f2fd060afc4b4618fe8104c4c5d771f36dc55b1db5a4623785a4ea707ec72fb4 arch=linux-rocky9-cascadelake
+[bl  ]          ^builtin.bzip2@1.0.8%gcc@10.2.0~debug~pic+shared arch=linux-rocky9-cascadelake
+[bl  ]          ^builtin.expat@2.4.1%gcc@10.2.0+libbsd arch=linux-rocky9-cascadelake
+[bl  ]              ^builtin.libbsd@0.11.3%gcc@10.2.0 arch=linux-rocky9-cascadelake
+[bl  ]                  ^builtin.libmd@1.0.3%gcc@10.2.0 arch=linux-rocky9-cascadelake
+[bl  ]          ^sdsc.gdbm@1.19%gcc@10.2.0 arch=linux-rocky9-cascadelake
+[bl  ]              ^builtin.readline@8.1%gcc@10.2.0 arch=linux-rocky9-cascadelake
+[bl  ]                  ^builtin.ncurses@6.2%gcc@10.2.0~symlinks+termlib abi=none arch=linux-rocky9-cascadelake
+[bl  ]          ^builtin.gettext@0.21%gcc@10.2.0+bzip2+curses+git~libunistring+libxml2+tar+xz arch=linux-rocky9-cascadelake
+[bl  ]              ^builtin.libiconv@1.16%gcc@10.2.0 libs=shared,static arch=linux-rocky9-cascadelake
+[bl  ]              ^builtin.libxml2@2.9.12%gcc@10.2.0~python arch=linux-rocky9-cascadelake
+[blr ]                  ^builtin.xz@5.2.5%gcc@10.2.0~pic libs=shared,static arch=linux-rocky9-cascadelake
+[bl  ]                  ^builtin.zlib@1.2.11%gcc@10.2.0+optimize+pic+shared arch=linux-rocky9-cascadelake
+[bl  ]              ^builtin.tar@1.34%gcc@10.2.0 arch=linux-rocky9-cascadelake
+[bl  ]          ^builtin.libffi@3.3%gcc@10.2.0 patches=26f26c6f29a7ce9bf370ad3ab2610f99365b4bdd7b82e7c31df41a3370d685c0 arch=linux-rocky9-cascadelake
+[bl  ]          ^builtin.openssl@3.0.1%gcc@10.2.0~docs certs=system arch=linux-rocky9-cascadelake
+[bl  ]          ^builtin.sqlite@3.36.0%gcc@10.2.0+column_metadata+fts~functions~rtree arch=linux-rocky9-cascadelake
+[bl  ]          ^builtin.util-linux-uuid@2.36.2%gcc@10.2.0 arch=linux-rocky9-cascadelake
+
+Concretized
+--------------------------------
+jwgjwhq  [    ]  builtin.gnuplot@5.4.2%gcc@10.2.0~X+cairo+gd+libcerf~pbm~qt~wx patches=ad89f23815fd925889ae78009ba22e6f9e4b12fea389280040cef519deafb052 arch=linux-rocky9-cascadelake
+pzz5ju6  [bl  ]      ^builtin.cairo@1.16.0%gcc@10.2.0~X+fc+ft+gobject+pdf~png~svg patches=7c4da77767fe9feb03f8051def0832f0c67f99162913275cfa127a88df19cf51 arch=linux-rocky9-cascadelake
+5ioejy7  [b   ]          ^builtin.autoconf@2.69%gcc@10.2.0 patches=35c449281546376449766f92d49fc121ca50e330e60fefcfc9be2af3253082c2,7793209b33013dc0f81208718c68440c5aae80e7a1c4b8d336e382525af791a7,a49dd5bac3b62daa0ff688ab4d508d71dbd2f4f8d7e2a02321926346161bf3ee arch=linux-rocky9-cascadelake
+iicu2mi  [b r ]              ^builtin.m4@1.4.19%gcc@10.2.0+sigsegv patches=9dc5fbd0d5cb1037ab1e6d0ecc74a30df218d0a94bdd5a02759a97f62daca573,bfdffa7c2eb01021d5849b36972c069693654ad826c1a20b53534009a4ec7a89 arch=linux-rocky9-cascadelake
+hktmtay  [bl  ]                  ^builtin.libsigsegv@2.13%gcc@10.2.0 arch=linux-rocky9-cascadelake
+6rhlmh6  [b r ]              ^sdsc.perl@5.32.0%gcc@10.2.0+cpanm+shared+threads arch=linux-rocky9-cascadelake
+jtqvkkl  [bl  ]                  ^builtin.berkeley-db@18.1.40%gcc@10.2.0+cxx~docs+stl patches=b231fcc4d5cff05e5c3a4814f6a5af0e9a966428dc2176540d2c05aff41de522 arch=linux-rocky9-cascadelake
+ajm27op  [bl  ]                  ^builtin.bzip2@1.0.8%gcc@10.2.0~debug~pic+shared arch=linux-rocky9-cascadelake
+72i4jhj  [bl  ]                  ^sdsc.gdbm@1.19%gcc@10.2.0 arch=linux-rocky9-cascadelake
+xbqj6ko  [bl  ]                      ^builtin.readline@8.1%gcc@10.2.0 arch=linux-rocky9-cascadelake
+bsjgtdt  [bl  ]                          ^builtin.ncurses@6.2%gcc@10.2.0~symlinks+termlib abi=none arch=linux-rocky9-cascadelake
+4uqbysq  [bl  ]                  ^builtin.zlib@1.2.11%gcc@10.2.0+optimize+pic+shared arch=linux-rocky9-cascadelake
+ibn4cup  [b   ]          ^builtin.automake@1.16.3%gcc@10.2.0 arch=linux-rocky9-cascadelake
+nx6w2xh  [bl  ]          ^builtin.fontconfig@2.13.94%gcc@10.2.0 arch=linux-rocky9-cascadelake
+wrnwjdi  [bl  ]              ^builtin.font-util@1.3.2%gcc@10.2.0 fonts=encodings,font-adobe-100dpi,font-adobe-75dpi,font-adobe-utopia-100dpi,font-adobe-utopia-75dpi,font-adobe-utopia-type1,font-alias,font-arabic-misc,font-bh-100dpi,font-bh-75dpi,font-bh-lucidatypewriter-100dpi,font-bh-lucidatypewriter-75dpi,font-bh-type1,font-bitstream-100dpi,font-bitstream-75dpi,font-bitstream-speedo,font-bitstream-type1,font-cronyx-cyrillic,font-cursor-misc,font-daewoo-misc,font-dec-misc,font-ibm-type1,font-isas-misc,font-jis-misc,font-micro-misc,font-misc-cyrillic,font-misc-ethiopic,font-misc-meltho,font-misc-misc,font-mutt-misc,font-schumacher-misc,font-screen-cyrillic,font-sun-misc,font-winitzki-cyrillic,font-xfree86-type1 arch=linux-rocky9-cascadelake
+tshkroz  [b   ]                  ^builtin.bdftopcf@1.0.5%gcc@10.2.0 arch=linux-rocky9-cascadelake
+53vqgot  [bl  ]                      ^builtin.fontsproto@2.1.3%gcc@10.2.0 arch=linux-rocky9-cascadelake
+fb5xiok  [b   ]                          ^builtin.pkgconf@1.8.0%gcc@10.2.0 arch=linux-rocky9-cascadelake
+tdnzbkl  [b   ]                          ^builtin.util-macros@1.19.3%gcc@10.2.0 arch=linux-rocky9-cascadelake
+ntvx4kh  [bl  ]                      ^builtin.libxfont@1.5.2%gcc@10.2.0 arch=linux-rocky9-cascadelake
+n3iwwll  [bl  ]                          ^builtin.freetype@2.11.0%gcc@10.2.0 arch=linux-rocky9-cascadelake
+emuqdf4  [bl  ]                              ^builtin.libpng@1.6.37%gcc@10.2.0 arch=linux-rocky9-cascadelake
+feqzjbt  [bl  ]                          ^builtin.libfontenc@1.1.3%gcc@10.2.0 arch=linux-rocky9-cascadelake
+2j3nx2y  [bl  ]                              ^builtin.xproto@7.0.31%gcc@10.2.0 arch=linux-rocky9-cascadelake
+h6hyd5f  [bl  ]                          ^builtin.xtrans@1.3.5%gcc@10.2.0 arch=linux-rocky9-cascadelake
+ez2tloq  [b   ]                  ^builtin.mkfontdir@1.0.7%gcc@10.2.0 arch=linux-rocky9-cascadelake
+2a2wmf3  [b r ]                      ^builtin.mkfontscale@1.1.2%gcc@10.2.0 arch=linux-rocky9-cascadelake
+d5a7gtt  [b   ]              ^builtin.gperf@3.1%gcc@10.2.0 arch=linux-rocky9-cascadelake
+vykfqo5  [bl  ]              ^builtin.libxml2@2.9.12%gcc@10.2.0~python arch=linux-rocky9-cascadelake
+wtudqp7  [bl  ]                  ^builtin.libiconv@1.16%gcc@10.2.0 libs=shared,static arch=linux-rocky9-cascadelake
+ou33t6h  [blr ]                  ^builtin.xz@5.2.5%gcc@10.2.0~pic libs=shared,static arch=linux-rocky9-cascadelake
+zbtfzsi  [blr ]              ^builtin.python@3.8.12%gcc@10.2.0+bz2+ctypes+dbm~debug+libxml2+lzma~nis+optimizations+pic+pyexpat+pythoncmd+readline+shared+sqlite3+ssl~tix~tkinter~ucs4+uuid+zlib patches=0d98e93189bc278fbc37a50ed7f183bd8aaf249a8e1670a465f0db6bb4f8cf87,4c2457325f2b608b1b6a2c63087df8c26e07db3e3d493caf36a56f0ecf6fb768,f2fd060afc4b4618fe8104c4c5d771f36dc55b1db5a4623785a4ea707ec72fb4 arch=linux-rocky9-cascadelake
+qj5aln7  [bl  ]                  ^builtin.expat@2.4.1%gcc@10.2.0+libbsd arch=linux-rocky9-cascadelake
+uau6dnm  [bl  ]                      ^builtin.libbsd@0.11.3%gcc@10.2.0 arch=linux-rocky9-cascadelake
+v7ub3z4  [bl  ]                          ^builtin.libmd@1.0.3%gcc@10.2.0 arch=linux-rocky9-cascadelake
+6vsp75v  [bl  ]                  ^builtin.gettext@0.21%gcc@10.2.0+bzip2+curses+git~libunistring+libxml2+tar+xz arch=linux-rocky9-cascadelake
+hmarh6a  [bl  ]                      ^builtin.tar@1.34%gcc@10.2.0 arch=linux-rocky9-cascadelake
+2mnqniq  [bl  ]                  ^builtin.libffi@3.3%gcc@10.2.0 patches=26f26c6f29a7ce9bf370ad3ab2610f99365b4bdd7b82e7c31df41a3370d685c0 arch=linux-rocky9-cascadelake
+hzcjij5  [bl  ]                  ^builtin.openssl@3.0.1%gcc@10.2.0~docs certs=system arch=linux-rocky9-cascadelake
+bljffxn  [bl  ]                  ^builtin.sqlite@3.36.0%gcc@10.2.0+column_metadata+fts~functions~rtree arch=linux-rocky9-cascadelake
+5r52k3d  [bl  ]                  ^builtin.util-linux-uuid@2.36.2%gcc@10.2.0 arch=linux-rocky9-cascadelake
+kawq5ti  [bl  ]          ^builtin.glib@2.70.0%gcc@10.2.0~libmount patches=8547954e50d0a720fa9794b84c31569df6a7419319b95ac9de0ed861d8969ffd tracing=none arch=linux-rocky9-cascadelake
+7tccydf  [b   ]              ^builtin.meson@0.60.0%gcc@10.2.0 patches=aa6c50d5a2aeb1a487d16f6712be4357fefb923aae37ab830699b07338388287 arch=linux-rocky9-cascadelake
+xmcqiev  [b r ]                  ^builtin.ninja@1.10.2%gcc@10.2.0 arch=linux-rocky9-cascadelake
+x4ymo7r  [b r ]                  ^builtin.py-setuptools@58.2.0%gcc@10.2.0 arch=linux-rocky9-cascadelake
+7v7gjy2  [bl  ]              ^builtin.pcre@8.44%gcc@10.2.0~jit+multibyte+utf arch=linux-rocky9-cascadelake
+jdsmqaa  [b   ]          ^builtin.libtool@2.4.6%gcc@10.2.0 arch=linux-rocky9-cascadelake
+wglpccn  [bl  ]          ^builtin.pixman@0.40.0%gcc@10.2.0 arch=linux-rocky9-cascadelake
+6rwfmle  [bl  ]      ^builtin.libcerf@1.3%gcc@10.2.0 arch=linux-rocky9-cascadelake
+w2vhbjw  [bl  ]      ^builtin.libgd@2.2.4%gcc@10.2.0 arch=linux-rocky9-cascadelake
+ggkrrmm  [bl  ]          ^builtin.libjpeg-turbo@2.1.0%gcc@10.2.0 arch=linux-rocky9-cascadelake
+msypfs7  [b   ]              ^builtin.cmake@3.21.4%gcc@10.2.0~doc+ncurses+openssl+ownlibs~qt build_type=Release arch=linux-rocky9-cascadelake
+c7c4vjb  [b   ]              ^builtin.nasm@2.15.05%gcc@10.2.0 arch=linux-rocky9-cascadelake
+3vhixwr  [bl  ]          ^builtin.libtiff@4.3.0%gcc@10.2.0~jbig~jpeg~jpeg12~lerc~libdeflate~lzma~old-jpeg~pixarlog~webp~zlib~zstd arch=linux-rocky9-cascadelake
+ylmq53w  [bl  ]      ^builtin.libxpm@3.5.12%gcc@10.2.0 arch=linux-rocky9-cascadelake
+6qxijt4  [bl  ]          ^builtin.libx11@1.7.0%gcc@10.2.0 arch=linux-rocky9-cascadelake
+qqgyokt  [bl  ]              ^builtin.inputproto@2.3.2%gcc@10.2.0 arch=linux-rocky9-cascadelake
+3smy73f  [bl  ]              ^builtin.kbproto@1.0.7%gcc@10.2.0 arch=linux-rocky9-cascadelake
+rq5ywtb  [bl  ]              ^builtin.libxcb@1.14%gcc@10.2.0 arch=linux-rocky9-cascadelake
+wb454zy  [bl  ]                  ^builtin.libpthread-stubs@0.4%gcc@10.2.0 arch=linux-rocky9-cascadelake
+kcdwkmc  [bl  ]                  ^builtin.libxau@1.0.8%gcc@10.2.0 arch=linux-rocky9-cascadelake
+afn7xvr  [bl  ]                  ^builtin.libxdmcp@1.1.2%gcc@10.2.0 arch=linux-rocky9-cascadelake
+gyf7qj6  [bl  ]                  ^builtin.xcb-proto@1.14.1%gcc@10.2.0 arch=linux-rocky9-cascadelake
+tauhx4z  [bl  ]              ^builtin.xextproto@7.3.0%gcc@10.2.0 arch=linux-rocky9-cascadelake
+wfre5r5  [bl  ]      ^builtin.pango@1.42.0%gcc@10.2.0~X arch=linux-rocky9-cascadelake
+u3pq6lz  [bl  ]          ^builtin.fribidi@1.0.5%gcc@10.2.0 arch=linux-rocky9-cascadelake
+bubyjxh  [bl  ]          ^builtin.gobject-introspection@1.56.1%gcc@10.2.0 patches=6f90bb267efa043ed70b900b4b8e2faf9e8133afae311893b01060356ea81bba,7700828b638c85255c87fcc317ea7e9572ff443f65c86648796528885e5b4cea arch=linux-rocky9-cascadelake
+egvqhvi  [b   ]              ^builtin.bison@3.8.2%gcc@10.2.0 arch=linux-rocky9-cascadelake
+eduenvo  [b   ]                  ^builtin.diffutils@3.8%gcc@10.2.0 arch=linux-rocky9-cascadelake
+rmcjigp  [b   ]              ^builtin.flex@2.6.3%gcc@10.2.0+lex~nls arch=linux-rocky9-cascadelake
+ljmyskd  [b   ]                  ^builtin.findutils@4.8.0%gcc@10.2.0 arch=linux-rocky9-cascadelake
+gj3cupe  [bl  ]          ^builtin.harfbuzz@2.6.8%gcc@10.2.0~graphite2 arch=linux-rocky9-cascadelake
+xhocqoa  [bl  ]              ^builtin.icu4c@67.1%gcc@10.2.0 cxxstd=11 arch=linux-rocky9-cascadelake
+
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/libsigsegv-2.13-hktmtayi77vhvccpaozxk7ptnydrcuox
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/berkeley-db-18.1.40-jtqvkkl7yqo2ltog5teew6oh7kzbv6oa
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/bzip2-1.0.8-ajm27opt7ijxmem5ggf4n5cxxc3t3adi
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/ncurses-6.2-bsjgtdtspyy5jo24t43pkbllqzvzi7f7
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/zlib-1.2.11-4uqbysqityp77r5nt3yi57vwyw4qnsoq
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/pkgconf-1.8.0-fb5xiokhlcrkbqmkzf2d2tqou2mbrdzc
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/util-macros-1.19.3-tdnzbkl74cgez4msdrngqoeptxaewryn
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/gperf-3.1-d5a7gttrhupedmy2wfpkt7mz4jkwx67e
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/libiconv-1.16-wtudqp7hljfefzx4fcbhnlgfntzgt2xp
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/xz-5.2.5-ou33t6hr3g4vspgpxkharomlppeoachh
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/libmd-1.0.3-v7ub3z4irykjddtmqzu43opgkbwrbfd5
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/libffi-3.3-2mnqniqgxxkzayjkb76afxi5xdy2hk5e
+[+] /usr (external openssl-3.0.1-hzcjij5xskkgom4gruklbckiveahq7zx)
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/util-linux-uuid-2.36.2-5r52k3duohk6cjunr3jmiakfem77274o
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/pcre-8.44-7v7gjy2tdd43o4yfwgp4vtp5syerdvqd
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/libcerf-1.3-6rwfmle25iwedqag6vrqjqvl4zbl6gsx
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/nasm-2.15.05-c7c4vjbmulthziaknoihpxtwqizuxtwv
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/libtiff-4.3.0-3vhixwrpdwiumyvnchsmib2h2pcyvmvb
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/libpthread-stubs-0.4-wb454zywlz77olh34u74yp2cynps2vlm
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/xcb-proto-1.14.1-gyf7qj6faxoouf2i6dnxxcyngwrvo6zm
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/findutils-4.8.0-ljmyskdwetbdrxluuntqve7pwghieybl
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/m4-1.4.19-iicu2mi436w36lirbi4y65mm2pbc5b77
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/readline-8.1-xbqj6kojps2er2fphfy76qa3akb5qpcd
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/libpng-1.6.37-emuqdf4saii7hyhinjau73yswlqphqrs
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/xextproto-7.3.0-tauhx4zjg7u4z2yluyckjuxiy4c6pung
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/fontsproto-2.1.3-53vqgoth4jp23suxqdrbrtcihy4bbwbx
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/xproto-7.0.31-2j3nx2yqlgfnrecu3v5uxjfaikzmnyna
+==> Installing kbproto-1.0.7-3smy73fkom3kezljg4o7lo5uej3dzp75
+==> No binary for kbproto-1.0.7-3smy73fkom3kezljg4o7lo5uej3dzp75 found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/82/828cb275b91268b1a3ea950d5c0c5eb076c678fdf005d517411f89cc8c3bb416.tar.gz
+==> No patches needed for kbproto
+==> kbproto: Executing phase: 'autoreconf'
+==> kbproto: Executing phase: 'configure'
+==> kbproto: Executing phase: 'build'
+==> kbproto: Executing phase: 'install'
+==> kbproto: Successfully installed kbproto-1.0.7-3smy73fkom3kezljg4o7lo5uej3dzp75
+  Fetch: 0.13s.  Build: 7.03s.  Total: 7.16s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/kbproto-1.0.7-3smy73fkom3kezljg4o7lo5uej3dzp75
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/xtrans-1.3.5-h6hyd5f5utnbadcf7r65kfhuev4ru4hn
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/inputproto-2.3.2-qqgyoktvuihmykudm5u5gicbenjxqj72
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/diffutils-3.8-eduenvop5dj34nt6zw5nhvzyxeknewpk
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/tar-1.34-hmarh6a5scrrrvy55lozh7yve2z4bjnm
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/libxml2-2.9.12-vykfqo5bcbyn55h62vjyw33pb2fo5e25
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/libbsd-0.11.3-uau6dnmu5oiufrxbbdnxxb3p4nowljws
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/libtool-2.4.6-jdsmqaa5z3wn4wcm3hdsbgox5mttap74
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/gdbm-1.19-72i4jhjkiit4mdywj3duxglj2gf2fsdr
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/sqlite-3.36.0-bljffxnoagqrxmddnzvusobmeb2c7dt5
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/freetype-2.11.0-n3iwwllkfzs765jle7rvgvjh6qmycldo
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/pixman-0.40.0-wglpccn3fdoobcnjswhutdds7ewozj7i
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/libfontenc-1.1.3-feqzjbts5ox73py2s4ctwxitq6jn3ivk
+==> Installing libxau-1.0.8-kcdwkmc7nw4fyiokv2ickcnkhvribwgr
+==> No binary for libxau-1.0.8-kcdwkmc7nw4fyiokv2ickcnkhvribwgr found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/c3/c343b4ef66d66a6b3e0e27aa46b37ad5cab0f11a5c565eafb4a1c7590bc71d7b.tar.gz
+==> No patches needed for libxau
+==> libxau: Executing phase: 'autoreconf'
+==> libxau: Executing phase: 'configure'
+==> libxau: Executing phase: 'build'
+==> libxau: Executing phase: 'install'
+==> libxau: Successfully installed libxau-1.0.8-kcdwkmc7nw4fyiokv2ickcnkhvribwgr
+  Fetch: 0.56s.  Build: 7.46s.  Total: 8.02s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/libxau-1.0.8-kcdwkmc7nw4fyiokv2ickcnkhvribwgr
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/gettext-0.21-6vsp75vosm5awm7hqlolf6lhfqjdoexk
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/expat-2.4.1-qj5aln7z27szycd6v2wbzzydof5sjxee
+==> Installing libxdmcp-1.1.2-afn7xvriikdcks24tqwfu6ybnxfrth5i
+==> No binary for libxdmcp-1.1.2-afn7xvriikdcks24tqwfu6ybnxfrth5i found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/6f/6f7c7e491a23035a26284d247779174dedc67e34e93cc3548b648ffdb6fc57c0.tar.gz
+==> No patches needed for libxdmcp
+==> libxdmcp: Executing phase: 'autoreconf'
+==> libxdmcp: Executing phase: 'configure'
+==> libxdmcp: Executing phase: 'build'
+==> libxdmcp: Executing phase: 'install'
+==> libxdmcp: Successfully installed libxdmcp-1.1.2-afn7xvriikdcks24tqwfu6ybnxfrth5i
+  Fetch: 0.62s.  Build: 6.32s.  Total: 6.94s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/libxdmcp-1.1.2-afn7xvriikdcks24tqwfu6ybnxfrth5i
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/libjpeg-turbo-2.1.0-ggkrrmmhdpkojt3dqtt462s5mye4yj4r
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/perl-5.32.0-6rhlmh6zt2avljkidzhcwpqml6rtxvok
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/mkfontscale-1.1.2-2a2wmf3s357w6pc535xotgbkmjgsqs7e
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/libxfont-1.5.2-ntvx4khl5o3gqa3xip7s3qn4vxwozjwc
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/python-3.8.12-zbtfzsi35ydhprggy2ibwfd6kyjjeqrz
+==> Installing libxcb-1.14-rq5ywtby4wmo66oclonvot65opdt2iqb
+==> No binary for libxcb-1.14-rq5ywtby4wmo66oclonvot65opdt2iqb found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/a5/a55ed6db98d43469801262d81dc2572ed124edc3db31059d4e9916eb9f844c34.tar.xz
+==> Ran patch() for libxcb
+==> libxcb: Executing phase: 'autoreconf'
+==> libxcb: Executing phase: 'configure'
+==> libxcb: Executing phase: 'build'
+==> libxcb: Executing phase: 'install'
+==> libxcb: Successfully installed libxcb-1.14-rq5ywtby4wmo66oclonvot65opdt2iqb
+  Fetch: 0.28s.  Build: 2m 7.15s.  Total: 2m 7.42s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/libxcb-1.14-rq5ywtby4wmo66oclonvot65opdt2iqb
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/autoconf-2.69-5ioejy7pdaefurpni2su25kbu56drp7u
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/bison-3.8.2-egvqhviywlssx3jqxi6ean2jvm5hgbi4
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/mkfontdir-1.0.7-ez2tloql6gfmew6ha5grytwyzaoeirbp
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/bdftopcf-1.0.5-tshkrozsouftrnp3wtttcz2fqw7ejh4k
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/icu4c-67.1-xhocqoauxhrduyaouccvytolxkmyf52a
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/ninja-1.10.2-xmcqievvgqsqrmgjoatdk34s2437cslh
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/py-setuptools-58.2.0-x4ymo7rpvsyfzfnjmsmybemvl6xf6jei
+==> Installing libx11-1.7.0-6qxijt464dkg57g3styryciug26it2iy
+==> No binary for libx11-1.7.0-6qxijt464dkg57g3styryciug26it2iy found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/c4/c48ec61785ec68fc6a9a6aca0a9578393414fe2562e3cc9cca30234345c7b6ac.tar.gz
+==> No patches needed for libx11
+==> libx11: Executing phase: 'autoreconf'
+==> libx11: Executing phase: 'configure'
+==> libx11: Executing phase: 'build'
+==> libx11: Executing phase: 'install'
+==> libx11: Successfully installed libx11-1.7.0-6qxijt464dkg57g3styryciug26it2iy
+  Fetch: 0.75s.  Build: 1m 57.48s.  Total: 1m 58.24s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/libx11-1.7.0-6qxijt464dkg57g3styryciug26it2iy
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/automake-1.16.3-ibn4cupobmtez7piomuox2c6xc3vbhwy
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/flex-2.6.3-rmcjigpusuzodkjz3zcwecikkzcjrgwq
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/meson-0.60.0-7tccydfeu2jiywceixkcmzfau7ovfwna
+==> Installing libxpm-3.5.12-ylmq53wf5sryrhbdaxhghlaek5d6lvgc
+==> No binary for libxpm-3.5.12-ylmq53wf5sryrhbdaxhghlaek5d6lvgc found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/25/2523acc780eac01db5163267b36f5b94374bfb0de26fc0b5a7bee76649fd8501.tar.gz
+==> No patches needed for libxpm
+==> libxpm: Executing phase: 'autoreconf'
+==> libxpm: Executing phase: 'configure'
+==> libxpm: Executing phase: 'build'
+==> libxpm: Executing phase: 'install'
+==> libxpm: Successfully installed libxpm-3.5.12-ylmq53wf5sryrhbdaxhghlaek5d6lvgc
+  Fetch: 0.28s.  Build: 11.57s.  Total: 11.85s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/libxpm-3.5.12-ylmq53wf5sryrhbdaxhghlaek5d6lvgc
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/fribidi-1.0.5-u3pq6lzix4yhepdjpifc7457l7uckpbu
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/font-util-1.3.2-wrnwjdiitjy35l6gybvgztht2c36zjs3
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/glib-2.70.0-kawq5tiolw7fyfmlvxa2nijjvnhlgrpn
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/fontconfig-2.13.94-nx6w2xhihvvjsgg3qikqrc5dxeeky6pe
+==> Installing libgd-2.2.4-w2vhbjwcj6kl4yfvunsq5yr3f3flecet
+==> No binary for libgd-2.2.4-w2vhbjwcj6kl4yfvunsq5yr3f3flecet found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/48/487a650aa614217ed08ab1bd1aa5d282f9d379cfd95c756aed0b43406381be65.tar.gz
+==> Ran patch() for libgd
+==> libgd: Executing phase: 'autoreconf'
+==> libgd: Executing phase: 'configure'
+==> libgd: Executing phase: 'build'
+==> libgd: Executing phase: 'install'
+==> libgd: Successfully installed libgd-2.2.4-w2vhbjwcj6kl4yfvunsq5yr3f3flecet
+  Fetch: 0.73s.  Build: 15.20s.  Total: 15.93s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/libgd-2.2.4-w2vhbjwcj6kl4yfvunsq5yr3f3flecet
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cairo-1.16.0-pzz5ju6d67zgmdmbs34zm5nukcnilgdw
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/harfbuzz-2.6.8-gj3cupep7zi7eabezljjjtayskocxrpq
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/gobject-introspection-1.56.1-bubyjxhdtraocjolhon7l3c6xnygdx6x
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/pango-1.42.0-wfre5r5n6hhads3a4vw3tuq36tettn6o
+==> Installing gnuplot-5.4.2-jwgjwhqutonu3dzgkieota6hu56nutbc
+==> No binary for gnuplot-5.4.2-jwgjwhqutonu3dzgkieota6hu56nutbc found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/e5/e57c75e1318133951d32a83bcdc4aff17fed28722c4e71f2305cfc2ae1cae7ba.tar.gz
+==> Applied patch /cm/shared/apps/spack/0.17.3/cpu/var/spack/repos/builtin/packages/gnuplot/term_include.patch
+==> gnuplot: Executing phase: 'autoreconf'
+==> gnuplot: Executing phase: 'configure'
+==> gnuplot: Executing phase: 'build'
+==> gnuplot: Executing phase: 'install'
+==> gnuplot: Successfully installed gnuplot-5.4.2-jwgjwhqutonu3dzgkieota6hu56nutbc
+  Fetch: 0.81s.  Build: 39.26s.  Total: 40.06s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/gnuplot-5.4.2-jwgjwhqutonu3dzgkieota6hu56nutbc
+real 402.71
+user 235.33
+sys 70.20
+==> Regenerating lmod module files
+Submitted batch job 2409
