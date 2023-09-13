@@ -1,0 +1,1141 @@
+1687835995 2952 9ed88457f0e0081811ecde5b1d2a4059  /cm/shared/apps/spack/0.17.3/cpu/etc/spack/sdsc/tscc/0.17.3/gpu/specs/gcc@10.2.0/py-numba@0.54.0.sh afterok:2950
+
+#!/usr/bin/env bash
+
+#SBATCH --job-name=py-numba@0.54.0
+#SBATCH --account=sys200
+#SBATCH --partition=hotel-gpu
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=1
+#SBATCH --cpus-per-task=8
+#SBATCH -w gpu1
+#SBATCH --time=01:00:00
+#SBATCH --output=%x.o%j.%N
+
+declare -xr LOCAL_TIME="$(date +'%Y%m%dT%H%M%S%z')"
+declare -xir UNIX_TIME="$(date +'%s')"
+
+declare -xr SYSTEM_NAME='tscc'
+
+declare -xr SPACK_VERSION='0.17.3'
+declare -xr SPACK_INSTANCE_NAME='gpu'
+declare -xr SPACK_INSTANCE_DIR="/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}"
+
+declare -xr SLURM_JOB_SCRIPT="$(scontrol show job ${SLURM_JOB_ID} | awk -F= '/Command=/{print $2}')"
+declare -xr SLURM_JOB_MD5SUM="$(md5sum ${SLURM_JOB_SCRIPT})"
+
+declare -xr SCHEDULER_MODULE='slurm'
+
+echo "${UNIX_TIME} ${SLURM_JOB_ID} ${SLURM_JOB_MD5SUM} ${SLURM_JOB_DEPENDENCY}" 
+echo ""
+
+cat "${SLURM_JOB_SCRIPT}"
+
+module purge
+module load "${SCHEDULER_MODULE}"
+module list
+. "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
+
+declare -xr SPACK_PACKAGE='py-numba@0.54.0'
+declare -xr SPACK_COMPILER='gcc@10.2.0'
+declare -xr SPACK_VARIANTS=''
+declare -xr SPACK_DEPENDENCIES="^py-numpy@1.20.3/$(spack find --format '{hash:7}' py-numpy@1.20.3 % ${SPACK_COMPILER}) ^openblas@0.3.17/$(spack find --format '{hash:7}' openblas@0.3.17 % ${SPACK_COMPILER} ~ilp64 threads=none)"
+declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
+
+printenv
+
+spack config get compilers  
+spack config get config  
+spack config get mirrors
+spack config get modules
+spack config get packages
+spack config get repos
+spack config get upstreams
+
+spack spec --long --namespaces --types "${SPACK_SPEC}"
+if [[ "${?}" -ne 0 ]]; then
+  echo 'ERROR: spack concretization failed.'
+  exit 1
+fi
+
+time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all "${SPACK_SPEC}"
+if [[ "${?}" -ne 0 ]]; then
+  echo 'ERROR: spack install failed.'
+  exit 1
+fi
+
+spack module lmod refresh --delete-tree -y
+
+#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'py-cupy@8.0.0.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'py-scipy@1.5.4.sh'
+
+sleep 20
+
+Currently Loaded Modules:
+  1) slurm/slurm/22.05.9
+
+ 
+
+SHELL=/bin/bash
+SLURM_JOB_USER=jpg
+SLURM_TASKS_PER_NODE=1
+SLURM_JOB_UID=422
+HISTCONTROL=ignoredups
+SLURM_JOB_MD5SUM=9ed88457f0e0081811ecde5b1d2a4059  /cm/shared/apps/spack/0.17.3/cpu/etc/spack/sdsc/tscc/0.17.3/gpu/specs/gcc@10.2.0/py-numba@0.54.0.sh
+SLURM_TASK_PID=3091160
+LMOD_arch=x86_64
+SLURM_LOCALID=0
+SLURM_SUBMIT_DIR=/cm/shared/apps/spack/0.17.3/cpu/etc/spack/sdsc/tscc/0.17.3/gpu/specs/gcc@10.2.0
+HOSTNAME=gpu1
+HISTSIZE=1000
+SLURMD_NODENAME=gpu1
+FPATH=/usr/share/lmod/lmod/init/ksh_funcs
+_ModuleTable002_=ZWZpbGVzIiwiL2V0Yy9tb2R1bGVmaWxlcyIsIi91c3Ivc2hhcmUvbW9kdWxlZmlsZXMiLCIvdXNyL3NoYXJlL01vZHVsZXMvbW9kdWxlZmlsZXMiLH0sWyJzeXN0ZW1CYXNlTVBBVEgiXT0iL2NtL2xvY2FsL21vZHVsZWZpbGVzOi9jbS9zaGFyZWQvbW9kdWxlZmlsZXM6L2V0Yy9tb2R1bGVmaWxlczovdXNyL3NoYXJlL21vZHVsZWZpbGVzOi91c3Ivc2hhcmUvTW9kdWxlcy9tb2R1bGVmaWxlcyIsfQ==
+SPACK_LD_LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:/cm/shared/apps/slurm/current/lib64
+__LMOD_REF_COUNT_MODULEPATH=/cm/shared/modulefiles:2;/cm/local/modulefiles:1;/etc/modulefiles:1;/usr/share/modulefiles:1;/usr/share/Modules/modulefiles:1
+SLURM_NODE_ALIASES=(null)
+SLURM_CLUSTER_NAME=slurm
+SLURM_JOB_SCRIPT=/cm/shared/apps/spack/0.17.3/cpu/etc/spack/sdsc/tscc/0.17.3/gpu/specs/gcc@10.2.0/py-numba@0.54.0.sh
+SCHEDULER_MODULE=slurm
+SPACK_INSTANCE_NAME=gpu
+SLURM_CPUS_ON_NODE=8
+__LMOD_REF_COUNT__LMFILES_=/cm/local/modulefiles/slurm/slurm/22.05.9:1
+SLURM_JOB_CPUS_PER_NODE=8
+SPACK_VARIANTS=
+LMOD_DIR=/usr/share/lmod/lmod/libexec
+SPACK_DEPENDENCIES=^py-numpy@1.20.3/56wtshk ^openblas@0.3.17/xmdkrna
+PWD=/home/jpg/specs_gpu_0.17.3/gcc@10.2.0
+SLURM_GTIDS=0
+LOGNAME=jpg
+XDG_SESSION_TYPE=tty
+SLURM_JOB_PARTITION=hotel-gpu
+MODULESHOME=/usr/share/lmod/lmod
+MANPATH=/cm/shared/apps/slurm/current/man:/usr/share/lmod/lmod/share/man:/usr/local/share/man:/usr/share/man:/cm/local/apps/environment-modules/current/share/man
+LMOD_PREPEND_BLOCK=normal
+SLURM_JOB_NUM_NODES=1
+SPACK_INSTANCE_DIR=/cm/shared/apps/spack/0.17.3/gpu
+SPACK_PYTHON=/usr/bin/python3
+SLURM_JOBID=2952
+SLURM_JOB_QOS=normal
+MOTD_SHOWN=pam
+__LMOD_REF_COUNT_PATH=/cm/shared/apps/slurm/current/sbin:1;/cm/shared/apps/slurm/current/bin:1;/cm/shared/apps/spack/0.17.3/gpu/bin:1;/home/jpg/usr/bin:2;/home/jpg/bin:3;/home/jpg/.local/bin:1;/usr/local/bin:1;/usr/bin:1;/usr/local/sbin:1;/usr/sbin:1
+HOME=/home/jpg
+_ModuleTable_Sz_=2
+__LMOD_REF_COUNT_LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:1;/cm/shared/apps/slurm/current/lib64:1
+LANG=en_US.UTF-8
+SLURM_JOB_DEPENDENCY=afterok:2950
+__LMOD_REF_COUNT_LOADEDMODULES=slurm/slurm/22.05.9:1
+LS_COLORS=rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=01;37;41:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=01;36:*.au=01;36:*.flac=01;36:*.m4a=01;36:*.mid=01;36:*.midi=01;36:*.mka=01;36:*.mp3=01;36:*.mpc=01;36:*.ogg=01;36:*.ra=01;36:*.wav=01;36:*.oga=01;36:*.opus=01;36:*.spx=01;36:*.xspf=01;36:
+SLURM_PROCID=0
+__LMOD_REF_COUNT_CPATH=/cm/shared/apps/slurm/current/include:1
+LMOD_SETTARG_FULL_SUPPORT=no
+SPACK_COMPILER=gcc@10.2.0
+TMPDIR=/tmp
+SLURM_CPUS_PER_TASK=8
+SLURM_NTASKS=1
+SLURM_TOPOLOGY_ADDR=gpu1
+LMOD_VERSION=8.5
+SSH_CONNECTION=70.95.82.22 52458 132.249.107.93 22
+SPACK_ROOT=/cm/shared/apps/spack/0.17.3/gpu
+MODULEPATH_ROOT=/usr/share/modulefiles
+SLURM_TOPOLOGY_ADDR_PATTERN=node
+XDG_SESSION_CLASS=user
+LMOD_PKG=/usr/share/lmod/lmod
+SLURM_WORKING_CLUSTER=slurm:mgr2:6817:9728:109
+TERM=xterm-256color
+LESSOPEN=||/usr/bin/lesspipe.sh %s
+USER=jpg
+LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:/cm/shared/apps/slurm/current/lib64
+SLURM_NODELIST=gpu1
+ENVIRONMENT=BATCH
+LOADEDMODULES=slurm/slurm/22.05.9
+SPACK_SPEC=py-numba@0.54.0 % gcc@10.2.0  ^py-numpy@1.20.3/56wtshk ^openblas@0.3.17/xmdkrna
+SLURM_JOB_ACCOUNT=sys200
+SLURM_PRIO_PROCESS=0
+SLURM_NPROCS=1
+LMOD_ROOT=/usr/share/lmod
+LMOD_SETTARG_CMD=:
+SHLVL=40
+SLURM_NNODES=1
+BASH_ENV=/usr/share/lmod/lmod/init/bash
+LMOD_FULL_SETTARG_SUPPORT=no
+LMOD_sys=Linux
+__LMOD_REF_COUNT_MANPATH=/cm/shared/apps/slurm/current/man:1;/usr/share/lmod/lmod/share/man:1;/usr/local/share/man:1;/usr/share/man:1;/cm/local/apps/environment-modules/current/share/man:1
+XDG_SESSION_ID=89424
+SLURM_SUBMIT_HOST=gpu1
+__LMOD_SET_FPATH=1
+_ModuleTable001_=X01vZHVsZVRhYmxlXz17WyJNVHZlcnNpb24iXT0zLFsiY19yZWJ1aWxkVGltZSJdPWZhbHNlLFsiY19zaG9ydFRpbWUiXT1mYWxzZSxkZXB0aFQ9e30sZmFtaWx5PXt9LG1UPXtzbHVybT17WyJmbiJdPSIvY20vbG9jYWwvbW9kdWxlZmlsZXMvc2x1cm0vc2x1cm0vMjIuMDUuOSIsWyJmdWxsTmFtZSJdPSJzbHVybS9zbHVybS8yMi4wNS45IixbImxvYWRPcmRlciJdPTEscHJvcFQ9e30sWyJzdGFja0RlcHRoIl09MCxbInN0YXR1cyJdPSJhY3RpdmUiLFsidXNlck5hbWUiXT0ic2x1cm0iLFsid1YiXT0iKnNsdXJtLzAwMDAwMDAyMi4wMDAwMDAwMDUuMDAwMDAwMDA5Lip6ZmluYWwiLH0sfSxtcGF0aEE9eyIvY20vc2hhcmVkL21vZHVsZWZpbGVzIiwiL2NtL2xvY2FsL21vZHVs
+SPACK_PACKAGE=py-numba@0.54.0
+LD_LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:/cm/shared/apps/slurm/current/lib64
+XDG_RUNTIME_DIR=/run/user/422
+LMOD_COLORIZE=yes
+SLURM_JOB_ID=2952
+SLURM_NODEID=0
+S_COLORS=auto
+SSH_CLIENT=70.95.82.22 52458 22
+DEBUGINFOD_URLS=https://debuginfod.centos.org/ 
+CMD_WLM_CLUSTER_NAME=slurm
+ENABLE_LMOD=1
+which_declare=declare -f
+UNIX_TIME=1687835995
+__Init_Default_Modules=1
+SLURM_CONF=/cm/shared/apps/slurm/var/etc/slurm/slurm.conf
+PATH=/cm/shared/apps/slurm/current/sbin:/cm/shared/apps/slurm/current/bin:/cm/shared/apps/spack/0.17.3/gpu/bin:/home/jpg/usr/bin:/home/jpg/bin:/home/jpg/.local/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin
+SLURM_JOB_NAME=py-numba@0.54.0
+LOCAL_TIME=20230626T201955-0700
+MODULEPATH=/cm/shared/modulefiles:/cm/local/modulefiles:/etc/modulefiles:/usr/share/modulefiles:/usr/share/Modules/modulefiles
+SLURM_NTASKS_PER_NODE=1
+_LMFILES_=/cm/local/modulefiles/slurm/slurm/22.05.9
+SYSTEM_NAME=tscc
+DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/422/bus
+LMOD_CMD=/usr/share/lmod/lmod/libexec/lmod
+MAIL=/var/spool/mail/jpg
+SSH_TTY=/dev/pts/0
+__LMOD_REF_COUNT_LD_LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:1;/cm/shared/apps/slurm/current/lib64:1
+LMOD_SYSTEM_DEFAULT_MODULES=DefaultModules
+SLURM_JOB_GID=7193
+CPATH=/cm/shared/apps/slurm/current/include
+SPACK_VERSION=0.17.3
+OLDPWD=/home/jpg/specs_gpu_0.17.3
+SLURM_JOB_NODELIST=gpu1
+BASH_FUNC_ml%%=() {  eval $($LMOD_DIR/ml_cmd "$@")
+}
+BASH_FUNC_which%%=() {  ( alias;
+ eval ${which_declare} ) | /usr/bin/which --tty-only --read-alias --read-functions --show-tilde --show-dot $@
+}
+BASH_FUNC_module%%=() {  eval $($LMOD_CMD bash "$@") && eval $(${LMOD_SETTARG_CMD:-:} -s sh)
+}
+BASH_FUNC__spack_shell_wrapper%%=() {  for var in LD_LIBRARY_PATH DYLD_LIBRARY_PATH DYLD_FALLBACK_LIBRARY_PATH;
+ do
+ eval "if [ -n \"\${${var}-}\" ]; then export SPACK_$var=\${${var}}; fi";
+ done;
+ if [ -n "${ZSH_VERSION:-}" ]; then
+ emulate -L sh;
+ fi;
+ _sp_flags="";
+ while [ ! -z ${1+x} ] && [ "${1#-}" != "${1}" ]; do
+ _sp_flags="$_sp_flags $1";
+ shift;
+ done;
+ if [ -n "$_sp_flags" ] && [ "${_sp_flags#*h}" != "${_sp_flags}" ] || [ "${_sp_flags#*V}" != "${_sp_flags}" ]; then
+ command spack $_sp_flags "$@";
+ return;
+ fi;
+ _sp_subcommand="";
+ if [ ! -z ${1+x} ]; then
+ _sp_subcommand="$1";
+ shift;
+ fi;
+ case $_sp_subcommand in 
+ "cd")
+ _sp_arg="";
+ if [ -n "$1" ]; then
+ _sp_arg="$1";
+ shift;
+ fi;
+ if [ "$_sp_arg" = "-h" ] || [ "$_sp_arg" = "--help" ]; then
+ command spack cd -h;
+ else
+ LOC="$(spack location $_sp_arg "$@")";
+ if [ -d "$LOC" ]; then
+ cd "$LOC";
+ else
+ return 1;
+ fi;
+ fi;
+ return
+ ;;
+ "env")
+ _sp_arg="";
+ if [ -n "$1" ]; then
+ _sp_arg="$1";
+ shift;
+ fi;
+ if [ "$_sp_arg" = "-h" ] || [ "$_sp_arg" = "--help" ]; then
+ command spack env -h;
+ else
+ case $_sp_arg in 
+ activate)
+ _a=" $@";
+ if [ -z ${1+x} ] || [ "${_a#* --sh}" != "$_a" ] || [ "${_a#* --csh}" != "$_a" ] || [ "${_a#* -h}" != "$_a" ] || [ "${_a#* --help}" != "$_a" ]; then
+ command spack env activate "$@";
+ else
+ stdout="$(command spack $_sp_flags env activate --sh "$@")" || return;
+ eval "$stdout";
+ fi
+ ;;
+ deactivate)
+ _a=" $@";
+ if [ "${_a#* --sh}" != "$_a" ] || [ "${_a#* --csh}" != "$_a" ]; then
+ command spack env deactivate "$@";
+ else
+ if [ -n "$*" ]; then
+ command spack env deactivate -h;
+ else
+ stdout="$(command spack $_sp_flags env deactivate --sh)" || return;
+ eval "$stdout";
+ fi;
+ fi
+ ;;
+ *)
+ command spack env $_sp_arg "$@"
+ ;;
+ esac;
+ fi;
+ return
+ ;;
+ "load" | "unload")
+ _a=" $@";
+ if [ "${_a#* --sh}" != "$_a" ] || [ "${_a#* --csh}" != "$_a" ] || [ "${_a#* -h}" != "$_a" ] || [ "${_a#* --list}" != "$_a" ] || [ "${_a#* --help}" != "$_a" ]; then
+ command spack $_sp_flags $_sp_subcommand "$@";
+ else
+ stdout="$(command spack $_sp_flags $_sp_subcommand --sh "$@")" || return;
+ eval "$stdout";
+ fi
+ ;;
+ *)
+ command spack $_sp_flags $_sp_subcommand "$@"
+ ;;
+ esac
+}
+BASH_FUNC_spack%%=() {  : this is a shell function from: /cm/shared/apps/spack/0.17.3/gpu/share/spack/setup-env.sh;
+ : the real spack script is here: /cm/shared/apps/spack/0.17.3/gpu/bin/spack;
+ _spack_shell_wrapper "$@";
+ return $?
+}
+_=/usr/bin/printenv
+compilers:
+- compiler:
+    spec: gcc@11.2.0
+    paths:
+      cc: /usr/bin/gcc
+      cxx: /usr/bin/g++
+      f77: /usr/bin/gfortran
+      fc: /usr/bin/gfortran
+    flags:
+      cflags: -O2 -march=native
+      cxxflags: -O2 -march=native
+      fflags: -O2 -march=native
+    operating_system: rocky9
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+- compiler:
+    spec: intel@19.1.1.217
+    paths:
+      cc: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/intel-19.1.1.217-7fcjggodrui3okoovfgtjf6gl5nf6nlv/bin/icc
+      cxx: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/intel-19.1.1.217-7fcjggodrui3okoovfgtjf6gl5nf6nlv/bin/icpc
+      f77: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/intel-19.1.1.217-7fcjggodrui3okoovfgtjf6gl5nf6nlv/bin/ifort
+      fc: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/intel-19.1.1.217-7fcjggodrui3okoovfgtjf6gl5nf6nlv/bin/ifort
+    flags:
+      cflags: -gcc-name=/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-8.5.0-mf5bqu2cwyzoxa5c7btqbbdxng3whbmf/bin/gcc
+      cxxflags: -gcc-name=/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-8.5.0-mf5bqu2cwyzoxa5c7btqbbdxng3whbmf/bin/gcc
+      fflags: -gcc-name=/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-8.5.0-mf5bqu2cwyzoxa5c7btqbbdxng3whbmf/bin/gcc
+    operating_system: rocky9
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+- compiler:
+    spec: gcc@10.2.0
+    paths:
+      cc: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-10.2.0-mqbpsxf6a5jhxi4vlwdtfyqe7q3yjgse/bin/gcc
+      cxx: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-10.2.0-mqbpsxf6a5jhxi4vlwdtfyqe7q3yjgse/bin/g++
+      f77: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-10.2.0-mqbpsxf6a5jhxi4vlwdtfyqe7q3yjgse/bin/gfortran
+      fc: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-10.2.0-mqbpsxf6a5jhxi4vlwdtfyqe7q3yjgse/bin/gfortran
+    flags: {}
+    operating_system: rocky9
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+- compiler:
+    spec: gcc@9.2.0
+    paths:
+      cc: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-9.2.0-nx6afhcfe2pccw7nla4fjmvdqvbhieh6/bin/gcc
+      cxx: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-9.2.0-nx6afhcfe2pccw7nla4fjmvdqvbhieh6/bin/g++
+      f77: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-9.2.0-nx6afhcfe2pccw7nla4fjmvdqvbhieh6/bin/gfortran
+      fc: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-9.2.0-nx6afhcfe2pccw7nla4fjmvdqvbhieh6/bin/gfortran
+    flags: {}
+    operating_system: rocky9
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+- compiler:
+    spec: gcc@8.5.0
+    paths:
+      cc: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-8.5.0-mf5bqu2cwyzoxa5c7btqbbdxng3whbmf/bin/gcc
+      cxx: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-8.5.0-mf5bqu2cwyzoxa5c7btqbbdxng3whbmf/bin/g++
+      f77: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-8.5.0-mf5bqu2cwyzoxa5c7btqbbdxng3whbmf/bin/gfortran
+      fc: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/gcc-8.5.0-mf5bqu2cwyzoxa5c7btqbbdxng3whbmf/bin/gfortran
+    flags: {}
+    operating_system: rocky9
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+- compiler:
+    spec: nvhpc@22.1
+    paths:
+      cc: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/nvhpc-22.1-rsks4ptuwyfjjxigybva7k53ihgacw3y/Linux_x86_64/22.1/compilers/bin/nvc
+      cxx: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/nvhpc-22.1-rsks4ptuwyfjjxigybva7k53ihgacw3y/Linux_x86_64/22.1/compilers/bin/nvc++
+      f77: /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/nvhpc-22.1-rsks4ptuwyfjjxigybva7k53ihgacw3y/Linux_x86_64/22.1/compilers/bin/nvfortran
+      fc: cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/nvhpc-22.1-rsks4ptuwyfjjxigybva7k53ihgacw3y/Linux_x86_64/22.1/compilers/bin/nvfortran
+    flags: {}
+    operating_system: rocky9
+    target: x86_64
+    modules: [nvhpc/22.1]
+    environment: {}
+    extra_rpaths: []
+config:
+  install_tree:
+    root: $spack/opt/spack
+    projections:
+      all: ${ARCHITECTURE}/${COMPILERNAME}-${COMPILERVER}/${PACKAGE}-${VERSION}-${HASH}
+  template_dirs:
+  - $spack/share/spack/templates
+
+  # Temporary locations Spack can try to use for builds.
+  #
+  # Recommended options are given below.
+  #
+  # Builds can be faster in temporary directories on some (e.g., HPC) systems.
+  # Specifying `$tempdir` will ensure use of the default temporary directory
+  # (i.e., ``$TMP` or ``$TMPDIR``).
+  #
+  # Another option that prevents conflicts and potential permission issues is
+  # to specify `$user_cache_path/stage`, which ensures each user builds in their
+  # home directory.
+  #
+  # A more traditional path uses the value of `$spack/var/spack/stage`, which
+  # builds directly inside Spack's instance without staging them in a
+  # temporary space.  Problems with specifying a path inside a Spack instance
+  # are that it precludes its use as a system package and its ability to be
+  # pip installable.
+  #
+  # In any case, if the username is not already in the path, Spack will append
+  # the value of `$user` in an attempt to avoid potential conflicts between
+  # users in shared temporary spaces.
+  #
+  # The build stage can be purged with `spack clean --stage` and
+  # `spack clean -a`, so it is important that the specified directory uniquely
+  # identifies Spack staging to avoid accidentally wiping out non-Spack work.
+  build_stage:
+  - $tempdir/$user/spack-stage
+  - $user_cache_path/stage
+  # - $spack/var/spack/stage
+
+  # Directory in which to run tests and store test results.
+  # Tests will be stored in directories named by date/time and package
+  # name/hash.
+  test_stage: $user_cache_path/test
+  source_cache: $spack/var/spack/cache
+  misc_cache: $user_cache_path/cache
+  connect_timeout: 10
+  verify_ssl: true
+  suppress_gpg_warnings: false
+  install_missing_compilers: false
+  checksum: true
+  deprecated: false
+  dirty: false
+  build_language: C
+  locks: true
+  url_fetch_method: urllib
+  ccache: false
+  concretizer: clingo
+  db_lock_timeout: 3
+  package_lock_timeout: null
+  shared_linking: rpath
+  allow_sgid: true
+  terminal_title: false
+  debug: false
+  build_jobs: 16
+mirrors:
+  spack-public: https://mirror.spack.io
+modules:
+  default:
+    'enable:':
+    - lmod
+    lmod:
+      core_compilers:
+      - gcc@11.2.0
+      hierarchy:
+      - mpi
+      hash_length: 7
+      blacklist_implicits: true
+      naming_scheme: '{name}/{version}'
+      projections:
+        all: '{name}/{version}'
+      adol-c:
+        suffixes:
+          +openmp: omp
+      amdblis:
+        suffixes:
+          threads=openmp: omp
+      fftw:
+        suffixes:
+          +openmp: omp
+      hpl:
+        suffixes:
+          +openmp: omp
+      hypre:
+        suffixes:
+          +openmp: omp
+      intel:
+        environment:
+          set:
+            INTEL_LICENSE_FILE: 40000@elprado.sdsc.edu:40100@elprado.sdsc.edu
+      kokkos:
+        suffixes:
+          +openmp: omp
+      intel-mkl:
+        suffixes:
+          threads=openmp: omp
+      openblas:
+        suffixes:
+          threads=openmp: omp
+          +ilp64: ilp64
+      'netlib-scalapack:':
+        suffixes:
+          ^openblas threads=openmp: omp
+      petsc:
+        suffixes:
+          +complex: cmplx
+      slepc:
+        suffixes:
+          ^petsc +complex: cmplx
+      ^python:
+        autoload: direct
+      ^ucx:
+        autoload: direct
+  prefix_inspections:
+    lib:
+    - LD_LIBRARY_PATH
+    lib64:
+    - LD_LIBRARY_PATH
+    bin:
+    - PATH
+    man:
+    - MANPATH
+    share/man:
+    - MANPATH
+    share/aclocal:
+    - ACLOCAL_PATH
+    lib/pkgconfig:
+    - PKG_CONFIG_PATH
+    lib64/pkgconfig:
+    - PKG_CONFIG_PATH
+    share/pkgconfig:
+    - PKG_CONFIG_PATH
+    ? ''
+    : - CMAKE_PREFIX_PATH
+
+  # These are configurations for the module set named "default"
+packages:
+  lustre:
+    externals:
+    - spec: lustre@2.15.2 % gcc@11.2.0 arch=linux-rocky9-broadwell
+      prefix: /usr
+    - spec: lustre@2.15.2 % gcc@10.2.0 arch=linux-rocky9-broadwell
+      prefix: /usr
+    - spec: lustre@2.15.2 % gcc@9.2.0 arch=linux-rocky9-broadwell
+      prefix: /usr
+    - spec: lustre@2.15.2 % gcc@8.5.0 arch=linux-rocky9-broadwell
+      prefix: /usr
+    - spec: lustre@2.15.2 % intel@19.1.1.217 arch=linux-rocky9-broadwell
+      prefix: /usr
+    - spec: lustre@2.15.2 % aocc@3.2.0 arch=linux-rocky9-broadwell
+      prefix: /usr
+    buildable: false
+  texlive:
+    externals:
+    - spec: texive@live % gcc@10.2.0 arch=linux-rocky9-broadwell
+      prefix: /usr
+    - spec: texive@live % gcc@9.2.0 arch=linux-rocky9-broadwell
+      prefix: /usr
+    - spec: texlive@live % intel@19.1.1.217 arch=linux-rocky9-broadwell
+      prefix: /usr
+    buildable: false
+  openmpi:
+    externals:
+    - spec: openmpi@4.0.5 % nvhpc@22.1 arch=linux-rocky9-broadwell
+      prefix: /home/jpg/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/nvhpc-22.1-rsks4ptuwyfjjxigybva7k53ihgacw3y/Linux_x86_64/22.1/comm_libs/openmpi4/openmpi-4.0.5
+    buildable: true
+  qd:
+    externals:
+    - spec: qd@2.3.13 % nvhpc@22.1 arch=linux-rocky9-broadwell
+      prefix: /home/jpg/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-11.2.0/nvhpc-22.1-rsks4ptuwyfjjxigybva7k53ihgacw3y/Linux_x86_64/22.1/compilers/extras/qd
+    buildable: false
+  openssl:
+    externals:
+    - spec: openssl@3.0.7 % gcc@11.2.0 arch=linux-rocky9-broadwell
+      prefix: /usr
+    - spec: openssl@3.0.7 % gcc@10.2.0 arch=linux-rocky9-broadwell
+      prefix: /usr
+    - spec: openssl@3.0.7 % gcc@9.2.0 arch=linux-rocky9-broadwell
+      prefix: /usr
+    - spec: openssl@3.0.7 % intel@19.1.1.217 arch=linux-rocky9-broadwell
+      prefix: /usr
+    buildable: false
+  rdma-core:
+    externals:
+    - spec: rdma-core@44.0 % gcc@10.2.0 arch=linux-rocky9-broadwell
+      prefix: /usr
+    - spec: rdma-core@44.0 % gcc@9.2.0 arch=linux-rocky9-broadwell
+      prefix: /usr
+    - spec: rdma-core@44.0 % intel@19.1.1.217 arch=linux-rocky9-broadwell
+      prefix: /usr
+    buildable: false
+  hcoll:
+    externals:
+    - spec: hcoll@4.4.2968 % gcc@10.2.0 arch=linux-rocky9-broadwell
+      prefix: /opt/mellanox/hcoll
+    - spec: hcoll@4.4.2968 % gcc@9.2.0 arch=linux-rocky9-broadwell
+      prefix: /opt/mellanox/hcoll
+    - spec: hcoll@4.4.2968 % intel@19.1.1.217 arch=linux-rocky9-broadwell
+      prefix: /opt/mellanox/hcoll
+    buildable: false
+  slurm:
+    externals:
+    - spec: slurm@22.05.9 % gcc@8.5.0 arch=linux-rocky9-broadwell
+      prefix: /cm/shared/apps/slurm/22.05.9
+    - spec: slurm@22.05.9 % gcc@11.2.0 arch=linux-rocky9-broadwell
+      prefix: /cm/shared/apps/slurm/22.05.9
+    - spec: slurm@22.05.9 % gcc@10.2.0 arch=linux-rocky9-broadwell
+      prefix: /cm/shared/apps/slurm/22.05.9
+    - spec: slurm@22.05.9 % gcc@9.2.0 arch=linux-rocky9-broadwell
+      prefix: /cm/shared/apps/slurm/22.05.9
+    - spec: slurm@22.05.9 % intel@19.1.1.217 arch=linux-rocky9-broadwell
+      prefix: /cm/shared/apps/slurm/22.05.9
+    buildable: false
+  librsvg:
+    externals:
+    - spec: librsvg@2.42.7 % gcc@10.2.0 arch=linux-rocky9-broadwell
+      prefix: /usr
+    - spec: librsvg@2.42.7 % gcc@9.2.0 arch=linux-rocky9-broadwell
+      prefix: /usr
+    - spec: librsvg@2.42.7 %  intel@19.1.1.217 arch=linux-rocky9-broadwell
+      prefix: /usr
+    buildable: false
+  ghostscript:
+    externals:
+    - spec: ghostscript@9.27 % gcc@10.2.0 arch=linux-rocky9-broadwell
+      prefix: /usr
+    buildable: false
+  gaussian:
+    permissions:
+      read: group
+      group: jpg
+  vasp6:
+    permissions:
+      read: group
+      group: vasp-6
+  all:
+    compiler: [gcc, intel, pgi, clang, xl, nag, fj, aocc]
+    providers:
+      awk: [gawk]
+      blas: [openblas, amdblis]
+      D: [ldc]
+      daal: [intel-daal]
+      elf: [elfutils]
+      fftw-api: [fftw, amdfftw]
+      flame: [libflame, amdlibflame]
+      fuse: [libfuse]
+      gl: [mesa+opengl, mesa18, opengl]
+      glu: [mesa-glu, openglu]
+      glx: [mesa+glx, mesa18+glx, opengl]
+      golang: [gcc]
+      iconv: [libiconv]
+      ipp: [intel-ipp]
+      java: [openjdk, jdk, ibm-java]
+      jpeg: [libjpeg-turbo, libjpeg]
+      lapack: [openblas, amdlibflame]
+      lua-lang: [lua, lua-luajit]
+      mariadb-client: [mariadb-c-client, mariadb]
+      mkl: [intel-mkl]
+      mpe: [mpe2]
+      mpi: [openmpi, mpich]
+      mysql-client: [mysql, mariadb-c-client]
+      opencl: [pocl]
+      onedal: [intel-oneapi-dal]
+      osmesa: [mesa+osmesa, mesa18+osmesa]
+      pbs: [openpbs, torque]
+      pil: [py-pillow]
+      pkgconfig: [pkgconf, pkg-config]
+      rpc: [libtirpc]
+      scalapack: [netlib-scalapack, amdscalapack]
+      sycl: [hipsycl]
+      szip: [libaec, libszip]
+      tbb: [intel-tbb]
+      unwind: [libunwind]
+      uuid: [util-linux-uuid, libuuid]
+      xxd: [xxd-standalone, vim]
+      yacc: [bison, byacc]
+      ziglang: [zig]
+    permissions:
+      read: world
+      write: user
+repos:
+- $spack/var/spack/repos/sdsc
+- $spack/var/spack/repos/builtin
+upstreams: {}
+Input spec
+--------------------------------
+[    ]  .py-numba@0.54.0%gcc@10.2.0
+[    ]      ^sdsc.openblas@0.3.17%gcc@10.2.0~bignuma~consistent_fpcsr~ilp64+locking+pic+shared threads=none arch=linux-rocky9-broadwell
+[    ]      ^builtin.py-numpy@1.20.3%gcc@10.2.0+blas+lapack patches=873745d7b547857fcfec9cae90b09c133b42a4f0c23b6c2d84cf37e2dd816604 arch=linux-rocky9-broadwell
+[bl  ]          ^sdsc.openblas@0.3.17%gcc@10.2.0~bignuma~consistent_fpcsr~ilp64+locking+pic+shared threads=none arch=linux-rocky9-broadwell
+[b r ]          ^builtin.py-setuptools@58.2.0%gcc@10.2.0 arch=linux-rocky9-broadwell
+[blr ]              ^builtin.python@3.8.12%gcc@10.2.0+bz2+ctypes+dbm~debug+libxml2+lzma~nis+optimizations+pic+pyexpat+pythoncmd+readline+shared+sqlite3+ssl~tix~tkinter~ucs4+uuid+zlib patches=0d98e93189bc278fbc37a50ed7f183bd8aaf249a8e1670a465f0db6bb4f8cf87,4c2457325f2b608b1b6a2c63087df8c26e07db3e3d493caf36a56f0ecf6fb768,f2fd060afc4b4618fe8104c4c5d771f36dc55b1db5a4623785a4ea707ec72fb4 arch=linux-rocky9-broadwell
+[bl  ]                  ^builtin.bzip2@1.0.8%gcc@10.2.0~debug~pic+shared arch=linux-rocky9-broadwell
+[bl  ]                  ^builtin.expat@2.4.1%gcc@10.2.0+libbsd arch=linux-rocky9-broadwell
+[bl  ]                      ^builtin.libbsd@0.11.3%gcc@10.2.0 arch=linux-rocky9-broadwell
+[bl  ]                          ^builtin.libmd@1.0.3%gcc@10.2.0 arch=linux-rocky9-broadwell
+[bl  ]                  ^sdsc.gdbm@1.19%gcc@10.2.0 arch=linux-rocky9-broadwell
+[bl  ]                      ^builtin.readline@8.1%gcc@10.2.0 arch=linux-rocky9-broadwell
+[bl  ]                          ^builtin.ncurses@6.2%gcc@10.2.0~symlinks+termlib abi=none arch=linux-rocky9-broadwell
+[bl  ]                  ^builtin.gettext@0.21%gcc@10.2.0+bzip2+curses+git~libunistring+libxml2+tar+xz arch=linux-rocky9-broadwell
+[bl  ]                      ^builtin.libiconv@1.16%gcc@10.2.0 libs=shared,static arch=linux-rocky9-broadwell
+[bl  ]                      ^builtin.libxml2@2.9.12%gcc@10.2.0~python arch=linux-rocky9-broadwell
+[blr ]                          ^builtin.xz@5.2.5%gcc@10.2.0~pic libs=shared,static arch=linux-rocky9-broadwell
+[bl  ]                          ^builtin.zlib@1.2.11%gcc@10.2.0+optimize+pic+shared arch=linux-rocky9-broadwell
+[bl  ]                      ^builtin.tar@1.34%gcc@10.2.0 arch=linux-rocky9-broadwell
+[bl  ]                  ^builtin.libffi@3.3%gcc@10.2.0 patches=26f26c6f29a7ce9bf370ad3ab2610f99365b4bdd7b82e7c31df41a3370d685c0 arch=linux-rocky9-broadwell
+[bl  ]                  ^builtin.openssl@3.0.7%gcc@10.2.0~docs certs=system arch=linux-rocky9-broadwell
+[bl  ]                  ^builtin.sqlite@3.36.0%gcc@10.2.0+column_metadata+fts~functions~rtree arch=linux-rocky9-broadwell
+[bl  ]                  ^builtin.util-linux-uuid@2.36.2%gcc@10.2.0 arch=linux-rocky9-broadwell
+
+Concretized
+--------------------------------
+nmpog3e  [    ]  builtin.py-numba@0.54.0%gcc@10.2.0 arch=linux-rocky9-broadwell
+lrkpdpz  [b r ]      ^builtin.py-llvmlite@0.37.0%gcc@10.2.0 arch=linux-rocky9-broadwell
+zop5ojb  [bl  ]          ^builtin.binutils@2.37%gcc@10.2.0~gas+gold~headers~interwork+ld~libiberty~lto+nls+plugins libs=shared,static arch=linux-rocky9-broadwell
+wbewze2  [b   ]              ^builtin.diffutils@3.8%gcc@10.2.0 arch=linux-rocky9-broadwell
+r7u3li4  [bl  ]                  ^builtin.libiconv@1.16%gcc@10.2.0 libs=shared,static arch=linux-rocky9-broadwell
+r6ujx4y  [bl  ]              ^builtin.gettext@0.21%gcc@10.2.0+bzip2+curses+git~libunistring+libxml2+tar+xz arch=linux-rocky9-broadwell
+dh4hxop  [bl  ]                  ^builtin.bzip2@1.0.8%gcc@10.2.0~debug~pic+shared arch=linux-rocky9-broadwell
+egosf32  [bl  ]                  ^builtin.libxml2@2.9.12%gcc@10.2.0~python arch=linux-rocky9-broadwell
+bnvpjjz  [blr ]                      ^builtin.xz@5.2.5%gcc@10.2.0~pic libs=shared,static arch=linux-rocky9-broadwell
+uezvqlh  [bl  ]                      ^builtin.zlib@1.2.11%gcc@10.2.0+optimize+pic+shared arch=linux-rocky9-broadwell
+ovtvq7m  [bl  ]                  ^builtin.ncurses@6.2%gcc@10.2.0~symlinks+termlib abi=none arch=linux-rocky9-broadwell
+lo6rmhe  [bl  ]                  ^builtin.tar@1.34%gcc@10.2.0 arch=linux-rocky9-broadwell
+ogq2oyq  [bl  ]          ^builtin.llvm@11.1.0%gcc@10.2.0~all_targets+clang~code_signing+compiler-rt~cuda~flang+gold+internal_unwind~ipo+libcxx+lld+lldb~llvm_dylib~mlir~omp_as_runtime~omp_debug~omp_tsan+polly~python~shared_libs~split_dwarf build_type=Release cuda_arch=none arch=linux-rocky9-broadwell
+765fkmw  [b   ]              ^builtin.cmake@3.21.4%gcc@10.2.0~doc+ncurses+openssl+ownlibs~qt build_type=Release arch=linux-rocky9-broadwell
+pu3y3pq  [bl  ]                  ^builtin.openssl@3.0.7%gcc@10.2.0~docs certs=system arch=linux-rocky9-broadwell
+stwsool  [bl  ]              ^builtin.hwloc@2.6.0%gcc@10.2.0~cairo~cuda~gl~libudev+libxml2~netloc~nvml~opencl+pci~rocm+shared arch=linux-rocky9-broadwell
+3alet2d  [bl  ]                  ^builtin.libpciaccess@0.16%gcc@10.2.0 arch=linux-rocky9-broadwell
+jmlifan  [b   ]                      ^builtin.libtool@2.4.6%gcc@10.2.0 arch=linux-rocky9-broadwell
+u3kd26l  [b   ]                          ^builtin.m4@1.4.19%gcc@10.2.0+sigsegv patches=9dc5fbd0d5cb1037ab1e6d0ecc74a30df218d0a94bdd5a02759a97f62daca573,bfdffa7c2eb01021d5849b36972c069693654ad826c1a20b53534009a4ec7a89 arch=linux-rocky9-broadwell
+5njhf6h  [bl  ]                              ^builtin.libsigsegv@2.13%gcc@10.2.0 arch=linux-rocky9-broadwell
+rps4kpp  [b   ]                      ^builtin.pkgconf@1.8.0%gcc@10.2.0 arch=linux-rocky9-broadwell
+i6u7kmg  [b   ]                      ^builtin.util-macros@1.19.3%gcc@10.2.0 arch=linux-rocky9-broadwell
+36zapox  [bl  ]              ^builtin.libedit@3.1-20210216%gcc@10.2.0 arch=linux-rocky9-broadwell
+nehbdcd  [b   ]              ^builtin.perl-data-dumper@2.173%gcc@10.2.0 arch=linux-rocky9-broadwell
+ozktzhy  [b r ]                  ^sdsc.perl@5.32.0%gcc@10.2.0+cpanm+shared+threads arch=linux-rocky9-broadwell
+3c33nyi  [bl  ]                      ^builtin.berkeley-db@18.1.40%gcc@10.2.0+cxx~docs+stl patches=b231fcc4d5cff05e5c3a4814f6a5af0e9a966428dc2176540d2c05aff41de522 arch=linux-rocky9-broadwell
+6ukzrku  [bl  ]                      ^sdsc.gdbm@1.19%gcc@10.2.0 arch=linux-rocky9-broadwell
+wndvzcw  [bl  ]                          ^builtin.readline@8.1%gcc@10.2.0 arch=linux-rocky9-broadwell
+inx66sv  [blr ]              ^builtin.python@3.8.12%gcc@10.2.0+bz2+ctypes+dbm~debug+libxml2+lzma~nis+optimizations+pic+pyexpat+pythoncmd+readline+shared+sqlite3+ssl~tix~tkinter~ucs4+uuid+zlib patches=0d98e93189bc278fbc37a50ed7f183bd8aaf249a8e1670a465f0db6bb4f8cf87,4c2457325f2b608b1b6a2c63087df8c26e07db3e3d493caf36a56f0ecf6fb768,f2fd060afc4b4618fe8104c4c5d771f36dc55b1db5a4623785a4ea707ec72fb4 arch=linux-rocky9-broadwell
+ppow2vp  [bl  ]                  ^builtin.expat@2.4.1%gcc@10.2.0+libbsd arch=linux-rocky9-broadwell
+aur3lqv  [bl  ]                      ^builtin.libbsd@0.11.3%gcc@10.2.0 arch=linux-rocky9-broadwell
+vmorxax  [bl  ]                          ^builtin.libmd@1.0.3%gcc@10.2.0 arch=linux-rocky9-broadwell
+rxt5der  [bl  ]                  ^builtin.libffi@3.3%gcc@10.2.0 patches=26f26c6f29a7ce9bf370ad3ab2610f99365b4bdd7b82e7c31df41a3370d685c0 arch=linux-rocky9-broadwell
+v36qrof  [bl  ]                  ^builtin.sqlite@3.36.0%gcc@10.2.0+column_metadata+fts~functions~rtree arch=linux-rocky9-broadwell
+nj7akxi  [bl  ]                  ^builtin.util-linux-uuid@2.36.2%gcc@10.2.0 arch=linux-rocky9-broadwell
+mfjsjnf  [bl  ]              ^builtin.swig@4.0.2%gcc@10.2.0 arch=linux-rocky9-broadwell
+gcnkq3z  [bl  ]                  ^builtin.pcre@8.44%gcc@10.2.0~jit+multibyte+utf arch=linux-rocky9-broadwell
+yidlsc7  [bl  ]              ^builtin.z3@4.8.9%gcc@10.2.0~gmp~ipo~python build_type=RelWithDebInfo arch=linux-rocky9-broadwell
+nhub4gi  [b r ]          ^builtin.py-setuptools@58.2.0%gcc@10.2.0 arch=linux-rocky9-broadwell
+56wtshk  [b r ]      ^builtin.py-numpy@1.20.3%gcc@10.2.0+blas+lapack patches=873745d7b547857fcfec9cae90b09c133b42a4f0c23b6c2d84cf37e2dd816604 arch=linux-rocky9-broadwell
+xmdkrna  [bl  ]          ^sdsc.openblas@0.3.17%gcc@10.2.0~bignuma~consistent_fpcsr~ilp64+locking+pic+shared threads=none arch=linux-rocky9-broadwell
+
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/libiconv-1.16-r7u3li4glgayxnqacdw7m4wp3gfijpeq
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/bzip2-1.0.8-dh4hxopngewrvpy5mcg3cm7wajypuh7w
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/xz-5.2.5-bnvpjjzuqqaesn3fsv3w2ttqxbhmy2mf
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/zlib-1.2.11-uezvqlhoqd7uhf3zwg55teiitoyu7sbu
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/ncurses-6.2-ovtvq7mr7iyw7ir5zbyj4kurazz4rb2o
+[+] /usr (external openssl-3.0.7-pu3y3pqej3bq67wxn2gm3uae32l4nf55)
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/libsigsegv-2.13-5njhf6hv2qx36i2fya2tk3xpe3m67xht
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/pkgconf-1.8.0-rps4kpplhmz2xn2cl4xwobgejiokatx2
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/util-macros-1.19.3-i6u7kmg4xid4f4rlktk4xu42u7mxusuu
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/berkeley-db-18.1.40-3c33nyicjq4uf6hzzr6gqwvijyipyqom
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/libmd-1.0.3-vmorxaxjxrs3ofrxxplqrzxoaut64uv2
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/libffi-3.3-rxt5dern5zniozejs7mafwanun2iyszt
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/util-linux-uuid-2.36.2-nj7akxi4jfeknflxqnnki4n3lvgu3qpa
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/pcre-8.44-gcnkq3zc433gldf475nn4lu63nzkgrzt
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/openblas-0.3.17-xmdkrnatcs2nmmz7odhjob7dzodwphy2
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/diffutils-3.8-wbewze2uiugpn4dmlvipimhcn32ncjqc
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/tar-1.34-lo6rmhewo2vkhysdbbd74xoe6tqnz5y5
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/libxml2-2.9.12-egosf32loqwemuf3bhpzcmndudvf6ovi
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/readline-8.1-wndvzcwt35ddbcuu2vsdf6bdtksvxx6j
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/cmake-3.21.4-765fkmw6ldmne4jhge6kmyxofk3ah6uq
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/m4-1.4.19-u3kd26lcrsx4ol5qed64rrqw6ouzyoqb
+==> Installing libedit-3.1-20210216-36zapoxkw3loevta3stlcxgwwpwd2het
+==> No binary for libedit-3.1-20210216-36zapoxkw3loevta3stlcxgwwpwd2het found: installing from source
+==> Using cached archive: /cm/shared/apps/spack/0.17.3/gpu/var/spack/cache/_source-cache/archive/22/2283f741d2aab935c8c52c04b57bf952d02c2c02e651172f8ac811f77b1fc77a.tar.gz
+==> No patches needed for libedit
+==> libedit: Executing phase: 'autoreconf'
+==> libedit: Executing phase: 'configure'
+==> libedit: Executing phase: 'build'
+==> libedit: Executing phase: 'install'
+==> libedit: Successfully installed libedit-3.1-20210216-36zapoxkw3loevta3stlcxgwwpwd2het
+  Fetch: 0.01s.  Build: 13.69s.  Total: 13.70s.
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/libedit-3.1-20210216-36zapoxkw3loevta3stlcxgwwpwd2het
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/libbsd-0.11.3-aur3lqvmfctcgiowem3kuby2af3ptxld
+==> Installing swig-4.0.2-mfjsjnfyed3eknuljmezzskzov5ieeda
+==> No binary for swig-4.0.2-mfjsjnfyed3eknuljmezzskzov5ieeda found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/d5/d53be9730d8d58a16bf0cbd1f8ac0c0c3e1090573168bfa151b01eb47fa906fc.tar.gz
+==> No patches needed for swig
+==> swig: Executing phase: 'autoreconf'
+==> swig: Executing phase: 'configure'
+==> swig: Executing phase: 'build'
+==> swig: Executing phase: 'install'
+==> swig: Successfully installed swig-4.0.2-mfjsjnfyed3eknuljmezzskzov5ieeda
+  Fetch: 0.85s.  Build: 50.81s.  Total: 51.66s.
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/swig-4.0.2-mfjsjnfyed3eknuljmezzskzov5ieeda
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/gettext-0.21-r6ujx4ysqbvw2g2iln72sqaqalc2i3em
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/sqlite-3.36.0-v36qrofqwobsa5vmaa7toof6i2ccmvwz
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/gdbm-1.19-6ukzrkuxtju3f4272ns4etuhtcxbikjs
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/libtool-2.4.6-jmlifanobral6btvyzutciuzkmezy3bm
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/expat-2.4.1-ppow2vpit3lloenthcxmoaew3dqyu5p4
+==> Installing binutils-2.37-zop5ojbxagdybl66xwfpwpevj6id7vy3
+==> No binary for binutils-2.37-zop5ojbxagdybl66xwfpwpevj6id7vy3 found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/67/67fc1a4030d08ee877a4867d3dcab35828148f87e1fd05da6db585ed5a166bd4.tar.bz2
+==> No patches needed for binutils
+==> binutils: Executing phase: 'autoreconf'
+==> binutils: Executing phase: 'configure'
+==> binutils: Executing phase: 'build'
+==> binutils: Executing phase: 'install'
+==> binutils: Successfully installed binutils-2.37-zop5ojbxagdybl66xwfpwpevj6id7vy3
+  Fetch: 1.50s.  Build: 7m 30.98s.  Total: 7m 32.48s.
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/binutils-2.37-zop5ojbxagdybl66xwfpwpevj6id7vy3
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/perl-5.32.0-ozktzhyz6kkfapjxt3dtpblzctrjok6z
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/libpciaccess-0.16-3alet2d42pn7yzbpw4isstiqut5heu5r
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/python-3.8.12-inx66svinrzmo2rcei33cwmfhkuoosgw
+==> Installing perl-data-dumper-2.173-nehbdcd3lvopnayg6iomcg7fcifcqttv
+==> No binary for perl-data-dumper-2.173-nehbdcd3lvopnayg6iomcg7fcifcqttv found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/69/697608b39330988e519131be667ff47168aaaaf99f06bd2095d5b46ad05d76fa.tar.gz
+==> No patches needed for perl-data-dumper
+==> perl-data-dumper: Executing phase: 'configure'
+==> perl-data-dumper: Executing phase: 'build'
+==> perl-data-dumper: Executing phase: 'install'
+==> perl-data-dumper: Successfully installed perl-data-dumper-2.173-nehbdcd3lvopnayg6iomcg7fcifcqttv
+  Fetch: 0.15s.  Build: 4.23s.  Total: 4.38s.
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/perl-data-dumper-2.173-nehbdcd3lvopnayg6iomcg7fcifcqttv
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/hwloc-2.6.0-stwsool5weo2y2ekxrquf3idjgsl2dl4
+==> Installing z3-4.8.9-yidlsc74fcm2x7feuiqr5ikoopmsxq5e
+==> No binary for z3-4.8.9-yidlsc74fcm2x7feuiqr5ikoopmsxq5e found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/c9/c9fd04b9b33be74fffaac3ec2bc2c320d1a4cc32e395203c55126b12a14ff3f4.tar.gz
+==> No patches needed for z3
+==> z3: Executing phase: 'cmake'
+==> z3: Executing phase: 'build'
+==> z3: Executing phase: 'install'
+==> z3: Successfully installed z3-4.8.9-yidlsc74fcm2x7feuiqr5ikoopmsxq5e
+  Fetch: 0.72s.  Build: 5m 28.67s.  Total: 5m 29.39s.
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/z3-4.8.9-yidlsc74fcm2x7feuiqr5ikoopmsxq5e
+[+] /cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky9-broadwell/gcc-10.2.0/py-setuptools-58.2.0-nhub4giqnth2e2zulzssiccxdx2br5pz
+==> Installing llvm-11.1.0-ogq2oyqe6qkzxknzcys6l42irasungfr
+==> No binary for llvm-11.1.0-ogq2oyqe6qkzxknzcys6l42irasungfr found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/53/53a0719f3f4b0388013cfffd7b10c7d5682eece1929a9553c722348d1f866e79.tar.gz
+==> No patches needed for llvm
+==> llvm: Executing phase: 'cmake'
+==> llvm: Executing phase: 'build'
+==> Error: ProcessError: Command exited with status 2:
+    'make' '-j8'
+
+3 errors found in build log:
+     2793    [  4%] Building CXX object projects/compiler-rt/lib/interception/C
+             MakeFiles/RTInterception.x86_64.dir/interception_mac.cpp.o
+     2794    cd /tmp/jpg/spack-stage/spack-stage-llvm-11.1.0-ogq2oyqe6qkzxknzcy
+             s6l42irasungfr/spack-build-ogq2oyq/projects/compiler-rt/lib/interc
+             eption && /cm/shared/apps/spack/0.17.3/gpu/lib/spack/env/gcc/g++ -
+             D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__S
+             TDC_LIMIT_MACROS -I/tmp/jpg/spack-stage/spack-stage-llvm-11.1.0-og
+             q2oyqe6qkzxknzcys6l42irasungfr/spack-build-ogq2oyq/projects/compil
+             er-rt/lib/interception -I/tmp/jpg/spack-stage/spack-stage-llvm-11.
+             1.0-ogq2oyqe6qkzxknzcys6l42irasungfr/spack-src/compiler-rt/lib/int
+             erception -I/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky
+             9-broadwell/gcc-10.2.0/libxml2-2.9.12-egosf32loqwemuf3bhpzcmndudvf
+             6ovi/include/libxml2 -I/tmp/jpg/spack-stage/spack-stage-llvm-11.1.
+             0-ogq2oyqe6qkzxknzcys6l42irasungfr/spack-build-ogq2oyq/include -I/
+             tmp/jpg/spack-stage/spack-stage-llvm-11.1.0-ogq2oyqe6qkzxknzcys6l4
+             2irasungfr/spack-src/llvm/include -I/tmp/jpg/spack-stage/spack-sta
+             ge-llvm-11.1.0-ogq2oyqe6qkzxknzcys6l42irasungfr/spack-src/compiler
+             -rt/lib/interception/.. -std=c++11 -fPIC -fvisibility-inlines-hidd
+             en -Werror=date-time -Wall -Wextra -Wno-unused-parameter -Wwrite-s
+             trings -Wcast-qual -Wno-missing-field-initializers -pedantic -Wno-
+             long-long -Wimplicit-fallthrough -Wno-maybe-uninitialized -Wno-cla
+             ss-memaccess -Wno-redundant-move -Wno-noexcept-type -Wdelete-non-v
+             irtual-dtor -Wno-comment -ffunction-sections -fdata-sections -Wall
+              -std=c++14 -Wno-unused-parameter -O3 -DNDEBUG  -m64 -fPIC -fno-bu
+             iltin -fno-exceptions -fomit-frame-pointer -funwind-tables -fno-st
+             ack-protector -fvisibility=hidden -fno-lto -O3 -g -Wno-variadic-ma
+             cros -Wno-non-virtual-dtor -fno-rtti -std=c++14 -MD -MT projects/c
+             ompiler-rt/lib/interception/CMakeFiles/RTInterception.x86_64.dir/i
+             nterception_mac.cpp.o -MF CMakeFiles/RTInterception.x86_64.dir/int
+             erception_mac.cpp.o.d -o CMakeFiles/RTInterception.x86_64.dir/inte
+             rception_mac.cpp.o -c /tmp/jpg/spack-stage/spack-stage-llvm-11.1.0
+             -ogq2oyqe6qkzxknzcys6l42irasungfr/spack-src/compiler-rt/lib/interc
+             eption/interception_mac.cpp
+     2795    [  4%] Building CXX object projects/compiler-rt/lib/interception/C
+             MakeFiles/RTInterception.x86_64.dir/interception_win.cpp.o
+     2796    cd /tmp/jpg/spack-stage/spack-stage-llvm-11.1.0-ogq2oyqe6qkzxknzcy
+             s6l42irasungfr/spack-build-ogq2oyq/projects/compiler-rt/lib/interc
+             eption && /cm/shared/apps/spack/0.17.3/gpu/lib/spack/env/gcc/g++ -
+             D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__S
+             TDC_LIMIT_MACROS -I/tmp/jpg/spack-stage/spack-stage-llvm-11.1.0-og
+             q2oyqe6qkzxknzcys6l42irasungfr/spack-build-ogq2oyq/projects/compil
+             er-rt/lib/interception -I/tmp/jpg/spack-stage/spack-stage-llvm-11.
+             1.0-ogq2oyqe6qkzxknzcys6l42irasungfr/spack-src/compiler-rt/lib/int
+             erception -I/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky
+             9-broadwell/gcc-10.2.0/libxml2-2.9.12-egosf32loqwemuf3bhpzcmndudvf
+             6ovi/include/libxml2 -I/tmp/jpg/spack-stage/spack-stage-llvm-11.1.
+             0-ogq2oyqe6qkzxknzcys6l42irasungfr/spack-build-ogq2oyq/include -I/
+             tmp/jpg/spack-stage/spack-stage-llvm-11.1.0-ogq2oyqe6qkzxknzcys6l4
+             2irasungfr/spack-src/llvm/include -I/tmp/jpg/spack-stage/spack-sta
+             ge-llvm-11.1.0-ogq2oyqe6qkzxknzcys6l42irasungfr/spack-src/compiler
+             -rt/lib/interception/.. -std=c++11 -fPIC -fvisibility-inlines-hidd
+             en -Werror=date-time -Wall -Wextra -Wno-unused-parameter -Wwrite-s
+             trings -Wcast-qual -Wno-missing-field-initializers -pedantic -Wno-
+             long-long -Wimplicit-fallthrough -Wno-maybe-uninitialized -Wno-cla
+             ss-memaccess -Wno-redundant-move -Wno-noexcept-type -Wdelete-non-v
+             irtual-dtor -Wno-comment -ffunction-sections -fdata-sections -Wall
+              -std=c++14 -Wno-unused-parameter -O3 -DNDEBUG  -m64 -fPIC -fno-bu
+             iltin -fno-exceptions -fomit-frame-pointer -funwind-tables -fno-st
+             ack-protector -fvisibility=hidden -fno-lto -O3 -g -Wno-variadic-ma
+             cros -Wno-non-virtual-dtor -fno-rtti -std=c++14 -MD -MT projects/c
+             ompiler-rt/lib/interception/CMakeFiles/RTInterception.x86_64.dir/i
+             nterception_win.cpp.o -MF CMakeFiles/RTInterception.x86_64.dir/int
+             erception_win.cpp.o.d -o CMakeFiles/RTInterception.x86_64.dir/inte
+             rception_win.cpp.o -c /tmp/jpg/spack-stage/spack-stage-llvm-11.1.0
+             -ogq2oyqe6qkzxknzcys6l42irasungfr/spack-src/compiler-rt/lib/interc
+             eption/interception_win.cpp
+     2797    [  4%] Building CXX object projects/compiler-rt/lib/interception/C
+             MakeFiles/RTInterception.x86_64.dir/interception_type_test.cpp.o
+     2798    cd /tmp/jpg/spack-stage/spack-stage-llvm-11.1.0-ogq2oyqe6qkzxknzcy
+             s6l42irasungfr/spack-build-ogq2oyq/projects/compiler-rt/lib/interc
+             eption && /cm/shared/apps/spack/0.17.3/gpu/lib/spack/env/gcc/g++ -
+             D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__S
+             TDC_LIMIT_MACROS -I/tmp/jpg/spack-stage/spack-stage-llvm-11.1.0-og
+             q2oyqe6qkzxknzcys6l42irasungfr/spack-build-ogq2oyq/projects/compil
+             er-rt/lib/interception -I/tmp/jpg/spack-stage/spack-stage-llvm-11.
+             1.0-ogq2oyqe6qkzxknzcys6l42irasungfr/spack-src/compiler-rt/lib/int
+             erception -I/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-rocky
+             9-broadwell/gcc-10.2.0/libxml2-2.9.12-egosf32loqwemuf3bhpzcmndudvf
+             6ovi/include/libxml2 -I/tmp/jpg/spack-stage/spack-stage-llvm-11.1.
+             0-ogq2oyqe6qkzxknzcys6l42irasungfr/spack-build-ogq2oyq/include -I/
+             tmp/jpg/spack-stage/spack-stage-llvm-11.1.0-ogq2oyqe6qkzxknzcys6l4
+             2irasungfr/spack-src/llvm/include -I/tmp/jpg/spack-stage/spack-sta
+             ge-llvm-11.1.0-ogq2oyqe6qkzxknzcys6l42irasungfr/spack-src/compiler
+             -rt/lib/interception/.. -std=c++11 -fPIC -fvisibility-inlines-hidd
+             en -Werror=date-time -Wall -Wextra -Wno-unused-parameter -Wwrite-s
+             trings -Wcast-qual -Wno-missing-field-initializers -pedantic -Wno-
+             long-long -Wimplicit-fallthrough -Wno-maybe-uninitialized -Wno-cla
+             ss-memaccess -Wno-redundant-move -Wno-noexcept-type -Wdelete-non-v
+             irtual-dtor -Wno-comment -ffunction-sections -fdata-sections -Wall
+              -std=c++14 -Wno-unused-parameter -O3 -DNDEBUG  -m64 -fPIC -fno-bu
+             iltin -fno-exceptions -fomit-frame-pointer -funwind-tables -fno-st
+             ack-protector -fvisibility=hidden -fno-lto -O3 -g -Wno-variadic-ma
+             cros -Wno-non-virtual-dtor -fno-rtti -std=c++14 -MD -MT projects/c
+             ompiler-rt/lib/interception/CMakeFiles/RTInterception.x86_64.dir/i
+             nterception_type_test.cpp.o -MF CMakeFiles/RTInterception.x86_64.d
+             ir/interception_type_test.cpp.o.d -o CMakeFiles/RTInterception.x86
+             _64.dir/interception_type_test.cpp.o -c /tmp/jpg/spack-stage/spack
+             -stage-llvm-11.1.0-ogq2oyqe6qkzxknzcys6l42irasungfr/spack-src/comp
+             iler-rt/lib/interception/interception_type_test.cpp
+  >> 2799    /tmp/jpg/spack-stage/spack-stage-llvm-11.1.0-ogq2oyqe6qkzxknzcys6l
+             42irasungfr/spack-src/compiler-rt/lib/sanitizer_common/sanitizer_p
+             latform_limits_posix.cpp:133:10: fatal error: linux/cyclades.h: No
+              such file or directory
+     2800      133 | #include <linux/cyclades.h>
+     2801          |          ^~~~~~~~~~~~~~~~~~
+     2802    compilation terminated.
+  >> 2803    make[2]: *** [projects/compiler-rt/lib/sanitizer_common/CMakeFiles
+             /RTSanitizerCommon.x86_64.dir/build.make:373: projects/compiler-rt
+             /lib/sanitizer_common/CMakeFiles/RTSanitizerCommon.x86_64.dir/sani
+             tizer_platform_limits_posix.cpp.o] Error 1
+     2804    make[2]: *** Waiting for unfinished jobs....
+     2805    [  4%] Building CXX object utils/TableGen/CMakeFiles/obj.llvm-tblg
+             en.dir/FixedLenDecoderEmitter.cpp.o
+     2806    cd /tmp/jpg/spack-stage/spack-stage-llvm-11.1.0-ogq2oyqe6qkzxknzcy
+             s6l42irasungfr/spack-build-ogq2oyq/utils/TableGen && /cm/shared/ap
+             ps/spack/0.17.3/gpu/lib/spack/env/gcc/g++ -D_GNU_SOURCE -D__STDC_C
+             ONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -I/tmp
+             /jpg/spack-stage/spack-stage-llvm-11.1.0-ogq2oyqe6qkzxknzcys6l42ir
+             asungfr/spack-build-ogq2oyq/utils/TableGen -I/tmp/jpg/spack-stage/
+             spack-stage-llvm-11.1.0-ogq2oyqe6qkzxknzcys6l42irasungfr/spack-src
+             /llvm/utils/TableGen -I/cm/shared/apps/spack/0.17.3/gpu/opt/spack/
+             linux-rocky9-broadwell/gcc-10.2.0/libxml2-2.9.12-egosf32loqwemuf3b
+             hpzcmndudvf6ovi/include/libxml2 -I/tmp/jpg/spack-stage/spack-stage
+             -llvm-11.1.0-ogq2oyqe6qkzxknzcys6l42irasungfr/spack-build-ogq2oyq/
+             include -I/tmp/jpg/spack-stage/spack-stage-llvm-11.1.0-ogq2oyqe6qk
+             zxknzcys6l42irasungfr/spack-src/llvm/include -std=c++11 -fPIC -fvi
+             sibility-inlines-hidden -Werror=date-time -Wall -Wextra -Wno-unuse
+             d-parameter -Wwrite-strings -Wcast-qual -Wno-missing-field-initial
+             izers -pedantic -Wno-long-long -Wimplicit-fallthrough -Wno-maybe-u
+             ninitialized -Wno-class-memaccess -Wno-redundant-move -Wno-noexcep
+             t-type -Wdelete-non-virtual-dtor -Wno-comment -ffunction-sections 
+             -fdata-sections -O3 -DNDEBUG -std=c++14 -MD -MT utils/TableGen/CMa
+             keFiles/obj.llvm-tblgen.dir/FixedLenDecoderEmitter.cpp.o -MF CMake
+             Files/obj.llvm-tblgen.dir/FixedLenDecoderEmitter.cpp.o.d -o CMakeF
+             iles/obj.llvm-tblgen.dir/FixedLenDecoderEmitter.cpp.o -c /tmp/jpg/
+             spack-stage/spack-stage-llvm-11.1.0-ogq2oyqe6qkzxknzcys6l42irasung
+             fr/spack-src/llvm/utils/TableGen/FixedLenDecoderEmitter.cpp
+     2807    [  4%] Building CXX object utils/TableGen/CMakeFiles/obj.llvm-tblg
+             en.dir/GICombinerEmitter.cpp.o
+     2808    cd /tmp/jpg/spack-stage/spack-stage-llvm-11.1.0-ogq2oyqe6qkzxknzcy
+             s6l42irasungfr/spack-build-ogq2oyq/utils/TableGen && /cm/shared/ap
+             ps/spack/0.17.3/gpu/lib/spack/env/gcc/g++ -D_GNU_SOURCE -D__STDC_C
+             ONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -I/tmp
+             /jpg/spack-stage/spack-stage-llvm-11.1.0-ogq2oyqe6qkzxknzcys6l42ir
+             asungfr/spack-build-ogq2oyq/utils/TableGen -I/tmp/jpg/spack-stage/
+             spack-stage-llvm-11.1.0-ogq2oyqe6qkzxknzcys6l42irasungfr/spack-src
+             /llvm/utils/TableGen -I/cm/shared/apps/spack/0.17.3/gpu/opt/spack/
+             linux-rocky9-broadwell/gcc-10.2.0/libxml2-2.9.12-egosf32loqwemuf3b
+             hpzcmndudvf6ovi/include/libxml2 -I/tmp/jpg/spack-stage/spack-stage
+             -llvm-11.1.0-ogq2oyqe6qkzxknzcys6l42irasungfr/spack-build-ogq2oyq/
+             include -I/tmp/jpg/spack-stage/spack-stage-llvm-11.1.0-ogq2oyqe6qk
+             zxknzcys6l42irasungfr/spack-src/llvm/include -std=c++11 -fPIC -fvi
+             sibility-inlines-hidden -Werror=date-time -Wall -Wextra -Wno-unuse
+             d-parameter -Wwrite-strings -Wcast-qual -Wno-missing-field-initial
+             izers -pedantic -Wno-long-long -Wimplicit-fallthrough -Wno-maybe-u
+             ninitialized -Wno-class-memaccess -Wno-redundant-move -Wno-noexcep
+             t-type -Wdelete-non-virtual-dtor -Wno-comment -ffunction-sections 
+             -fdata-sections -O3 -DNDEBUG -std=c++14 -MD -MT utils/TableGen/CMa
+             keFiles/obj.llvm-tblgen.dir/GICombinerEmitter.cpp.o -MF CMakeFiles
+             /obj.llvm-tblgen.dir/GICombinerEmitter.cpp.o.d -o CMakeFiles/obj.l
+             lvm-tblgen.dir/GICombinerEmitter.cpp.o -c /tmp/jpg/spack-stage/spa
+             ck-stage-llvm-11.1.0-ogq2oyqe6qkzxknzcys6l42irasungfr/spack-src/ll
+             vm/utils/TableGen/GICombinerEmitter.cpp
+     2809    make[2]: Leaving directory '/tmp/jpg/spack-stage/spack-stage-llvm-
+             11.1.0-ogq2oyqe6qkzxknzcys6l42irasungfr/spack-build-ogq2oyq'
+
+     ...
+
+     2814    cd /tmp/jpg/spack-stage/spack-stage-llvm-11.1.0-ogq2oyqe6qkzxknzcy
+             s6l42irasungfr/spack-build-ogq2oyq/utils/TableGen && /cm/shared/ap
+             ps/spack/0.17.3/gpu/lib/spack/env/gcc/g++ -D_GNU_SOURCE -D__STDC_C
+             ONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -I/tmp
+             /jpg/spack-stage/spack-stage-llvm-11.1.0-ogq2oyqe6qkzxknzcys6l42ir
+             asungfr/spack-build-ogq2oyq/utils/TableGen -I/tmp/jpg/spack-stage/
+             spack-stage-llvm-11.1.0-ogq2oyqe6qkzxknzcys6l42irasungfr/spack-src
+             /llvm/utils/TableGen -I/cm/shared/apps/spack/0.17.3/gpu/opt/spack/
+             linux-rocky9-broadwell/gcc-10.2.0/libxml2-2.9.12-egosf32loqwemuf3b
+             hpzcmndudvf6ovi/include/libxml2 -I/tmp/jpg/spack-stage/spack-stage
+             -llvm-11.1.0-ogq2oyqe6qkzxknzcys6l42irasungfr/spack-build-ogq2oyq/
+             include -I/tmp/jpg/spack-stage/spack-stage-llvm-11.1.0-ogq2oyqe6qk
+             zxknzcys6l42irasungfr/spack-src/llvm/include -std=c++11 -fPIC -fvi
+             sibility-inlines-hidden -Werror=date-time -Wall -Wextra -Wno-unuse
+             d-parameter -Wwrite-strings -Wcast-qual -Wno-missing-field-initial
+             izers -pedantic -Wno-long-long -Wimplicit-fallthrough -Wno-maybe-u
+             ninitialized -Wno-class-memaccess -Wno-redundant-move -Wno-noexcep
+             t-type -Wdelete-non-virtual-dtor -Wno-comment -ffunction-sections 
+             -fdata-sections -O3 -DNDEBUG -std=c++14 -MD -MT utils/TableGen/CMa
+             keFiles/obj.llvm-tblgen.dir/GlobalISelEmitter.cpp.o -MF CMakeFiles
+             /obj.llvm-tblgen.dir/GlobalISelEmitter.cpp.o.d -o CMakeFiles/obj.l
+             lvm-tblgen.dir/GlobalISelEmitter.cpp.o -c /tmp/jpg/spack-stage/spa
+             ck-stage-llvm-11.1.0-ogq2oyqe6qkzxknzcys6l42irasungfr/spack-src/ll
+             vm/utils/TableGen/GlobalISelEmitter.cpp
+     2815    make[2]: Leaving directory '/tmp/jpg/spack-stage/spack-stage-llvm-
+             11.1.0-ogq2oyqe6qkzxknzcys6l42irasungfr/spack-build-ogq2oyq'
+     2816    [  4%] Built target RTSanitizerCommonSymbolizer.x86_64
+     2817    [  4%] Building CXX object utils/TableGen/CMakeFiles/obj.llvm-tblg
+             en.dir/InfoByHwMode.cpp.o
+     2818    cd /tmp/jpg/spack-stage/spack-stage-llvm-11.1.0-ogq2oyqe6qkzxknzcy
+             s6l42irasungfr/spack-build-ogq2oyq/utils/TableGen && /cm/shared/ap
+             ps/spack/0.17.3/gpu/lib/spack/env/gcc/g++ -D_GNU_SOURCE -D__STDC_C
+             ONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -I/tmp
+             /jpg/spack-stage/spack-stage-llvm-11.1.0-ogq2oyqe6qkzxknzcys6l42ir
+             asungfr/spack-build-ogq2oyq/utils/TableGen -I/tmp/jpg/spack-stage/
+             spack-stage-llvm-11.1.0-ogq2oyqe6qkzxknzcys6l42irasungfr/spack-src
+             /llvm/utils/TableGen -I/cm/shared/apps/spack/0.17.3/gpu/opt/spack/
+             linux-rocky9-broadwell/gcc-10.2.0/libxml2-2.9.12-egosf32loqwemuf3b
+             hpzcmndudvf6ovi/include/libxml2 -I/tmp/jpg/spack-stage/spack-stage
+             -llvm-11.1.0-ogq2oyqe6qkzxknzcys6l42irasungfr/spack-build-ogq2oyq/
+             include -I/tmp/jpg/spack-stage/spack-stage-llvm-11.1.0-ogq2oyqe6qk
+             zxknzcys6l42irasungfr/spack-src/llvm/include -std=c++11 -fPIC -fvi
+             sibility-inlines-hidden -Werror=date-time -Wall -Wextra -Wno-unuse
+             d-parameter -Wwrite-strings -Wcast-qual -Wno-missing-field-initial
+             izers -pedantic -Wno-long-long -Wimplicit-fallthrough -Wno-maybe-u
+             ninitialized -Wno-class-memaccess -Wno-redundant-move -Wno-noexcep
+             t-type -Wdelete-non-virtual-dtor -Wno-comment -ffunction-sections 
+             -fdata-sections -O3 -DNDEBUG -std=c++14 -MD -MT utils/TableGen/CMa
+             keFiles/obj.llvm-tblgen.dir/InfoByHwMode.cpp.o -MF CMakeFiles/obj.
+             llvm-tblgen.dir/InfoByHwMode.cpp.o.d -o CMakeFiles/obj.llvm-tblgen
+             .dir/InfoByHwMode.cpp.o -c /tmp/jpg/spack-stage/spack-stage-llvm-1
+             1.1.0-ogq2oyqe6qkzxknzcys6l42irasungfr/spack-src/llvm/utils/TableG
+             en/InfoByHwMode.cpp
+     2819    make[2]: Leaving directory '/tmp/jpg/spack-stage/spack-stage-llvm-
+             11.1.0-ogq2oyqe6qkzxknzcys6l42irasungfr/spack-build-ogq2oyq'
+  >> 2820    make[1]: *** [CMakeFiles/Makefile2:27054: projects/compiler-rt/lib
+             /sanitizer_common/CMakeFiles/RTSanitizerCommon.x86_64.dir/all] Err
+             or 2
+     2821    make[1]: *** Waiting for unfinished jobs....
+     2822    [  4%] Building CXX object utils/TableGen/CMakeFiles/obj.llvm-tblg
+             en.dir/InstrInfoEmitter.cpp.o
+     2823    cd /tmp/jpg/spack-stage/spack-stage-llvm-11.1.0-ogq2oyqe6qkzxknzcy
+             s6l42irasungfr/spack-build-ogq2oyq/utils/TableGen && /cm/shared/ap
+             ps/spack/0.17.3/gpu/lib/spack/env/gcc/g++ -D_GNU_SOURCE -D__STDC_C
+             ONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -I/tmp
+             /jpg/spack-stage/spack-stage-llvm-11.1.0-ogq2oyqe6qkzxknzcys6l42ir
+             asungfr/spack-build-ogq2oyq/utils/TableGen -I/tmp/jpg/spack-stage/
+             spack-stage-llvm-11.1.0-ogq2oyqe6qkzxknzcys6l42irasungfr/spack-src
+             /llvm/utils/TableGen -I/cm/shared/apps/spack/0.17.3/gpu/opt/spack/
+             linux-rocky9-broadwell/gcc-10.2.0/libxml2-2.9.12-egosf32loqwemuf3b
+             hpzcmndudvf6ovi/include/libxml2 -I/tmp/jpg/spack-stage/spack-stage
+             -llvm-11.1.0-ogq2oyqe6qkzxknzcys6l42irasungfr/spack-build-ogq2oyq/
+             include -I/tmp/jpg/spack-stage/spack-stage-llvm-11.1.0-ogq2oyqe6qk
+             zxknzcys6l42irasungfr/spack-src/llvm/include -std=c++11 -fPIC -fvi
+             sibility-inlines-hidden -Werror=date-time -Wall -Wextra -Wno-unuse
+             d-parameter -Wwrite-strings -Wcast-qual -Wno-missing-field-initial
+             izers -pedantic -Wno-long-long -Wimplicit-fallthrough -Wno-maybe-u
+             ninitialized -Wno-class-memaccess -Wno-redundant-move -Wno-noexcep
+             t-type -Wdelete-non-virtual-dtor -Wno-comment -ffunction-sections 
+             -fdata-sections -O3 -DNDEBUG -std=c++14 -MD -MT utils/TableGen/CMa
+             keFiles/obj.llvm-tblgen.dir/InstrInfoEmitter.cpp.o -MF CMakeFiles/
+             obj.llvm-tblgen.dir/InstrInfoEmitter.cpp.o.d -o CMakeFiles/obj.llv
+             m-tblgen.dir/InstrInfoEmitter.cpp.o -c /tmp/jpg/spack-stage/spack-
+             stage-llvm-11.1.0-ogq2oyqe6qkzxknzcys6l42irasungfr/spack-src/llvm/
+             utils/TableGen/InstrInfoEmitter.cpp
+     2824    [  4%] Building CXX object utils/TableGen/CMakeFiles/obj.llvm-tblg
+             en.dir/InstrDocsEmitter.cpp.o
+     2825    cd /tmp/jpg/spack-stage/spack-stage-llvm-11.1.0-ogq2oyqe6qkzxknzcy
+             s6l42irasungfr/spack-build-ogq2oyq/utils/TableGen && /cm/shared/ap
+             ps/spack/0.17.3/gpu/lib/spack/env/gcc/g++ -D_GNU_SOURCE -D__STDC_C
+             ONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -I/tmp
+             /jpg/spack-stage/spack-stage-llvm-11.1.0-ogq2oyqe6qkzxknzcys6l42ir
+             asungfr/spack-build-ogq2oyq/utils/TableGen -I/tmp/jpg/spack-stage/
+             spack-stage-llvm-11.1.0-ogq2oyqe6qkzxknzcys6l42irasungfr/spack-src
+             /llvm/utils/TableGen -I/cm/shared/apps/spack/0.17.3/gpu/opt/spack/
+             linux-rocky9-broadwell/gcc-10.2.0/libxml2-2.9.12-egosf32loqwemuf3b
+             hpzcmndudvf6ovi/include/libxml2 -I/tmp/jpg/spack-stage/spack-stage
+             -llvm-11.1.0-ogq2oyqe6qkzxknzcys6l42irasungfr/spack-build-ogq2oyq/
+             include -I/tmp/jpg/spack-stage/spack-stage-llvm-11.1.0-ogq2oyqe6qk
+             zxknzcys6l42irasungfr/spack-src/llvm/include -std=c++11 -fPIC -fvi
+             sibility-inlines-hidden -Werror=date-time -Wall -Wextra -Wno-unuse
+             d-parameter -Wwrite-strings -Wcast-qual -Wno-missing-field-initial
+             izers -pedantic -Wno-long-long -Wimplicit-fallthrough -Wno-maybe-u
+             ninitialized -Wno-class-memaccess -Wno-redundant-move -Wno-noexcep
+             t-type -Wdelete-non-virtual-dtor -Wno-comment -ffunction-sections 
+             -fdata-sections -O3 -DNDEBUG -std=c++14 -MD -MT utils/TableGen/CMa
+             keFiles/obj.llvm-tblgen.dir/InstrDocsEmitter.cpp.o -MF CMakeFiles/
+             obj.llvm-tblgen.dir/InstrDocsEmitter.cpp.o.d -o CMakeFiles/obj.llv
+             m-tblgen.dir/InstrDocsEmitter.cpp.o -c /tmp/jpg/spack-stage/spack-
+             stage-llvm-11.1.0-ogq2oyqe6qkzxknzcys6l42irasungfr/spack-src/llvm/
+             utils/TableGen/InstrDocsEmitter.cpp
+     2826    [  4%] Building C object tools/polly/lib/External/CMakeFiles/Polly
+             ISL.dir/isl/isl_options.c.o
+
+See build log for details:
+  /tmp/jpg/spack-stage/spack-stage-llvm-11.1.0-ogq2oyqe6qkzxknzcys6l42irasungfr/spack-build-out.txt
+
+==> Warning: Skipping build of py-llvmlite-0.37.0-lrkpdpzj6bu3wmkcuw3xmf6nensxyxrb since llvm-11.1.0-ogq2oyqe6qkzxknzcys6l42irasungfr failed
+==> Warning: Skipping build of py-numba-0.54.0-nmpog3exss4xtdbqjqaadqxdrn5f7kec since py-llvmlite-0.37.0-lrkpdpzj6bu3wmkcuw3xmf6nensxyxrb failed
+==> Error: Terminating after first install failure: ProcessError: Command exited with status 2:
+    'make' '-j8'
+real 1142.23
+user 3442.52
+sys 452.49
+ERROR: spack install failed.
