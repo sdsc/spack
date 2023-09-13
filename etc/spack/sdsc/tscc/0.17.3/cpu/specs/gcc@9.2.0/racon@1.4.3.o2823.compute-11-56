@@ -1,0 +1,1033 @@
+1687667018 2823 89b511bb1867f4496a1a2c5d819da81f  /cm/shared/apps/spack/0.17.3/cpu/etc/spack/sdsc/tscc/0.17.3/cpu/specs/gcc@9.2.0/racon@1.4.3.sh 
+
+#!/usr/bin/env bash
+
+#SBATCH --job-name=racon@1.4.3
+#SBATCH --account=sys200
+#SBATCH --partition=hotel
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=1
+#SBATCH --exclude=gpu1
+#SBATCH --cpus-per-task=8
+#SBATCH --time=01:00:00
+#SBATCH --output=%x.o%j.%N
+
+declare -xr LOCAL_TIME="$(date +'%Y%m%dT%H%M%S%z')"
+declare -xir UNIX_TIME="$(date +'%s')"
+
+declare -xr SYSTEM_NAME='tscc'
+
+declare -xr SPACK_VERSION='0.17.3'
+declare -xr SPACK_INSTANCE_NAME='cpu'
+declare -xr SPACK_INSTANCE_DIR="/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}"
+
+declare -xr SLURM_JOB_SCRIPT="$(scontrol show job ${SLURM_JOB_ID} | awk -F= '/Command=/{print $2}')"
+declare -xr SLURM_JOB_MD5SUM="$(md5sum ${SLURM_JOB_SCRIPT})"
+
+declare -xr SCHEDULER_MODULE='slurm'
+
+echo "${UNIX_TIME} ${SLURM_JOB_ID} ${SLURM_JOB_MD5SUM} ${SLURM_JOB_DEPENDENCY}" 
+echo ""
+
+cat "${SLURM_JOB_SCRIPT}"
+
+module purge
+module load "${SCHEDULER_MODULE}"
+module list
+. "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
+
+
+declare -xr SPACK_PACKAGE='racon@1.4.3'
+declare -xr SPACK_COMPILER='gcc@9.2.0'
+declare -xr SPACK_VARIANTS=''
+declare -xr SPACK_DEPENDENCIES="^python@3.8.12/$(spack find --format '{hash:7}' python@3.8.12 % ${SPACK_COMPILER})"
+declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
+
+printenv
+
+spack config get compilers  
+spack config get config  
+spack config get mirrors
+spack config get modules
+spack config get packages
+spack config get repos
+spack config get upstreams
+
+spack spec --long --namespaces --types "${SPACK_SPEC}"
+if [[ "${?}" -ne 0 ]]; then
+  echo 'ERROR: spack concretization failed.'
+  exit 1
+fi
+
+time -p spack install -v  --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all "${SPACK_SPEC}"
+if [[ "${?}" -ne 0 ]]; then
+  echo 'ERROR: spack install failed.'
+  exit 1
+fi
+
+spack module lmod refresh --delete-tree -y
+
+sbatch --dependency="afterok:${SLURM_JOB_ID}" ''
+
+sleep 20
+
+Currently Loaded Modules:
+  1) slurm/slurm/22.05.9
+
+ 
+
+SHELL=/bin/bash
+SLURM_JOB_USER=jpg
+SLURM_TASKS_PER_NODE=1
+SLURM_JOB_UID=422
+HISTCONTROL=ignoredups
+SLURM_JOB_MD5SUM=89b511bb1867f4496a1a2c5d819da81f  /cm/shared/apps/spack/0.17.3/cpu/etc/spack/sdsc/tscc/0.17.3/cpu/specs/gcc@9.2.0/racon@1.4.3.sh
+SLURM_TASK_PID=740500
+LMOD_arch=x86_64
+SLURM_LOCALID=0
+SLURM_SUBMIT_DIR=/cm/shared/apps/spack/0.17.3/cpu/etc/spack/sdsc/tscc/0.17.3/cpu/specs/gcc@9.2.0
+HOSTNAME=compute-11-56
+HISTSIZE=1000
+SLURMD_NODENAME=compute-11-56
+FPATH=/usr/share/lmod/lmod/init/ksh_funcs
+_ModuleTable002_=ZWZpbGVzIiwiL2V0Yy9tb2R1bGVmaWxlcyIsIi91c3Ivc2hhcmUvbW9kdWxlZmlsZXMiLCIvdXNyL3NoYXJlL01vZHVsZXMvbW9kdWxlZmlsZXMiLH0sWyJzeXN0ZW1CYXNlTVBBVEgiXT0iL2NtL2xvY2FsL21vZHVsZWZpbGVzOi9jbS9zaGFyZWQvbW9kdWxlZmlsZXM6L2V0Yy9tb2R1bGVmaWxlczovdXNyL3NoYXJlL21vZHVsZWZpbGVzOi91c3Ivc2hhcmUvTW9kdWxlcy9tb2R1bGVmaWxlcyIsfQ==
+SPACK_LD_LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:/cm/shared/apps/slurm/current/lib64:/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-10.2.0-2ml3m2ltzeohnaco3bxthfprl6dr5gfi/lib64:/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-10.2.0-2ml3m2ltzeohnaco3bxthfprl6dr5gfi/lib
+__LMOD_REF_COUNT_MODULEPATH=/cm/shared/modulefiles:2;/cm/local/modulefiles:1;/etc/modulefiles:1;/usr/share/modulefiles:1;/usr/share/Modules/modulefiles:1
+SLURM_NODE_ALIASES=(null)
+SLURM_CLUSTER_NAME=slurm
+SLURM_JOB_SCRIPT=/cm/shared/apps/spack/0.17.3/cpu/etc/spack/sdsc/tscc/0.17.3/cpu/specs/gcc@9.2.0/racon@1.4.3.sh
+SCHEDULER_MODULE=slurm
+SPACK_INSTANCE_NAME=cpu
+SLURM_CPUS_ON_NODE=8
+__LMOD_REF_COUNT__LMFILES_=/cm/local/modulefiles/slurm/slurm/22.05.9:1
+SLURM_JOB_CPUS_PER_NODE=8
+SPACK_VARIANTS=
+LMOD_DIR=/usr/share/lmod/lmod/libexec
+SPACK_DEPENDENCIES=^python@3.8.12/k6e5dxr
+PWD=/home/jpg/specs_cpu_0.17.3/gcc@9.2.0
+SLURM_GTIDS=0
+LOGNAME=jpg
+XDG_SESSION_TYPE=tty
+SLURM_JOB_PARTITION=hotel
+MODULESHOME=/usr/share/lmod/lmod
+MANPATH=/cm/shared/apps/slurm/current/man:/usr/share/lmod/lmod/share/man:/usr/local/share/man:/usr/share/man:/cm/local/apps/environment-modules/current/share/man
+LMOD_PREPEND_BLOCK=normal
+SLURM_JOB_NUM_NODES=1
+SPACK_INSTANCE_DIR=/cm/shared/apps/spack/0.17.3/cpu
+SPACK_PYTHON=/usr/bin/python3
+SLURM_JOBID=2823
+SLURM_JOB_QOS=normal
+MOTD_SHOWN=pam
+__LMOD_REF_COUNT_PATH=/cm/shared/apps/slurm/current/sbin:1;/cm/shared/apps/slurm/current/bin:1;/home/jpg/usr/bin:2;/home/jpg/bin:3;/home/jpg/.local/bin:1;/usr/local/bin:1;/usr/bin:1;/usr/local/sbin:1;/usr/sbin:1
+HOME=/home/jpg
+_ModuleTable_Sz_=2
+__LMOD_REF_COUNT_LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:1;/cm/shared/apps/slurm/current/lib64:1
+LANG=en_US.UTF-8
+__LMOD_REF_COUNT_LOADEDMODULES=slurm/slurm/22.05.9:1
+LS_COLORS=rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=01;37;41:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=01;36:*.au=01;36:*.flac=01;36:*.m4a=01;36:*.mid=01;36:*.midi=01;36:*.mka=01;36:*.mp3=01;36:*.mpc=01;36:*.ogg=01;36:*.ra=01;36:*.wav=01;36:*.oga=01;36:*.opus=01;36:*.spx=01;36:*.xspf=01;36:
+SLURM_PROCID=0
+__LMOD_REF_COUNT_CPATH=/cm/shared/apps/slurm/current/include:1
+LMOD_SETTARG_FULL_SUPPORT=no
+SPACK_COMPILER=gcc@9.2.0
+TMPDIR=/tmp
+SLURM_CPUS_PER_TASK=8
+SLURM_NTASKS=1
+SLURM_TOPOLOGY_ADDR=compute-11-56
+LMOD_VERSION=8.5
+SSH_CONNECTION=70.95.82.22 56397 132.249.107.93 22
+SPACK_ROOT=/cm/shared/apps/spack/0.17.3/cpu
+MODULEPATH_ROOT=/usr/share/modulefiles
+SLURM_TOPOLOGY_ADDR_PATTERN=node
+XDG_SESSION_CLASS=user
+LMOD_PKG=/usr/share/lmod/lmod
+SLURM_WORKING_CLUSTER=slurm:mgr2:6817:9728:109
+TERM=xterm-256color
+LESSOPEN=||/usr/bin/lesspipe.sh %s
+USER=jpg
+LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:/cm/shared/apps/slurm/current/lib64
+SLURM_NODELIST=compute-11-56
+ENVIRONMENT=BATCH
+LOADEDMODULES=slurm/slurm/22.05.9
+SPACK_SPEC=racon@1.4.3 % gcc@9.2.0  ^python@3.8.12/k6e5dxr
+SLURM_JOB_ACCOUNT=sys200
+SLURM_PRIO_PROCESS=0
+SLURM_NPROCS=1
+LMOD_ROOT=/usr/share/lmod
+LMOD_SETTARG_CMD=:
+SHLVL=2
+SLURM_NNODES=1
+BASH_ENV=/usr/share/lmod/lmod/init/bash
+LMOD_FULL_SETTARG_SUPPORT=no
+LMOD_sys=Linux
+__LMOD_REF_COUNT_MANPATH=/cm/shared/apps/slurm/current/man:1;/usr/share/lmod/lmod/share/man:1;/usr/local/share/man:1;/usr/share/man:1;/cm/local/apps/environment-modules/current/share/man:1
+XDG_SESSION_ID=86862
+SLURM_SUBMIT_HOST=login1
+__LMOD_SET_FPATH=1
+_ModuleTable001_=X01vZHVsZVRhYmxlXz17WyJNVHZlcnNpb24iXT0zLFsiY19yZWJ1aWxkVGltZSJdPWZhbHNlLFsiY19zaG9ydFRpbWUiXT1mYWxzZSxkZXB0aFQ9e30sZmFtaWx5PXt9LG1UPXtzbHVybT17WyJmbiJdPSIvY20vbG9jYWwvbW9kdWxlZmlsZXMvc2x1cm0vc2x1cm0vMjIuMDUuOSIsWyJmdWxsTmFtZSJdPSJzbHVybS9zbHVybS8yMi4wNS45IixbImxvYWRPcmRlciJdPTEscHJvcFQ9e30sWyJzdGFja0RlcHRoIl09MCxbInN0YXR1cyJdPSJhY3RpdmUiLFsidXNlck5hbWUiXT0ic2x1cm0iLFsid1YiXT0iKnNsdXJtLzAwMDAwMDAyMi4wMDAwMDAwMDUuMDAwMDAwMDA5Lip6ZmluYWwiLH0sfSxtcGF0aEE9eyIvY20vc2hhcmVkL21vZHVsZWZpbGVzIiwiL2NtL2xvY2FsL21vZHVs
+SPACK_PACKAGE=racon@1.4.3
+LD_LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:/cm/shared/apps/slurm/current/lib64
+XDG_RUNTIME_DIR=/run/user/422
+LMOD_COLORIZE=yes
+SLURM_JOB_ID=2823
+SLURM_NODEID=0
+S_COLORS=auto
+SSH_CLIENT=70.95.82.22 56397 22
+DEBUGINFOD_URLS=https://debuginfod.centos.org/ 
+CMD_WLM_CLUSTER_NAME=slurm
+ENABLE_LMOD=1
+which_declare=declare -f
+UNIX_TIME=1687667018
+__Init_Default_Modules=1
+SLURM_CONF=/cm/shared/apps/slurm/var/etc/slurm/slurm.conf
+PATH=/cm/shared/apps/spack/0.17.3/cpu/bin:/cm/shared/apps/slurm/current/sbin:/cm/shared/apps/slurm/current/bin:/home/jpg/usr/bin:/home/jpg/bin:/home/jpg/.local/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin
+SLURM_JOB_NAME=racon@1.4.3
+LOCAL_TIME=20230624T212338-0700
+MODULEPATH=/cm/shared/modulefiles:/cm/local/modulefiles:/etc/modulefiles:/usr/share/modulefiles:/usr/share/Modules/modulefiles
+SLURM_NTASKS_PER_NODE=1
+_LMFILES_=/cm/local/modulefiles/slurm/slurm/22.05.9
+SYSTEM_NAME=tscc
+DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/422/bus
+LMOD_CMD=/usr/share/lmod/lmod/libexec/lmod
+MAIL=/var/spool/mail/jpg
+SSH_TTY=/dev/pts/0
+__LMOD_REF_COUNT_LD_LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:1;/cm/shared/apps/slurm/current/lib64:1
+LMOD_SYSTEM_DEFAULT_MODULES=DefaultModules
+SLURM_JOB_GID=7193
+CPATH=/cm/shared/apps/slurm/current/include
+SPACK_VERSION=0.17.3
+OLDPWD=/home/jpg/specs_cpu_0.17.3
+SLURM_JOB_NODELIST=compute-11-56
+BASH_FUNC_ml%%=() {  eval $($LMOD_DIR/ml_cmd "$@")
+}
+BASH_FUNC_which%%=() {  ( alias;
+ eval ${which_declare} ) | /usr/bin/which --tty-only --read-alias --read-functions --show-tilde --show-dot $@
+}
+BASH_FUNC_module%%=() {  eval $($LMOD_CMD bash "$@") && eval $(${LMOD_SETTARG_CMD:-:} -s sh)
+}
+BASH_FUNC__spack_shell_wrapper%%=() {  for var in LD_LIBRARY_PATH DYLD_LIBRARY_PATH DYLD_FALLBACK_LIBRARY_PATH;
+ do
+ eval "if [ -n \"\${${var}-}\" ]; then export SPACK_$var=\${${var}}; fi";
+ done;
+ if [ -n "${ZSH_VERSION:-}" ]; then
+ emulate -L sh;
+ fi;
+ _sp_flags="";
+ while [ ! -z ${1+x} ] && [ "${1#-}" != "${1}" ]; do
+ _sp_flags="$_sp_flags $1";
+ shift;
+ done;
+ if [ -n "$_sp_flags" ] && [ "${_sp_flags#*h}" != "${_sp_flags}" ] || [ "${_sp_flags#*V}" != "${_sp_flags}" ]; then
+ command spack $_sp_flags "$@";
+ return;
+ fi;
+ _sp_subcommand="";
+ if [ ! -z ${1+x} ]; then
+ _sp_subcommand="$1";
+ shift;
+ fi;
+ case $_sp_subcommand in 
+ "cd")
+ _sp_arg="";
+ if [ -n "$1" ]; then
+ _sp_arg="$1";
+ shift;
+ fi;
+ if [ "$_sp_arg" = "-h" ] || [ "$_sp_arg" = "--help" ]; then
+ command spack cd -h;
+ else
+ LOC="$(spack location $_sp_arg "$@")";
+ if [ -d "$LOC" ]; then
+ cd "$LOC";
+ else
+ return 1;
+ fi;
+ fi;
+ return
+ ;;
+ "env")
+ _sp_arg="";
+ if [ -n "$1" ]; then
+ _sp_arg="$1";
+ shift;
+ fi;
+ if [ "$_sp_arg" = "-h" ] || [ "$_sp_arg" = "--help" ]; then
+ command spack env -h;
+ else
+ case $_sp_arg in 
+ activate)
+ _a=" $@";
+ if [ -z ${1+x} ] || [ "${_a#* --sh}" != "$_a" ] || [ "${_a#* --csh}" != "$_a" ] || [ "${_a#* -h}" != "$_a" ] || [ "${_a#* --help}" != "$_a" ]; then
+ command spack env activate "$@";
+ else
+ stdout="$(command spack $_sp_flags env activate --sh "$@")" || return;
+ eval "$stdout";
+ fi
+ ;;
+ deactivate)
+ _a=" $@";
+ if [ "${_a#* --sh}" != "$_a" ] || [ "${_a#* --csh}" != "$_a" ]; then
+ command spack env deactivate "$@";
+ else
+ if [ -n "$*" ]; then
+ command spack env deactivate -h;
+ else
+ stdout="$(command spack $_sp_flags env deactivate --sh)" || return;
+ eval "$stdout";
+ fi;
+ fi
+ ;;
+ *)
+ command spack env $_sp_arg "$@"
+ ;;
+ esac;
+ fi;
+ return
+ ;;
+ "load" | "unload")
+ _a=" $@";
+ if [ "${_a#* --sh}" != "$_a" ] || [ "${_a#* --csh}" != "$_a" ] || [ "${_a#* -h}" != "$_a" ] || [ "${_a#* --list}" != "$_a" ] || [ "${_a#* --help}" != "$_a" ]; then
+ command spack $_sp_flags $_sp_subcommand "$@";
+ else
+ stdout="$(command spack $_sp_flags $_sp_subcommand --sh "$@")" || return;
+ eval "$stdout";
+ fi
+ ;;
+ *)
+ command spack $_sp_flags $_sp_subcommand "$@"
+ ;;
+ esac
+}
+BASH_FUNC_spack%%=() {  : this is a shell function from: /cm/shared/apps/spack/0.17.3/cpu/share/spack/setup-env.sh;
+ : the real spack script is here: /cm/shared/apps/spack/0.17.3/cpu/bin/spack;
+ _spack_shell_wrapper "$@";
+ return $?
+}
+_=/usr/bin/printenv
+compilers:
+- compiler:
+    spec: gcc@11.2.0
+    paths:
+      cc: /usr/bin/gcc
+      cxx: /usr/bin/g++
+      f77: /usr/bin/gfortran
+      fc: /usr/bin/gfortran
+    flags:
+      cflags: -O2 -march=native
+      cxxflags: -O2 -march=native
+      fflags: -O2 -march=native
+    operating_system: rocky9
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+- compiler:
+    spec: gcc@10.2.0
+    paths:
+      cc: /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-10.2.0-2ml3m2ltzeohnaco3bxthfprl6dr5gfi/bin/gcc
+      cxx: /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-10.2.0-2ml3m2ltzeohnaco3bxthfprl6dr5gfi/bin/g++
+      f77: /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-10.2.0-2ml3m2ltzeohnaco3bxthfprl6dr5gfi/bin/gfortran
+      fc: /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-10.2.0-2ml3m2ltzeohnaco3bxthfprl6dr5gfi/bin/gfortran
+    flags: {}
+    operating_system: rocky9
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+- compiler:
+    spec: intel@19.1.1.217
+    paths:
+      cc: /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/intel-19.1.1.217-6wcrifpdhjoyp4oawdlvcabo2kpbi2xk/bin/icc
+      cxx: /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/intel-19.1.1.217-6wcrifpdhjoyp4oawdlvcabo2kpbi2xk/bin/icpc
+      f77: /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/intel-19.1.1.217-6wcrifpdhjoyp4oawdlvcabo2kpbi2xk/bin/ifort
+      fc: /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/intel-19.1.1.217-6wcrifpdhjoyp4oawdlvcabo2kpbi2xk/bin/ifort
+    flags:
+      cflags: -gcc-name=/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-8.5.0-w6lov36mdw33cg7qm7ekuusp2bbmt6lu/bin/gcc
+      cxxflags: -gcc-name=/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-8.5.0-w6lov36mdw33cg7qm7ekuusp2bbmt6lu/bin/gcc
+    operating_system: rocky9
+    target: x86_64
+    modules: [intel/19.1.1.217]
+    environment: {}
+    extra_rpaths: []
+- compiler:
+    spec: gcc@8.5.0
+    paths:
+      cc: /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-8.5.0-w6lov36mdw33cg7qm7ekuusp2bbmt6lu/bin/gcc
+      cxx: /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-8.5.0-w6lov36mdw33cg7qm7ekuusp2bbmt6lu/bin/g++
+      f77: /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-8.5.0-w6lov36mdw33cg7qm7ekuusp2bbmt6lu/bin/gfortran
+      fc: /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-8.5.0-w6lov36mdw33cg7qm7ekuusp2bbmt6lu/bin/gfortran
+    flags: {}
+    operating_system: rocky9
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+- compiler:
+    spec: gcc@9.2.0
+    paths:
+      cc: /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-9.2.0-ess446ry7axsy3husbm53pc2wuuheun5/bin/gcc
+      cxx: /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-9.2.0-ess446ry7axsy3husbm53pc2wuuheun5/bin/g++
+      f77: /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-9.2.0-ess446ry7axsy3husbm53pc2wuuheun5/bin/gfortran
+      fc: /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-9.2.0-ess446ry7axsy3husbm53pc2wuuheun5/bin/gfortran
+    flags: {}
+    operating_system: rocky9
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+config:
+  install_tree:
+    root: $spack/opt/spack
+    projections:
+      all: ${ARCHITECTURE}/${COMPILERNAME}-${COMPILERVER}/${PACKAGE}-${VERSION}-${HASH}
+  template_dirs:
+  - $spack/share/spack/templates
+
+  # Temporary locations Spack can try to use for builds.
+  #
+  # Recommended options are given below.
+  #
+  # Builds can be faster in temporary directories on some (e.g., HPC) systems.
+  # Specifying `$tempdir` will ensure use of the default temporary directory
+  # (i.e., ``$TMP` or ``$TMPDIR``).
+  #
+  # Another option that prevents conflicts and potential permission issues is
+  # to specify `$user_cache_path/stage`, which ensures each user builds in their
+  # home directory.
+  #
+  # A more traditional path uses the value of `$spack/var/spack/stage`, which
+  # builds directly inside Spack's instance without staging them in a
+  # temporary space.  Problems with specifying a path inside a Spack instance
+  # are that it precludes its use as a system package and its ability to be
+  # pip installable.
+  #
+  # In any case, if the username is not already in the path, Spack will append
+  # the value of `$user` in an attempt to avoid potential conflicts between
+  # users in shared temporary spaces.
+  #
+  # The build stage can be purged with `spack clean --stage` and
+  # `spack clean -a`, so it is important that the specified directory uniquely
+  # identifies Spack staging to avoid accidentally wiping out non-Spack work.
+  build_stage:
+  - $tempdir/$user/spack-stage
+  - $user_cache_path/stage
+  # - $spack/var/spack/stage
+
+  # Directory in which to run tests and store test results.
+  # Tests will be stored in directories named by date/time and package
+  # name/hash.
+  test_stage: $user_cache_path/test
+  source_cache: $spack/var/spack/cache
+  misc_cache: $user_cache_path/cache
+  connect_timeout: 10
+  verify_ssl: true
+  suppress_gpg_warnings: false
+  install_missing_compilers: false
+  checksum: true
+  deprecated: false
+  dirty: false
+  build_language: C
+  locks: true
+  url_fetch_method: urllib
+  ccache: false
+  concretizer: clingo
+  db_lock_timeout: 3
+  package_lock_timeout: null
+  shared_linking: rpath
+  allow_sgid: true
+  terminal_title: false
+  debug: false
+  build_jobs: 16
+mirrors:
+  spack-public: https://mirror.spack.io
+modules:
+  default:
+    lmod:
+      core_compilers:
+      - gcc@11.2.0
+      hierarchy:
+      - mpi
+      hash_length: 7
+      blacklist_implicits: true
+      naming_scheme: '{name}/{version}'
+      projections:
+        all: '{name}/{version}'
+      adol-c:
+        suffixes:
+          +openmp: omp
+      amdblis:
+        suffixes:
+          threads=openmp: omp
+      fftw:
+        suffixes:
+          +openmp: omp
+      hpl:
+        suffixes:
+          +openmp: omp
+      hypre:
+        suffixes:
+          +openmp: omp
+      intel:
+        environment:
+          set:
+            INTEL_LICENSE_FILE: 40000@elprado.sdsc.edu:40100@elprado.sdsc.edu
+      kokkos:
+        suffixes:
+          +openmp: omp
+      openblas:
+        suffixes:
+          threads=openmp: omp
+          +ilp64: ilp64
+      'netlib-scalapack:':
+        suffixes:
+          ^openblas threads=openmp: omp
+      petsc:
+        suffixes:
+          +complex: cmplx
+      slepc:
+        suffixes:
+          ^petsc +complex: cmplx
+      ^python:
+        autoload: direct
+      ^ucx:
+        autoload: direct
+    'enable:':
+    - lmod
+  prefix_inspections:
+    lib:
+    - LD_LIBRARY_PATH
+    lib64:
+    - LD_LIBRARY_PATH
+    bin:
+    - PATH
+    man:
+    - MANPATH
+    share/man:
+    - MANPATH
+    share/aclocal:
+    - ACLOCAL_PATH
+    lib/pkgconfig:
+    - PKG_CONFIG_PATH
+    lib64/pkgconfig:
+    - PKG_CONFIG_PATH
+    share/pkgconfig:
+    - PKG_CONFIG_PATH
+    ? ''
+    : - CMAKE_PREFIX_PATH
+
+  # These are configurations for the module set named "default"
+packages:
+  lustre:
+    externals:
+    - spec: lustre@2.15.2 % gcc@10.2.0 arch=linux-rocky9-cascadelake
+      prefix: /usr
+    - spec: lustre@2.15.2 % gcc@11.2.0 arch=linux-rocky9-cascadelake
+      prefix: /usr
+    - spec: lustre@2.15.2 % intel@19.1.1.217 arch=linux-rocky9-cascadelake
+      prefix: /usr
+    buildable: false
+  texlive:
+    externals:
+    - spec: texlive@live % gcc@10.2.0  arch=linux-rocky9-cascadelake
+      prefix: /usr
+    - spec: texlive@live % gcc@11.2.0  arch=linux-rocky9-cascadelake
+      prefix: /usr
+    - spec: texlive@live % intel@19.1.1.217  arch=linux-rocky9-cascadelake
+      prefix: /usr
+    buildable: false
+  openssl:
+    externals:
+    - spec: openssl@3.0.1 % gcc@10.2.0 arch=linux-rocky9-cascadelake
+      prefix: /usr
+    - spec: openssl@3.0.1 % gcc@11.2.0 arch=linux-rocky9-cascadelake
+      prefix: /usr
+    - spec: openssl@3.0.1 % intel@19.1.1.217 arch=linux-rocky9-cascadelake
+      prefix: /usr
+    buildable: false
+  rdma-core:
+    externals:
+    - spec: rdma-core@41.0 % gcc@11.2.0 arch=linux-rocky9-cascadelake
+      prefix: /usr
+    - spec: rdma-core@41.0 % gcc@10.2.0 arch=linux-rocky9-cascadelake
+      prefix: /usr
+    - spec: rdma-core@41.0 % intel@19.1.1.217 arch=linux-rocky9-cascadelake
+      prefix: /usr
+    buildable: false
+  slurm:
+    externals:
+    - spec: slurm@22.05.9 % gcc@11.2.0 arch=linux-rocky9-cascadelake
+      prefix: /cm/shared/apps/slurm/22.05.9
+    - spec: slurm@22.05.8 % gcc@10.2.0 arch=linux-rocky9-cascadelake
+      prefix: /cm/shared/apps/slurm/22.05.9
+    - spec: slurm@22.05.8 % intel@19.1.1.217 arch=linux-rocky9-cascadelake
+      prefix: /cm/shared/apps/slurm/22.05.9
+    buildable: false
+  librsvg:
+    externals:
+    - spec: librsvg@2.42.7 % gcc@10.2.0 arch=linux-rocky9-cascadelake
+      prefix: /usr
+    - spec: librsvg@2.42.7 % gcc@11.2.0 arch=linux-rocky9-cascadelake
+      prefix: /usr
+    - spec: librsvg@2.42.7 % intel@19.1.1.217 arch=linux-rocky9-cascadelake
+      prefix: /usr
+    buildable: false
+  ghostscript:
+    externals:
+    - spec: ghostscript@9.27 % gcc@10.2.0 arch=linux-rocky9-cascadelake
+      prefix: /usr
+    - spec: ghostscript@9.27 % gcc@11.2.0 arch=linux-rocky9-cascadelake
+      prefix: /usr
+    - spec: ghostscript@9.27 % intel@19.1.1.217 arch=linux-rocky9-cascadelake
+      prefix: /usr
+    buildable: false
+  vasp6:
+    permissions:
+      read: group
+      group: vasp-6
+  all:
+    compiler: [gcc, intel, pgi, clang, xl, nag, fj, aocc]
+    providers:
+      awk: [gawk]
+      blas: [openblas, amdblis]
+      D: [ldc]
+      daal: [intel-daal]
+      elf: [elfutils]
+      fftw-api: [fftw, amdfftw]
+      flame: [libflame, amdlibflame]
+      fuse: [libfuse]
+      gl: [mesa+opengl, mesa18, opengl]
+      glu: [mesa-glu, openglu]
+      glx: [mesa+glx, mesa18+glx, opengl]
+      golang: [gcc]
+      iconv: [libiconv]
+      ipp: [intel-ipp]
+      java: [openjdk, jdk, ibm-java]
+      jpeg: [libjpeg-turbo, libjpeg]
+      lapack: [openblas, amdlibflame]
+      lua-lang: [lua, lua-luajit]
+      mariadb-client: [mariadb-c-client, mariadb]
+      mkl: [intel-mkl]
+      mpe: [mpe2]
+      mpi: [openmpi, mpich]
+      mysql-client: [mysql, mariadb-c-client]
+      opencl: [pocl]
+      onedal: [intel-oneapi-dal]
+      osmesa: [mesa+osmesa, mesa18+osmesa]
+      pbs: [openpbs, torque]
+      pil: [py-pillow]
+      pkgconfig: [pkgconf, pkg-config]
+      rpc: [libtirpc]
+      scalapack: [netlib-scalapack, amdscalapack]
+      sycl: [hipsycl]
+      szip: [libaec, libszip]
+      tbb: [intel-tbb]
+      unwind: [libunwind]
+      uuid: [util-linux-uuid, libuuid]
+      xxd: [xxd-standalone, vim]
+      yacc: [bison, byacc]
+      ziglang: [zig]
+    permissions:
+      read: world
+      write: user
+repos:
+- $spack/var/spack/repos/sdsc
+- $spack/var/spack/repos/builtin
+upstreams: {}
+Input spec
+--------------------------------
+[    ]  .racon@1.4.3%gcc@9.2.0
+[    ]      ^builtin.python@3.8.12%gcc@9.2.0+bz2+ctypes+dbm~debug+libxml2+lzma~nis+optimizations+pic+pyexpat+pythoncmd+readline+shared+sqlite3+ssl~tix~tkinter~ucs4+uuid+zlib patches=0d98e93189bc278fbc37a50ed7f183bd8aaf249a8e1670a465f0db6bb4f8cf87,4c2457325f2b608b1b6a2c63087df8c26e07db3e3d493caf36a56f0ecf6fb768,f2fd060afc4b4618fe8104c4c5d771f36dc55b1db5a4623785a4ea707ec72fb4 arch=linux-rocky9-cascadelake
+[bl  ]          ^builtin.bzip2@1.0.8%gcc@9.2.0~debug~pic+shared arch=linux-rocky9-cascadelake
+[bl  ]          ^builtin.expat@2.4.1%gcc@9.2.0+libbsd arch=linux-rocky9-cascadelake
+[bl  ]              ^builtin.libbsd@0.11.3%gcc@9.2.0 arch=linux-rocky9-cascadelake
+[bl  ]                  ^builtin.libmd@1.0.3%gcc@9.2.0 arch=linux-rocky9-cascadelake
+[bl  ]          ^sdsc.gdbm@1.19%gcc@9.2.0 arch=linux-rocky9-cascadelake
+[bl  ]              ^builtin.readline@8.1%gcc@9.2.0 arch=linux-rocky9-cascadelake
+[bl  ]                  ^builtin.ncurses@6.2%gcc@9.2.0~symlinks+termlib abi=none arch=linux-rocky9-cascadelake
+[bl  ]          ^builtin.gettext@0.21%gcc@9.2.0+bzip2+curses+git~libunistring+libxml2+tar+xz arch=linux-rocky9-cascadelake
+[bl  ]              ^builtin.libiconv@1.16%gcc@9.2.0 libs=shared,static arch=linux-rocky9-cascadelake
+[bl  ]              ^builtin.libxml2@2.9.12%gcc@9.2.0~python arch=linux-rocky9-cascadelake
+[blr ]                  ^builtin.xz@5.2.5%gcc@9.2.0~pic libs=shared,static arch=linux-rocky9-cascadelake
+[bl  ]                  ^builtin.zlib@1.2.11%gcc@9.2.0+optimize+pic+shared arch=linux-rocky9-cascadelake
+[bl  ]              ^builtin.tar@1.34%gcc@9.2.0 arch=linux-rocky9-cascadelake
+[bl  ]          ^builtin.libffi@3.3%gcc@9.2.0 patches=26f26c6f29a7ce9bf370ad3ab2610f99365b4bdd7b82e7c31df41a3370d685c0 arch=linux-rocky9-cascadelake
+[bl  ]          ^builtin.openssl@3.0.1%gcc@11.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~docs certs=system arch=linux-rocky9-cascadelake
+[bl  ]          ^builtin.sqlite@3.36.0%gcc@9.2.0+column_metadata+fts~functions~rtree arch=linux-rocky9-cascadelake
+[bl  ]          ^builtin.util-linux-uuid@2.36.2%gcc@9.2.0 arch=linux-rocky9-cascadelake
+
+Concretized
+--------------------------------
+gfbg7zm  [    ]  builtin.racon@1.4.3%gcc@9.2.0~ipo build_type=RelWithDebInfo arch=linux-rocky9-cascadelake
+ykymw6l  [b   ]      ^builtin.cmake@3.21.4%gcc@9.2.0~doc+ncurses+openssl+ownlibs~qt build_type=Release arch=linux-rocky9-cascadelake
+wngtuw4  [bl  ]          ^builtin.ncurses@6.2%gcc@9.2.0~symlinks+termlib abi=none arch=linux-rocky9-cascadelake
+rfmpf4o  [bl  ]          ^builtin.openssl@3.0.1%gcc@11.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~docs certs=system arch=linux-rocky9-cascadelake
+k6e5dxr  [b   ]      ^builtin.python@3.8.12%gcc@9.2.0+bz2+ctypes+dbm~debug+libxml2+lzma~nis+optimizations+pic+pyexpat+pythoncmd+readline+shared+sqlite3+ssl~tix~tkinter~ucs4+uuid+zlib patches=0d98e93189bc278fbc37a50ed7f183bd8aaf249a8e1670a465f0db6bb4f8cf87,4c2457325f2b608b1b6a2c63087df8c26e07db3e3d493caf36a56f0ecf6fb768,f2fd060afc4b4618fe8104c4c5d771f36dc55b1db5a4623785a4ea707ec72fb4 arch=linux-rocky9-cascadelake
+7453rpl  [bl  ]          ^builtin.bzip2@1.0.8%gcc@9.2.0~debug~pic+shared arch=linux-rocky9-cascadelake
+jy2gkxr  [bl  ]          ^builtin.expat@2.4.1%gcc@9.2.0+libbsd arch=linux-rocky9-cascadelake
+dbmvgsr  [bl  ]              ^builtin.libbsd@0.11.3%gcc@9.2.0 arch=linux-rocky9-cascadelake
+45pvrs6  [bl  ]                  ^builtin.libmd@1.0.3%gcc@9.2.0 arch=linux-rocky9-cascadelake
+4r3wtqn  [bl  ]          ^sdsc.gdbm@1.19%gcc@9.2.0 arch=linux-rocky9-cascadelake
+4dwlhz7  [bl  ]              ^builtin.readline@8.1%gcc@9.2.0 arch=linux-rocky9-cascadelake
+y5a4qcv  [bl  ]          ^builtin.gettext@0.21%gcc@9.2.0+bzip2+curses+git~libunistring+libxml2+tar+xz arch=linux-rocky9-cascadelake
+tm6hn3f  [bl  ]              ^builtin.libiconv@1.16%gcc@9.2.0 libs=shared,static arch=linux-rocky9-cascadelake
+6koe4g4  [bl  ]              ^builtin.libxml2@2.9.12%gcc@9.2.0~python arch=linux-rocky9-cascadelake
+wu3lrkk  [blr ]                  ^builtin.xz@5.2.5%gcc@9.2.0~pic libs=shared,static arch=linux-rocky9-cascadelake
+q67lxvd  [bl  ]                  ^builtin.zlib@1.2.11%gcc@9.2.0+optimize+pic+shared arch=linux-rocky9-cascadelake
+7voabsy  [bl  ]              ^builtin.tar@1.34%gcc@9.2.0 arch=linux-rocky9-cascadelake
+w6bcjdx  [bl  ]          ^builtin.libffi@3.3%gcc@9.2.0 patches=26f26c6f29a7ce9bf370ad3ab2610f99365b4bdd7b82e7c31df41a3370d685c0 arch=linux-rocky9-cascadelake
+fvexeyh  [bl  ]          ^builtin.sqlite@3.36.0%gcc@9.2.0+column_metadata+fts~functions~rtree arch=linux-rocky9-cascadelake
+hjywwlz  [bl  ]          ^builtin.util-linux-uuid@2.36.2%gcc@9.2.0 arch=linux-rocky9-cascadelake
+
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-9.2.0/ncurses-6.2-wngtuw4qwwqxyvkcoub34y7v7hdrzh7n
+[+] /usr (external openssl-3.0.1-rfmpf4oqfckt66trjdsgwfvrdnpx5jed)
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-9.2.0/bzip2-1.0.8-7453rplzooycn6edlg3lt4jmo6uaysgm
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-9.2.0/libmd-1.0.3-45pvrs6uc22xi33zmlvzi4vh6hevmxyn
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-9.2.0/libiconv-1.16-tm6hn3fmgjnsjnadbhimrypyl2i6fscm
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-9.2.0/xz-5.2.5-wu3lrkkhrjkbu4jichylmuw57hex7yti
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-9.2.0/zlib-1.2.11-q67lxvdatu545ck24p3hkzvhrr2z6hkk
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-9.2.0/libffi-3.3-w6bcjdx7tp2shqqvco7yfb4q5kysii5g
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-9.2.0/util-linux-uuid-2.36.2-hjywwlzuk6eslnsv7c4gzvss4ahsquiv
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-9.2.0/readline-8.1-4dwlhz7c2rcw3h6zm427h67lrat3y7l5
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-9.2.0/cmake-3.21.4-ykymw6lylcccganlv3hxbkbslm3rz4yk
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-9.2.0/libbsd-0.11.3-dbmvgsr3rnew7agpveupij2c566bl2nk
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-9.2.0/tar-1.34-7voabsy2xich4jwxas5g65d4cvoodikc
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-9.2.0/libxml2-2.9.12-6koe4g4675hh427j7g3jr4gx7x6w5nlq
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-9.2.0/gdbm-1.19-4r3wtqn5bb3fjnbuteqbo2ss7ttmu7rz
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-9.2.0/sqlite-3.36.0-fvexeyhl2zabibsdklu2gbxvg7k24wmv
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-9.2.0/expat-2.4.1-jy2gkxrxw3uznhs375bmrrw7irf5loyh
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-9.2.0/gettext-0.21-y5a4qcvjaliitmp5a55ikxedjufgllbw
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-9.2.0/python-3.8.12-k6e5dxrezdq7p3qatmsv2dx2clfxxxow
+==> Installing racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj
+==> No binary for racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/df/dfce0bae8234c414ef72b690247701b4299e39a2593bcda548a7a864f51de7f2.tar.gz
+==> No patches needed for racon
+==> racon: Executing phase: 'cmake'
+==> [2023-06-24-21:24:03.653855] 'cmake' '-G' 'Unix Makefiles' '-DCMAKE_INSTALL_PREFIX:STRING=/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-9.2.0/racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj' '-DCMAKE_BUILD_TYPE:STRING=RelWithDebInfo' '-DCMAKE_INTERPROCEDURAL_OPTIMIZATION:BOOL=OFF' '-DCMAKE_VERBOSE_MAKEFILE:BOOL=ON' '-DCMAKE_INSTALL_RPATH_USE_LINK_PATH:BOOL=OFF' '-DCMAKE_INSTALL_RPATH:STRING=/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-9.2.0/racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/lib;/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-9.2.0/racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/lib64' '-DCMAKE_PREFIX_PATH:STRING=/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-9.2.0/python-3.8.12-k6e5dxrezdq7p3qatmsv2dx2clfxxxow;/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-9.2.0/cmake-3.21.4-ykymw6lylcccganlv3hxbkbslm3rz4yk' '-Dracon_build_wrapper=ON' '/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src'
+-- The C compiler identification is GNU 9.2.0
+-- The CXX compiler identification is GNU 9.2.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /cm/shared/apps/spack/0.17.3/cpu/lib/spack/env/gcc/gcc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /cm/shared/apps/spack/0.17.3/cpu/lib/spack/env/gcc/g++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+CMake Deprecation Warning at vendor/bioparser/vendor/zlib/CMakeLists.txt:1 (cmake_minimum_required):
+  Compatibility with CMake < 2.8.12 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value or use a ...<max> suffix to tell
+  CMake that the project does not need compatibility with older versions.
+
+
+-- Looking for sys/types.h
+-- Looking for sys/types.h - found
+-- Looking for stdint.h
+-- Looking for stdint.h - found
+-- Looking for stddef.h
+-- Looking for stddef.h - found
+-- Check size of off64_t
+-- Check size of off64_t - done
+-- Looking for fseeko
+-- Looking for fseeko - found
+-- Looking for unistd.h
+-- Looking for unistd.h - found
+-- Renaming
+--     /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/bioparser/vendor/zlib/zconf.h
+-- to 'zconf.h.included' because this file is included with zlib
+-- but CMake generates it automatically in the build directory.
+-- Looking for pthread.h
+-- Looking for pthread.h - found
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE  
+Setting warning flags
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm
+==> racon: Executing phase: 'build'
+==> [2023-06-24-21:24:04.711316] 'make' '-j8'
+/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-9.2.0/cmake-3.21.4-ykymw6lylcccganlv3hxbkbslm3rz4yk/bin/cmake -S/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src -B/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm --check-build-system CMakeFiles/Makefile.cmake 0
+/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-9.2.0/cmake-3.21.4-ykymw6lylcccganlv3hxbkbslm3rz4yk/bin/cmake -E cmake_progress_start /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/CMakeFiles /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm//CMakeFiles/progress.marks
+make  -f CMakeFiles/Makefile2 all
+make[1]: Entering directory '/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm'
+make  -f vendor/logger/CMakeFiles/logger.dir/build.make vendor/logger/CMakeFiles/logger.dir/depend
+make  -f vendor/bioparser/vendor/zlib/CMakeFiles/zlibstatic.dir/build.make vendor/bioparser/vendor/zlib/CMakeFiles/zlibstatic.dir/depend
+make  -f vendor/spoa/CMakeFiles/spoa.dir/build.make vendor/spoa/CMakeFiles/spoa.dir/depend
+make  -f vendor/thread_pool/CMakeFiles/thread_pool.dir/build.make vendor/thread_pool/CMakeFiles/thread_pool.dir/depend
+make[2]: Entering directory '/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm'
+cd /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm && /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-9.2.0/cmake-3.21.4-ykymw6lylcccganlv3hxbkbslm3rz4yk/bin/cmake -E cmake_depends "Unix Makefiles" /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/logger /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/logger /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/logger/CMakeFiles/logger.dir/DependInfo.cmake --color=
+make  -f vendor/edlib/CMakeFiles/edlib_static.dir/build.make vendor/edlib/CMakeFiles/edlib_static.dir/depend
+make[2]: Entering directory '/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm'
+cd /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm && /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-9.2.0/cmake-3.21.4-ykymw6lylcccganlv3hxbkbslm3rz4yk/bin/cmake -E cmake_depends "Unix Makefiles" /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/spoa /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/spoa /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/spoa/CMakeFiles/spoa.dir/DependInfo.cmake --color=
+make[2]: Entering directory '/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm'
+cd /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm && /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-9.2.0/cmake-3.21.4-ykymw6lylcccganlv3hxbkbslm3rz4yk/bin/cmake -E cmake_depends "Unix Makefiles" /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/bioparser/vendor/zlib /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/bioparser/vendor/zlib /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/bioparser/vendor/zlib/CMakeFiles/zlibstatic.dir/DependInfo.cmake --color=
+make[2]: Entering directory '/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm'
+cd /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm && /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-9.2.0/cmake-3.21.4-ykymw6lylcccganlv3hxbkbslm3rz4yk/bin/cmake -E cmake_depends "Unix Makefiles" /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/thread_pool /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/thread_pool /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/thread_pool/CMakeFiles/thread_pool.dir/DependInfo.cmake --color=
+make[2]: Entering directory '/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm'
+cd /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm && /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-9.2.0/cmake-3.21.4-ykymw6lylcccganlv3hxbkbslm3rz4yk/bin/cmake -E cmake_depends "Unix Makefiles" /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/edlib /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/edlib /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/edlib/CMakeFiles/edlib_static.dir/DependInfo.cmake --color=
+make[2]: Leaving directory '/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm'
+make  -f vendor/logger/CMakeFiles/logger.dir/build.make vendor/logger/CMakeFiles/logger.dir/build
+make[2]: Leaving directory '/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm'
+make  -f vendor/spoa/CMakeFiles/spoa.dir/build.make vendor/spoa/CMakeFiles/spoa.dir/build
+make[2]: Leaving directory '/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm'
+make[2]: Entering directory '/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm'
+make  -f vendor/bioparser/vendor/zlib/CMakeFiles/zlibstatic.dir/build.make vendor/bioparser/vendor/zlib/CMakeFiles/zlibstatic.dir/build
+make[2]: Leaving directory '/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm'
+make[2]: Leaving directory '/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm'
+make  -f vendor/thread_pool/CMakeFiles/thread_pool.dir/build.make vendor/thread_pool/CMakeFiles/thread_pool.dir/build
+make  -f vendor/edlib/CMakeFiles/edlib_static.dir/build.make vendor/edlib/CMakeFiles/edlib_static.dir/build
+make[2]: Entering directory '/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm'
+make[2]: Entering directory '/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm'
+make[2]: Entering directory '/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm'
+make[2]: Entering directory '/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm'
+[  2%] Building CXX object vendor/logger/CMakeFiles/logger.dir/src/logger.cpp.o
+cd /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/logger && /cm/shared/apps/spack/0.17.3/cpu/lib/spack/env/gcc/g++  -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/src -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/logger/include -Wall -Wextra -pedantic -Wall -Wextra -pedantic -O2 -g -DNDEBUG -std=c++11 -MD -MT vendor/logger/CMakeFiles/logger.dir/src/logger.cpp.o -MF CMakeFiles/logger.dir/src/logger.cpp.o.d -o CMakeFiles/logger.dir/src/logger.cpp.o -c /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/logger/src/logger.cpp
+[  5%] Building CXX object vendor/spoa/CMakeFiles/spoa.dir/src/alignment_engine.cpp.o
+[  8%] Building CXX object vendor/spoa/CMakeFiles/spoa.dir/src/graph.cpp.o
+[ 10%] Building CXX object vendor/spoa/CMakeFiles/spoa.dir/src/simd_alignment_engine.cpp.o
+cd /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/spoa && /cm/shared/apps/spack/0.17.3/cpu/lib/spack/env/gcc/g++  -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/src -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/spoa/include -Wall -Wextra -pedantic -Wall -Wextra -pedantic -march=native -O2 -g -DNDEBUG -std=c++11 -MD -MT vendor/spoa/CMakeFiles/spoa.dir/src/alignment_engine.cpp.o -MF CMakeFiles/spoa.dir/src/alignment_engine.cpp.o.d -o CMakeFiles/spoa.dir/src/alignment_engine.cpp.o -c /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/spoa/src/alignment_engine.cpp
+[ 13%] Building CXX object vendor/thread_pool/CMakeFiles/thread_pool.dir/src/thread_pool.cpp.o
+cd /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/spoa && /cm/shared/apps/spack/0.17.3/cpu/lib/spack/env/gcc/g++  -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/src -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/spoa/include -Wall -Wextra -pedantic -Wall -Wextra -pedantic -march=native -O2 -g -DNDEBUG -std=c++11 -MD -MT vendor/spoa/CMakeFiles/spoa.dir/src/graph.cpp.o -MF CMakeFiles/spoa.dir/src/graph.cpp.o.d -o CMakeFiles/spoa.dir/src/graph.cpp.o -c /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/spoa/src/graph.cpp
+cd /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/spoa && /cm/shared/apps/spack/0.17.3/cpu/lib/spack/env/gcc/g++  -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/src -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/spoa/include -Wall -Wextra -pedantic -Wall -Wextra -pedantic -march=native -O2 -g -DNDEBUG -std=c++11 -MD -MT vendor/spoa/CMakeFiles/spoa.dir/src/simd_alignment_engine.cpp.o -MF CMakeFiles/spoa.dir/src/simd_alignment_engine.cpp.o.d -o CMakeFiles/spoa.dir/src/simd_alignment_engine.cpp.o -c /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/spoa/src/simd_alignment_engine.cpp
+[ 18%] Building C object vendor/bioparser/vendor/zlib/CMakeFiles/zlibstatic.dir/adler32.o
+[ 18%] Building CXX object vendor/edlib/CMakeFiles/edlib_static.dir/edlib/src/edlib.cpp.o
+[ 21%] Building CXX object vendor/spoa/CMakeFiles/spoa.dir/src/sisd_alignment_engine.cpp.o
+cd /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/thread_pool && /cm/shared/apps/spack/0.17.3/cpu/lib/spack/env/gcc/g++  -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/src -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/thread_pool/include -Wall -Wextra -pedantic -Wall -Wextra -pedantic -march=native -O2 -g -DNDEBUG -std=c++11 -MD -MT vendor/thread_pool/CMakeFiles/thread_pool.dir/src/thread_pool.cpp.o -MF CMakeFiles/thread_pool.dir/src/thread_pool.cpp.o.d -o CMakeFiles/thread_pool.dir/src/thread_pool.cpp.o -c /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/thread_pool/src/thread_pool.cpp
+cd /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/edlib && /cm/shared/apps/spack/0.17.3/cpu/lib/spack/env/gcc/g++  -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/src -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/edlib/edlib/include -Wall -Wextra -pedantic -Wall -Wextra -pedantic -O2 -g -DNDEBUG -std=c++11 -MD -MT vendor/edlib/CMakeFiles/edlib_static.dir/edlib/src/edlib.cpp.o -MF CMakeFiles/edlib_static.dir/edlib/src/edlib.cpp.o.d -o CMakeFiles/edlib_static.dir/edlib/src/edlib.cpp.o -c /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/edlib/edlib/src/edlib.cpp
+cd /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/spoa && /cm/shared/apps/spack/0.17.3/cpu/lib/spack/env/gcc/g++  -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/src -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/spoa/include -Wall -Wextra -pedantic -Wall -Wextra -pedantic -march=native -O2 -g -DNDEBUG -std=c++11 -MD -MT vendor/spoa/CMakeFiles/spoa.dir/src/sisd_alignment_engine.cpp.o -MF CMakeFiles/spoa.dir/src/sisd_alignment_engine.cpp.o.d -o CMakeFiles/spoa.dir/src/sisd_alignment_engine.cpp.o -c /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/spoa/src/sisd_alignment_engine.cpp
+cd /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/bioparser/vendor/zlib && /cm/shared/apps/spack/0.17.3/cpu/lib/spack/env/gcc/gcc -D_LARGEFILE64_SOURCE=1 -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/src -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/bioparser/vendor/zlib -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src -O2 -g -DNDEBUG -MD -MT vendor/bioparser/vendor/zlib/CMakeFiles/zlibstatic.dir/adler32.o -MF CMakeFiles/zlibstatic.dir/adler32.o.d -o CMakeFiles/zlibstatic.dir/adler32.o -c /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/bioparser/vendor/zlib/adler32.c
+[ 24%] Building C object vendor/bioparser/vendor/zlib/CMakeFiles/zlibstatic.dir/compress.o
+cd /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/bioparser/vendor/zlib && /cm/shared/apps/spack/0.17.3/cpu/lib/spack/env/gcc/gcc -D_LARGEFILE64_SOURCE=1 -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/src -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/bioparser/vendor/zlib -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src -O2 -g -DNDEBUG -MD -MT vendor/bioparser/vendor/zlib/CMakeFiles/zlibstatic.dir/compress.o -MF CMakeFiles/zlibstatic.dir/compress.o.d -o CMakeFiles/zlibstatic.dir/compress.o -c /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/bioparser/vendor/zlib/compress.c
+[ 27%] Building C object vendor/bioparser/vendor/zlib/CMakeFiles/zlibstatic.dir/crc32.o
+cd /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/bioparser/vendor/zlib && /cm/shared/apps/spack/0.17.3/cpu/lib/spack/env/gcc/gcc -D_LARGEFILE64_SOURCE=1 -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/src -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/bioparser/vendor/zlib -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src -O2 -g -DNDEBUG -MD -MT vendor/bioparser/vendor/zlib/CMakeFiles/zlibstatic.dir/crc32.o -MF CMakeFiles/zlibstatic.dir/crc32.o.d -o CMakeFiles/zlibstatic.dir/crc32.o -c /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/bioparser/vendor/zlib/crc32.c
+[ 29%] Building C object vendor/bioparser/vendor/zlib/CMakeFiles/zlibstatic.dir/deflate.o
+cd /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/bioparser/vendor/zlib && /cm/shared/apps/spack/0.17.3/cpu/lib/spack/env/gcc/gcc -D_LARGEFILE64_SOURCE=1 -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/src -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/bioparser/vendor/zlib -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src -O2 -g -DNDEBUG -MD -MT vendor/bioparser/vendor/zlib/CMakeFiles/zlibstatic.dir/deflate.o -MF CMakeFiles/zlibstatic.dir/deflate.o.d -o CMakeFiles/zlibstatic.dir/deflate.o -c /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/bioparser/vendor/zlib/deflate.c
+[ 32%] Building C object vendor/bioparser/vendor/zlib/CMakeFiles/zlibstatic.dir/gzclose.o
+cd /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/bioparser/vendor/zlib && /cm/shared/apps/spack/0.17.3/cpu/lib/spack/env/gcc/gcc -D_LARGEFILE64_SOURCE=1 -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/src -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/bioparser/vendor/zlib -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src -O2 -g -DNDEBUG -MD -MT vendor/bioparser/vendor/zlib/CMakeFiles/zlibstatic.dir/gzclose.o -MF CMakeFiles/zlibstatic.dir/gzclose.o.d -o CMakeFiles/zlibstatic.dir/gzclose.o -c /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/bioparser/vendor/zlib/gzclose.c
+[ 35%] Building C object vendor/bioparser/vendor/zlib/CMakeFiles/zlibstatic.dir/gzlib.o
+cd /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/bioparser/vendor/zlib && /cm/shared/apps/spack/0.17.3/cpu/lib/spack/env/gcc/gcc -D_LARGEFILE64_SOURCE=1 -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/src -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/bioparser/vendor/zlib -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src -O2 -g -DNDEBUG -MD -MT vendor/bioparser/vendor/zlib/CMakeFiles/zlibstatic.dir/gzlib.o -MF CMakeFiles/zlibstatic.dir/gzlib.o.d -o CMakeFiles/zlibstatic.dir/gzlib.o -c /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/bioparser/vendor/zlib/gzlib.c
+[ 37%] Linking CXX static library lib/liblogger.a
+cd /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/logger && /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-9.2.0/cmake-3.21.4-ykymw6lylcccganlv3hxbkbslm3rz4yk/bin/cmake -P CMakeFiles/logger.dir/cmake_clean_target.cmake
+cd /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/logger && /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-9.2.0/cmake-3.21.4-ykymw6lylcccganlv3hxbkbslm3rz4yk/bin/cmake -E cmake_link_script CMakeFiles/logger.dir/link.txt --verbose=1
+/usr/bin/ar qc lib/liblogger.a CMakeFiles/logger.dir/src/logger.cpp.o
+/usr/bin/ranlib lib/liblogger.a
+make[2]: Leaving directory '/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm'
+[ 37%] Built target logger
+[ 40%] Building C object vendor/bioparser/vendor/zlib/CMakeFiles/zlibstatic.dir/gzread.o
+cd /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/bioparser/vendor/zlib && /cm/shared/apps/spack/0.17.3/cpu/lib/spack/env/gcc/gcc -D_LARGEFILE64_SOURCE=1 -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/src -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/bioparser/vendor/zlib -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src -O2 -g -DNDEBUG -MD -MT vendor/bioparser/vendor/zlib/CMakeFiles/zlibstatic.dir/gzread.o -MF CMakeFiles/zlibstatic.dir/gzread.o.d -o CMakeFiles/zlibstatic.dir/gzread.o -c /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/bioparser/vendor/zlib/gzread.c
+[ 43%] Building C object vendor/bioparser/vendor/zlib/CMakeFiles/zlibstatic.dir/gzwrite.o
+cd /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/bioparser/vendor/zlib && /cm/shared/apps/spack/0.17.3/cpu/lib/spack/env/gcc/gcc -D_LARGEFILE64_SOURCE=1 -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/src -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/bioparser/vendor/zlib -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src -O2 -g -DNDEBUG -MD -MT vendor/bioparser/vendor/zlib/CMakeFiles/zlibstatic.dir/gzwrite.o -MF CMakeFiles/zlibstatic.dir/gzwrite.o.d -o CMakeFiles/zlibstatic.dir/gzwrite.o -c /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/bioparser/vendor/zlib/gzwrite.c
+/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/spoa/src/simd_alignment_engine.cpp:313:30: warning: ignoring attributes on template argument 'spoa::__mxxxi []' {aka '__vector(4) long long int []'} [-Wignored-attributes]
+  313 |     std::unique_ptr<__mxxxi[]> sequence_profile_storage;
+      |                              ^
+/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/spoa/src/simd_alignment_engine.cpp:318:30: warning: ignoring attributes on template argument 'spoa::__mxxxi []' {aka '__vector(4) long long int []'} [-Wignored-attributes]
+  318 |     std::unique_ptr<__mxxxi[]> M_storage;
+      |                              ^
+/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/spoa/src/simd_alignment_engine.cpp:322:30: warning: ignoring attributes on template argument 'spoa::__mxxxi []' {aka '__vector(4) long long int []'} [-Wignored-attributes]
+  322 |     std::unique_ptr<__mxxxi[]> masks_storage;
+      |                              ^
+/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/spoa/src/simd_alignment_engine.cpp:326:30: warning: ignoring attributes on template argument 'spoa::__mxxxi []' {aka '__vector(4) long long int []'} [-Wignored-attributes]
+  326 |     std::unique_ptr<__mxxxi[]> penalties_storage;
+      |                              ^
+/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/spoa/src/simd_alignment_engine.cpp: In member function 'void spoa::SimdAlignmentEngine::realloc(uint32_t, uint32_t, uint32_t)':
+/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/spoa/src/simd_alignment_engine.cpp:386:69: warning: ignoring attributes on template argument 'spoa::__mxxxi []' {aka '__vector(4) long long int []'} [-Wignored-attributes]
+  386 |         pimpl_->sequence_profile_storage = std::unique_ptr<__mxxxi[]>(storage);
+      |                                                                     ^
+/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/spoa/src/simd_alignment_engine.cpp:397:54: warning: ignoring attributes on template argument 'spoa::__mxxxi []' {aka '__vector(4) long long int []'} [-Wignored-attributes]
+  397 |         pimpl_->M_storage = std::unique_ptr<__mxxxi[]>(storage);
+      |                                                      ^
+/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/spoa/src/simd_alignment_engine.cpp:405:58: warning: ignoring attributes on template argument 'spoa::__mxxxi []' {aka '__vector(4) long long int []'} [-Wignored-attributes]
+  405 |         pimpl_->masks_storage = std::unique_ptr<__mxxxi[]>(storage);
+      |                                                          ^
+/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/spoa/src/simd_alignment_engine.cpp:413:62: warning: ignoring attributes on template argument 'spoa::__mxxxi []' {aka '__vector(4) long long int []'} [-Wignored-attributes]
+  413 |         pimpl_->penalties_storage = std::unique_ptr<__mxxxi[]>(storage);
+      |                                                              ^
+[ 45%] Building C object vendor/bioparser/vendor/zlib/CMakeFiles/zlibstatic.dir/inflate.o
+cd /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/bioparser/vendor/zlib && /cm/shared/apps/spack/0.17.3/cpu/lib/spack/env/gcc/gcc -D_LARGEFILE64_SOURCE=1 -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/src -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/bioparser/vendor/zlib -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src -O2 -g -DNDEBUG -MD -MT vendor/bioparser/vendor/zlib/CMakeFiles/zlibstatic.dir/inflate.o -MF CMakeFiles/zlibstatic.dir/inflate.o.d -o CMakeFiles/zlibstatic.dir/inflate.o -c /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/bioparser/vendor/zlib/inflate.c
+/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/spoa/src/simd_alignment_engine.cpp: In instantiation of 'T* spoa::allocateAlignedMemory(T**, uint32_t, uint32_t) [with T = __vector(4) long long int; uint32_t = unsigned int]':
+/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/spoa/src/simd_alignment_engine.cpp:384:61:   required from here
+/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/spoa/src/simd_alignment_engine.cpp:36:16: warning: 'new' of type '__vector(4) long long int' with extended alignment 32 [-Waligned-new=]
+   36 |     *storage = new T[size + alignment - 1];
+      |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/spoa/src/simd_alignment_engine.cpp:36:16: note: uses 'void* operator new [](std::size_t)', which does not have an alignment parameter
+/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/spoa/src/simd_alignment_engine.cpp:36:16: note: use '-faligned-new' to enable C++17 over-aligned new support
+[ 48%] Building C object vendor/bioparser/vendor/zlib/CMakeFiles/zlibstatic.dir/infback.o
+cd /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/bioparser/vendor/zlib && /cm/shared/apps/spack/0.17.3/cpu/lib/spack/env/gcc/gcc -D_LARGEFILE64_SOURCE=1 -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/src -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/bioparser/vendor/zlib -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src -O2 -g -DNDEBUG -MD -MT vendor/bioparser/vendor/zlib/CMakeFiles/zlibstatic.dir/infback.o -MF CMakeFiles/zlibstatic.dir/infback.o.d -o CMakeFiles/zlibstatic.dir/infback.o -c /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/bioparser/vendor/zlib/infback.c
+[ 51%] Building C object vendor/bioparser/vendor/zlib/CMakeFiles/zlibstatic.dir/inftrees.o
+cd /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/bioparser/vendor/zlib && /cm/shared/apps/spack/0.17.3/cpu/lib/spack/env/gcc/gcc -D_LARGEFILE64_SOURCE=1 -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/src -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/bioparser/vendor/zlib -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src -O2 -g -DNDEBUG -MD -MT vendor/bioparser/vendor/zlib/CMakeFiles/zlibstatic.dir/inftrees.o -MF CMakeFiles/zlibstatic.dir/inftrees.o.d -o CMakeFiles/zlibstatic.dir/inftrees.o -c /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/bioparser/vendor/zlib/inftrees.c
+[ 54%] Building C object vendor/bioparser/vendor/zlib/CMakeFiles/zlibstatic.dir/inffast.o
+cd /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/bioparser/vendor/zlib && /cm/shared/apps/spack/0.17.3/cpu/lib/spack/env/gcc/gcc -D_LARGEFILE64_SOURCE=1 -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/src -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/bioparser/vendor/zlib -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src -O2 -g -DNDEBUG -MD -MT vendor/bioparser/vendor/zlib/CMakeFiles/zlibstatic.dir/inffast.o -MF CMakeFiles/zlibstatic.dir/inffast.o.d -o CMakeFiles/zlibstatic.dir/inffast.o -c /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/bioparser/vendor/zlib/inffast.c
+[ 56%] Linking CXX static library lib/libthread_pool.a
+cd /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/thread_pool && /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-9.2.0/cmake-3.21.4-ykymw6lylcccganlv3hxbkbslm3rz4yk/bin/cmake -P CMakeFiles/thread_pool.dir/cmake_clean_target.cmake
+[ 59%] Building C object vendor/bioparser/vendor/zlib/CMakeFiles/zlibstatic.dir/trees.o
+cd /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/bioparser/vendor/zlib && /cm/shared/apps/spack/0.17.3/cpu/lib/spack/env/gcc/gcc -D_LARGEFILE64_SOURCE=1 -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/src -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/bioparser/vendor/zlib -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src -O2 -g -DNDEBUG -MD -MT vendor/bioparser/vendor/zlib/CMakeFiles/zlibstatic.dir/trees.o -MF CMakeFiles/zlibstatic.dir/trees.o.d -o CMakeFiles/zlibstatic.dir/trees.o -c /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/bioparser/vendor/zlib/trees.c
+cd /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/thread_pool && /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-9.2.0/cmake-3.21.4-ykymw6lylcccganlv3hxbkbslm3rz4yk/bin/cmake -E cmake_link_script CMakeFiles/thread_pool.dir/link.txt --verbose=1
+/usr/bin/ar qc lib/libthread_pool.a CMakeFiles/thread_pool.dir/src/thread_pool.cpp.o
+/usr/bin/ranlib lib/libthread_pool.a
+make[2]: Leaving directory '/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm'
+[ 59%] Built target thread_pool
+[ 62%] Building C object vendor/bioparser/vendor/zlib/CMakeFiles/zlibstatic.dir/uncompr.o
+cd /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/bioparser/vendor/zlib && /cm/shared/apps/spack/0.17.3/cpu/lib/spack/env/gcc/gcc -D_LARGEFILE64_SOURCE=1 -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/src -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/bioparser/vendor/zlib -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src -O2 -g -DNDEBUG -MD -MT vendor/bioparser/vendor/zlib/CMakeFiles/zlibstatic.dir/uncompr.o -MF CMakeFiles/zlibstatic.dir/uncompr.o.d -o CMakeFiles/zlibstatic.dir/uncompr.o -c /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/bioparser/vendor/zlib/uncompr.c
+[ 64%] Building C object vendor/bioparser/vendor/zlib/CMakeFiles/zlibstatic.dir/zutil.o
+cd /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/bioparser/vendor/zlib && /cm/shared/apps/spack/0.17.3/cpu/lib/spack/env/gcc/gcc -D_LARGEFILE64_SOURCE=1 -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/src -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/bioparser/vendor/zlib -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src -O2 -g -DNDEBUG -MD -MT vendor/bioparser/vendor/zlib/CMakeFiles/zlibstatic.dir/zutil.o -MF CMakeFiles/zlibstatic.dir/zutil.o.d -o CMakeFiles/zlibstatic.dir/zutil.o -c /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/bioparser/vendor/zlib/zutil.c
+[ 67%] Linking CXX static library ../../lib/libedlib_static.a
+cd /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/edlib && /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-9.2.0/cmake-3.21.4-ykymw6lylcccganlv3hxbkbslm3rz4yk/bin/cmake -P CMakeFiles/edlib_static.dir/cmake_clean_target.cmake
+cd /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/edlib && /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-9.2.0/cmake-3.21.4-ykymw6lylcccganlv3hxbkbslm3rz4yk/bin/cmake -E cmake_link_script CMakeFiles/edlib_static.dir/link.txt --verbose=1
+/usr/bin/ar qc ../../lib/libedlib_static.a CMakeFiles/edlib_static.dir/edlib/src/edlib.cpp.o
+/usr/bin/ranlib ../../lib/libedlib_static.a
+make[2]: Leaving directory '/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm'
+[ 67%] Built target edlib_static
+[ 70%] Linking C static library ../../lib/libz.a
+cd /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/bioparser/vendor/zlib && /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-9.2.0/cmake-3.21.4-ykymw6lylcccganlv3hxbkbslm3rz4yk/bin/cmake -P CMakeFiles/zlibstatic.dir/cmake_clean_target.cmake
+cd /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/bioparser/vendor/zlib && /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-9.2.0/cmake-3.21.4-ykymw6lylcccganlv3hxbkbslm3rz4yk/bin/cmake -E cmake_link_script CMakeFiles/zlibstatic.dir/link.txt --verbose=1
+/usr/bin/ar qc ../../lib/libz.a CMakeFiles/zlibstatic.dir/adler32.o CMakeFiles/zlibstatic.dir/compress.o CMakeFiles/zlibstatic.dir/crc32.o CMakeFiles/zlibstatic.dir/deflate.o CMakeFiles/zlibstatic.dir/gzclose.o CMakeFiles/zlibstatic.dir/gzlib.o CMakeFiles/zlibstatic.dir/gzread.o CMakeFiles/zlibstatic.dir/gzwrite.o CMakeFiles/zlibstatic.dir/inflate.o CMakeFiles/zlibstatic.dir/infback.o CMakeFiles/zlibstatic.dir/inftrees.o CMakeFiles/zlibstatic.dir/inffast.o CMakeFiles/zlibstatic.dir/trees.o CMakeFiles/zlibstatic.dir/uncompr.o CMakeFiles/zlibstatic.dir/zutil.o
+/usr/bin/ranlib ../../lib/libz.a
+make[2]: Leaving directory '/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm'
+[ 70%] Built target zlibstatic
+make  -f vendor/rampler/CMakeFiles/rampler.dir/build.make vendor/rampler/CMakeFiles/rampler.dir/depend
+make[2]: Entering directory '/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm'
+cd /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm && /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-9.2.0/cmake-3.21.4-ykymw6lylcccganlv3hxbkbslm3rz4yk/bin/cmake -E cmake_depends "Unix Makefiles" /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/rampler /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/rampler /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/rampler/CMakeFiles/rampler.dir/DependInfo.cmake --color=
+make[2]: Leaving directory '/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm'
+make  -f vendor/rampler/CMakeFiles/rampler.dir/build.make vendor/rampler/CMakeFiles/rampler.dir/build
+make[2]: Entering directory '/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm'
+[ 78%] Building CXX object vendor/rampler/CMakeFiles/rampler.dir/src/sampler.cpp.o
+[ 78%] Building CXX object vendor/rampler/CMakeFiles/rampler.dir/src/main.cpp.o
+[ 78%] Building CXX object vendor/rampler/CMakeFiles/rampler.dir/src/sequence.cpp.o
+cd /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/rampler && /cm/shared/apps/spack/0.17.3/cpu/lib/spack/env/gcc/g++  -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/src -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/bioparser/include -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/bioparser/vendor/zlib -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/bioparser/vendor/zlib -Wall -Wextra -pedantic -Wall -Wextra -pedantic -O2 -g -DNDEBUG -std=c++11 -MD -MT vendor/rampler/CMakeFiles/rampler.dir/src/sampler.cpp.o -MF CMakeFiles/rampler.dir/src/sampler.cpp.o.d -o CMakeFiles/rampler.dir/src/sampler.cpp.o -c /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/rampler/src/sampler.cpp
+cd /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/rampler && /cm/shared/apps/spack/0.17.3/cpu/lib/spack/env/gcc/g++  -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/src -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/bioparser/include -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/bioparser/vendor/zlib -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/bioparser/vendor/zlib -Wall -Wextra -pedantic -Wall -Wextra -pedantic -O2 -g -DNDEBUG -std=c++11 -MD -MT vendor/rampler/CMakeFiles/rampler.dir/src/main.cpp.o -MF CMakeFiles/rampler.dir/src/main.cpp.o.d -o CMakeFiles/rampler.dir/src/main.cpp.o -c /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/rampler/src/main.cpp
+cd /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/rampler && /cm/shared/apps/spack/0.17.3/cpu/lib/spack/env/gcc/g++  -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/src -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/bioparser/include -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/bioparser/vendor/zlib -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/bioparser/vendor/zlib -Wall -Wextra -pedantic -Wall -Wextra -pedantic -O2 -g -DNDEBUG -std=c++11 -MD -MT vendor/rampler/CMakeFiles/rampler.dir/src/sequence.cpp.o -MF CMakeFiles/rampler.dir/src/sequence.cpp.o.d -o CMakeFiles/rampler.dir/src/sequence.cpp.o -c /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/rampler/src/sequence.cpp
+[ 81%] Linking CXX static library lib/libspoa.a
+cd /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/spoa && /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-9.2.0/cmake-3.21.4-ykymw6lylcccganlv3hxbkbslm3rz4yk/bin/cmake -P CMakeFiles/spoa.dir/cmake_clean_target.cmake
+cd /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/spoa && /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-9.2.0/cmake-3.21.4-ykymw6lylcccganlv3hxbkbslm3rz4yk/bin/cmake -E cmake_link_script CMakeFiles/spoa.dir/link.txt --verbose=1
+/usr/bin/ar qc lib/libspoa.a CMakeFiles/spoa.dir/src/alignment_engine.cpp.o CMakeFiles/spoa.dir/src/graph.cpp.o CMakeFiles/spoa.dir/src/simd_alignment_engine.cpp.o CMakeFiles/spoa.dir/src/sisd_alignment_engine.cpp.o
+/usr/bin/ranlib lib/libspoa.a
+make[2]: Leaving directory '/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm'
+[ 81%] Built target spoa
+make  -f CMakeFiles/racon.dir/build.make CMakeFiles/racon.dir/depend
+make[2]: Entering directory '/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm'
+cd /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm && /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-9.2.0/cmake-3.21.4-ykymw6lylcccganlv3hxbkbslm3rz4yk/bin/cmake -E cmake_depends "Unix Makefiles" /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/CMakeFiles/racon.dir/DependInfo.cmake --color=
+make[2]: Leaving directory '/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm'
+make  -f CMakeFiles/racon.dir/build.make CMakeFiles/racon.dir/build
+make[2]: Entering directory '/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm'
+[ 89%] Building CXX object CMakeFiles/racon.dir/src/main.cpp.o
+[ 89%] Building CXX object CMakeFiles/racon.dir/src/overlap.cpp.o
+[ 89%] Building CXX object CMakeFiles/racon.dir/src/polisher.cpp.o
+/cm/shared/apps/spack/0.17.3/cpu/lib/spack/env/gcc/g++  -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/src -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/bioparser/include -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/bioparser/vendor/zlib -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/bioparser/vendor/zlib -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/spoa/include -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/thread_pool/include -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/edlib/edlib/include -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/logger/include -Wall -Wextra -pedantic -O2 -g -DNDEBUG -std=c++11 -MD -MT CMakeFiles/racon.dir/src/main.cpp.o -MF CMakeFiles/racon.dir/src/main.cpp.o.d -o CMakeFiles/racon.dir/src/main.cpp.o -c /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/src/main.cpp
+[ 94%] Building CXX object CMakeFiles/racon.dir/src/sequence.cpp.o
+[ 94%] Building CXX object CMakeFiles/racon.dir/src/window.cpp.o
+/cm/shared/apps/spack/0.17.3/cpu/lib/spack/env/gcc/g++  -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/src -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/bioparser/include -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/bioparser/vendor/zlib -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/bioparser/vendor/zlib -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/spoa/include -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/thread_pool/include -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/edlib/edlib/include -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/logger/include -Wall -Wextra -pedantic -O2 -g -DNDEBUG -std=c++11 -MD -MT CMakeFiles/racon.dir/src/polisher.cpp.o -MF CMakeFiles/racon.dir/src/polisher.cpp.o.d -o CMakeFiles/racon.dir/src/polisher.cpp.o -c /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/src/polisher.cpp
+/cm/shared/apps/spack/0.17.3/cpu/lib/spack/env/gcc/g++  -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/src -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/bioparser/include -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/bioparser/vendor/zlib -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/bioparser/vendor/zlib -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/spoa/include -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/thread_pool/include -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/edlib/edlib/include -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/logger/include -Wall -Wextra -pedantic -O2 -g -DNDEBUG -std=c++11 -MD -MT CMakeFiles/racon.dir/src/overlap.cpp.o -MF CMakeFiles/racon.dir/src/overlap.cpp.o.d -o CMakeFiles/racon.dir/src/overlap.cpp.o -c /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/src/overlap.cpp
+/cm/shared/apps/spack/0.17.3/cpu/lib/spack/env/gcc/g++  -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/src -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/bioparser/include -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/bioparser/vendor/zlib -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/bioparser/vendor/zlib -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/spoa/include -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/thread_pool/include -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/edlib/edlib/include -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/logger/include -Wall -Wextra -pedantic -O2 -g -DNDEBUG -std=c++11 -MD -MT CMakeFiles/racon.dir/src/sequence.cpp.o -MF CMakeFiles/racon.dir/src/sequence.cpp.o.d -o CMakeFiles/racon.dir/src/sequence.cpp.o -c /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/src/sequence.cpp
+/cm/shared/apps/spack/0.17.3/cpu/lib/spack/env/gcc/g++  -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/src -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/bioparser/include -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/bioparser/vendor/zlib -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/bioparser/vendor/zlib -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/spoa/include -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/thread_pool/include -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/edlib/edlib/include -I/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/logger/include -Wall -Wextra -pedantic -O2 -g -DNDEBUG -std=c++11 -MD -MT CMakeFiles/racon.dir/src/window.cpp.o -MF CMakeFiles/racon.dir/src/window.cpp.o.d -o CMakeFiles/racon.dir/src/window.cpp.o -c /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/src/window.cpp
+[ 97%] Linking CXX executable bin/rampler
+cd /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/rampler && /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-9.2.0/cmake-3.21.4-ykymw6lylcccganlv3hxbkbslm3rz4yk/bin/cmake -E cmake_link_script CMakeFiles/rampler.dir/link.txt --verbose=1
+/cm/shared/apps/spack/0.17.3/cpu/lib/spack/env/gcc/g++  -Wall -Wextra -pedantic -Wall -Wextra -pedantic -O2 -g -DNDEBUG -rdynamic CMakeFiles/rampler.dir/src/main.cpp.o CMakeFiles/rampler.dir/src/sequence.cpp.o CMakeFiles/rampler.dir/src/sampler.cpp.o -o bin/rampler  -Wl,-rpath,::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: ../bioparser/lib/libz.a 
+make[2]: Leaving directory '/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm'
+[ 97%] Built target rampler
+[100%] Linking CXX executable bin/racon
+/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-9.2.0/cmake-3.21.4-ykymw6lylcccganlv3hxbkbslm3rz4yk/bin/cmake -E cmake_link_script CMakeFiles/racon.dir/link.txt --verbose=1
+/cm/shared/apps/spack/0.17.3/cpu/lib/spack/env/gcc/g++  -Wall -Wextra -pedantic -O2 -g -DNDEBUG -rdynamic CMakeFiles/racon.dir/src/main.cpp.o CMakeFiles/racon.dir/src/polisher.cpp.o CMakeFiles/racon.dir/src/overlap.cpp.o CMakeFiles/racon.dir/src/sequence.cpp.o CMakeFiles/racon.dir/src/window.cpp.o -o bin/racon  -Wl,-rpath,::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: vendor/spoa/lib/libspoa.a vendor/thread_pool/lib/libthread_pool.a lib/libedlib_static.a vendor/logger/lib/liblogger.a vendor/bioparser/lib/libz.a 
+make[2]: Leaving directory '/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm'
+[100%] Built target racon
+make[1]: Leaving directory '/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm'
+/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-9.2.0/cmake-3.21.4-ykymw6lylcccganlv3hxbkbslm3rz4yk/bin/cmake -E cmake_progress_start /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/CMakeFiles 0
+==> racon: Executing phase: 'install'
+==> [2023-06-24-21:24:12.440521] 'make' '-j8' 'install'
+/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-9.2.0/cmake-3.21.4-ykymw6lylcccganlv3hxbkbslm3rz4yk/bin/cmake -S/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src -B/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm --check-build-system CMakeFiles/Makefile.cmake 0
+/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-9.2.0/cmake-3.21.4-ykymw6lylcccganlv3hxbkbslm3rz4yk/bin/cmake -E cmake_progress_start /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/CMakeFiles /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm//CMakeFiles/progress.marks
+make  -f CMakeFiles/Makefile2 all
+make[1]: Entering directory '/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm'
+make  -f vendor/logger/CMakeFiles/logger.dir/build.make vendor/logger/CMakeFiles/logger.dir/depend
+make  -f vendor/bioparser/vendor/zlib/CMakeFiles/zlibstatic.dir/build.make vendor/bioparser/vendor/zlib/CMakeFiles/zlibstatic.dir/depend
+make  -f vendor/spoa/CMakeFiles/spoa.dir/build.make vendor/spoa/CMakeFiles/spoa.dir/depend
+make  -f vendor/thread_pool/CMakeFiles/thread_pool.dir/build.make vendor/thread_pool/CMakeFiles/thread_pool.dir/depend
+make[2]: Entering directory '/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm'
+cd /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm && /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-9.2.0/cmake-3.21.4-ykymw6lylcccganlv3hxbkbslm3rz4yk/bin/cmake -E cmake_depends "Unix Makefiles" /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/logger /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/logger /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/logger/CMakeFiles/logger.dir/DependInfo.cmake --color=
+make  -f vendor/edlib/CMakeFiles/edlib_static.dir/build.make vendor/edlib/CMakeFiles/edlib_static.dir/depend
+make[2]: Entering directory '/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm'
+cd /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm && /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-9.2.0/cmake-3.21.4-ykymw6lylcccganlv3hxbkbslm3rz4yk/bin/cmake -E cmake_depends "Unix Makefiles" /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/spoa /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/spoa /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/spoa/CMakeFiles/spoa.dir/DependInfo.cmake --color=
+make[2]: Entering directory '/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm'
+cd /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm && /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-9.2.0/cmake-3.21.4-ykymw6lylcccganlv3hxbkbslm3rz4yk/bin/cmake -E cmake_depends "Unix Makefiles" /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/bioparser/vendor/zlib /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/bioparser/vendor/zlib /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/bioparser/vendor/zlib/CMakeFiles/zlibstatic.dir/DependInfo.cmake --color=
+make[2]: Entering directory '/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm'
+cd /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm && /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-9.2.0/cmake-3.21.4-ykymw6lylcccganlv3hxbkbslm3rz4yk/bin/cmake -E cmake_depends "Unix Makefiles" /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/thread_pool /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/thread_pool /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/thread_pool/CMakeFiles/thread_pool.dir/DependInfo.cmake --color=
+make[2]: Entering directory '/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm'
+cd /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm && /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-9.2.0/cmake-3.21.4-ykymw6lylcccganlv3hxbkbslm3rz4yk/bin/cmake -E cmake_depends "Unix Makefiles" /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/edlib /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/edlib /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/edlib/CMakeFiles/edlib_static.dir/DependInfo.cmake --color=
+Consolidate compiler generated dependencies of target logger
+make[2]: Leaving directory '/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm'
+make  -f vendor/logger/CMakeFiles/logger.dir/build.make vendor/logger/CMakeFiles/logger.dir/build
+Consolidate compiler generated dependencies of target edlib_static
+Consolidate compiler generated dependencies of target thread_pool
+make[2]: Leaving directory '/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm'
+make[2]: Leaving directory '/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm'
+make  -f vendor/edlib/CMakeFiles/edlib_static.dir/build.make vendor/edlib/CMakeFiles/edlib_static.dir/build
+make  -f vendor/thread_pool/CMakeFiles/thread_pool.dir/build.make vendor/thread_pool/CMakeFiles/thread_pool.dir/build
+make[2]: Entering directory '/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm'
+make[2]: Nothing to be done for 'vendor/logger/CMakeFiles/logger.dir/build'.
+make[2]: Leaving directory '/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm'
+Consolidate compiler generated dependencies of target spoa
+make[2]: Entering directory '/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm'
+make[2]: Nothing to be done for 'vendor/edlib/CMakeFiles/edlib_static.dir/build'.
+make[2]: Leaving directory '/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm'
+Consolidate compiler generated dependencies of target zlibstatic
+make[2]: Entering directory '/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm'
+make[2]: Nothing to be done for 'vendor/thread_pool/CMakeFiles/thread_pool.dir/build'.
+make[2]: Leaving directory '/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm'
+make[2]: Leaving directory '/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm'
+make[2]: Leaving directory '/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm'
+make  -f vendor/bioparser/vendor/zlib/CMakeFiles/zlibstatic.dir/build.make vendor/bioparser/vendor/zlib/CMakeFiles/zlibstatic.dir/build
+make  -f vendor/spoa/CMakeFiles/spoa.dir/build.make vendor/spoa/CMakeFiles/spoa.dir/build
+make[2]: Entering directory '/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm'
+make[2]: Nothing to be done for 'vendor/bioparser/vendor/zlib/CMakeFiles/zlibstatic.dir/build'.
+make[2]: Leaving directory '/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm'
+[  5%] Built target logger
+make[2]: Entering directory '/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm'
+make[2]: Nothing to be done for 'vendor/spoa/CMakeFiles/spoa.dir/build'.
+make[2]: Leaving directory '/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm'
+[ 10%] Built target edlib_static
+[ 16%] Built target thread_pool
+[ 59%] Built target zlibstatic
+make  -f vendor/rampler/CMakeFiles/rampler.dir/build.make vendor/rampler/CMakeFiles/rampler.dir/depend
+[ 72%] Built target spoa
+make  -f CMakeFiles/racon.dir/build.make CMakeFiles/racon.dir/depend
+make[2]: Entering directory '/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm'
+cd /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm && /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-9.2.0/cmake-3.21.4-ykymw6lylcccganlv3hxbkbslm3rz4yk/bin/cmake -E cmake_depends "Unix Makefiles" /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src/vendor/rampler /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/rampler /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/vendor/rampler/CMakeFiles/rampler.dir/DependInfo.cmake --color=
+make[2]: Entering directory '/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm'
+cd /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm && /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-9.2.0/cmake-3.21.4-ykymw6lylcccganlv3hxbkbslm3rz4yk/bin/cmake -E cmake_depends "Unix Makefiles" /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-src /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/CMakeFiles/racon.dir/DependInfo.cmake --color=
+Consolidate compiler generated dependencies of target rampler
+make[2]: Leaving directory '/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm'
+make  -f vendor/rampler/CMakeFiles/rampler.dir/build.make vendor/rampler/CMakeFiles/rampler.dir/build
+Consolidate compiler generated dependencies of target racon
+make[2]: Leaving directory '/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm'
+make[2]: Entering directory '/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm'
+make[2]: Nothing to be done for 'vendor/rampler/CMakeFiles/rampler.dir/build'.
+make[2]: Leaving directory '/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm'
+make  -f CMakeFiles/racon.dir/build.make CMakeFiles/racon.dir/build
+make[2]: Entering directory '/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm'
+make[2]: Nothing to be done for 'CMakeFiles/racon.dir/build'.
+make[2]: Leaving directory '/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm'
+[ 83%] Built target rampler
+[100%] Built target racon
+make[1]: Leaving directory '/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm'
+/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-9.2.0/cmake-3.21.4-ykymw6lylcccganlv3hxbkbslm3rz4yk/bin/cmake -E cmake_progress_start /tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm/CMakeFiles 0
+make  -f CMakeFiles/Makefile2 preinstall
+make[1]: Entering directory '/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm'
+make[1]: Nothing to be done for 'preinstall'.
+make[1]: Leaving directory '/tmp/jpg/spack-stage/spack-stage-racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/spack-build-gfbg7zm'
+Install the project...
+/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-9.2.0/cmake-3.21.4-ykymw6lylcccganlv3hxbkbslm3rz4yk/bin/cmake -P cmake_install.cmake
+-- Install configuration: "RelWithDebInfo"
+-- Installing: /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-9.2.0/racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/bin/racon
+-- Set runtime path of "/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-9.2.0/racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/bin/racon" to "/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-9.2.0/racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/lib:/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-9.2.0/racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/lib64"
+-- Installing: /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-9.2.0/racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/bin/rampler
+-- Set runtime path of "/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-9.2.0/racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/bin/rampler" to "/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-9.2.0/racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/lib:/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-9.2.0/racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj/lib64"
+==> racon: Successfully installed racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj
+  Fetch: 1.90s.  Build: 17.48s.  Total: 19.37s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-9.2.0/racon-1.4.3-gfbg7zm3hpxj3uwrmtmljoqpo24x6fjj
+real 31.48
+user 27.87
+sys 3.55
+==> Regenerating lmod module files
+sbatch: error: Unable to open file 

@@ -1,0 +1,1886 @@
+1687566387 2566 0efb21bbe0ead4bf3a8cc905f0d776f0  /cm/shared/apps/spack/0.17.3/cpu/etc/spack/sdsc/tscc/0.17.3/cpu/specs/gcc@10.2.0/bam-readcount@0.8.0.sh afterok:2565
+
+#!/usr/bin/env bash
+
+#SBATCH --job-name=bam-readcount@0.8.0
+#SBATCH --account=sys200
+#SBATCH --partition=hotel
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=1
+#SBATCH --cpus-per-task=8
+#SBATCH --time=01:00:00
+#SBATCH --output=%x.o%j.%N
+
+declare -xr LOCAL_TIME="$(date +'%Y%m%dT%H%M%S%z')"
+declare -xir UNIX_TIME="$(date +'%s')"
+
+declare -xr SYSTEM_NAME='tscc'
+
+declare -xr SPACK_VERSION='0.17.3'
+declare -xr SPACK_INSTANCE_NAME='cpu'
+declare -xr SPACK_INSTANCE_DIR="/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}"
+
+declare -xr SLURM_JOB_SCRIPT="$(scontrol show job ${SLURM_JOB_ID} | awk -F= '/Command=/{print $2}')"
+declare -xr SLURM_JOB_MD5SUM="$(md5sum ${SLURM_JOB_SCRIPT})"
+
+declare -xr SCHEDULER_MODULE='slurm'
+
+echo "${UNIX_TIME} ${SLURM_JOB_ID} ${SLURM_JOB_MD5SUM} ${SLURM_JOB_DEPENDENCY}" 
+echo ""
+
+cat "${SLURM_JOB_SCRIPT}"
+
+module purge
+module load "${SCHEDULER_MODULE}"
+module list
+. "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
+
+
+declare -xr SPACK_PACKAGE='bam-readcount@0.8.0'
+declare -xr SPACK_COMPILER='gcc@10.2.0'
+declare -xr SPACK_VARIANTS=""
+declare -xr SPACK_DEPENDENCIES=""
+declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
+
+printenv
+
+spack config get compilers  
+spack config get config  
+spack config get mirrors
+spack config get modules
+spack config get packages
+spack config get repos
+spack config get upstreams
+
+spack spec --long --namespaces --types "${SPACK_SPEC}"
+if [[ "${?}" -ne 0 ]]; then
+  echo 'ERROR: spack concretization failed.'
+  exit 1
+fi
+
+time -p spack install -v  --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all "${SPACK_SPEC}"
+if [[ "${?}" -ne 0 ]]; then
+  echo 'ERROR: spack install failed.'
+  exit 1
+fi
+
+spack module lmod refresh --delete-tree -y
+
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'py-dendropy@4.5.2.sh'
+
+sleep 20
+
+Currently Loaded Modules:
+  1) slurm/slurm/22.05.9
+
+ 
+
+SHELL=/bin/bash
+SLURM_JOB_USER=jpg
+SLURM_TASKS_PER_NODE=1
+SLURM_JOB_UID=422
+HISTCONTROL=ignoredups
+SLURM_JOB_MD5SUM=0efb21bbe0ead4bf3a8cc905f0d776f0  /cm/shared/apps/spack/0.17.3/cpu/etc/spack/sdsc/tscc/0.17.3/cpu/specs/gcc@10.2.0/bam-readcount@0.8.0.sh
+SLURM_TASK_PID=262739
+LMOD_arch=x86_64
+SLURM_LOCALID=0
+SLURM_SUBMIT_DIR=/cm/shared/apps/spack/0.17.3/cpu/etc/spack/sdsc/tscc/0.17.3/cpu/specs/gcc@10.2.0
+HOSTNAME=compute-11-56
+HISTSIZE=1000
+SLURMD_NODENAME=compute-11-56
+FPATH=/usr/share/lmod/lmod/init/ksh_funcs
+_ModuleTable002_=L2xvY2FsL21vZHVsZWZpbGVzIiwiL2V0Yy9tb2R1bGVmaWxlcyIsIi91c3Ivc2hhcmUvbW9kdWxlZmlsZXMiLCIvdXNyL3NoYXJlL01vZHVsZXMvbW9kdWxlZmlsZXMiLH0sWyJzeXN0ZW1CYXNlTVBBVEgiXT0iL2NtL2xvY2FsL21vZHVsZWZpbGVzOi9jbS9zaGFyZWQvbW9kdWxlZmlsZXM6L2V0Yy9tb2R1bGVmaWxlczovdXNyL3NoYXJlL21vZHVsZWZpbGVzOi91c3Ivc2hhcmUvTW9kdWxlcy9tb2R1bGVmaWxlcyIsfQ==
+SPACK_LD_LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:/cm/shared/apps/slurm/current/lib64
+__LMOD_REF_COUNT_MODULEPATH=/cm/shared/modulefiles:2;/cm/local/modulefiles:1;/etc/modulefiles:1;/usr/share/modulefiles:1;/usr/share/Modules/modulefiles:1
+SLURM_NODE_ALIASES=(null)
+SLURM_CLUSTER_NAME=slurm
+SLURM_JOB_SCRIPT=/cm/shared/apps/spack/0.17.3/cpu/etc/spack/sdsc/tscc/0.17.3/cpu/specs/gcc@10.2.0/bam-readcount@0.8.0.sh
+SCHEDULER_MODULE=slurm
+SPACK_INSTANCE_NAME=cpu
+SLURM_CPUS_ON_NODE=8
+__LMOD_REF_COUNT__LMFILES_=/cm/local/modulefiles/slurm/slurm/22.05.9:1
+SLURM_JOB_CPUS_PER_NODE=8
+SPACK_VARIANTS=
+LMOD_DIR=/usr/share/lmod/lmod/libexec
+SPACK_DEPENDENCIES=
+PWD=/home/jpg/specs_cpu_0.17.3/gcc@10.2.0
+SLURM_GTIDS=0
+LOGNAME=jpg
+XDG_SESSION_TYPE=tty
+SLURM_JOB_PARTITION=hotel
+MODULESHOME=/usr/share/lmod/lmod
+MANPATH=/cm/shared/apps/slurm/current/man:/usr/share/lmod/lmod/share/man:/usr/local/share/man:/usr/share/man:/cm/local/apps/environment-modules/current/share/man
+LMOD_PREPEND_BLOCK=normal
+SLURM_JOB_NUM_NODES=1
+SPACK_INSTANCE_DIR=/cm/shared/apps/spack/0.17.3/cpu
+SPACK_PYTHON=/usr/bin/python3
+SLURM_JOBID=2566
+SLURM_JOB_QOS=normal
+MOTD_SHOWN=pam
+__LMOD_REF_COUNT_PATH=/cm/shared/apps/slurm/current/sbin:1;/cm/shared/apps/slurm/current/bin:1;/cm/shared/apps/spack/0.17.3/cpu/bin:1;/home/jpg/usr/bin:2;/home/jpg/bin:3;/home/jpg/.local/bin:1;/usr/local/bin:1;/usr/bin:1;/usr/local/sbin:1;/usr/sbin:1
+HOME=/home/jpg
+_ModuleTable_Sz_=2
+__LMOD_REF_COUNT_LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:1;/cm/shared/apps/slurm/current/lib64:1
+LANG=en_US.UTF-8
+SLURM_JOB_DEPENDENCY=afterok:2565
+__LMOD_REF_COUNT_LOADEDMODULES=slurm/slurm/22.05.9:1
+LS_COLORS=rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=01;37;41:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=01;36:*.au=01;36:*.flac=01;36:*.m4a=01;36:*.mid=01;36:*.midi=01;36:*.mka=01;36:*.mp3=01;36:*.mpc=01;36:*.ogg=01;36:*.ra=01;36:*.wav=01;36:*.oga=01;36:*.opus=01;36:*.spx=01;36:*.xspf=01;36:
+SLURM_PROCID=0
+__LMOD_REF_COUNT_CPATH=/cm/shared/apps/slurm/current/include:1
+LMOD_SETTARG_FULL_SUPPORT=no
+SPACK_COMPILER=gcc@10.2.0
+TMPDIR=/tmp
+SLURM_CPUS_PER_TASK=8
+SLURM_NTASKS=1
+SLURM_TOPOLOGY_ADDR=compute-11-56
+LMOD_VERSION=8.5
+SSH_CONNECTION=70.95.82.22 52198 132.249.107.93 22
+SPACK_ROOT=/cm/shared/apps/spack/0.17.3/cpu
+_ModuleTable003_=bE5hbWUiXT0ic2hhcmVkIixbImxvYWRPcmRlciJdPTEscHJvcFQ9e30sWyJzdGFja0RlcHRoIl09MSxbInN0YXR1cyJdPSJhY3RpdmUiLFsidXNlck5hbWUiXT0ic2hhcmVkIixbIndWIl09Ik0uKnpmaW5hbCIsfSxzbHVybT17WyJmbiJdPSIvY20vbG9jYWwvbW9kdWxlZmlsZXMvc2x1cm0vc2x1cm0vMjIuMDUuOSIsWyJmdWxsTmFtZSJdPSJzbHVybS9zbHVybS8yMi4wNS45IixbImxvYWRPcmRlciJdPTUscHJvcFQ9e30sWyJzdGFja0RlcHRoIl09MCxbInN0YXR1cyJdPSJhY3RpdmUiLFsidXNlck5hbWUiXT0ic2x1cm0iLFsid1YiXT0iKnNsdXJtLzAwMDAwMDAyMi4wMDAwMDAwMDUuMDAwMDAwMDA5Lip6ZmluYWwiLH0sfSxtcGF0aEE9eyIvY20vc2hhcmVkL21vZHVsZWZp
+MODULEPATH_ROOT=/usr/share/modulefiles
+SLURM_TOPOLOGY_ADDR_PATTERN=node
+XDG_SESSION_CLASS=user
+LMOD_PKG=/usr/share/lmod/lmod
+SLURM_WORKING_CLUSTER=slurm:mgr2:6817:9728:109
+TERM=xterm-256color
+LESSOPEN=||/usr/bin/lesspipe.sh %s
+USER=jpg
+LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:/cm/shared/apps/slurm/current/lib64
+SLURM_NODELIST=compute-11-56
+ENVIRONMENT=BATCH
+LOADEDMODULES=slurm/slurm/22.05.9
+SPACK_SPEC=bam-readcount@0.8.0 % gcc@10.2.0  
+SLURM_JOB_ACCOUNT=sys200
+SLURM_PRIO_PROCESS=0
+SLURM_NPROCS=1
+LMOD_ROOT=/usr/share/lmod
+LMOD_SETTARG_CMD=:
+SHLVL=8
+SLURM_NNODES=1
+BASH_ENV=/usr/share/lmod/lmod/init/bash
+LMOD_FULL_SETTARG_SUPPORT=no
+LMOD_sys=Linux
+__LMOD_REF_COUNT_MANPATH=/cm/shared/apps/slurm/current/man:1;/usr/share/lmod/lmod/share/man:1;/usr/local/share/man:1;/usr/share/man:1;/cm/local/apps/environment-modules/current/share/man:1
+XDG_SESSION_ID=85045
+SLURM_SUBMIT_HOST=compute-11-56
+__LMOD_SET_FPATH=1
+_ModuleTable001_=X01vZHVsZVRhYmxlXz17WyJNVHZlcnNpb24iXT0zLFsiY19yZWJ1aWxkVGltZSJdPTcyMDAuMCxbImNfc2hvcnRUaW1lIl09MC4zMTI2Mjk5MzgxMjU2MSxkZXB0aFQ9e30sZmFtaWx5PXt9LG1UPXtzbHVybT17WyJmbiJdPSIvY20vbG9jYWwvbW9kdWxlZmlsZXMvc2x1cm0vc2x1cm0vMjIuMDUuOSIsWyJmdWxsTmFtZSJdPSJzbHVybS9zbHVybS8yMi4wNS45IixbImxvYWRPcmRlciJdPTEscHJvcFQ9e30sWyJzdGFja0RlcHRoIl09MCxbInN0YXR1cyJdPSJhY3RpdmUiLFsidXNlck5hbWUiXT0ic2x1cm0iLFsid1YiXT0iKnNsdXJtLzAwMDAwMDAyMi4wMDAwMDAwMDUuMDAwMDAwMDA5Lip6ZmluYWwiLH0sfSxtcGF0aEE9eyIvY20vc2hhcmVkL21vZHVsZWZpbGVzIiwiL2Nt
+SPACK_PACKAGE=bam-readcount@0.8.0
+LD_LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:/cm/shared/apps/slurm/current/lib64
+XDG_RUNTIME_DIR=/run/user/422
+LMOD_COLORIZE=yes
+SLURM_JOB_ID=2566
+SLURM_NODEID=0
+S_COLORS=auto
+SSH_CLIENT=70.95.82.22 52198 22
+DEBUGINFOD_URLS=https://debuginfod.centos.org/ 
+CMD_WLM_CLUSTER_NAME=slurm
+ENABLE_LMOD=1
+which_declare=declare -f
+UNIX_TIME=1687566387
+__Init_Default_Modules=1
+SLURM_CONF=/cm/shared/apps/slurm/var/etc/slurm/slurm.conf
+PATH=/cm/shared/apps/slurm/current/sbin:/cm/shared/apps/slurm/current/bin:/cm/shared/apps/spack/0.17.3/cpu/bin:/home/jpg/usr/bin:/home/jpg/bin:/home/jpg/.local/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin
+SLURM_JOB_NAME=bam-readcount@0.8.0
+LOCAL_TIME=20230623T172627-0700
+MODULEPATH=/cm/shared/modulefiles:/cm/local/modulefiles:/etc/modulefiles:/usr/share/modulefiles:/usr/share/Modules/modulefiles
+SLURM_NTASKS_PER_NODE=1
+_LMFILES_=/cm/local/modulefiles/slurm/slurm/22.05.9
+SYSTEM_NAME=tscc
+DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/422/bus
+LMOD_CMD=/usr/share/lmod/lmod/libexec/lmod
+MAIL=/var/spool/mail/jpg
+SSH_TTY=/dev/pts/1
+__LMOD_REF_COUNT_LD_LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:1;/cm/shared/apps/slurm/current/lib64:1
+LMOD_SYSTEM_DEFAULT_MODULES=DefaultModules
+SLURM_JOB_GID=7193
+CPATH=/cm/shared/apps/slurm/current/include
+SPACK_VERSION=0.17.3
+OLDPWD=/home/jpg/specs_cpu_0.17.3
+SLURM_JOB_NODELIST=compute-11-56
+BASH_FUNC_ml%%=() {  eval $($LMOD_DIR/ml_cmd "$@")
+}
+BASH_FUNC_which%%=() {  ( alias;
+ eval ${which_declare} ) | /usr/bin/which --tty-only --read-alias --read-functions --show-tilde --show-dot $@
+}
+BASH_FUNC_module%%=() {  eval $($LMOD_CMD bash "$@") && eval $(${LMOD_SETTARG_CMD:-:} -s sh)
+}
+BASH_FUNC__spack_shell_wrapper%%=() {  for var in LD_LIBRARY_PATH DYLD_LIBRARY_PATH DYLD_FALLBACK_LIBRARY_PATH;
+ do
+ eval "if [ -n \"\${${var}-}\" ]; then export SPACK_$var=\${${var}}; fi";
+ done;
+ if [ -n "${ZSH_VERSION:-}" ]; then
+ emulate -L sh;
+ fi;
+ _sp_flags="";
+ while [ ! -z ${1+x} ] && [ "${1#-}" != "${1}" ]; do
+ _sp_flags="$_sp_flags $1";
+ shift;
+ done;
+ if [ -n "$_sp_flags" ] && [ "${_sp_flags#*h}" != "${_sp_flags}" ] || [ "${_sp_flags#*V}" != "${_sp_flags}" ]; then
+ command spack $_sp_flags "$@";
+ return;
+ fi;
+ _sp_subcommand="";
+ if [ ! -z ${1+x} ]; then
+ _sp_subcommand="$1";
+ shift;
+ fi;
+ case $_sp_subcommand in 
+ "cd")
+ _sp_arg="";
+ if [ -n "$1" ]; then
+ _sp_arg="$1";
+ shift;
+ fi;
+ if [ "$_sp_arg" = "-h" ] || [ "$_sp_arg" = "--help" ]; then
+ command spack cd -h;
+ else
+ LOC="$(spack location $_sp_arg "$@")";
+ if [ -d "$LOC" ]; then
+ cd "$LOC";
+ else
+ return 1;
+ fi;
+ fi;
+ return
+ ;;
+ "env")
+ _sp_arg="";
+ if [ -n "$1" ]; then
+ _sp_arg="$1";
+ shift;
+ fi;
+ if [ "$_sp_arg" = "-h" ] || [ "$_sp_arg" = "--help" ]; then
+ command spack env -h;
+ else
+ case $_sp_arg in 
+ activate)
+ _a=" $@";
+ if [ -z ${1+x} ] || [ "${_a#* --sh}" != "$_a" ] || [ "${_a#* --csh}" != "$_a" ] || [ "${_a#* -h}" != "$_a" ] || [ "${_a#* --help}" != "$_a" ]; then
+ command spack env activate "$@";
+ else
+ stdout="$(command spack $_sp_flags env activate --sh "$@")" || return;
+ eval "$stdout";
+ fi
+ ;;
+ deactivate)
+ _a=" $@";
+ if [ "${_a#* --sh}" != "$_a" ] || [ "${_a#* --csh}" != "$_a" ]; then
+ command spack env deactivate "$@";
+ else
+ if [ -n "$*" ]; then
+ command spack env deactivate -h;
+ else
+ stdout="$(command spack $_sp_flags env deactivate --sh)" || return;
+ eval "$stdout";
+ fi;
+ fi
+ ;;
+ *)
+ command spack env $_sp_arg "$@"
+ ;;
+ esac;
+ fi;
+ return
+ ;;
+ "load" | "unload")
+ _a=" $@";
+ if [ "${_a#* --sh}" != "$_a" ] || [ "${_a#* --csh}" != "$_a" ] || [ "${_a#* -h}" != "$_a" ] || [ "${_a#* --list}" != "$_a" ] || [ "${_a#* --help}" != "$_a" ]; then
+ command spack $_sp_flags $_sp_subcommand "$@";
+ else
+ stdout="$(command spack $_sp_flags $_sp_subcommand --sh "$@")" || return;
+ eval "$stdout";
+ fi
+ ;;
+ *)
+ command spack $_sp_flags $_sp_subcommand "$@"
+ ;;
+ esac
+}
+BASH_FUNC_spack%%=() {  : this is a shell function from: /cm/shared/apps/spack/0.17.3/cpu/share/spack/setup-env.sh;
+ : the real spack script is here: /cm/shared/apps/spack/0.17.3/cpu/bin/spack;
+ _spack_shell_wrapper "$@";
+ return $?
+}
+_=/usr/bin/printenv
+compilers:
+- compiler:
+    spec: gcc@11.2.0
+    paths:
+      cc: /usr/bin/gcc
+      cxx: /usr/bin/g++
+      f77: /usr/bin/gfortran
+      fc: /usr/bin/gfortran
+    flags:
+      cflags: -O2 -march=native
+      cxxflags: -O2 -march=native
+      fflags: -O2 -march=native
+    operating_system: rocky9
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+- compiler:
+    spec: gcc@10.2.0
+    paths:
+      cc: /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-10.2.0-2ml3m2ltzeohnaco3bxthfprl6dr5gfi/bin/gcc
+      cxx: /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-10.2.0-2ml3m2ltzeohnaco3bxthfprl6dr5gfi/bin/g++
+      f77: /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-10.2.0-2ml3m2ltzeohnaco3bxthfprl6dr5gfi/bin/gfortran
+      fc: /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-10.2.0-2ml3m2ltzeohnaco3bxthfprl6dr5gfi/bin/gfortran
+    flags: {}
+    operating_system: rocky9
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+- compiler:
+    spec: intel@19.1.1.217
+    paths:
+      cc: /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/intel-19.1.1.217-6wcrifpdhjoyp4oawdlvcabo2kpbi2xk/bin/icc
+      cxx: /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/intel-19.1.1.217-6wcrifpdhjoyp4oawdlvcabo2kpbi2xk/bin/icpc
+      f77: /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/intel-19.1.1.217-6wcrifpdhjoyp4oawdlvcabo2kpbi2xk/bin/ifort
+      fc: /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/intel-19.1.1.217-6wcrifpdhjoyp4oawdlvcabo2kpbi2xk/bin/ifort
+    flags:
+      cflags: -gcc-name=/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-8.5.0-w6lov36mdw33cg7qm7ekuusp2bbmt6lu/bin/gcc
+      cxxflags: -gcc-name=/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-8.5.0-w6lov36mdw33cg7qm7ekuusp2bbmt6lu/bin/gcc
+    operating_system: rocky9
+    target: x86_64
+    modules: [intel/19.1.1.217]
+    environment: {}
+    extra_rpaths: []
+- compiler:
+    spec: gcc@8.5.0
+    paths:
+      cc: /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-8.5.0-w6lov36mdw33cg7qm7ekuusp2bbmt6lu/bin/gcc
+      cxx: /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-8.5.0-w6lov36mdw33cg7qm7ekuusp2bbmt6lu/bin/g++
+      f77: /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-8.5.0-w6lov36mdw33cg7qm7ekuusp2bbmt6lu/bin/gfortran
+      fc: /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-8.5.0-w6lov36mdw33cg7qm7ekuusp2bbmt6lu/bin/gfortran
+    flags: {}
+    operating_system: rocky9
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+- compiler:
+    spec: gcc@9.2.0
+    paths:
+      cc: /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-9.2.0-ess446ry7axsy3husbm53pc2wuuheun5/bin/gcc
+      cxx: /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-9.2.0-ess446ry7axsy3husbm53pc2wuuheun5/bin/g++
+      f77: /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-9.2.0-ess446ry7axsy3husbm53pc2wuuheun5/bin/gfortran
+      fc: /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-9.2.0-ess446ry7axsy3husbm53pc2wuuheun5/bin/gfortran
+    flags: {}
+    operating_system: rocky9
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+config:
+  install_tree:
+    root: $spack/opt/spack
+    projections:
+      all: ${ARCHITECTURE}/${COMPILERNAME}-${COMPILERVER}/${PACKAGE}-${VERSION}-${HASH}
+  template_dirs:
+  - $spack/share/spack/templates
+
+  # Temporary locations Spack can try to use for builds.
+  #
+  # Recommended options are given below.
+  #
+  # Builds can be faster in temporary directories on some (e.g., HPC) systems.
+  # Specifying `$tempdir` will ensure use of the default temporary directory
+  # (i.e., ``$TMP` or ``$TMPDIR``).
+  #
+  # Another option that prevents conflicts and potential permission issues is
+  # to specify `$user_cache_path/stage`, which ensures each user builds in their
+  # home directory.
+  #
+  # A more traditional path uses the value of `$spack/var/spack/stage`, which
+  # builds directly inside Spack's instance without staging them in a
+  # temporary space.  Problems with specifying a path inside a Spack instance
+  # are that it precludes its use as a system package and its ability to be
+  # pip installable.
+  #
+  # In any case, if the username is not already in the path, Spack will append
+  # the value of `$user` in an attempt to avoid potential conflicts between
+  # users in shared temporary spaces.
+  #
+  # The build stage can be purged with `spack clean --stage` and
+  # `spack clean -a`, so it is important that the specified directory uniquely
+  # identifies Spack staging to avoid accidentally wiping out non-Spack work.
+  build_stage:
+  - $tempdir/$user/spack-stage
+  - $user_cache_path/stage
+  # - $spack/var/spack/stage
+
+  # Directory in which to run tests and store test results.
+  # Tests will be stored in directories named by date/time and package
+  # name/hash.
+  test_stage: $user_cache_path/test
+  source_cache: $spack/var/spack/cache
+  misc_cache: $user_cache_path/cache
+  connect_timeout: 10
+  verify_ssl: true
+  suppress_gpg_warnings: false
+  install_missing_compilers: false
+  checksum: true
+  deprecated: false
+  dirty: false
+  build_language: C
+  locks: true
+  url_fetch_method: urllib
+  ccache: false
+  concretizer: clingo
+  db_lock_timeout: 3
+  package_lock_timeout: null
+  shared_linking: rpath
+  allow_sgid: true
+  terminal_title: false
+  debug: false
+  build_jobs: 16
+mirrors:
+  spack-public: https://mirror.spack.io
+modules:
+  default:
+    lmod:
+      core_compilers:
+      - gcc@11.2.0
+      hierarchy:
+      - mpi
+      hash_length: 7
+      blacklist_implicits: true
+      naming_scheme: '{name}/{version}'
+      projections:
+        all: '{name}/{version}'
+      adol-c:
+        suffixes:
+          +openmp: omp
+      amdblis:
+        suffixes:
+          threads=openmp: omp
+      fftw:
+        suffixes:
+          +openmp: omp
+      hpl:
+        suffixes:
+          +openmp: omp
+      hypre:
+        suffixes:
+          +openmp: omp
+      intel:
+        environment:
+          set:
+            INTEL_LICENSE_FILE: 40000@elprado.sdsc.edu:40100@elprado.sdsc.edu
+      kokkos:
+        suffixes:
+          +openmp: omp
+      openblas:
+        suffixes:
+          threads=openmp: omp
+          +ilp64: ilp64
+      'netlib-scalapack:':
+        suffixes:
+          ^openblas threads=openmp: omp
+      petsc:
+        suffixes:
+          +complex: cmplx
+      slepc:
+        suffixes:
+          ^petsc +complex: cmplx
+      ^python:
+        autoload: direct
+      ^ucx:
+        autoload: direct
+    'enable:':
+    - lmod
+  prefix_inspections:
+    lib:
+    - LD_LIBRARY_PATH
+    lib64:
+    - LD_LIBRARY_PATH
+    bin:
+    - PATH
+    man:
+    - MANPATH
+    share/man:
+    - MANPATH
+    share/aclocal:
+    - ACLOCAL_PATH
+    lib/pkgconfig:
+    - PKG_CONFIG_PATH
+    lib64/pkgconfig:
+    - PKG_CONFIG_PATH
+    share/pkgconfig:
+    - PKG_CONFIG_PATH
+    ? ''
+    : - CMAKE_PREFIX_PATH
+
+  # These are configurations for the module set named "default"
+packages:
+  lustre:
+    externals:
+    - spec: lustre@2.15.2 % gcc@10.2.0 arch=linux-rocky9-cascadelake
+      prefix: /usr
+    - spec: lustre@2.15.2 % gcc@11.2.0 arch=linux-rocky9-cascadelake
+      prefix: /usr
+    - spec: lustre@2.15.2 % intel@19.1.1.217 arch=linux-rocky9-cascadelake
+      prefix: /usr
+    buildable: false
+  texlive:
+    externals:
+    - spec: texlive@live % gcc@10.2.0  arch=linux-rocky9-cascadelake
+      prefix: /usr
+    - spec: texlive@live % gcc@11.2.0  arch=linux-rocky9-cascadelake
+      prefix: /usr
+    - spec: texlive@live % intel@19.1.1.217  arch=linux-rocky9-cascadelake
+      prefix: /usr
+    buildable: false
+  openssl:
+    externals:
+    - spec: openssl@3.0.1 % gcc@10.2.0 arch=linux-rocky9-cascadelake
+      prefix: /usr
+    - spec: openssl@3.0.1 % gcc@11.2.0 arch=linux-rocky9-cascadelake
+      prefix: /usr
+    - spec: openssl@3.0.1 % intel@19.1.1.217 arch=linux-rocky9-cascadelake
+      prefix: /usr
+    buildable: false
+  rdma-core:
+    externals:
+    - spec: rdma-core@41.0 % gcc@11.2.0 arch=linux-rocky9-cascadelake
+      prefix: /usr
+    - spec: rdma-core@41.0 % gcc@10.2.0 arch=linux-rocky9-cascadelake
+      prefix: /usr
+    - spec: rdma-core@41.0 % intel@19.1.1.217 arch=linux-rocky9-cascadelake
+      prefix: /usr
+    buildable: false
+  slurm:
+    externals:
+    - spec: slurm@22.05.9 % gcc@11.2.0 arch=linux-rocky9-cascadelake
+      prefix: /cm/shared/apps/slurm/22.05.9
+    - spec: slurm@22.05.8 % gcc@10.2.0 arch=linux-rocky9-cascadelake
+      prefix: /cm/shared/apps/slurm/22.05.9
+    - spec: slurm@22.05.8 % intel@19.1.1.217 arch=linux-rocky9-cascadelake
+      prefix: /cm/shared/apps/slurm/22.05.9
+    buildable: false
+  librsvg:
+    externals:
+    - spec: librsvg@2.42.7 % gcc@10.2.0 arch=linux-rocky9-cascadelake
+      prefix: /usr
+    - spec: librsvg@2.42.7 % gcc@11.2.0 arch=linux-rocky9-cascadelake
+      prefix: /usr
+    - spec: librsvg@2.42.7 % intel@19.1.1.217 arch=linux-rocky9-cascadelake
+      prefix: /usr
+    buildable: false
+  ghostscript:
+    externals:
+    - spec: ghostscript@9.27 % gcc@10.2.0 arch=linux-rocky9-cascadelake
+      prefix: /usr
+    - spec: ghostscript@9.27 % gcc@11.2.0 arch=linux-rocky9-cascadelake
+      prefix: /usr
+    - spec: ghostscript@9.27 % intel@19.1.1.217 arch=linux-rocky9-cascadelake
+      prefix: /usr
+    buildable: false
+  gaussian:
+    permissions:
+      read: group
+      group: jpg
+  vasp6:
+    permissions:
+      read: group
+      group: vasp-6
+  all:
+    compiler: [gcc, intel, pgi, clang, xl, nag, fj, aocc]
+    providers:
+      awk: [gawk]
+      blas: [openblas, amdblis]
+      D: [ldc]
+      daal: [intel-daal]
+      elf: [elfutils]
+      fftw-api: [fftw, amdfftw]
+      flame: [libflame, amdlibflame]
+      fuse: [libfuse]
+      gl: [mesa+opengl, mesa18, opengl]
+      glu: [mesa-glu, openglu]
+      glx: [mesa+glx, mesa18+glx, opengl]
+      golang: [gcc]
+      iconv: [libiconv]
+      ipp: [intel-ipp]
+      java: [openjdk, jdk, ibm-java]
+      jpeg: [libjpeg-turbo, libjpeg]
+      lapack: [openblas, amdlibflame]
+      lua-lang: [lua, lua-luajit]
+      mariadb-client: [mariadb-c-client, mariadb]
+      mkl: [intel-mkl]
+      mpe: [mpe2]
+      mpi: [openmpi, mpich]
+      mysql-client: [mysql, mariadb-c-client]
+      opencl: [pocl]
+      onedal: [intel-oneapi-dal]
+      osmesa: [mesa+osmesa, mesa18+osmesa]
+      pbs: [openpbs, torque]
+      pil: [py-pillow]
+      pkgconfig: [pkgconf, pkg-config]
+      rpc: [libtirpc]
+      scalapack: [netlib-scalapack, amdscalapack]
+      sycl: [hipsycl]
+      szip: [libaec, libszip]
+      tbb: [intel-tbb]
+      unwind: [libunwind]
+      uuid: [util-linux-uuid, libuuid]
+      xxd: [xxd-standalone, vim]
+      yacc: [bison, byacc]
+      ziglang: [zig]
+    permissions:
+      read: world
+      write: user
+repos:
+- $spack/var/spack/repos/sdsc
+- $spack/var/spack/repos/builtin
+upstreams: {}
+Input spec
+--------------------------------
+[    ]  .bam-readcount@0.8.0%gcc@10.2.0
+
+Concretized
+--------------------------------
+rqmhh5n  [    ]  builtin.bam-readcount@0.8.0%gcc@10.2.0~ipo build_type=RelWithDebInfo arch=linux-rocky9-cascadelake
+msypfs7  [b   ]      ^builtin.cmake@3.21.4%gcc@10.2.0~doc+ncurses+openssl+ownlibs~qt build_type=Release arch=linux-rocky9-cascadelake
+bsjgtdt  [bl  ]          ^builtin.ncurses@6.2%gcc@10.2.0~symlinks+termlib abi=none arch=linux-rocky9-cascadelake
+fb5xiok  [b   ]              ^builtin.pkgconf@1.8.0%gcc@10.2.0 arch=linux-rocky9-cascadelake
+hzcjij5  [bl  ]          ^builtin.openssl@3.0.1%gcc@10.2.0~docs certs=system arch=linux-rocky9-cascadelake
+
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/pkgconf-1.8.0-fb5xiokhlcrkbqmkzf2d2tqou2mbrdzc
+[+] /usr (external openssl-3.0.1-hzcjij5xskkgom4gruklbckiveahq7zx)
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/ncurses-6.2-bsjgtdtspyy5jo24t43pkbllqzvzi7f7
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl
+==> Installing bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b
+==> No binary for bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/4f/4f4dd558e3c6bfb24d6a57ec441568f7524be6639b24f13ea6f2bb350c7ea65f.tar.gz
+==> No patches needed for bam-readcount
+==> bam-readcount: Executing phase: 'cmake'
+==> [2023-06-23-17:26:48.864936] 'cmake' '-G' 'Unix Makefiles' '-DCMAKE_INSTALL_PREFIX:STRING=/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b' '-DCMAKE_BUILD_TYPE:STRING=RelWithDebInfo' '-DCMAKE_INTERPROCEDURAL_OPTIMIZATION:BOOL=OFF' '-DCMAKE_VERBOSE_MAKEFILE:BOOL=ON' '-DCMAKE_INSTALL_RPATH_USE_LINK_PATH:BOOL=OFF' '-DCMAKE_INSTALL_RPATH:STRING=/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/lib;/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/lib64' '-DCMAKE_PREFIX_PATH:STRING=/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl' '/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src'
+CMake Deprecation Warning at CMakeLists.txt:1 (cmake_minimum_required):
+  Compatibility with CMake < 2.8.12 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value or use a ...<max> suffix to tell
+  CMake that the project does not need compatibility with older versions.
+
+
+-- The C compiler identification is GNU 10.2.0
+-- The CXX compiler identification is GNU 10.2.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /cm/shared/apps/spack/0.17.3/cpu/lib/spack/env/gcc/gcc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /cm/shared/apps/spack/0.17.3/cpu/lib/spack/env/gcc/g++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Looking for pthread.h
+-- Looking for pthread.h - found
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE  
+CMake Deprecation Warning at build-common/cmake/PreDepends.cmake:68 (cmake_minimum_required):
+  Compatibility with CMake < 2.8.12 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value or use a ...<max> suffix to tell
+  CMake that the project does not need compatibility with older versions.
+Call Stack (most recent call first):
+  CMakeLists.txt:17 (include)
+
+
+CMake Deprecation Warning at cmake/BuildBoost.cmake:1 (cmake_minimum_required):
+  Compatibility with CMake < 2.8.12 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value or use a ...<max> suffix to tell
+  CMake that the project does not need compatibility with older versions.
+Call Stack (most recent call first):
+  CMakeLists.txt:26 (include)
+
+
+Extracting boost from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/vendor/boost-1.55-bamrc.tar.gz
+Boost build log can be found at /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost-src/build.log
+CMake Warning (dev) at /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/share/cmake-3.21/Modules/ExternalProject.cmake:1193 (message):
+  value '' with no previous keyword in ExternalProject_Add
+Call Stack (most recent call first):
+  /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/share/cmake-3.21/Modules/ExternalProject.cmake:3651 (_ep_parse_arguments)
+  build-common/cmake/PreDepends.cmake:107 (ExternalProject_Add)
+  cmake/BuildBoost.cmake:25 (ExternalDependency_Add)
+  CMakeLists.txt:26 (include)
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+CMake Deprecation Warning at cmake/BuildSamtools.cmake:1 (cmake_minimum_required):
+  Compatibility with CMake < 2.8.12 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value or use a ...<max> suffix to tell
+  CMake that the project does not need compatibility with older versions.
+Call Stack (most recent call first):
+  CMakeLists.txt:29 (include)
+
+
+-- Found ZLIB: /usr/lib64/libz.so (found version "1.2.11") 
+CMake Warning (dev) at /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/share/cmake-3.21/Modules/ExternalProject.cmake:1193 (message):
+  value '' with no previous keyword in ExternalProject_Add
+Call Stack (most recent call first):
+  /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/share/cmake-3.21/Modules/ExternalProject.cmake:3651 (_ep_parse_arguments)
+  build-common/cmake/PreDepends.cmake:107 (ExternalProject_Add)
+  cmake/BuildSamtools.cmake:27 (ExternalDependency_Add)
+  CMakeLists.txt:29 (include)
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+CMake Deprecation Warning at src/lib/bamrc/CMakeLists.txt:1 (cmake_minimum_required):
+  Compatibility with CMake < 2.8.12 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value or use a ...<max> suffix to tell
+  CMake that the project does not need compatibility with older versions.
+
+
+CMake Deprecation Warning at src/exe/bam-readcount/CMakeLists.txt:1 (cmake_minimum_required):
+  Compatibility with CMake < 2.8.12 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value or use a ...<max> suffix to tell
+  CMake that the project does not need compatibility with older versions.
+
+
+CMake Deprecation Warning at test/lib/bamrc/CMakeLists.txt:1 (cmake_minimum_required):
+  Compatibility with CMake < 2.8.12 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value or use a ...<max> suffix to tell
+  CMake that the project does not need compatibility with older versions.
+
+
+CMake Deprecation Warning at PackageInfo.cmake:1 (cmake_minimum_required):
+  Compatibility with CMake < 2.8.12 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value or use a ...<max> suffix to tell
+  CMake that the project does not need compatibility with older versions.
+Call Stack (most recent call first):
+  CMakeLists.txt:61 (include)
+
+
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n
+==> bam-readcount: Executing phase: 'build'
+==> [2023-06-23-17:26:49.559964] 'make' '-j8'
+/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -S/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src -B/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n --check-build-system CMakeFiles/Makefile.cmake 0
+/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E cmake_progress_start /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/CMakeFiles /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n//CMakeFiles/progress.marks
+make  -f CMakeFiles/Makefile2 all
+make[1]: Entering directory '/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n'
+make  -f CMakeFiles/samtools-lib.dir/build.make CMakeFiles/samtools-lib.dir/depend
+make  -f CMakeFiles/boost-1.55.dir/build.make CMakeFiles/boost-1.55.dir/depend
+make  -f CMakeFiles/gtest160.dir/build.make CMakeFiles/gtest160.dir/depend
+make[2]: Entering directory '/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n'
+cd /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n && /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E cmake_depends "Unix Makefiles" /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/CMakeFiles/samtools-lib.dir/DependInfo.cmake --color=
+make[2]: Entering directory '/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n'
+cd /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n && /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E cmake_depends "Unix Makefiles" /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/CMakeFiles/boost-1.55.dir/DependInfo.cmake --color=
+make[2]: Entering directory '/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n'
+cd /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n && /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E cmake_depends "Unix Makefiles" /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/CMakeFiles/gtest160.dir/DependInfo.cmake --color=
+make[2]: Leaving directory '/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n'
+make  -f CMakeFiles/samtools-lib.dir/build.make CMakeFiles/samtools-lib.dir/build
+make[2]: Leaving directory '/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n'
+make  -f CMakeFiles/boost-1.55.dir/build.make CMakeFiles/boost-1.55.dir/build
+make[2]: Entering directory '/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n'
+make[2]: Leaving directory '/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n'
+make[2]: Entering directory '/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n'
+make  -f CMakeFiles/gtest160.dir/build.make CMakeFiles/gtest160.dir/build
+make[2]: Entering directory '/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n'
+[  2%] Creating directories for 'boost-1.55'
+[  5%] Creating directories for 'samtools-lib'
+/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E make_directory /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost-src
+/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E make_directory /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/samtools
+[  8%] Creating directories for 'gtest160'
+/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E make_directory /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/src/gtest160
+/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E make_directory /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/samtools
+/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E make_directory /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost-src
+/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E make_directory /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/gtest160-build
+/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E make_directory /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor
+/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E make_directory /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor
+/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E make_directory /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor
+/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E make_directory /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/tmp
+/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E make_directory /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/tmp
+/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E make_directory /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/tmp
+/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E make_directory /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/src/boost-1.55-stamp
+/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E make_directory /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/src/samtools-lib-stamp
+/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E make_directory /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/src/gtest160-stamp
+/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E make_directory /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/src
+/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E make_directory /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/src
+/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E make_directory /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/src
+/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E make_directory /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/src/samtools-lib-stamp
+/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E make_directory /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/src/boost-1.55-stamp
+/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E make_directory /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/src/gtest160-stamp
+/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E touch /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/src/samtools-lib-stamp/samtools-lib-mkdir
+/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E touch /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/src/boost-1.55-stamp/boost-1.55-mkdir
+/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E touch /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/src/gtest160-stamp/gtest160-mkdir
+[ 11%] Performing download step (verify and extract) for 'samtools-lib'
+cd /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor && /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -P /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/src/samtools-lib-stamp/verify-samtools-lib.cmake
+[ 14%] Performing download step (verify and extract) for 'boost-1.55'
+cd /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor && /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -P /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/src/boost-1.55-stamp/verify-boost-1.55.cmake
+[ 17%] Performing download step (verify and extract) for 'gtest160'
+cd /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/src && /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -P /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/src/gtest160-stamp/verify-gtest160.cmake
+CMake Warning at src/samtools-lib-stamp/verify-samtools-lib.cmake:15 (message):
+  File will not be verified since no URL_HASH specified
+
+
+CMake Warning at src/boost-1.55-stamp/verify-boost-1.55.cmake:15 (message):
+  File will not be verified since no URL_HASH specified
+
+
+cd /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor && /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -P /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/src/samtools-lib-stamp/extract-samtools-lib.cmake
+cd /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor && /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -P /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/src/boost-1.55-stamp/extract-boost-1.55.cmake
+CMake Warning at gtest160-stamp/verify-gtest160.cmake:15 (message):
+  File will not be verified since no URL_HASH specified
+
+
+cd /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/src && /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -P /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/src/gtest160-stamp/extract-gtest160.cmake
+-- extracting...
+     src='/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/vendor/samtools-0.1.19.tar.gz'
+     dst='/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/samtools'
+-- extracting... [tar xfz]
+-- extracting...
+     src='/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/vendor/boost-1.55-bamrc.tar.gz'
+     dst='/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost-src'
+-- extracting... [tar xfz]
+-- extracting...
+     src='/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/build-common/vendor/gtest-1.6.0.tar.gz'
+     dst='/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/src/gtest160'
+-- extracting... [tar xfz]
+-- extracting... [analysis]
+-- extracting... [rename]
+-- extracting... [clean up]
+-- extracting... done
+cd /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor && /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E touch /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/src/samtools-lib-stamp/samtools-lib-download
+[ 20%] No update step for 'samtools-lib'
+/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E echo_append
+-- extracting... [analysis]
+-- extracting... [rename]
+-- extracting... [clean up]
+-- extracting... done
+cd /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/src && /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E touch /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/src/gtest160-stamp/gtest160-download
+/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E touch /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/src/samtools-lib-stamp/samtools-lib-update
+[ 22%] No update step for 'gtest160'
+/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E echo_append
+[ 25%] Performing patch step for 'samtools-lib'
+cd /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/samtools && patch -p2 -t -N < /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/vendor/samtools0.1.19.patch
+/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E touch /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/src/gtest160-stamp/gtest160-update
+patching file sam_header.c
+cd /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/samtools && /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E touch /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/src/samtools-lib-stamp/samtools-lib-patch
+[ 28%] No patch step for 'gtest160'
+/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E echo_append
+[ 31%] Performing configure step for 'samtools-lib'
+cd /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/samtools && echo "Building samtools, build log at /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/samtools/build.log"
+/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E touch /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/src/gtest160-stamp/gtest160-patch
+Building samtools, build log at /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/samtools/build.log
+cd /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/samtools && /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E touch /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/src/samtools-lib-stamp/samtools-lib-configure
+[ 34%] Performing configure step for 'gtest160'
+cd /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/gtest160-build && /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -DCMAKE_CXX_FLAGS=-DGTEST_USE_OWN_TR1_TUPLE=1 "-GUnix Makefiles" /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/src/gtest160
+[ 37%] Performing build step for 'samtools-lib'
+cd /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/samtools && make INCLUDES=-I/usr/include libbam.a > /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/samtools/build.log 2>&1
+-- extracting... [analysis]
+-- extracting... [rename]
+-- extracting... [clean up]
+-- extracting... done
+cd /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor && /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E touch /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/src/boost-1.55-stamp/boost-1.55-download
+[ 40%] No update step for 'boost-1.55'
+/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E echo_append
+/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E touch /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/src/boost-1.55-stamp/boost-1.55-update
+[ 42%] No patch step for 'boost-1.55'
+/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E echo_append
+/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E touch /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/src/boost-1.55-stamp/boost-1.55-patch
+[ 45%] Performing configure step for 'boost-1.55'
+cd /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost-src && ./bootstrap.sh
+Building Boost.Build engine with toolset gcc... -- The CXX compiler identification is GNU 10.2.0
+-- The C compiler identification is GNU 10.2.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /cm/shared/apps/spack/0.17.3/cpu/lib/spack/env/gcc/g++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /cm/shared/apps/spack/0.17.3/cpu/lib/spack/env/gcc/gcc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+CMake Deprecation Warning at CMakeLists.txt:43 (cmake_minimum_required):
+  Compatibility with CMake < 2.8.12 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value or use a ...<max> suffix to tell
+  CMake that the project does not need compatibility with older versions.
+
+
+-- Found PythonInterp: /usr/bin/python (found version "3.9.16") 
+-- Looking for pthread.h
+-- Looking for pthread.h - found
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE  
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/gtest160-build
+cd /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/gtest160-build && /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E touch /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/src/gtest160-stamp/gtest160-configure
+[ 48%] Performing build step for 'gtest160'
+cd /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/gtest160-build && make
+make[3]: Entering directory '/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/gtest160-build'
+make[4]: Entering directory '/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/gtest160-build'
+make[5]: Entering directory '/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/gtest160-build'
+make[5]: Leaving directory '/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/gtest160-build'
+make[5]: Entering directory '/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/gtest160-build'
+[ 25%] Building CXX object CMakeFiles/gtest.dir/src/gtest-all.cc.o
+[ 50%] Linking CXX static library libgtest.a
+make[5]: Leaving directory '/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/gtest160-build'
+[ 50%] Built target gtest
+make[5]: Entering directory '/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/gtest160-build'
+make[5]: Leaving directory '/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/gtest160-build'
+make[5]: Entering directory '/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/gtest160-build'
+[ 75%] Building CXX object CMakeFiles/gtest_main.dir/src/gtest_main.cc.o
+[100%] Linking CXX static library libgtest_main.a
+make[5]: Leaving directory '/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/gtest160-build'
+[100%] Built target gtest_main
+make[4]: Leaving directory '/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/gtest160-build'
+make[3]: Leaving directory '/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/gtest160-build'
+cd /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/gtest160-build && /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E touch /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/src/gtest160-stamp/gtest160-build
+[ 51%] No install step for 'gtest160'
+cd /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/gtest160-build && /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E echo_append
+cd /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/gtest160-build && /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E touch /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/src/gtest160-stamp/gtest160-install
+[ 54%] Completed 'gtest160'
+/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E make_directory /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/CMakeFiles
+/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E touch /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/CMakeFiles/gtest160-complete
+/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E touch /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/src/gtest160-stamp/gtest160-done
+make[2]: Leaving directory '/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n'
+[ 54%] Built target gtest160
+cd /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/samtools && /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E touch /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/src/samtools-lib-stamp/samtools-lib-build
+[ 57%] Performing install step for 'samtools-lib'
+cd /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/samtools && true
+cd /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/samtools && /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E touch /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/src/samtools-lib-stamp/samtools-lib-install
+[ 60%] Completed 'samtools-lib'
+/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E make_directory /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/CMakeFiles
+/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E touch /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/CMakeFiles/samtools-lib-complete
+/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E touch /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/src/samtools-lib-stamp/samtools-lib-done
+make[2]: Leaving directory '/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n'
+[ 60%] Built target samtools-lib
+tools/build/v2/engine/bin.linuxx86_64/b2
+Detecting Python version... 3.9
+Detecting Python root...   File "<string>", line 1
+    import sys; print sys.prefix
+                      ^
+SyntaxError: invalid syntax
+
+Unicode/ICU support for Boost.Regex?... /usr
+Generating Boost.Build configuration in project-config.jam...
+
+Bootstrapping is done. To build, run:
+
+    ./b2
+    
+To adjust configuration, edit 'project-config.jam'.
+Further information:
+
+   - Command line help:
+     ./b2 --help
+     
+   - Getting started guide: 
+     http://www.boost.org/more/getting_started/unix-variants.html
+     
+   - Boost.Build documentation:
+     http://www.boost.org/boost-build2/doc/html/index.html
+
+cd /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost-src && /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E touch /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/src/boost-1.55-stamp/boost-1.55-configure
+[ 62%] Performing build step for 'boost-1.55'
+cd /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost-src && echo "Building boost, build log is /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost-src/build.log" && ./b2 --prefix=/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost --layout=system link=static threading=multi install --with-program_options --with-regex > /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost-src/build.log 2>&1
+Building boost, build log is /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost-src/build.log
+cd /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost-src && /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E touch /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/src/boost-1.55-stamp/boost-1.55-build
+[ 65%] Performing install step for 'boost-1.55'
+cd /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost-src && true
+cd /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost-src && /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E touch /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/src/boost-1.55-stamp/boost-1.55-install
+[ 68%] Completed 'boost-1.55'
+/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E make_directory /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/CMakeFiles
+/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E touch /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/CMakeFiles/boost-1.55-complete
+/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E touch /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/src/boost-1.55-stamp/boost-1.55-done
+make[2]: Leaving directory '/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n'
+[ 68%] Built target boost-1.55
+make  -f CMakeFiles/__bc_predepends.dir/build.make CMakeFiles/__bc_predepends.dir/depend
+make[2]: Entering directory '/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n'
+cd /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n && /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E cmake_depends "Unix Makefiles" /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/CMakeFiles/__bc_predepends.dir/DependInfo.cmake --color=
+make[2]: Leaving directory '/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n'
+make  -f CMakeFiles/__bc_predepends.dir/build.make CMakeFiles/__bc_predepends.dir/build
+make[2]: Entering directory '/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n'
+make[2]: Nothing to be done for 'CMakeFiles/__bc_predepends.dir/build'.
+make[2]: Leaving directory '/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n'
+[ 68%] Built target __bc_predepends
+make  -f build/src/lib/bamrc/CMakeFiles/bamrc.dir/build.make build/src/lib/bamrc/CMakeFiles/bamrc.dir/depend
+make[2]: Entering directory '/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n'
+cd /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n && /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E cmake_depends "Unix Makefiles" /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/src/lib/bamrc /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/build/src/lib/bamrc /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/build/src/lib/bamrc/CMakeFiles/bamrc.dir/DependInfo.cmake --color=
+make[2]: Leaving directory '/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n'
+make  -f build/src/lib/bamrc/CMakeFiles/bamrc.dir/build.make build/src/lib/bamrc/CMakeFiles/bamrc.dir/build
+make[2]: Entering directory '/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n'
+[ 71%] Building CXX object build/src/lib/bamrc/CMakeFiles/bamrc.dir/BasicStat.cpp.o
+cd /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/build/src/lib/bamrc && /cm/shared/apps/spack/0.17.3/cpu/lib/spack/env/gcc/g++  -I/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/src/gtest160/include -I/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/version -I/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include -I/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/samtools -I/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/src/lib -Wall -std=c++0x -O2 -g -DNDEBUG -MD -MT build/src/lib/bamrc/CMakeFiles/bamrc.dir/BasicStat.cpp.o -MF CMakeFiles/bamrc.dir/BasicStat.cpp.o.d -o CMakeFiles/bamrc.dir/BasicStat.cpp.o -c /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/src/lib/bamrc/BasicStat.cpp
+[ 77%] Building CXX object build/src/lib/bamrc/CMakeFiles/bamrc.dir/IndelQueue.cpp.o
+[ 77%] Building CXX object build/src/lib/bamrc/CMakeFiles/bamrc.dir/IndelQueueEntry.cpp.o
+cd /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/build/src/lib/bamrc && /cm/shared/apps/spack/0.17.3/cpu/lib/spack/env/gcc/g++  -I/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/src/gtest160/include -I/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/version -I/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include -I/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/samtools -I/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/src/lib -Wall -std=c++0x -O2 -g -DNDEBUG -MD -MT build/src/lib/bamrc/CMakeFiles/bamrc.dir/IndelQueue.cpp.o -MF CMakeFiles/bamrc.dir/IndelQueue.cpp.o.d -o CMakeFiles/bamrc.dir/IndelQueue.cpp.o -c /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/src/lib/bamrc/IndelQueue.cpp
+cd /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/build/src/lib/bamrc && /cm/shared/apps/spack/0.17.3/cpu/lib/spack/env/gcc/g++  -I/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/src/gtest160/include -I/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/version -I/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include -I/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/samtools -I/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/src/lib -Wall -std=c++0x -O2 -g -DNDEBUG -MD -MT build/src/lib/bamrc/CMakeFiles/bamrc.dir/IndelQueueEntry.cpp.o -MF CMakeFiles/bamrc.dir/IndelQueueEntry.cpp.o.d -o CMakeFiles/bamrc.dir/IndelQueueEntry.cpp.o -c /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/src/lib/bamrc/IndelQueueEntry.cpp
+In file included from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/src/lib/bamrc/BasicStat.cpp:3:
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/src/lib/bamrc/ReadWarnings.hpp:60:13: warning: 'template<class> class std::auto_ptr' is deprecated [-Wdeprecated-declarations]
+   60 | extern std::auto_ptr<ReadWarnings> WARN;
+      |             ^~~~~~~~
+In file included from /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-10.2.0-2ml3m2ltzeohnaco3bxthfprl6dr5gfi/include/c++/10.2.0/memory:83,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/src/lib/bamrc/ReadWarnings.hpp:8,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/src/lib/bamrc/BasicStat.cpp:3:
+/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-10.2.0-2ml3m2ltzeohnaco3bxthfprl6dr5gfi/include/c++/10.2.0/bits/unique_ptr.h:57:28: note: declared here
+   57 |   template<typename> class auto_ptr;
+      |                            ^~~~~~~~
+[ 80%] Linking CXX static library libbamrc.a
+cd /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/build/src/lib/bamrc && /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -P CMakeFiles/bamrc.dir/cmake_clean_target.cmake
+cd /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/build/src/lib/bamrc && /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E cmake_link_script CMakeFiles/bamrc.dir/link.txt --verbose=1
+/usr/bin/ar qc libbamrc.a CMakeFiles/bamrc.dir/BasicStat.cpp.o CMakeFiles/bamrc.dir/IndelQueueEntry.cpp.o CMakeFiles/bamrc.dir/IndelQueue.cpp.o
+/usr/bin/ranlib libbamrc.a
+make[2]: Leaving directory '/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n'
+[ 80%] Built target bamrc
+make  -f build/src/exe/bam-readcount/CMakeFiles/bam-readcount.dir/build.make build/src/exe/bam-readcount/CMakeFiles/bam-readcount.dir/depend
+make  -f build/test/lib/bamrc/CMakeFiles/TestBamrcLib.dir/build.make build/test/lib/bamrc/CMakeFiles/TestBamrcLib.dir/depend
+make[2]: Entering directory '/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n'
+cd /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n && /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E cmake_depends "Unix Makefiles" /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/src/exe/bam-readcount /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/build/src/exe/bam-readcount /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/build/src/exe/bam-readcount/CMakeFiles/bam-readcount.dir/DependInfo.cmake --color=
+make[2]: Entering directory '/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n'
+cd /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n && /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E cmake_depends "Unix Makefiles" /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/test/lib/bamrc /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/build/test/lib/bamrc /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/build/test/lib/bamrc/CMakeFiles/TestBamrcLib.dir/DependInfo.cmake --color=
+make[2]: Leaving directory '/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n'
+make  -f build/src/exe/bam-readcount/CMakeFiles/bam-readcount.dir/build.make build/src/exe/bam-readcount/CMakeFiles/bam-readcount.dir/build
+make[2]: Entering directory '/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n'
+make[2]: Leaving directory '/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n'
+make  -f build/test/lib/bamrc/CMakeFiles/TestBamrcLib.dir/build.make build/test/lib/bamrc/CMakeFiles/TestBamrcLib.dir/build
+make[2]: Entering directory '/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n'
+[ 82%] Building CXX object build/src/exe/bam-readcount/CMakeFiles/bam-readcount.dir/bamreadcount.cpp.o
+cd /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/build/src/exe/bam-readcount && /cm/shared/apps/spack/0.17.3/cpu/lib/spack/env/gcc/g++  -I/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/src/gtest160/include -I/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/version -I/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include -I/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/samtools -I/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/src/lib -Wall -std=c++0x -O2 -g -DNDEBUG -MD -MT build/src/exe/bam-readcount/CMakeFiles/bam-readcount.dir/bamreadcount.cpp.o -MF CMakeFiles/bam-readcount.dir/bamreadcount.cpp.o.d -o CMakeFiles/bam-readcount.dir/bamreadcount.cpp.o -c /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/src/exe/bam-readcount/bamreadcount.cpp
+[ 88%] Building CXX object build/test/lib/bamrc/CMakeFiles/TestBamrcLib.dir/TestAuxFields.cpp.o
+[ 88%] Building CXX object build/test/lib/bamrc/CMakeFiles/TestBamrcLib.dir/TestReadWarnings.cpp.o
+[ 91%] Building CXX object build/test/lib/bamrc/CMakeFiles/TestBamrcLib.dir/TestIndelQueue.cpp.o
+cd /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/build/test/lib/bamrc && /cm/shared/apps/spack/0.17.3/cpu/lib/spack/env/gcc/g++  -I/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/src/gtest160/include -I/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/version -I/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include -I/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/samtools -I/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/src/lib -Wall -std=c++0x -O2 -g -DNDEBUG -DGTEST_USE_OWN_TR1_TUPLE=1 -MD -MT build/test/lib/bamrc/CMakeFiles/TestBamrcLib.dir/TestReadWarnings.cpp.o -MF CMakeFiles/TestBamrcLib.dir/TestReadWarnings.cpp.o.d -o CMakeFiles/TestBamrcLib.dir/TestReadWarnings.cpp.o -c /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/test/lib/bamrc/TestReadWarnings.cpp
+cd /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/build/test/lib/bamrc && /cm/shared/apps/spack/0.17.3/cpu/lib/spack/env/gcc/g++  -I/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/src/gtest160/include -I/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/version -I/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include -I/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/samtools -I/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/src/lib -Wall -std=c++0x -O2 -g -DNDEBUG -DGTEST_USE_OWN_TR1_TUPLE=1 -MD -MT build/test/lib/bamrc/CMakeFiles/TestBamrcLib.dir/TestAuxFields.cpp.o -MF CMakeFiles/TestBamrcLib.dir/TestAuxFields.cpp.o.d -o CMakeFiles/TestBamrcLib.dir/TestAuxFields.cpp.o -c /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/test/lib/bamrc/TestAuxFields.cpp
+[ 94%] Building CXX object build/test/lib/bamrc/CMakeFiles/TestBamrcLib.dir/TestIndelQueueEntry.cpp.o
+cd /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/build/test/lib/bamrc && /cm/shared/apps/spack/0.17.3/cpu/lib/spack/env/gcc/g++  -I/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/src/gtest160/include -I/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/version -I/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include -I/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/samtools -I/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/src/lib -Wall -std=c++0x -O2 -g -DNDEBUG -DGTEST_USE_OWN_TR1_TUPLE=1 -MD -MT build/test/lib/bamrc/CMakeFiles/TestBamrcLib.dir/TestIndelQueue.cpp.o -MF CMakeFiles/TestBamrcLib.dir/TestIndelQueue.cpp.o.d -o CMakeFiles/TestBamrcLib.dir/TestIndelQueue.cpp.o -c /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/test/lib/bamrc/TestIndelQueue.cpp
+cd /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/build/test/lib/bamrc && /cm/shared/apps/spack/0.17.3/cpu/lib/spack/env/gcc/g++  -I/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/src/gtest160/include -I/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/version -I/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include -I/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/samtools -I/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/src/lib -Wall -std=c++0x -O2 -g -DNDEBUG -DGTEST_USE_OWN_TR1_TUPLE=1 -MD -MT build/test/lib/bamrc/CMakeFiles/TestBamrcLib.dir/TestIndelQueueEntry.cpp.o -MF CMakeFiles/TestBamrcLib.dir/TestIndelQueueEntry.cpp.o.d -o CMakeFiles/TestBamrcLib.dir/TestIndelQueueEntry.cpp.o -c /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/test/lib/bamrc/TestIndelQueueEntry.cpp
+In file included from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/test/lib/bamrc/TestReadWarnings.cpp:1:
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/src/lib/bamrc/ReadWarnings.hpp:60:13: warning: 'template<class> class std::auto_ptr' is deprecated [-Wdeprecated-declarations]
+   60 | extern std::auto_ptr<ReadWarnings> WARN;
+      |             ^~~~~~~~
+In file included from /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-10.2.0-2ml3m2ltzeohnaco3bxthfprl6dr5gfi/include/c++/10.2.0/memory:83,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/src/lib/bamrc/ReadWarnings.hpp:8,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/test/lib/bamrc/TestReadWarnings.cpp:1:
+/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-10.2.0-2ml3m2ltzeohnaco3bxthfprl6dr5gfi/include/c++/10.2.0/bits/unique_ptr.h:57:28: note: declared here
+   57 |   template<typename> class auto_ptr;
+      |                            ^~~~~~~~
+In file included from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/test/lib/bamrc/TestIndelQueueEntry.cpp:2:
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/src/lib/bamrc/ReadWarnings.hpp:60:13: warning: 'template<class> class std::auto_ptr' is deprecated [-Wdeprecated-declarations]
+   60 | extern std::auto_ptr<ReadWarnings> WARN;
+      |             ^~~~~~~~
+In file included from /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-10.2.0-2ml3m2ltzeohnaco3bxthfprl6dr5gfi/include/c++/10.2.0/memory:83,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/src/lib/bamrc/ReadWarnings.hpp:8,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/test/lib/bamrc/TestIndelQueueEntry.cpp:2:
+/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-10.2.0-2ml3m2ltzeohnaco3bxthfprl6dr5gfi/include/c++/10.2.0/bits/unique_ptr.h:57:28: note: declared here
+   57 |   template<typename> class auto_ptr;
+      |                            ^~~~~~~~
+In file included from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/test/lib/bamrc/TestIndelQueue.cpp:3:
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/src/lib/bamrc/ReadWarnings.hpp:60:13: warning: 'template<class> class std::auto_ptr' is deprecated [-Wdeprecated-declarations]
+   60 | extern std::auto_ptr<ReadWarnings> WARN;
+      |             ^~~~~~~~
+In file included from /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-10.2.0-2ml3m2ltzeohnaco3bxthfprl6dr5gfi/include/c++/10.2.0/memory:83,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/src/lib/bamrc/ReadWarnings.hpp:8,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/test/lib/bamrc/TestIndelQueue.cpp:3:
+/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-10.2.0-2ml3m2ltzeohnaco3bxthfprl6dr5gfi/include/c++/10.2.0/bits/unique_ptr.h:57:28: note: declared here
+   57 |   template<typename> class auto_ptr;
+      |                            ^~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/test/lib/bamrc/TestIndelQueueEntry.cpp:12:6: warning: 'template<class> class std::auto_ptr' is deprecated [-Wdeprecated-declarations]
+   12 | std::auto_ptr<ReadWarnings> WARN;
+      |      ^~~~~~~~
+In file included from /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-10.2.0-2ml3m2ltzeohnaco3bxthfprl6dr5gfi/include/c++/10.2.0/memory:83,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/src/lib/bamrc/ReadWarnings.hpp:8,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/test/lib/bamrc/TestIndelQueueEntry.cpp:2:
+/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-10.2.0-2ml3m2ltzeohnaco3bxthfprl6dr5gfi/include/c++/10.2.0/bits/unique_ptr.h:57:28: note: declared here
+   57 |   template<typename> class auto_ptr;
+      |                            ^~~~~~~~
+In file included from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/test/lib/bamrc/TestIndelQueueEntry.cpp:5:
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/src/gtest160/include/gtest/gtest.h: In instantiation of 'testing::AssertionResult testing::internal::CmpHelperEQ(const char*, const char*, const T1&, const T2&) [with T1 = int; T2 = unsigned int]':
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/src/gtest160/include/gtest/gtest.h:1352:23:   required from 'static testing::AssertionResult testing::internal::EqHelper<lhs_is_null_literal>::Compare(const char*, const char*, const T1&, const T2&) [with T1 = int; T2 = unsigned int; bool lhs_is_null_literal = false]'
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/test/lib/bamrc/TestIndelQueueEntry.cpp:19:5:   required from here
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/src/gtest160/include/gtest/gtest.h:1316:16: warning: comparison of integer expressions of different signedness: 'const int' and 'const unsigned int' [-Wsign-compare]
+ 1316 |   if (expected == actual) {
+      |       ~~~~~~~~~^~~~~~~~~
+In file included from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/test/lib/bamrc/TestIndelQueue.cpp:5:
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/src/gtest160/include/gtest/gtest.h: In instantiation of 'testing::AssertionResult testing::internal::CmpHelperNE(const char*, const char*, const T1&, const T2&) [with T1 = int; T2 = long unsigned int]':
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/test/lib/bamrc/TestIndelQueue.cpp:87:5:   required from here
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/src/gtest160/include/gtest/gtest.h:1445:28: warning: comparison of integer expressions of different signedness: 'const int' and 'const long unsigned int' [-Wsign-compare]
+ 1430 |   if (val1 op val2) {\
+      |       ~~~~~~~~~~~~          
+......
+ 1445 | GTEST_IMPL_CMP_HELPER_(NE, !=);
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/src/gtest160/include/gtest/gtest.h:1430:12: note: in definition of macro 'GTEST_IMPL_CMP_HELPER_'
+ 1430 |   if (val1 op val2) {\
+      |            ^~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/src/gtest160/include/gtest/gtest.h: In instantiation of 'testing::AssertionResult testing::internal::CmpHelperEQ(const char*, const char*, const T1&, const T2&) [with T1 = int; T2 = long unsigned int]':
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/src/gtest160/include/gtest/gtest.h:1352:23:   required from 'static testing::AssertionResult testing::internal::EqHelper<lhs_is_null_literal>::Compare(const char*, const char*, const T1&, const T2&) [with T1 = int; T2 = long unsigned int; bool lhs_is_null_literal = false]'
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/test/lib/bamrc/TestIndelQueue.cpp:17:5:   required from here
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/src/gtest160/include/gtest/gtest.h:1316:16: warning: comparison of integer expressions of different signedness: 'const int' and 'const long unsigned int' [-Wsign-compare]
+ 1316 |   if (expected == actual) {
+      |       ~~~~~~~~~^~~~~~~~~
+In file included from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/src/exe/bam-readcount/bamreadcount.cpp:6:
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/src/lib/bamrc/ReadWarnings.hpp:60:13: warning: 'template<class> class std::auto_ptr' is deprecated [-Wdeprecated-declarations]
+   60 | extern std::auto_ptr<ReadWarnings> WARN;
+      |             ^~~~~~~~
+In file included from /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-10.2.0-2ml3m2ltzeohnaco3bxthfprl6dr5gfi/include/c++/10.2.0/memory:83,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/src/lib/bamrc/ReadWarnings.hpp:8,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/src/exe/bam-readcount/bamreadcount.cpp:6:
+/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-10.2.0-2ml3m2ltzeohnaco3bxthfprl6dr5gfi/include/c++/10.2.0/bits/unique_ptr.h:57:28: note: declared here
+   57 |   template<typename> class auto_ptr;
+      |                            ^~~~~~~~
+In file included from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/bind/mem_fn.hpp:25,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/mem_fn.hpp:22,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/function/detail/prologue.hpp:18,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/function/function_template.hpp:13,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/function/detail/maybe_include.hpp:18,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/function/function1.hpp:11,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/program_options/value_semantic.hpp:13,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/program_options/options_description.hpp:13,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/program_options.hpp:15,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/src/exe/bam-readcount/bamreadcount.cpp:8:
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/get_pointer.hpp:27:40: warning: 'template<class> class std::auto_ptr' is deprecated [-Wdeprecated-declarations]
+   27 | template<class T> T * get_pointer(std::auto_ptr<T> const& p)
+      |                                        ^~~~~~~~
+In file included from /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-10.2.0-2ml3m2ltzeohnaco3bxthfprl6dr5gfi/include/c++/10.2.0/memory:83,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/src/lib/bamrc/ReadWarnings.hpp:8,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/src/exe/bam-readcount/bamreadcount.cpp:6:
+/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-10.2.0-2ml3m2ltzeohnaco3bxthfprl6dr5gfi/include/c++/10.2.0/bits/unique_ptr.h:57:28: note: declared here
+   57 |   template<typename> class auto_ptr;
+      |                            ^~~~~~~~
+In file included from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/mpl/aux_/na_assert.hpp:23,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/mpl/arg.hpp:25,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/mpl/placeholders.hpp:24,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/mpl/apply.hpp:24,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/mpl/aux_/iter_apply.hpp:17,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/mpl/aux_/find_if_pred.hpp:14,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/mpl/find_if.hpp:17,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/mpl/find.hpp:17,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/mpl/aux_/contains_impl.hpp:20,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/mpl/contains.hpp:20,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/math/policies/policy.hpp:10,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/math/special_functions/math_fwd.hpp:28,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/math/special_functions/sign.hpp:17,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/lexical_cast.hpp:167,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/program_options/value_semantic.hpp:14,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/program_options/options_description.hpp:13,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/program_options.hpp:15,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/src/exe/bam-readcount/bamreadcount.cpp:8:
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/mpl/assert.hpp:187:21: warning: unnecessary parentheses in declaration of 'assert_arg' [-Wparentheses]
+  187 | failed ************ (Pred::************
+      |                     ^
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/mpl/assert.hpp:192:21: warning: unnecessary parentheses in declaration of 'assert_not_arg' [-Wparentheses]
+  192 | failed ************ (boost::mpl::not_<Pred>::************
+      |                     ^
+In file included from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/mpl/aux_/integral_wrapper.hpp:22,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/mpl/int.hpp:20,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/type_traits/detail/template_arity_spec.hpp:10,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/type_traits/detail/type_trait_def.hpp:14,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/type_traits/remove_reference.hpp:21,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/any.hpp:21,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/program_options/value_semantic.hpp:12,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/program_options/options_description.hpp:13,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/program_options.hpp:15,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/src/exe/bam-readcount/bamreadcount.cpp:8:
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept_check.hpp: In function 'void boost::function_requires(Model*)':
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/detail/general.hpp:71:20: warning: typedef 'boost_concept_check45' locally defined but not used [-Wunused-local-typedefs]
+   71 |       BOOST_PP_CAT(boost_concept_check,__LINE__)
+      |                    ^~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/preprocessor/cat.hpp:29:34: note: in definition of macro 'BOOST_PP_CAT_I'
+   29 | #    define BOOST_PP_CAT_I(a, b) a ## b
+      |                                  ^
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/detail/general.hpp:71:7: note: in expansion of macro 'BOOST_PP_CAT'
+   71 |       BOOST_PP_CAT(boost_concept_check,__LINE__)
+      |       ^~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/assert.hpp:44:5: note: in expansion of macro 'BOOST_CONCEPT_ASSERT_FN'
+   44 |     BOOST_CONCEPT_ASSERT_FN(void(*)ModelInParens)
+      |     ^~~~~~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept_check.hpp:45:7: note: in expansion of macro 'BOOST_CONCEPT_ASSERT'
+   45 |       BOOST_CONCEPT_ASSERT((Model));
+      |       ^~~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept_check.hpp: In destructor 'boost::AdaptableGenerator<Func, Return>::~AdaptableGenerator()':
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/detail/general.hpp:71:20: warning: typedef 'boost_concept_check453' locally defined but not used [-Wunused-local-typedefs]
+   71 |       BOOST_PP_CAT(boost_concept_check,__LINE__)
+      |                    ^~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/preprocessor/cat.hpp:29:34: note: in definition of macro 'BOOST_PP_CAT_I'
+   29 | #    define BOOST_PP_CAT_I(a, b) a ## b
+      |                                  ^
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/detail/general.hpp:71:7: note: in expansion of macro 'BOOST_PP_CAT'
+   71 |       BOOST_PP_CAT(boost_concept_check,__LINE__)
+      |       ^~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/assert.hpp:44:5: note: in expansion of macro 'BOOST_CONCEPT_ASSERT_FN'
+   44 |     BOOST_CONCEPT_ASSERT_FN(void(*)ModelInParens)
+      |     ^~~~~~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept_check.hpp:453:11: note: in expansion of macro 'BOOST_CONCEPT_ASSERT'
+  453 |           BOOST_CONCEPT_ASSERT((Convertible<result_type, Return>));
+      |           ^~~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept_check.hpp: In destructor 'boost::AdaptableUnaryFunction<Func, Return, Arg>::~AdaptableUnaryFunction()':
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/detail/general.hpp:71:20: warning: typedef 'boost_concept_check465' locally defined but not used [-Wunused-local-typedefs]
+   71 |       BOOST_PP_CAT(boost_concept_check,__LINE__)
+      |                    ^~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/preprocessor/cat.hpp:29:34: note: in definition of macro 'BOOST_PP_CAT_I'
+   29 | #    define BOOST_PP_CAT_I(a, b) a ## b
+      |                                  ^
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/detail/general.hpp:71:7: note: in expansion of macro 'BOOST_PP_CAT'
+   71 |       BOOST_PP_CAT(boost_concept_check,__LINE__)
+      |       ^~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/assert.hpp:44:5: note: in expansion of macro 'BOOST_CONCEPT_ASSERT_FN'
+   44 |     BOOST_CONCEPT_ASSERT_FN(void(*)ModelInParens)
+      |     ^~~~~~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept_check.hpp:465:11: note: in expansion of macro 'BOOST_CONCEPT_ASSERT'
+  465 |           BOOST_CONCEPT_ASSERT((Convertible<result_type, Return>));
+      |           ^~~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/detail/general.hpp:71:20: warning: typedef 'boost_concept_check466' locally defined but not used [-Wunused-local-typedefs]
+   71 |       BOOST_PP_CAT(boost_concept_check,__LINE__)
+      |                    ^~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/preprocessor/cat.hpp:29:34: note: in definition of macro 'BOOST_PP_CAT_I'
+   29 | #    define BOOST_PP_CAT_I(a, b) a ## b
+      |                                  ^
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/detail/general.hpp:71:7: note: in expansion of macro 'BOOST_PP_CAT'
+   71 |       BOOST_PP_CAT(boost_concept_check,__LINE__)
+      |       ^~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/assert.hpp:44:5: note: in expansion of macro 'BOOST_CONCEPT_ASSERT_FN'
+   44 |     BOOST_CONCEPT_ASSERT_FN(void(*)ModelInParens)
+      |     ^~~~~~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept_check.hpp:466:11: note: in expansion of macro 'BOOST_CONCEPT_ASSERT'
+  466 |           BOOST_CONCEPT_ASSERT((Convertible<Arg, argument_type>));
+      |           ^~~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept_check.hpp: In destructor 'boost::AdaptableBinaryFunction<Func, Return, First, Second>::~AdaptableBinaryFunction()':
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/detail/general.hpp:71:20: warning: typedef 'boost_concept_check484' locally defined but not used [-Wunused-local-typedefs]
+   71 |       BOOST_PP_CAT(boost_concept_check,__LINE__)
+      |                    ^~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/preprocessor/cat.hpp:29:34: note: in definition of macro 'BOOST_PP_CAT_I'
+   29 | #    define BOOST_PP_CAT_I(a, b) a ## b
+      |                                  ^
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/detail/general.hpp:71:7: note: in expansion of macro 'BOOST_PP_CAT'
+   71 |       BOOST_PP_CAT(boost_concept_check,__LINE__)
+      |       ^~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/assert.hpp:44:5: note: in expansion of macro 'BOOST_CONCEPT_ASSERT_FN'
+   44 |     BOOST_CONCEPT_ASSERT_FN(void(*)ModelInParens)
+      |     ^~~~~~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept_check.hpp:484:11: note: in expansion of macro 'BOOST_CONCEPT_ASSERT'
+  484 |           BOOST_CONCEPT_ASSERT((Convertible<result_type, Return>));
+      |           ^~~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/detail/general.hpp:71:20: warning: typedef 'boost_concept_check485' locally defined but not used [-Wunused-local-typedefs]
+   71 |       BOOST_PP_CAT(boost_concept_check,__LINE__)
+      |                    ^~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/preprocessor/cat.hpp:29:34: note: in definition of macro 'BOOST_PP_CAT_I'
+   29 | #    define BOOST_PP_CAT_I(a, b) a ## b
+      |                                  ^
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/detail/general.hpp:71:7: note: in expansion of macro 'BOOST_PP_CAT'
+   71 |       BOOST_PP_CAT(boost_concept_check,__LINE__)
+      |       ^~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/assert.hpp:44:5: note: in expansion of macro 'BOOST_CONCEPT_ASSERT_FN'
+   44 |     BOOST_CONCEPT_ASSERT_FN(void(*)ModelInParens)
+      |     ^~~~~~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept_check.hpp:485:11: note: in expansion of macro 'BOOST_CONCEPT_ASSERT'
+  485 |           BOOST_CONCEPT_ASSERT((Convertible<First, first_argument_type>));
+      |           ^~~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/detail/general.hpp:71:20: warning: typedef 'boost_concept_check486' locally defined but not used [-Wunused-local-typedefs]
+   71 |       BOOST_PP_CAT(boost_concept_check,__LINE__)
+      |                    ^~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/preprocessor/cat.hpp:29:34: note: in definition of macro 'BOOST_PP_CAT_I'
+   29 | #    define BOOST_PP_CAT_I(a, b) a ## b
+      |                                  ^
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/detail/general.hpp:71:7: note: in expansion of macro 'BOOST_PP_CAT'
+   71 |       BOOST_PP_CAT(boost_concept_check,__LINE__)
+      |       ^~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/assert.hpp:44:5: note: in expansion of macro 'BOOST_CONCEPT_ASSERT_FN'
+   44 |     BOOST_CONCEPT_ASSERT_FN(void(*)ModelInParens)
+      |     ^~~~~~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept_check.hpp:486:11: note: in expansion of macro 'BOOST_CONCEPT_ASSERT'
+  486 |           BOOST_CONCEPT_ASSERT((Convertible<Second, second_argument_type>));
+      |           ^~~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept_check.hpp: In destructor 'boost::InputIterator<TT>::~InputIterator()':
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/detail/general.hpp:71:20: warning: typedef 'boost_concept_check517' locally defined but not used [-Wunused-local-typedefs]
+   71 |       BOOST_PP_CAT(boost_concept_check,__LINE__)
+      |                    ^~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/preprocessor/cat.hpp:29:34: note: in definition of macro 'BOOST_PP_CAT_I'
+   29 | #    define BOOST_PP_CAT_I(a, b) a ## b
+      |                                  ^
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/detail/general.hpp:71:7: note: in expansion of macro 'BOOST_PP_CAT'
+   71 |       BOOST_PP_CAT(boost_concept_check,__LINE__)
+      |       ^~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/assert.hpp:44:5: note: in expansion of macro 'BOOST_CONCEPT_ASSERT_FN'
+   44 |     BOOST_CONCEPT_ASSERT_FN(void(*)ModelInParens)
+      |     ^~~~~~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept_check.hpp:517:9: note: in expansion of macro 'BOOST_CONCEPT_ASSERT'
+  517 |         BOOST_CONCEPT_ASSERT((SignedInteger<difference_type>));
+      |         ^~~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/detail/general.hpp:71:20: warning: typedef 'boost_concept_check518' locally defined but not used [-Wunused-local-typedefs]
+   71 |       BOOST_PP_CAT(boost_concept_check,__LINE__)
+      |                    ^~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/preprocessor/cat.hpp:29:34: note: in definition of macro 'BOOST_PP_CAT_I'
+   29 | #    define BOOST_PP_CAT_I(a, b) a ## b
+      |                                  ^
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/detail/general.hpp:71:7: note: in expansion of macro 'BOOST_PP_CAT'
+   71 |       BOOST_PP_CAT(boost_concept_check,__LINE__)
+      |       ^~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/assert.hpp:44:5: note: in expansion of macro 'BOOST_CONCEPT_ASSERT_FN'
+   44 |     BOOST_CONCEPT_ASSERT_FN(void(*)ModelInParens)
+      |     ^~~~~~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept_check.hpp:518:9: note: in expansion of macro 'BOOST_CONCEPT_ASSERT'
+  518 |         BOOST_CONCEPT_ASSERT((Convertible<iterator_category, std::input_iterator_tag>));
+      |         ^~~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept_check.hpp: In destructor 'boost::ForwardIterator<TT>::~ForwardIterator()':
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/detail/general.hpp:71:20: warning: typedef 'boost_concept_check548' locally defined but not used [-Wunused-local-typedefs]
+   71 |       BOOST_PP_CAT(boost_concept_check,__LINE__)
+      |                    ^~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/preprocessor/cat.hpp:29:34: note: in definition of macro 'BOOST_PP_CAT_I'
+   29 | #    define BOOST_PP_CAT_I(a, b) a ## b
+      |                                  ^
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/detail/general.hpp:71:7: note: in expansion of macro 'BOOST_PP_CAT'
+   71 |       BOOST_PP_CAT(boost_concept_check,__LINE__)
+      |       ^~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/assert.hpp:44:5: note: in expansion of macro 'BOOST_CONCEPT_ASSERT_FN'
+   44 |     BOOST_CONCEPT_ASSERT_FN(void(*)ModelInParens)
+      |     ^~~~~~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept_check.hpp:548:11: note: in expansion of macro 'BOOST_CONCEPT_ASSERT'
+  548 |           BOOST_CONCEPT_ASSERT((Convertible<
+      |           ^~~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept_check.hpp: In destructor 'boost::BidirectionalIterator<TT>::~BidirectionalIterator()':
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/detail/general.hpp:71:20: warning: typedef 'boost_concept_check576' locally defined but not used [-Wunused-local-typedefs]
+   71 |       BOOST_PP_CAT(boost_concept_check,__LINE__)
+      |                    ^~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/preprocessor/cat.hpp:29:34: note: in definition of macro 'BOOST_PP_CAT_I'
+   29 | #    define BOOST_PP_CAT_I(a, b) a ## b
+      |                                  ^
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/detail/general.hpp:71:7: note: in expansion of macro 'BOOST_PP_CAT'
+   71 |       BOOST_PP_CAT(boost_concept_check,__LINE__)
+      |       ^~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/assert.hpp:44:5: note: in expansion of macro 'BOOST_CONCEPT_ASSERT_FN'
+   44 |     BOOST_CONCEPT_ASSERT_FN(void(*)ModelInParens)
+      |     ^~~~~~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept_check.hpp:576:11: note: in expansion of macro 'BOOST_CONCEPT_ASSERT'
+  576 |           BOOST_CONCEPT_ASSERT((Convertible<
+      |           ^~~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept_check.hpp: In destructor 'boost::RandomAccessIterator<TT>::~RandomAccessIterator()':
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/detail/general.hpp:71:20: warning: typedef 'boost_concept_check606' locally defined but not used [-Wunused-local-typedefs]
+   71 |       BOOST_PP_CAT(boost_concept_check,__LINE__)
+      |                    ^~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/preprocessor/cat.hpp:29:34: note: in definition of macro 'BOOST_PP_CAT_I'
+   29 | #    define BOOST_PP_CAT_I(a, b) a ## b
+      |                                  ^
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/detail/general.hpp:71:7: note: in expansion of macro 'BOOST_PP_CAT'
+   71 |       BOOST_PP_CAT(boost_concept_check,__LINE__)
+      |       ^~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/assert.hpp:44:5: note: in expansion of macro 'BOOST_CONCEPT_ASSERT_FN'
+   44 |     BOOST_CONCEPT_ASSERT_FN(void(*)ModelInParens)
+      |     ^~~~~~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept_check.hpp:606:11: note: in expansion of macro 'BOOST_CONCEPT_ASSERT'
+  606 |           BOOST_CONCEPT_ASSERT((Convertible<
+      |           ^~~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept_check.hpp: In destructor 'boost::Container<C>::~Container()':
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/detail/general.hpp:71:20: warning: typedef 'boost_concept_check653' locally defined but not used [-Wunused-local-typedefs]
+   71 |       BOOST_PP_CAT(boost_concept_check,__LINE__)
+      |                    ^~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/preprocessor/cat.hpp:29:34: note: in definition of macro 'BOOST_PP_CAT_I'
+   29 | #    define BOOST_PP_CAT_I(a, b) a ## b
+      |                                  ^
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/detail/general.hpp:71:7: note: in expansion of macro 'BOOST_PP_CAT'
+   71 |       BOOST_PP_CAT(boost_concept_check,__LINE__)
+      |       ^~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/assert.hpp:44:5: note: in expansion of macro 'BOOST_CONCEPT_ASSERT_FN'
+   44 |     BOOST_CONCEPT_ASSERT_FN(void(*)ModelInParens)
+      |     ^~~~~~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept_check.hpp:653:11: note: in expansion of macro 'BOOST_CONCEPT_ASSERT'
+  653 |           BOOST_CONCEPT_ASSERT((InputIterator<const_iterator>));
+      |           ^~~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept_check.hpp: In destructor 'boost::Mutable_Container<C>::~Mutable_Container()':
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/detail/general.hpp:71:20: warning: typedef 'boost_concept_check680' locally defined but not used [-Wunused-local-typedefs]
+   71 |       BOOST_PP_CAT(boost_concept_check,__LINE__)
+      |                    ^~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/preprocessor/cat.hpp:29:34: note: in definition of macro 'BOOST_PP_CAT_I'
+   29 | #    define BOOST_PP_CAT_I(a, b) a ## b
+      |                                  ^
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/detail/general.hpp:71:7: note: in expansion of macro 'BOOST_PP_CAT'
+   71 |       BOOST_PP_CAT(boost_concept_check,__LINE__)
+      |       ^~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/assert.hpp:44:5: note: in expansion of macro 'BOOST_CONCEPT_ASSERT_FN'
+   44 |     BOOST_CONCEPT_ASSERT_FN(void(*)ModelInParens)
+      |     ^~~~~~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept_check.hpp:680:11: note: in expansion of macro 'BOOST_CONCEPT_ASSERT'
+  680 |           BOOST_CONCEPT_ASSERT((
+      |           ^~~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/detail/general.hpp:71:20: warning: typedef 'boost_concept_check683' locally defined but not used [-Wunused-local-typedefs]
+   71 |       BOOST_PP_CAT(boost_concept_check,__LINE__)
+      |                    ^~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/preprocessor/cat.hpp:29:34: note: in definition of macro 'BOOST_PP_CAT_I'
+   29 | #    define BOOST_PP_CAT_I(a, b) a ## b
+      |                                  ^
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/detail/general.hpp:71:7: note: in expansion of macro 'BOOST_PP_CAT'
+   71 |       BOOST_PP_CAT(boost_concept_check,__LINE__)
+      |       ^~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/assert.hpp:44:5: note: in expansion of macro 'BOOST_CONCEPT_ASSERT_FN'
+   44 |     BOOST_CONCEPT_ASSERT_FN(void(*)ModelInParens)
+      |     ^~~~~~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept_check.hpp:683:11: note: in expansion of macro 'BOOST_CONCEPT_ASSERT'
+  683 |           BOOST_CONCEPT_ASSERT((InputIterator<iterator>));
+      |           ^~~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept_check.hpp: In destructor 'boost::ForwardContainer<C>::~ForwardContainer()':
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/detail/general.hpp:71:20: warning: typedef 'boost_concept_check700' locally defined but not used [-Wunused-local-typedefs]
+   71 |       BOOST_PP_CAT(boost_concept_check,__LINE__)
+      |                    ^~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/preprocessor/cat.hpp:29:34: note: in definition of macro 'BOOST_PP_CAT_I'
+   29 | #    define BOOST_PP_CAT_I(a, b) a ## b
+      |                                  ^
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/detail/general.hpp:71:7: note: in expansion of macro 'BOOST_PP_CAT'
+   71 |       BOOST_PP_CAT(boost_concept_check,__LINE__)
+      |       ^~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/assert.hpp:44:5: note: in expansion of macro 'BOOST_CONCEPT_ASSERT_FN'
+   44 |     BOOST_CONCEPT_ASSERT_FN(void(*)ModelInParens)
+      |     ^~~~~~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept_check.hpp:700:11: note: in expansion of macro 'BOOST_CONCEPT_ASSERT'
+  700 |           BOOST_CONCEPT_ASSERT((
+      |           ^~~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept_check.hpp: In destructor 'boost::Mutable_ForwardContainer<C>::~Mutable_ForwardContainer()':
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/detail/general.hpp:71:20: warning: typedef 'boost_concept_check713' locally defined but not used [-Wunused-local-typedefs]
+   71 |       BOOST_PP_CAT(boost_concept_check,__LINE__)
+      |                    ^~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/preprocessor/cat.hpp:29:34: note: in definition of macro 'BOOST_PP_CAT_I'
+   29 | #    define BOOST_PP_CAT_I(a, b) a ## b
+      |                                  ^
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/detail/general.hpp:71:7: note: in expansion of macro 'BOOST_PP_CAT'
+   71 |       BOOST_PP_CAT(boost_concept_check,__LINE__)
+      |       ^~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/assert.hpp:44:5: note: in expansion of macro 'BOOST_CONCEPT_ASSERT_FN'
+   44 |     BOOST_CONCEPT_ASSERT_FN(void(*)ModelInParens)
+      |     ^~~~~~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept_check.hpp:713:11: note: in expansion of macro 'BOOST_CONCEPT_ASSERT'
+  713 |           BOOST_CONCEPT_ASSERT((
+      |           ^~~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept_check.hpp: In destructor 'boost::ReversibleContainer<C>::~ReversibleContainer()':
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/detail/general.hpp:71:20: warning: typedef 'boost_concept_check729' locally defined but not used [-Wunused-local-typedefs]
+   71 |       BOOST_PP_CAT(boost_concept_check,__LINE__)
+      |                    ^~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/preprocessor/cat.hpp:29:34: note: in definition of macro 'BOOST_PP_CAT_I'
+   29 | #    define BOOST_PP_CAT_I(a, b) a ## b
+      |                                  ^
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/detail/general.hpp:71:7: note: in expansion of macro 'BOOST_PP_CAT'
+   71 |       BOOST_PP_CAT(boost_concept_check,__LINE__)
+      |       ^~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/assert.hpp:44:5: note: in expansion of macro 'BOOST_CONCEPT_ASSERT_FN'
+   44 |     BOOST_CONCEPT_ASSERT_FN(void(*)ModelInParens)
+      |     ^~~~~~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept_check.hpp:729:11: note: in expansion of macro 'BOOST_CONCEPT_ASSERT'
+  729 |           BOOST_CONCEPT_ASSERT((
+      |           ^~~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/detail/general.hpp:71:20: warning: typedef 'boost_concept_check733' locally defined but not used [-Wunused-local-typedefs]
+   71 |       BOOST_PP_CAT(boost_concept_check,__LINE__)
+      |                    ^~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/preprocessor/cat.hpp:29:34: note: in definition of macro 'BOOST_PP_CAT_I'
+   29 | #    define BOOST_PP_CAT_I(a, b) a ## b
+      |                                  ^
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/detail/general.hpp:71:7: note: in expansion of macro 'BOOST_PP_CAT'
+   71 |       BOOST_PP_CAT(boost_concept_check,__LINE__)
+      |       ^~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/assert.hpp:44:5: note: in expansion of macro 'BOOST_CONCEPT_ASSERT_FN'
+   44 |     BOOST_CONCEPT_ASSERT_FN(void(*)ModelInParens)
+      |     ^~~~~~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept_check.hpp:733:11: note: in expansion of macro 'BOOST_CONCEPT_ASSERT'
+  733 |           BOOST_CONCEPT_ASSERT((BidirectionalIterator<const_reverse_iterator>));
+      |           ^~~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept_check.hpp: In destructor 'boost::Mutable_ReversibleContainer<C>::~Mutable_ReversibleContainer()':
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/detail/general.hpp:71:20: warning: typedef 'boost_concept_check755' locally defined but not used [-Wunused-local-typedefs]
+   71 |       BOOST_PP_CAT(boost_concept_check,__LINE__)
+      |                    ^~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/preprocessor/cat.hpp:29:34: note: in definition of macro 'BOOST_PP_CAT_I'
+   29 | #    define BOOST_PP_CAT_I(a, b) a ## b
+      |                                  ^
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/detail/general.hpp:71:7: note: in expansion of macro 'BOOST_PP_CAT'
+   71 |       BOOST_PP_CAT(boost_concept_check,__LINE__)
+      |       ^~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/assert.hpp:44:5: note: in expansion of macro 'BOOST_CONCEPT_ASSERT_FN'
+   44 |     BOOST_CONCEPT_ASSERT_FN(void(*)ModelInParens)
+      |     ^~~~~~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept_check.hpp:755:11: note: in expansion of macro 'BOOST_CONCEPT_ASSERT'
+  755 |           BOOST_CONCEPT_ASSERT((Mutable_BidirectionalIterator<iterator>));
+      |           ^~~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/detail/general.hpp:71:20: warning: typedef 'boost_concept_check756' locally defined but not used [-Wunused-local-typedefs]
+   71 |       BOOST_PP_CAT(boost_concept_check,__LINE__)
+      |                    ^~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/preprocessor/cat.hpp:29:34: note: in definition of macro 'BOOST_PP_CAT_I'
+   29 | #    define BOOST_PP_CAT_I(a, b) a ## b
+      |                                  ^
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/detail/general.hpp:71:7: note: in expansion of macro 'BOOST_PP_CAT'
+   71 |       BOOST_PP_CAT(boost_concept_check,__LINE__)
+      |       ^~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/assert.hpp:44:5: note: in expansion of macro 'BOOST_CONCEPT_ASSERT_FN'
+   44 |     BOOST_CONCEPT_ASSERT_FN(void(*)ModelInParens)
+      |     ^~~~~~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept_check.hpp:756:11: note: in expansion of macro 'BOOST_CONCEPT_ASSERT'
+  756 |           BOOST_CONCEPT_ASSERT((Mutable_BidirectionalIterator<reverse_iterator>));
+      |           ^~~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept_check.hpp: In destructor 'boost::RandomAccessContainer<C>::~RandomAccessContainer()':
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/detail/general.hpp:71:20: warning: typedef 'boost_concept_check773' locally defined but not used [-Wunused-local-typedefs]
+   71 |       BOOST_PP_CAT(boost_concept_check,__LINE__)
+      |                    ^~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/preprocessor/cat.hpp:29:34: note: in definition of macro 'BOOST_PP_CAT_I'
+   29 | #    define BOOST_PP_CAT_I(a, b) a ## b
+      |                                  ^
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/detail/general.hpp:71:7: note: in expansion of macro 'BOOST_PP_CAT'
+   71 |       BOOST_PP_CAT(boost_concept_check,__LINE__)
+      |       ^~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/assert.hpp:44:5: note: in expansion of macro 'BOOST_CONCEPT_ASSERT_FN'
+   44 |     BOOST_CONCEPT_ASSERT_FN(void(*)ModelInParens)
+      |     ^~~~~~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept_check.hpp:773:11: note: in expansion of macro 'BOOST_CONCEPT_ASSERT'
+  773 |           BOOST_CONCEPT_ASSERT((
+      |           ^~~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept_check.hpp: In destructor 'boost::Mutable_RandomAccessContainer<C>::~Mutable_RandomAccessContainer()':
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/detail/general.hpp:71:20: warning: typedef 'boost_concept_check800' locally defined but not used [-Wunused-local-typedefs]
+   71 |       BOOST_PP_CAT(boost_concept_check,__LINE__)
+      |                    ^~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/preprocessor/cat.hpp:29:34: note: in definition of macro 'BOOST_PP_CAT_I'
+   29 | #    define BOOST_PP_CAT_I(a, b) a ## b
+      |                                  ^
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/detail/general.hpp:71:7: note: in expansion of macro 'BOOST_PP_CAT'
+   71 |       BOOST_PP_CAT(boost_concept_check,__LINE__)
+      |       ^~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/assert.hpp:44:5: note: in expansion of macro 'BOOST_CONCEPT_ASSERT_FN'
+   44 |     BOOST_CONCEPT_ASSERT_FN(void(*)ModelInParens)
+      |     ^~~~~~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept_check.hpp:800:11: note: in expansion of macro 'BOOST_CONCEPT_ASSERT'
+  800 |           BOOST_CONCEPT_ASSERT((Mutable_RandomAccessIterator<typename self::iterator>));
+      |           ^~~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/detail/general.hpp:71:20: warning: typedef 'boost_concept_check801' locally defined but not used [-Wunused-local-typedefs]
+   71 |       BOOST_PP_CAT(boost_concept_check,__LINE__)
+      |                    ^~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/preprocessor/cat.hpp:29:34: note: in definition of macro 'BOOST_PP_CAT_I'
+   29 | #    define BOOST_PP_CAT_I(a, b) a ## b
+      |                                  ^
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/detail/general.hpp:71:7: note: in expansion of macro 'BOOST_PP_CAT'
+   71 |       BOOST_PP_CAT(boost_concept_check,__LINE__)
+      |       ^~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/assert.hpp:44:5: note: in expansion of macro 'BOOST_CONCEPT_ASSERT_FN'
+   44 |     BOOST_CONCEPT_ASSERT_FN(void(*)ModelInParens)
+      |     ^~~~~~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept_check.hpp:801:11: note: in expansion of macro 'BOOST_CONCEPT_ASSERT'
+  801 |           BOOST_CONCEPT_ASSERT((Mutable_RandomAccessIterator<typename self::reverse_iterator>));
+      |           ^~~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept_check.hpp: In destructor 'boost::AssociativeContainer<C>::~AssociativeContainer()':
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/detail/general.hpp:71:20: warning: typedef 'boost_concept_check905' locally defined but not used [-Wunused-local-typedefs]
+   71 |       BOOST_PP_CAT(boost_concept_check,__LINE__)
+      |                    ^~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/preprocessor/cat.hpp:29:34: note: in definition of macro 'BOOST_PP_CAT_I'
+   29 | #    define BOOST_PP_CAT_I(a, b) a ## b
+      |                                  ^
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/detail/general.hpp:71:7: note: in expansion of macro 'BOOST_PP_CAT'
+   71 |       BOOST_PP_CAT(boost_concept_check,__LINE__)
+      |       ^~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/assert.hpp:44:5: note: in expansion of macro 'BOOST_CONCEPT_ASSERT_FN'
+   44 |     BOOST_CONCEPT_ASSERT_FN(void(*)ModelInParens)
+      |     ^~~~~~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept_check.hpp:905:11: note: in expansion of macro 'BOOST_CONCEPT_ASSERT'
+  905 |           BOOST_CONCEPT_ASSERT((BinaryPredicate<key_compare,key_type,key_type>));
+      |           ^~~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/detail/general.hpp:71:20: warning: typedef 'boost_concept_check908' locally defined but not used [-Wunused-local-typedefs]
+   71 |       BOOST_PP_CAT(boost_concept_check,__LINE__)
+      |                    ^~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/preprocessor/cat.hpp:29:34: note: in definition of macro 'BOOST_PP_CAT_I'
+   29 | #    define BOOST_PP_CAT_I(a, b) a ## b
+      |                                  ^
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/detail/general.hpp:71:7: note: in expansion of macro 'BOOST_PP_CAT'
+   71 |       BOOST_PP_CAT(boost_concept_check,__LINE__)
+      |       ^~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/assert.hpp:44:5: note: in expansion of macro 'BOOST_CONCEPT_ASSERT_FN'
+   44 |     BOOST_CONCEPT_ASSERT_FN(void(*)ModelInParens)
+      |     ^~~~~~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept_check.hpp:908:11: note: in expansion of macro 'BOOST_CONCEPT_ASSERT'
+  908 |           BOOST_CONCEPT_ASSERT((BinaryPredicate<value_compare,value_type_,value_type_>));
+      |           ^~~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/range/algorithm/equal.hpp: In function 'bool boost::range::equal(const SinglePassRange1&, const SinglePassRange2&)':
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/detail/general.hpp:71:20: warning: typedef 'boost_concept_check172' locally defined but not used [-Wunused-local-typedefs]
+   71 |       BOOST_PP_CAT(boost_concept_check,__LINE__)
+      |                    ^~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/preprocessor/cat.hpp:29:34: note: in definition of macro 'BOOST_PP_CAT_I'
+   29 | #    define BOOST_PP_CAT_I(a, b) a ## b
+      |                                  ^
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/detail/general.hpp:71:7: note: in expansion of macro 'BOOST_PP_CAT'
+   71 |       BOOST_PP_CAT(boost_concept_check,__LINE__)
+      |       ^~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/assert.hpp:44:5: note: in expansion of macro 'BOOST_CONCEPT_ASSERT_FN'
+   44 |     BOOST_CONCEPT_ASSERT_FN(void(*)ModelInParens)
+      |     ^~~~~~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/range/concepts.hpp:92:45: note: in expansion of macro 'BOOST_CONCEPT_ASSERT'
+   92 |     #define BOOST_RANGE_CONCEPT_ASSERT( x ) BOOST_CONCEPT_ASSERT( x )
+      |                                             ^~~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/range/algorithm/equal.hpp:172:13: note: in expansion of macro 'BOOST_RANGE_CONCEPT_ASSERT'
+  172 |             BOOST_RANGE_CONCEPT_ASSERT(( SinglePassRangeConcept<const SinglePassRange1> ));
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/detail/general.hpp:71:20: warning: typedef 'boost_concept_check173' locally defined but not used [-Wunused-local-typedefs]
+   71 |       BOOST_PP_CAT(boost_concept_check,__LINE__)
+      |                    ^~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/preprocessor/cat.hpp:29:34: note: in definition of macro 'BOOST_PP_CAT_I'
+   29 | #    define BOOST_PP_CAT_I(a, b) a ## b
+      |                                  ^
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/detail/general.hpp:71:7: note: in expansion of macro 'BOOST_PP_CAT'
+   71 |       BOOST_PP_CAT(boost_concept_check,__LINE__)
+      |       ^~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/assert.hpp:44:5: note: in expansion of macro 'BOOST_CONCEPT_ASSERT_FN'
+   44 |     BOOST_CONCEPT_ASSERT_FN(void(*)ModelInParens)
+      |     ^~~~~~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/range/concepts.hpp:92:45: note: in expansion of macro 'BOOST_CONCEPT_ASSERT'
+   92 |     #define BOOST_RANGE_CONCEPT_ASSERT( x ) BOOST_CONCEPT_ASSERT( x )
+      |                                             ^~~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/range/algorithm/equal.hpp:173:13: note: in expansion of macro 'BOOST_RANGE_CONCEPT_ASSERT'
+  173 |             BOOST_RANGE_CONCEPT_ASSERT(( SinglePassRangeConcept<const SinglePassRange2> ));
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/range/algorithm/equal.hpp: In function 'bool boost::range::equal(const SinglePassRange1&, const SinglePassRange2&, BinaryPredicate)':
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/detail/general.hpp:71:20: warning: typedef 'boost_concept_check185' locally defined but not used [-Wunused-local-typedefs]
+   71 |       BOOST_PP_CAT(boost_concept_check,__LINE__)
+      |                    ^~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/preprocessor/cat.hpp:29:34: note: in definition of macro 'BOOST_PP_CAT_I'
+   29 | #    define BOOST_PP_CAT_I(a, b) a ## b
+      |                                  ^
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/detail/general.hpp:71:7: note: in expansion of macro 'BOOST_PP_CAT'
+   71 |       BOOST_PP_CAT(boost_concept_check,__LINE__)
+      |       ^~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/assert.hpp:44:5: note: in expansion of macro 'BOOST_CONCEPT_ASSERT_FN'
+   44 |     BOOST_CONCEPT_ASSERT_FN(void(*)ModelInParens)
+      |     ^~~~~~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/range/concepts.hpp:92:45: note: in expansion of macro 'BOOST_CONCEPT_ASSERT'
+   92 |     #define BOOST_RANGE_CONCEPT_ASSERT( x ) BOOST_CONCEPT_ASSERT( x )
+      |                                             ^~~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/range/algorithm/equal.hpp:185:13: note: in expansion of macro 'BOOST_RANGE_CONCEPT_ASSERT'
+  185 |             BOOST_RANGE_CONCEPT_ASSERT(( SinglePassRangeConcept<const SinglePassRange1> ));
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/detail/general.hpp:71:20: warning: typedef 'boost_concept_check186' locally defined but not used [-Wunused-local-typedefs]
+   71 |       BOOST_PP_CAT(boost_concept_check,__LINE__)
+      |                    ^~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/preprocessor/cat.hpp:29:34: note: in definition of macro 'BOOST_PP_CAT_I'
+   29 | #    define BOOST_PP_CAT_I(a, b) a ## b
+      |                                  ^
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/detail/general.hpp:71:7: note: in expansion of macro 'BOOST_PP_CAT'
+   71 |       BOOST_PP_CAT(boost_concept_check,__LINE__)
+      |       ^~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/concept/assert.hpp:44:5: note: in expansion of macro 'BOOST_CONCEPT_ASSERT_FN'
+   44 |     BOOST_CONCEPT_ASSERT_FN(void(*)ModelInParens)
+      |     ^~~~~~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/range/concepts.hpp:92:45: note: in expansion of macro 'BOOST_CONCEPT_ASSERT'
+   92 |     #define BOOST_RANGE_CONCEPT_ASSERT( x ) BOOST_CONCEPT_ASSERT( x )
+      |                                             ^~~~~~~~~~~~~~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/range/algorithm/equal.hpp:186:13: note: in expansion of macro 'BOOST_RANGE_CONCEPT_ASSERT'
+  186 |             BOOST_RANGE_CONCEPT_ASSERT(( SinglePassRangeConcept<const SinglePassRange2> ));
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/smart_ptr/shared_ptr.hpp:32,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/shared_ptr.hpp:17,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/program_options/options_description.hpp:16,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/program_options.hpp:15,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/src/exe/bam-readcount/bamreadcount.cpp:8:
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/smart_ptr/detail/shared_count.hpp: At global scope:
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/smart_ptr/detail/shared_count.hpp:323:33: warning: 'template<class> class std::auto_ptr' is deprecated [-Wdeprecated-declarations]
+  323 |     explicit shared_count( std::auto_ptr<Y> & r ): pi_( new sp_counted_impl_p<Y>( r.get() ) )
+      |                                 ^~~~~~~~
+In file included from /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-10.2.0-2ml3m2ltzeohnaco3bxthfprl6dr5gfi/include/c++/10.2.0/memory:83,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/src/lib/bamrc/ReadWarnings.hpp:8,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/src/exe/bam-readcount/bamreadcount.cpp:6:
+/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-10.2.0-2ml3m2ltzeohnaco3bxthfprl6dr5gfi/include/c++/10.2.0/bits/unique_ptr.h:57:28: note: declared here
+   57 |   template<typename> class auto_ptr;
+      |                            ^~~~~~~~
+In file included from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/shared_ptr.hpp:17,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/program_options/options_description.hpp:16,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/program_options.hpp:15,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/src/exe/bam-readcount/bamreadcount.cpp:8:
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/smart_ptr/shared_ptr.hpp:247:65: warning: 'template<class> class std::auto_ptr' is deprecated [-Wdeprecated-declarations]
+  247 | template< class T, class R > struct sp_enable_if_auto_ptr< std::auto_ptr< T >, R >
+      |                                                                 ^~~~~~~~
+In file included from /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-10.2.0-2ml3m2ltzeohnaco3bxthfprl6dr5gfi/include/c++/10.2.0/memory:83,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/src/lib/bamrc/ReadWarnings.hpp:8,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/src/exe/bam-readcount/bamreadcount.cpp:6:
+/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-10.2.0-2ml3m2ltzeohnaco3bxthfprl6dr5gfi/include/c++/10.2.0/bits/unique_ptr.h:57:28: note: declared here
+   57 |   template<typename> class auto_ptr;
+      |                            ^~~~~~~~
+In file included from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/shared_ptr.hpp:17,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/program_options/options_description.hpp:16,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/program_options.hpp:15,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/src/exe/bam-readcount/bamreadcount.cpp:8:
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/smart_ptr/shared_ptr.hpp:446:31: warning: 'template<class> class std::auto_ptr' is deprecated [-Wdeprecated-declarations]
+  446 |     explicit shared_ptr( std::auto_ptr<Y> & r ): px(r.get()), pn()
+      |                               ^~~~~~~~
+In file included from /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-10.2.0-2ml3m2ltzeohnaco3bxthfprl6dr5gfi/include/c++/10.2.0/memory:83,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/src/lib/bamrc/ReadWarnings.hpp:8,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/src/exe/bam-readcount/bamreadcount.cpp:6:
+/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-10.2.0-2ml3m2ltzeohnaco3bxthfprl6dr5gfi/include/c++/10.2.0/bits/unique_ptr.h:57:28: note: declared here
+   57 |   template<typename> class auto_ptr;
+      |                            ^~~~~~~~
+In file included from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/shared_ptr.hpp:17,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/program_options/options_description.hpp:16,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/program_options.hpp:15,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/src/exe/bam-readcount/bamreadcount.cpp:8:
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/smart_ptr/shared_ptr.hpp:459:22: warning: 'template<class> class std::auto_ptr' is deprecated [-Wdeprecated-declarations]
+  459 |     shared_ptr( std::auto_ptr<Y> && r ): px(r.get()), pn()
+      |                      ^~~~~~~~
+In file included from /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-10.2.0-2ml3m2ltzeohnaco3bxthfprl6dr5gfi/include/c++/10.2.0/memory:83,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/src/lib/bamrc/ReadWarnings.hpp:8,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/src/exe/bam-readcount/bamreadcount.cpp:6:
+/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-10.2.0-2ml3m2ltzeohnaco3bxthfprl6dr5gfi/include/c++/10.2.0/bits/unique_ptr.h:57:28: note: declared here
+   57 |   template<typename> class auto_ptr;
+      |                            ^~~~~~~~
+In file included from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/shared_ptr.hpp:17,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/program_options/options_description.hpp:16,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/program_options.hpp:15,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/src/exe/bam-readcount/bamreadcount.cpp:8:
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/smart_ptr/shared_ptr.hpp:525:34: warning: 'template<class> class std::auto_ptr' is deprecated [-Wdeprecated-declarations]
+  525 |     shared_ptr & operator=( std::auto_ptr<Y> & r )
+      |                                  ^~~~~~~~
+In file included from /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-10.2.0-2ml3m2ltzeohnaco3bxthfprl6dr5gfi/include/c++/10.2.0/memory:83,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/src/lib/bamrc/ReadWarnings.hpp:8,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/src/exe/bam-readcount/bamreadcount.cpp:6:
+/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-10.2.0-2ml3m2ltzeohnaco3bxthfprl6dr5gfi/include/c++/10.2.0/bits/unique_ptr.h:57:28: note: declared here
+   57 |   template<typename> class auto_ptr;
+      |                            ^~~~~~~~
+In file included from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/shared_ptr.hpp:17,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/program_options/options_description.hpp:16,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/program_options.hpp:15,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/src/exe/bam-readcount/bamreadcount.cpp:8:
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/smart_ptr/shared_ptr.hpp:534:34: warning: 'template<class> class std::auto_ptr' is deprecated [-Wdeprecated-declarations]
+  534 |     shared_ptr & operator=( std::auto_ptr<Y> && r )
+      |                                  ^~~~~~~~
+In file included from /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-10.2.0-2ml3m2ltzeohnaco3bxthfprl6dr5gfi/include/c++/10.2.0/memory:83,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/src/lib/bamrc/ReadWarnings.hpp:8,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/src/exe/bam-readcount/bamreadcount.cpp:6:
+/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-10.2.0-2ml3m2ltzeohnaco3bxthfprl6dr5gfi/include/c++/10.2.0/bits/unique_ptr.h:57:28: note: declared here
+   57 |   template<typename> class auto_ptr;
+      |                            ^~~~~~~~
+In file included from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/shared_ptr.hpp:17,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/program_options/options_description.hpp:16,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/program_options.hpp:15,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/src/exe/bam-readcount/bamreadcount.cpp:8:
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/smart_ptr/shared_ptr.hpp: In member function 'boost::shared_ptr<T>& boost::shared_ptr<T>::operator=(std::auto_ptr<_Up>&&)':
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/vendor/boost/include/boost/smart_ptr/shared_ptr.hpp:536:38: warning: 'template<class> class std::auto_ptr' is deprecated [-Wdeprecated-declarations]
+  536 |         this_type( static_cast< std::auto_ptr<Y> && >( r ) ).swap( *this );
+      |                                      ^~~~~~~~
+In file included from /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-10.2.0-2ml3m2ltzeohnaco3bxthfprl6dr5gfi/include/c++/10.2.0/memory:83,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/src/lib/bamrc/ReadWarnings.hpp:8,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/src/exe/bam-readcount/bamreadcount.cpp:6:
+/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-10.2.0-2ml3m2ltzeohnaco3bxthfprl6dr5gfi/include/c++/10.2.0/bits/unique_ptr.h:57:28: note: declared here
+   57 |   template<typename> class auto_ptr;
+      |                            ^~~~~~~~
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/src/exe/bam-readcount/bamreadcount.cpp: At global scope:
+/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/src/exe/bam-readcount/bamreadcount.cpp:79:6: warning: 'template<class> class std::auto_ptr' is deprecated [-Wdeprecated-declarations]
+   79 | std::auto_ptr<ReadWarnings> WARN;
+      |      ^~~~~~~~
+In file included from /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-10.2.0-2ml3m2ltzeohnaco3bxthfprl6dr5gfi/include/c++/10.2.0/memory:83,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/src/lib/bamrc/ReadWarnings.hpp:8,
+                 from /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/src/exe/bam-readcount/bamreadcount.cpp:6:
+/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-10.2.0-2ml3m2ltzeohnaco3bxthfprl6dr5gfi/include/c++/10.2.0/bits/unique_ptr.h:57:28: note: declared here
+   57 |   template<typename> class auto_ptr;
+      |                            ^~~~~~~~
+[ 97%] Linking CXX executable ../../../../test-bin/TestBamrcLib
+cd /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/build/test/lib/bamrc && /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E cmake_link_script CMakeFiles/TestBamrcLib.dir/link.txt --verbose=1
+/cm/shared/apps/spack/0.17.3/cpu/lib/spack/env/gcc/g++ -Wall -std=c++0x -O2 -g -DNDEBUG -rdynamic CMakeFiles/TestBamrcLib.dir/TestAuxFields.cpp.o CMakeFiles/TestBamrcLib.dir/TestReadWarnings.cpp.o CMakeFiles/TestBamrcLib.dir/TestIndelQueue.cpp.o CMakeFiles/TestBamrcLib.dir/TestIndelQueueEntry.cpp.o -o ../../../../test-bin/TestBamrcLib  ../../../src/lib/bamrc/libbamrc.a ../../../../vendor/gtest160-build/libgtest.a ../../../../vendor/gtest160-build/libgtest_main.a ../../../../vendor/boost/lib/libboost_program_options.a ../../../../vendor/boost/lib/libboost_regex.a ../../../../vendor/samtools/libbam.a -lm -lz 
+make[2]: Leaving directory '/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n'
+[ 97%] Built target TestBamrcLib
+[100%] Linking CXX executable ../../../../bin/bam-readcount
+cd /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/build/src/exe/bam-readcount && /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E cmake_link_script CMakeFiles/bam-readcount.dir/link.txt --verbose=1
+/cm/shared/apps/spack/0.17.3/cpu/lib/spack/env/gcc/g++ -Wall -std=c++0x -O2 -g -DNDEBUG -rdynamic CMakeFiles/bam-readcount.dir/bamreadcount.cpp.o -o ../../../../bin/bam-readcount  -Wl,-rpath,::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: ../../lib/bamrc/libbamrc.a ../../../../vendor/samtools/libbam.a -lm -lz ../../../../vendor/boost/lib/libboost_program_options.a ../../../../vendor/boost/lib/libboost_regex.a 
+make[2]: Leaving directory '/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n'
+[100%] Built target bam-readcount
+make[1]: Leaving directory '/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n'
+/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E cmake_progress_start /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/CMakeFiles 0
+==> bam-readcount: Executing phase: 'install'
+==> [2023-06-23-17:28:07.953207] 'make' '-j8' 'install'
+/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -S/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src -B/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n --check-build-system CMakeFiles/Makefile.cmake 0
+/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E cmake_progress_start /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/CMakeFiles /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n//CMakeFiles/progress.marks
+make  -f CMakeFiles/Makefile2 all
+make[1]: Entering directory '/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n'
+make  -f CMakeFiles/samtools-lib.dir/build.make CMakeFiles/samtools-lib.dir/depend
+make  -f CMakeFiles/boost-1.55.dir/build.make CMakeFiles/boost-1.55.dir/depend
+make  -f CMakeFiles/gtest160.dir/build.make CMakeFiles/gtest160.dir/depend
+make[2]: Entering directory '/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n'
+cd /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n && /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E cmake_depends "Unix Makefiles" /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/CMakeFiles/samtools-lib.dir/DependInfo.cmake --color=
+make[2]: Entering directory '/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n'
+cd /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n && /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E cmake_depends "Unix Makefiles" /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/CMakeFiles/boost-1.55.dir/DependInfo.cmake --color=
+make[2]: Entering directory '/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n'
+cd /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n && /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E cmake_depends "Unix Makefiles" /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/CMakeFiles/gtest160.dir/DependInfo.cmake --color=
+make[2]: Leaving directory '/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n'
+make[2]: Leaving directory '/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n'
+make  -f CMakeFiles/boost-1.55.dir/build.make CMakeFiles/boost-1.55.dir/build
+make  -f CMakeFiles/samtools-lib.dir/build.make CMakeFiles/samtools-lib.dir/build
+make[2]: Leaving directory '/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n'
+make  -f CMakeFiles/gtest160.dir/build.make CMakeFiles/gtest160.dir/build
+make[2]: Entering directory '/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n'
+make[2]: Nothing to be done for 'CMakeFiles/boost-1.55.dir/build'.
+make[2]: Leaving directory '/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n'
+make[2]: Entering directory '/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n'
+make[2]: Nothing to be done for 'CMakeFiles/samtools-lib.dir/build'.
+make[2]: Leaving directory '/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n'
+make[2]: Entering directory '/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n'
+make[2]: Nothing to be done for 'CMakeFiles/gtest160.dir/build'.
+make[2]: Leaving directory '/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n'
+[ 22%] Built target gtest160
+[ 45%] Built target samtools-lib
+[ 68%] Built target boost-1.55
+make  -f CMakeFiles/__bc_predepends.dir/build.make CMakeFiles/__bc_predepends.dir/depend
+make[2]: Entering directory '/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n'
+cd /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n && /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E cmake_depends "Unix Makefiles" /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/CMakeFiles/__bc_predepends.dir/DependInfo.cmake --color=
+make[2]: Leaving directory '/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n'
+make  -f CMakeFiles/__bc_predepends.dir/build.make CMakeFiles/__bc_predepends.dir/build
+make[2]: Entering directory '/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n'
+make[2]: Nothing to be done for 'CMakeFiles/__bc_predepends.dir/build'.
+make[2]: Leaving directory '/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n'
+[ 68%] Built target __bc_predepends
+make  -f build/src/lib/bamrc/CMakeFiles/bamrc.dir/build.make build/src/lib/bamrc/CMakeFiles/bamrc.dir/depend
+make[2]: Entering directory '/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n'
+cd /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n && /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E cmake_depends "Unix Makefiles" /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/src/lib/bamrc /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/build/src/lib/bamrc /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/build/src/lib/bamrc/CMakeFiles/bamrc.dir/DependInfo.cmake --color=
+Consolidate compiler generated dependencies of target bamrc
+make[2]: Leaving directory '/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n'
+make  -f build/src/lib/bamrc/CMakeFiles/bamrc.dir/build.make build/src/lib/bamrc/CMakeFiles/bamrc.dir/build
+make[2]: Entering directory '/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n'
+make[2]: Nothing to be done for 'build/src/lib/bamrc/CMakeFiles/bamrc.dir/build'.
+make[2]: Leaving directory '/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n'
+[ 80%] Built target bamrc
+make  -f build/src/exe/bam-readcount/CMakeFiles/bam-readcount.dir/build.make build/src/exe/bam-readcount/CMakeFiles/bam-readcount.dir/depend
+make  -f build/test/lib/bamrc/CMakeFiles/TestBamrcLib.dir/build.make build/test/lib/bamrc/CMakeFiles/TestBamrcLib.dir/depend
+make[2]: Entering directory '/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n'
+cd /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n && /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E cmake_depends "Unix Makefiles" /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/src/exe/bam-readcount /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/build/src/exe/bam-readcount /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/build/src/exe/bam-readcount/CMakeFiles/bam-readcount.dir/DependInfo.cmake --color=
+make[2]: Entering directory '/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n'
+cd /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n && /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E cmake_depends "Unix Makefiles" /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-src/test/lib/bamrc /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/build/test/lib/bamrc /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/build/test/lib/bamrc/CMakeFiles/TestBamrcLib.dir/DependInfo.cmake --color=
+Consolidate compiler generated dependencies of target bam-readcount
+Consolidate compiler generated dependencies of target TestBamrcLib
+make[2]: Leaving directory '/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n'
+make  -f build/src/exe/bam-readcount/CMakeFiles/bam-readcount.dir/build.make build/src/exe/bam-readcount/CMakeFiles/bam-readcount.dir/build
+make[2]: Leaving directory '/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n'
+make  -f build/test/lib/bamrc/CMakeFiles/TestBamrcLib.dir/build.make build/test/lib/bamrc/CMakeFiles/TestBamrcLib.dir/build
+make[2]: Entering directory '/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n'
+make[2]: Nothing to be done for 'build/test/lib/bamrc/CMakeFiles/TestBamrcLib.dir/build'.
+make[2]: Leaving directory '/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n'
+make[2]: Entering directory '/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n'
+make[2]: Nothing to be done for 'build/src/exe/bam-readcount/CMakeFiles/bam-readcount.dir/build'.
+make[2]: Leaving directory '/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n'
+[ 94%] Built target TestBamrcLib
+[100%] Built target bam-readcount
+make[1]: Leaving directory '/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n'
+/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -E cmake_progress_start /tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n/CMakeFiles 0
+make  -f CMakeFiles/Makefile2 preinstall
+make[1]: Entering directory '/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n'
+make[1]: Nothing to be done for 'preinstall'.
+make[1]: Leaving directory '/tmp/jpg/spack-stage/spack-stage-bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/spack-build-rqmhh5n'
+Install the project...
+/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/cmake-3.21.4-msypfs7b3ridcgqrtcrfj7yrbizgvqrl/bin/cmake -P cmake_install.cmake
+-- Install configuration: "RelWithDebInfo"
+-- Installing: /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/bin/bam-readcount
+-- Set runtime path of "/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/bin/bam-readcount" to "/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/lib:/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b/lib64"
+==> bam-readcount: Successfully installed bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b
+  Fetch: 0.85s.  Build: 1m 22.05s.  Total: 1m 22.90s.
+[+] /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-10.2.0/bam-readcount-0.8.0-rqmhh5niaesnpwm73mrjgxwll5u2bq2b
+real 93.68
+user 91.79
+sys 9.98
+==> Regenerating lmod module files
+Submitted batch job 2567

@@ -1,0 +1,345 @@
+1688009537 3354 b405a281825778125e0ec02fa9882fff  /cm/shared/apps/spack/0.17.3/cpu/etc/spack/sdsc/tscc/0.17.3/cpu/specs/matlab@2022b.sh 
+
+/cm/local/apps/slurm/var/spool/job03354/slurm_script: line 29: /cm/shared/apps/spack/0.17.3/cpu/share/spack/setup-env.sh/share/spack/setup-env.sh: Not a directory
+compilers:
+- compiler:
+    spec: gcc@11.3.1
+    paths:
+      cc: /usr/bin/gcc
+      cxx: /usr/bin/g++
+      f77: /usr/bin/gfortran
+      fc: /usr/bin/gfortran
+    flags: {}
+    operating_system: rocky9
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+- compiler:
+    spec: gcc@11.2.0
+    paths:
+      cc: /usr/bin/gcc
+      cxx: /usr/bin/g++
+      f77: /usr/bin/gfortran
+      fc: /usr/bin/gfortran
+    flags:
+      cflags: -O2 -march=native
+      cxxflags: -O2 -march=native
+      fflags: -O2 -march=native
+    operating_system: rocky9
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+- compiler:
+    spec: gcc@10.2.0
+    paths:
+      cc: /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-10.2.0-2ml3m2ltzeohnaco3bxthfprl6dr5gfi/bin/gcc
+      cxx: /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-10.2.0-2ml3m2ltzeohnaco3bxthfprl6dr5gfi/bin/g++
+      f77: /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-10.2.0-2ml3m2ltzeohnaco3bxthfprl6dr5gfi/bin/gfortran
+      fc: /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-10.2.0-2ml3m2ltzeohnaco3bxthfprl6dr5gfi/bin/gfortran
+    flags: {}
+    operating_system: rocky9
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+- compiler:
+    spec: intel@19.1.1.217
+    paths:
+      cc: /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/intel-19.1.1.217-6wcrifpdhjoyp4oawdlvcabo2kpbi2xk/bin/icc
+      cxx: /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/intel-19.1.1.217-6wcrifpdhjoyp4oawdlvcabo2kpbi2xk/bin/icpc
+      f77: /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/intel-19.1.1.217-6wcrifpdhjoyp4oawdlvcabo2kpbi2xk/bin/ifort
+      fc: /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/intel-19.1.1.217-6wcrifpdhjoyp4oawdlvcabo2kpbi2xk/bin/ifort
+    flags:
+      cflags: -gcc-name=/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-8.5.0-w6lov36mdw33cg7qm7ekuusp2bbmt6lu/bin/gcc
+      cxxflags: -gcc-name=/cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-8.5.0-w6lov36mdw33cg7qm7ekuusp2bbmt6lu/bin/gcc
+    operating_system: rocky9
+    target: x86_64
+    modules: [intel/19.1.1.217]
+    environment: {}
+    extra_rpaths: []
+- compiler:
+    spec: gcc@8.5.0
+    paths:
+      cc: /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-8.5.0-w6lov36mdw33cg7qm7ekuusp2bbmt6lu/bin/gcc
+      cxx: /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-8.5.0-w6lov36mdw33cg7qm7ekuusp2bbmt6lu/bin/g++
+      f77: /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-8.5.0-w6lov36mdw33cg7qm7ekuusp2bbmt6lu/bin/gfortran
+      fc: /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-8.5.0-w6lov36mdw33cg7qm7ekuusp2bbmt6lu/bin/gfortran
+    flags: {}
+    operating_system: rocky9
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+- compiler:
+    spec: gcc@9.2.0
+    paths:
+      cc: /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-9.2.0-ess446ry7axsy3husbm53pc2wuuheun5/bin/gcc
+      cxx: /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-9.2.0-ess446ry7axsy3husbm53pc2wuuheun5/bin/g++
+      f77: /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-9.2.0-ess446ry7axsy3husbm53pc2wuuheun5/bin/gfortran
+      fc: /cm/shared/apps/spack/0.17.3/cpu/opt/spack/linux-rocky9-cascadelake/gcc-11.2.0/gcc-9.2.0-ess446ry7axsy3husbm53pc2wuuheun5/bin/gfortran
+    flags: {}
+    operating_system: rocky9
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+config:
+  install_tree:
+    root: $spack/opt/spack
+    projections:
+      all: ${ARCHITECTURE}/${COMPILERNAME}-${COMPILERVER}/${PACKAGE}-${VERSION}-${HASH}
+  template_dirs:
+  - $spack/share/spack/templates
+
+  # Temporary locations Spack can try to use for builds.
+  #
+  # Recommended options are given below.
+  #
+  # Builds can be faster in temporary directories on some (e.g., HPC) systems.
+  # Specifying `$tempdir` will ensure use of the default temporary directory
+  # (i.e., ``$TMP` or ``$TMPDIR``).
+  #
+  # Another option that prevents conflicts and potential permission issues is
+  # to specify `$user_cache_path/stage`, which ensures each user builds in their
+  # home directory.
+  #
+  # A more traditional path uses the value of `$spack/var/spack/stage`, which
+  # builds directly inside Spack's instance without staging them in a
+  # temporary space.  Problems with specifying a path inside a Spack instance
+  # are that it precludes its use as a system package and its ability to be
+  # pip installable.
+  #
+  # In any case, if the username is not already in the path, Spack will append
+  # the value of `$user` in an attempt to avoid potential conflicts between
+  # users in shared temporary spaces.
+  #
+  # The build stage can be purged with `spack clean --stage` and
+  # `spack clean -a`, so it is important that the specified directory uniquely
+  # identifies Spack staging to avoid accidentally wiping out non-Spack work.
+  build_stage:
+  - $tempdir/$user/spack-stage
+  - $user_cache_path/stage
+  # - $spack/var/spack/stage
+
+  # Directory in which to run tests and store test results.
+  # Tests will be stored in directories named by date/time and package
+  # name/hash.
+  test_stage: $user_cache_path/test
+  source_cache: $spack/var/spack/cache
+  misc_cache: $user_cache_path/cache
+  connect_timeout: 10
+  verify_ssl: true
+  suppress_gpg_warnings: false
+  install_missing_compilers: false
+  checksum: true
+  deprecated: false
+  dirty: false
+  build_language: C
+  locks: true
+  url_fetch_method: urllib
+  ccache: false
+  concretizer: clingo
+  db_lock_timeout: 3
+  package_lock_timeout: null
+  shared_linking: rpath
+  allow_sgid: true
+  terminal_title: false
+  debug: false
+  build_jobs: 16
+mirrors:
+  spack-public: https://mirror.spack.io
+modules:
+  default:
+    'enable:':
+    - lmod
+    lmod:
+      core_compilers:
+      - gcc@11.2.0
+      hierarchy:
+      - mpi
+      hash_length: 7
+      blacklist_implicits: true
+      naming_scheme: '{name}/{version}'
+      projections:
+        all: '{name}/{version}'
+      adol-c:
+        suffixes:
+          +openmp: omp
+      amdblis:
+        suffixes:
+          threads=openmp: omp
+      fftw:
+        suffixes:
+          +openmp: omp
+      hpl:
+        suffixes:
+          +openmp: omp
+      hypre:
+        suffixes:
+          +openmp: omp
+      intel:
+        environment:
+          set:
+            INTEL_LICENSE_FILE: 40000@elprado.sdsc.edu:40100@elprado.sdsc.edu
+      kokkos:
+        suffixes:
+          +openmp: omp
+      openblas:
+        suffixes:
+          threads=openmp: omp
+          +ilp64: ilp64
+      'netlib-scalapack:':
+        suffixes:
+          ^openblas threads=openmp: omp
+      petsc:
+        suffixes:
+          +complex: cmplx
+      slepc:
+        suffixes:
+          ^petsc +complex: cmplx
+      ^python:
+        autoload: direct
+      ^ucx:
+        autoload: direct
+  prefix_inspections:
+    lib:
+    - LD_LIBRARY_PATH
+    lib64:
+    - LD_LIBRARY_PATH
+    bin:
+    - PATH
+    man:
+    - MANPATH
+    share/man:
+    - MANPATH
+    share/aclocal:
+    - ACLOCAL_PATH
+    lib/pkgconfig:
+    - PKG_CONFIG_PATH
+    lib64/pkgconfig:
+    - PKG_CONFIG_PATH
+    share/pkgconfig:
+    - PKG_CONFIG_PATH
+    ? ''
+    : - CMAKE_PREFIX_PATH
+
+  # These are configurations for the module set named "default"
+packages:
+  lustre:
+    externals:
+    - spec: lustre@2.15.2 % gcc@10.2.0 arch=linux-rocky9-cascadelake
+      prefix: /usr
+    - spec: lustre@2.15.2 % gcc@11.2.0 arch=linux-rocky9-cascadelake
+      prefix: /usr
+    - spec: lustre@2.15.2 % intel@19.1.1.217 arch=linux-rocky9-cascadelake
+      prefix: /usr
+    buildable: false
+  texlive:
+    externals:
+    - spec: texlive@live % gcc@10.2.0  arch=linux-rocky9-cascadelake
+      prefix: /usr
+    - spec: texlive@live % gcc@11.2.0  arch=linux-rocky9-cascadelake
+      prefix: /usr
+    - spec: texlive@live % intel@19.1.1.217  arch=linux-rocky9-cascadelake
+      prefix: /usr
+    buildable: false
+  openssl:
+    externals:
+    - spec: openssl@3.0.1 % gcc@10.2.0 arch=linux-rocky9-cascadelake
+      prefix: /usr
+    - spec: openssl@3.0.1 % gcc@11.2.0 arch=linux-rocky9-cascadelake
+      prefix: /usr
+    - spec: openssl@3.0.1 % intel@19.1.1.217 arch=linux-rocky9-cascadelake
+      prefix: /usr
+    buildable: false
+  rdma-core:
+    externals:
+    - spec: rdma-core@41.0 % gcc@11.2.0 arch=linux-rocky9-cascadelake
+      prefix: /usr
+    - spec: rdma-core@41.0 % gcc@10.2.0 arch=linux-rocky9-cascadelake
+      prefix: /usr
+    - spec: rdma-core@41.0 % intel@19.1.1.217 arch=linux-rocky9-cascadelake
+      prefix: /usr
+    buildable: false
+  slurm:
+    externals:
+    - spec: slurm@22.05.9 % gcc@11.2.0 arch=linux-rocky9-cascadelake
+      prefix: /cm/shared/apps/slurm/22.05.9
+    - spec: slurm@22.05.8 % gcc@10.2.0 arch=linux-rocky9-cascadelake
+      prefix: /cm/shared/apps/slurm/22.05.9
+    - spec: slurm@22.05.8 % intel@19.1.1.217 arch=linux-rocky9-cascadelake
+      prefix: /cm/shared/apps/slurm/22.05.9
+    buildable: false
+  librsvg:
+    externals:
+    - spec: librsvg@2.42.7 % gcc@10.2.0 arch=linux-rocky9-cascadelake
+      prefix: /usr
+    - spec: librsvg@2.42.7 % gcc@11.2.0 arch=linux-rocky9-cascadelake
+      prefix: /usr
+    - spec: librsvg@2.42.7 % intel@19.1.1.217 arch=linux-rocky9-cascadelake
+      prefix: /usr
+    buildable: false
+  ghostscript:
+    externals:
+    - spec: ghostscript@9.27 % gcc@10.2.0 arch=linux-rocky9-cascadelake
+      prefix: /usr
+    - spec: ghostscript@9.27 % gcc@11.2.0 arch=linux-rocky9-cascadelake
+      prefix: /usr
+    - spec: ghostscript@9.27 % intel@19.1.1.217 arch=linux-rocky9-cascadelake
+      prefix: /usr
+    buildable: false
+  vasp6:
+    permissions:
+      read: group
+      group: vasp-6
+  all:
+    compiler: [gcc, intel, pgi, clang, xl, nag, fj, aocc]
+    providers:
+      awk: [gawk]
+      blas: [openblas, amdblis]
+      D: [ldc]
+      daal: [intel-daal]
+      elf: [elfutils]
+      fftw-api: [fftw, amdfftw]
+      flame: [libflame, amdlibflame]
+      fuse: [libfuse]
+      gl: [mesa+opengl, mesa18, opengl]
+      glu: [mesa-glu, openglu]
+      glx: [mesa+glx, mesa18+glx, opengl]
+      golang: [gcc]
+      iconv: [libiconv]
+      ipp: [intel-ipp]
+      java: [openjdk, jdk, ibm-java]
+      jpeg: [libjpeg-turbo, libjpeg]
+      lapack: [openblas, amdlibflame]
+      lua-lang: [lua, lua-luajit]
+      mariadb-client: [mariadb-c-client, mariadb]
+      mkl: [intel-mkl]
+      mpe: [mpe2]
+      mpi: [openmpi, mpich]
+      mysql-client: [mysql, mariadb-c-client]
+      opencl: [pocl]
+      onedal: [intel-oneapi-dal]
+      osmesa: [mesa+osmesa, mesa18+osmesa]
+      pbs: [openpbs, torque]
+      pil: [py-pillow]
+      pkgconfig: [pkgconf, pkg-config]
+      rpc: [libtirpc]
+      scalapack: [netlib-scalapack, amdscalapack]
+      sycl: [hipsycl]
+      szip: [libaec, libszip]
+      tbb: [intel-tbb]
+      unwind: [libunwind]
+      uuid: [util-linux-uuid, libuuid]
+      xxd: [xxd-standalone, vim]
+      yacc: [bison, byacc]
+      ziglang: [zig]
+    permissions:
+      read: world
+      write: user
+repos:
+- $spack/var/spack/repos/sdsc
+- $spack/var/spack/repos/builtin
+upstreams: {}
