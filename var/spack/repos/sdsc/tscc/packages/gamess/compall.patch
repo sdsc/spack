@@ -1,8 +1,0 @@
---- gamess-2019.06/compall	2019-08-04 10:27:44.000000000 -0700
-+++ patch-files/compall	2019-09-06 09:56:40.695948705 -0700
-@@ -1,4 +1,4 @@
--#!/bin/csh
-+#!/bin/csh -f
- #
- # 27 Mar 2014 - script to compile the GAMESS quantum chemistry code.
- #

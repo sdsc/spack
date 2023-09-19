@@ -1,5 +1,0 @@
-#!/bin/csh -f
-setenv g16root $argv[1]
-bsd/install
-source ${g16root}/g16/bsd/g16.login
-bsd/bldg16 all CUDABUILD 
