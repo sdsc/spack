@@ -2,28 +2,13 @@
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
-
-# ----------------------------------------------------------------------------
-# If you submit this package back to Spack as a pull request,
-# please first remove this boilerplate and all FIXME comments.
-#
-# This is a template package file for Spack.  We've put "FIXME"
-# next to all the things you'll want to change. Once you've handled
-# them, you can save this file and test your package like this:
-#
-#     spack install amber
-#
-# You can edit this file again by typing:
-#
-#     spack edit amber
-#
-# See the Spack documentation for more information on packaging.
 # ----------------------------------------------------------------------------
 
 from spack import *
 import os
 import subprocess
 import shutil
+import glob
 
 
 class Amber(Package,CudaPackage):
@@ -40,12 +25,10 @@ class Amber(Package,CudaPackage):
 
 
     version('22', sha256='3c887ccbad690fc76ff0b120a3448eae023c08e76582aac07900d4a9708ebd16')
-    version('20', sha256='a4c53639441c8cc85adee397933d07856cc4a723c82c6bea585cd76c197ead75')
 
     resources = [
       # [version amber, version ambertools , sha256sum]
-        ('22', '22', '1571d4e0f7d45b2a71dce5999fa875aea8c90ee219eb218d7916bf30ea229121'),
-        ('20', '20', 'b1e1f8f277c54e88abc9f590e788bbb2f7a49bcff5e8d8a6eacfaf332a4890f9'),
+        ('22', '23', 'debb52e6ef2e1b4eaa917a8b4d4934bd2388659c660501a81ea044903bf9ee9d'),
     ]
 
     for ver, ambertools_ver, checksum in resources:
@@ -72,10 +55,12 @@ class Amber(Package,CudaPackage):
     depends_on('netcdf-c')
     depends_on('netcdf-fortran')
     depends_on('parallel-netcdf')
-    depends_on('boost')
-    depends_on('python')
     depends_on('mpi', when='+mpi')
     depends_on('cuda', when='+cuda')
+    depends_on('cmake')
+    depends_on('zlib')
+    depends_on('bzip2')
+ 
 
 
     def install(self, spec, prefix):
@@ -97,8 +82,7 @@ class Amber(Package,CudaPackage):
         args.append('-DMPI=FALSE')
         args.append('-DCUDA=FALSE')
         args.append('-DINSTALL_TESTS=TRUE')
-        args.append('-DDOWNLOAD_MINICONDA=FALSE')
-        args.append('-DPYTHON_EXECUTABLE=python3')
+        args.append('-DDOWNLOAD_MINICONDA=TRUE')
         args.append('-DPnetCDF_C_LIBRARY='+join_path(spec['parallel-netcdf'].prefix,'lib','libpnetcdf.so'))
         args.append('-DPnetCDF_C_INCLUDE_DIR='+join_path(spec['parallel-netcdf'].prefix,'include'))
         args.append('-DNetCDF_INCLUDES='+join_path(spec['parallel-netcdf'].prefix,'include'))
@@ -111,6 +95,12 @@ class Amber(Package,CudaPackage):
         os.chdir('build')
         cmake(*args)
         make('install')
+        for x,y in enumerate(args):
+                if '-DDOWNLOAD_MINICONDA=TRUE' in y:
+                    args.remove(y)
+                    args.insert(x,'-DDOWNLOAD_MINICONDA=FALSE')
+             
+        args.append('-DBUILD_PYTHON=FALSE')
         if '+mpi' in spec:
             for x,y in enumerate(args):
                 if 'DMPI' in y:
@@ -135,3 +125,13 @@ class Amber(Package,CudaPackage):
                         args.insert(x,'-DMPI=TRUE')
                         cmake(*args)
                         make('install')
+
+    def setup_run_environment(self, env):
+        env.set('AMBER_PREFIX', self.prefix)
+        env.set('AMBERHOME', self.prefix)
+        env.prepend_path('PATH',join_path(self.prefix,'miniconda','bin'))
+        file = glob.glob(join_path(self.prefix,'miniconda','lib','python*'))[0]
+        env.prepend_path('PYTHONPATH',join_path(file,'site-packages'))
+        file = glob.glob(join_path(self.prefix.lib,'python*'))[0]
+        env.prepend_path('PYTHONPATH',join_path(file,'site-packages'))
+
