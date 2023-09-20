@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=parallel@20210922
+#SBATCH --job-name=valgrind@3.17.0
 #SBATCH --account=use300
 #SBATCH --reservation=root_73
 #SBATCH --partition=ind-gpu-shared
@@ -40,10 +40,10 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-declare -xr SPACK_PACKAGE='parallel@20210922'
-declare -xr SPACK_COMPILER='gcc@8.5.0'
-declare -xr SPACK_VARIANTS=''
-declare -xr SPACK_DEPENDENCIES=''
+declare -xr SPACK_PACKAGE='valgrind@3.17.0'
+declare -xr SPACK_COMPILER='gcc@8.4.0'
+declare -xr SPACK_VARIANTS='+boost +mpi +only64bit +ubsan'
+declare -xr SPACK_DEPENDENCIES="^boost@1.77.0/$(spack find --format '{hash:7}' boost@1.77.0 % ${SPACK_COMPILER} +mpi ^openmpi@4.1.3)"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -70,6 +70,6 @@ fi
 
 #spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'pigz@2.6.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'mpip@3.5.sh'
 
 sleep 30

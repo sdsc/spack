@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=parallel@20210922
+#SBATCH --job-name=gcc@8.4.0
 #SBATCH --account=use300
 #SBATCH --reservation=root_73
 #SBATCH --partition=ind-gpu-shared
@@ -9,7 +9,7 @@
 #SBATCH --cpus-per-task=10
 #SBATCH --mem=93G
 #SBATCH --gpus=1
-#SBATCH --time=00:30:00
+#SBATCH --time=01:00:00
 #SBATCH --output=%x.o%j.%N
 
 declare -xr LOCAL_TIME="$(date +'%Y%m%dT%H%M%S%z')"
@@ -37,13 +37,13 @@ cat "${SLURM_JOB_SCRIPT}"
 
 module purge
 module load "${SCHEDULER_MODULE}"
-module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
+module list
 
-declare -xr SPACK_PACKAGE='parallel@20210922'
+declare -xr SPACK_PACKAGE='gcc@8.4.0'
 declare -xr SPACK_COMPILER='gcc@8.5.0'
-declare -xr SPACK_VARIANTS=''
-declare -xr SPACK_DEPENDENCIES=''
+declare -xr SPACK_VARIANTS='~binutils ~bootstrap ~graphite ~nvptx ~piclibs ~strip'
+declare -xr SPACK_DEPENDENCIES='' 
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -56,20 +56,20 @@ spack config get packages
 spack config get repos
 spack config get upstreams
 
-time -p spack spec --long --namespaces --types "${SPACK_SPEC}"
+time -p spack spec --long --namespaces --types --reuse "${SPACK_SPEC}"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack concretization failed.'
   exit 1
 fi
 
-time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all "${SPACK_SPEC}"
+time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all --reuse "${SPACK_SPEC}"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
   exit 1
 fi
 
-#spack module lmod refresh --delete-tree -y
+spack compiler add --scope site "$(spack location -i ${SPACK_PACKAGE})"
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'pigz@2.6.sh'
+spack module lmod refresh --delete-tree -y
 
 sleep 30

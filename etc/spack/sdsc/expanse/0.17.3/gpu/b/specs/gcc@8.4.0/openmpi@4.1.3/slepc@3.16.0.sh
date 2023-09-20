@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=parallel@20210922
+#SBATCH --job-name=slepc@3.16.0
 #SBATCH --account=use300
 #SBATCH --reservation=root_73
 #SBATCH --partition=ind-gpu-shared
@@ -40,10 +40,11 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-declare -xr SPACK_PACKAGE='parallel@20210922'
-declare -xr SPACK_COMPILER='gcc@8.5.0'
-declare -xr SPACK_VARIANTS=''
-declare -xr SPACK_DEPENDENCIES=''
+# Error: Package slepc does not depend on arpack-ng
+declare -xr SPACK_PACKAGE='slepc@3.16.0'
+declare -xr SPACK_COMPILER='gcc@8.4.0'
+declare -xr SPACK_VARIANTS='~arpack ~blopex +cuda cuda_arch=70 ~rocm'
+declare -xr SPACK_DEPENDENCIES="^petsc@3.16.1/$(spack find --format '{hash:7}' petsc@3.16.1 % ${SPACK_COMPILER} ~complex +mpi ^openmpi@4.1.3)" #^python@3.8.12/$(spack find --format '{hash:7}' python@3.8.12 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -56,20 +57,20 @@ spack config get packages
 spack config get repos
 spack config get upstreams
 
-time -p spack spec --long --namespaces --types "${SPACK_SPEC}"
+time -p spack spec --long --namespaces --types --reuse $(echo "${SPACK_SPEC}")
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack concretization failed.'
   exit 1
 fi
 
-time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all "${SPACK_SPEC}"
+time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all --reuse $(echo "${SPACK_SPEC}")
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
   exit 1
 fi
 
-#spack module lmod refresh --delete-tree -y
+spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'pigz@2.6.sh'
+#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'py-petsc4py@3.16.1.sh'
 
 sleep 30

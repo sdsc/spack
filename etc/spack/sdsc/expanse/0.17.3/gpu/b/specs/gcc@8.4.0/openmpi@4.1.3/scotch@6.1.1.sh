@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=parallel@20210922
+#SBATCH --job-name=scotch@6.1.1
 #SBATCH --account=use300
 #SBATCH --reservation=root_73
 #SBATCH --partition=ind-gpu-shared
@@ -40,10 +40,13 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-declare -xr SPACK_PACKAGE='parallel@20210922'
-declare -xr SPACK_COMPILER='gcc@8.5.0'
-declare -xr SPACK_VARIANTS=''
-declare -xr SPACK_DEPENDENCIES=''
+# Setting +metis doesn't seem to create dependecy to metis when 
+# concretized; investigate in the future why this is the case.
+# mumps requires scotch constrain a concrete spec scotch+esmumps~metis+mpi
+declare -xr SPACK_PACKAGE='scotch@6.1.1'
+declare -xr SPACK_COMPILER='gcc@8.4.0'
+declare -xr SPACK_VARIANTS='+compression +esmumps ~int64 ~metis +mpi +shared'
+declare -xr SPACK_DEPENDENCIES="^openmpi@4.1.3/$(spack find --format '{hash:7}' openmpi@4.1.3 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -70,6 +73,6 @@ fi
 
 #spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'pigz@2.6.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'mumps@5.4.0.sh'
 
 sleep 30
