@@ -1,0 +1,1235 @@
+1695331370 25319729 5ea7cd366f277ea3ddac734a34ba5647  /cm/shared/apps/spack/0.17.3/gpu/b/etc/spack/sdsc/expanse/0.17.3/gpu/b/specs/gcc@8.4.0/openmpi@4.1.3/kokkos@3.4.01.sh 
+
+#!/usr/bin/env bash
+
+#SBATCH --job-name=kokkos@3.4.01
+#SBATCH --account=use300
+#SBATCH --reservation=root_73
+#SBATCH --partition=ind-gpu-shared
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=1
+#SBATCH --cpus-per-task=10
+#SBATCH --mem=93G
+#SBATCH --gpus=1
+#SBATCH --time=00:30:00
+#SBATCH --output=%x.o%j.%N
+
+declare -xr LOCAL_TIME="$(date +'%Y%m%dT%H%M%S%z')"
+declare -xir UNIX_TIME="$(date +'%s')"
+
+declare -xr LOCAL_SCRATCH_DIR="/scratch/${USER}/job_${SLURM_JOB_ID}"
+declare -xr TMPDIR="${LOCAL_SCRATCH_DIR}"
+
+declare -xr SYSTEM_NAME='expanse'
+
+declare -xr SPACK_VERSION='0.17.3'
+declare -xr SPACK_INSTANCE_NAME='gpu'
+declare -xr SPACK_INSTANCE_VERSION='b'
+declare -xr SPACK_INSTANCE_DIR="/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}/${SPACK_INSTANCE_VERSION}"
+
+declare -xr SLURM_JOB_SCRIPT="$(scontrol show job ${SLURM_JOB_ID} | awk -F= '/Command=/{print $2}')"
+declare -xr SLURM_JOB_MD5SUM="$(md5sum ${SLURM_JOB_SCRIPT})"
+
+declare -xr SCHEDULER_MODULE='slurm'
+
+echo "${UNIX_TIME} ${SLURM_JOB_ID} ${SLURM_JOB_MD5SUM} ${SLURM_JOB_DEPENDENCY}" 
+echo ""
+
+cat "${SLURM_JOB_SCRIPT}"
+
+module purge
+module load "${SCHEDULER_MODULE}"
+module list
+. "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
+
+# +cuda_relocatable_device_code not working; would you need cuda +dev for static libraries to be installed? or is this in driver packages?
+# >> 12    CMake Error at cmake/kokkos_enable_options.cmake:124 (MESSAGE):
+#     13      Relocatable device code requires static libraries.
+
+# multiple cuda_arch not working together? does KOKKOS not support multiple cuda_arch in same build?
+#>> 13    CMake Error at cmake/kokkos_arch.cmake:383 (MESSAGE):
+#     14      Multiple GPU architectures given! Already have VOLTA70, but trying
+#            to add
+#     15      AMPERE80.  If you are re-running CMake, try clearing the cache and
+#            running
+#     16      again
+
+declare -xr SPACK_PACKAGE='kokkos@3.4.01'
+declare -xr SPACK_COMPILER='gcc@8.4.0'
+declare -xr SPACK_VARIANTS='~aggressive_vectorization ~compiler_warnings +cuda cuda_arch=70 +cuda_constexpr +cuda_lambda +cuda_ldg_intrinsic ~cuda_relocatable_device_code ~cuda_uvm ~debug ~debug_bounds_check ~debug_dualview_modify_check ~deprecated_code ~examples ~explicit_instantiation ~hpx ~hpx_async_dispatch ~hwloc ~ipo ~memkind ~numactl ~openmp +pic +profiling ~profiling_load_print ~pthread ~qthread ~rocm +serial +shared ~sycl ~tests ~tuning +wrapper'
+declare -xr SPACK_DEPENDENCIES="^openmpi@4.1.3/$(spack find --format '{hash:7}' openmpi@4.1.3 % ${SPACK_COMPILER})"
+declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
+
+printenv
+
+spack config get compilers  
+spack config get config  
+spack config get mirrors
+spack config get modules
+spack config get packages
+spack config get repos
+spack config get upstreams
+
+time -p spack spec --long --namespaces --types --reuse $(echo "${SPACK_SPEC}")
+if [[ "${?}" -ne 0 ]]; then
+  echo 'ERROR: spack concretization failed.'
+fi
+
+time -p spack install -v --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all --reuse $(echo "${SPACK_SPEC}")
+if [[ "${?}" -ne 0 ]]; then
+  echo 'ERROR: spack install failed.'
+  exit 1
+fi
+
+spack module lmod refresh --delete-tree -y
+
+#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'lammps@20210310.sh'
+
+sleep 30
+
+Currently Loaded Modules:
+  1) slurm/expanse/21.08.8
+
+ 
+
+LD_LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:/cm/shared/apps/slurm/current/lib64
+LS_COLORS=rs=0:di=38;5;33:ln=38;5;51:mh=00:pi=40;38;5;11:so=38;5;13:do=38;5;5:bd=48;5;232;38;5;11:cd=48;5;232;38;5;3:or=48;5;232;38;5;9:mi=01;05;37;41:su=48;5;196;38;5;15:sg=48;5;11;38;5;16:ca=48;5;196;38;5;226:tw=48;5;10;38;5;16:ow=48;5;10;38;5;21:st=48;5;21;38;5;15:ex=38;5;40:*.tar=38;5;9:*.tgz=38;5;9:*.arc=38;5;9:*.arj=38;5;9:*.taz=38;5;9:*.lha=38;5;9:*.lz4=38;5;9:*.lzh=38;5;9:*.lzma=38;5;9:*.tlz=38;5;9:*.txz=38;5;9:*.tzo=38;5;9:*.t7z=38;5;9:*.zip=38;5;9:*.z=38;5;9:*.dz=38;5;9:*.gz=38;5;9:*.lrz=38;5;9:*.lz=38;5;9:*.lzo=38;5;9:*.xz=38;5;9:*.zst=38;5;9:*.tzst=38;5;9:*.bz2=38;5;9:*.bz=38;5;9:*.tbz=38;5;9:*.tbz2=38;5;9:*.tz=38;5;9:*.deb=38;5;9:*.rpm=38;5;9:*.jar=38;5;9:*.war=38;5;9:*.ear=38;5;9:*.sar=38;5;9:*.rar=38;5;9:*.alz=38;5;9:*.ace=38;5;9:*.zoo=38;5;9:*.cpio=38;5;9:*.7z=38;5;9:*.rz=38;5;9:*.cab=38;5;9:*.wim=38;5;9:*.swm=38;5;9:*.dwm=38;5;9:*.esd=38;5;9:*.jpg=38;5;13:*.jpeg=38;5;13:*.mjpg=38;5;13:*.mjpeg=38;5;13:*.gif=38;5;13:*.bmp=38;5;13:*.pbm=38;5;13:*.pgm=38;5;13:*.ppm=38;5;13:*.tga=38;5;13:*.xbm=38;5;13:*.xpm=38;5;13:*.tif=38;5;13:*.tiff=38;5;13:*.png=38;5;13:*.svg=38;5;13:*.svgz=38;5;13:*.mng=38;5;13:*.pcx=38;5;13:*.mov=38;5;13:*.mpg=38;5;13:*.mpeg=38;5;13:*.m2v=38;5;13:*.mkv=38;5;13:*.webm=38;5;13:*.ogm=38;5;13:*.mp4=38;5;13:*.m4v=38;5;13:*.mp4v=38;5;13:*.vob=38;5;13:*.qt=38;5;13:*.nuv=38;5;13:*.wmv=38;5;13:*.asf=38;5;13:*.rm=38;5;13:*.rmvb=38;5;13:*.flc=38;5;13:*.avi=38;5;13:*.fli=38;5;13:*.flv=38;5;13:*.gl=38;5;13:*.dl=38;5;13:*.xcf=38;5;13:*.xwd=38;5;13:*.yuv=38;5;13:*.cgm=38;5;13:*.emf=38;5;13:*.ogv=38;5;13:*.ogx=38;5;13:*.aac=38;5;45:*.au=38;5;45:*.flac=38;5;45:*.m4a=38;5;45:*.mid=38;5;45:*.midi=38;5;45:*.mka=38;5;45:*.mp3=38;5;45:*.mpc=38;5;45:*.ogg=38;5;45:*.ra=38;5;45:*.wav=38;5;45:*.oga=38;5;45:*.opus=38;5;45:*.spx=38;5;45:*.xspf=38;5;45:
+SRUN_DEBUG=3
+SLURM_STEP_ID=0
+LOCAL_SCRATCH_DIR=/scratch/spack_gpu/job_25319729
+SLURM_STEP_GPUS=0
+SLURM_NODEID=0
+SLURM_TASK_PID=2482212
+__LMOD_REF_COUNT_PATH=/cm/shared/apps/slurm/current/sbin:1;/cm/shared/apps/slurm/current/bin:1;/home/spack_gpu/.local/bin:2;/home/spack_gpu/bin:2;/usr/local/bin:1;/usr/bin:1;/usr/local/sbin:1;/usr/sbin:1
+_ModuleTable002_=L21vZHVsZWZpbGVzIiwiL3Vzci9zaGFyZS9Nb2R1bGVzL21vZHVsZWZpbGVzIiwiL2NtL3NoYXJlZC9tb2R1bGVmaWxlcyIsfSxbInN5c3RlbUJhc2VNUEFUSCJdPSIvY20vbG9jYWwvbW9kdWxlZmlsZXM6L2NtL3NoYXJlZC9hcHBzL2FjY2Vzcy9tb2R1bGVmaWxlczovY20vc2hhcmVkL21vZHVsZWZpbGVzOi9ldGMvbW9kdWxlZmlsZXM6L3Vzci9zaGFyZS9tb2R1bGVmaWxlczovdXNyL3NoYXJlL01vZHVsZXMvbW9kdWxlZmlsZXMiLH0=
+SSH_CONNECTION=198.202.100.13 60088 198.202.100.13 22
+SPACK_PYTHON=/usr/bin/python3
+SLURM_PRIO_PROCESS=0
+SLURM_CPU_BIND_VERBOSE=quiet
+LANG=en_US.UTF-8
+SLURM_SUBMIT_DIR=/cm/shared/apps/spack/0.17.3/gpu/b/etc/spack/sdsc/expanse/0.17.3/gpu/b/specs/gcc@8.4.0/openmpi@4.1.3
+HISTCONTROL=ignoredups
+HOSTNAME=exp-15-57
+LMOD_SYSTEM_DEFAULT_MODULES=DefaultModules
+OLDPWD=/cm/shared/apps/spack/0.17.3/gpu/b/etc/spack/sdsc/expanse/0.17.3/gpu/b/specs
+__LMOD_REF_COUNT__LMFILES_=/cm/local/modulefiles/slurm/expanse/21.08.8:1
+SLURM_CPUS_PER_TASK=10
+SLURM_STEPID=0
+SLURM_SRUN_COMM_HOST=10.21.0.19
+SPACK_DEPENDENCIES=^openmpi@4.1.3/v2ei3ge
+SLURM_DISTRIBUTION=cyclic
+ENVIRONMENT=BATCH
+SPACK_VERSION=0.17.3
+ROCR_VISIBLE_DEVICES=0
+SLURM_PROCID=0
+SPACK_INSTANCE_VERSION=b
+SLURM_JOB_GID=11491
+SPACK_VARIANTS=~aggressive_vectorization ~compiler_warnings +cuda cuda_arch=70 +cuda_constexpr +cuda_lambda +cuda_ldg_intrinsic ~cuda_relocatable_device_code ~cuda_uvm ~debug ~debug_bounds_check ~debug_dualview_modify_check ~deprecated_code ~examples ~explicit_instantiation ~hpx ~hpx_async_dispatch ~hwloc ~ipo ~memkind ~numactl ~openmp +pic +profiling ~profiling_load_print ~pthread ~qthread ~rocm +serial +shared ~sycl ~tests ~tuning +wrapper
+SPACK_INSTANCE_DIR=/cm/shared/apps/spack/0.17.3/gpu/b
+__LMOD_REF_COUNT_LD_LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:1;/cm/shared/apps/slurm/current/lib64:1
+SLURM_CPU_BIND=quiet,mask_cpu:0x0000055555
+SLURM_JOB_SCRIPT=/cm/shared/apps/spack/0.17.3/gpu/b/etc/spack/sdsc/expanse/0.17.3/gpu/b/specs/gcc@8.4.0/openmpi@4.1.3/kokkos@3.4.01.sh
+SLURMD_NODENAME=exp-15-57
+SLURM_TASKS_PER_NODE=1
+S_COLORS=auto
+which_declare=declare -f
+SPACK_COMPILER=gcc@8.4.0
+SLURM_JOB_RESERVATION=root_73
+XDG_SESSION_ID=132644
+USER=spack_gpu
+SLURM_NNODES=1
+SLURM_LAUNCH_NODE_IPADDR=10.21.0.19
+SLURM_STEP_TASKS_PER_NODE=1
+SLURM_NTASKS_PER_NODE=1
+__LMOD_REF_COUNT_MODULEPATH=/cm/local/modulefiles:1;/cm/shared/apps/access/modulefiles:1;/etc/modulefiles:1;/usr/share/modulefiles:1;/usr/share/Modules/modulefiles:1;/cm/shared/modulefiles:1
+__LMOD_REF_COUNT_LOADEDMODULES=slurm/expanse/21.08.8:1
+SLURM_GPUS=1
+PWD=/cm/shared/apps/spack/0.17.3/gpu/b/etc/spack/sdsc/expanse/0.17.3/gpu/b/specs/gcc@8.4.0/openmpi@4.1.3
+ENABLE_LMOD=1
+SLURM_JOB_NODELIST=exp-15-57
+HOME=/home/spack_gpu
+SLURM_CLUSTER_NAME=expanse
+LMOD_COLORIZE=yes
+LOCAL_TIME=20230921T142250-0700
+LMOD_SYSHOST=expanse
+SLURM_NODELIST=exp-15-57
+SLURM_GPUS_ON_NODE=1
+SSH_CLIENT=198.202.100.13 60088 22
+LMOD_VERSION=8.2.4
+CPATH=/cm/shared/apps/slurm/current/include
+SLURM_NTASKS=1
+LMOD_SETTARG_CMD=:
+SLURM_JOB_CPUS_PER_NODE=10
+BASH_ENV=/usr/share/lmod/lmod/init/bash
+SLURM_TOPOLOGY_ADDR=exp-15-57
+SLURM_WORKING_CLUSTER=expanse:mgr1:6817:9472:109
+SLURM_JOB_MD5SUM=5ea7cd366f277ea3ddac734a34ba5647  /cm/shared/apps/spack/0.17.3/gpu/b/etc/spack/sdsc/expanse/0.17.3/gpu/b/specs/gcc@8.4.0/openmpi@4.1.3/kokkos@3.4.01.sh
+SPACK_PACKAGE=kokkos@3.4.01
+__LMOD_REF_COUNT_LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:1;/cm/shared/apps/slurm/current/lib64:1
+SLURM_STEP_NODELIST=exp-15-57
+SLURM_JOB_NAME=kokkos@3.4.01
+SLURM_SRUN_COMM_PORT=32911
+TMPDIR=/scratch/spack_gpu/job_25319729
+LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:/cm/shared/apps/slurm/current/lib64
+SLURM_JOB_GPUS=2
+LMOD_sys=Linux
+SLURM_JOBID=25319729
+SYSTEM_NAME=expanse
+_ModuleTable001_=X01vZHVsZVRhYmxlXz17WyJNVHZlcnNpb24iXT0zLFsiY19yZWJ1aWxkVGltZSJdPWZhbHNlLFsiY19zaG9ydFRpbWUiXT1mYWxzZSxkZXB0aFQ9e30sZmFtaWx5PXt9LG1UPXtzbHVybT17WyJmbiJdPSIvY20vbG9jYWwvbW9kdWxlZmlsZXMvc2x1cm0vZXhwYW5zZS8yMS4wOC44IixbImZ1bGxOYW1lIl09InNsdXJtL2V4cGFuc2UvMjEuMDguOCIsWyJsb2FkT3JkZXIiXT0xLHByb3BUPXt9LFsic3RhY2tEZXB0aCJdPTAsWyJzdGF0dXMiXT0iYWN0aXZlIixbInVzZXJOYW1lIl09InNsdXJtIix9LH0sbXBhdGhBPXsiL2NtL2xvY2FsL21vZHVsZWZpbGVzIiwiL2NtL3NoYXJlZC9hcHBzL2FjY2Vzcy9tb2R1bGVmaWxlcyIsIi9ldGMvbW9kdWxlZmlsZXMiLCIvdXNyL3NoYXJl
+SLURM_CONF=/cm/shared/apps/slurm/var/etc/expanse/slurm.conf
+LOADEDMODULES=slurm/expanse/21.08.8
+__LMOD_REF_COUNT_MANPATH=/cm/shared/apps/slurm/current/man:3;/usr/share/lmod/lmod/share/man:1;/usr/local/share/man:2;/usr/share/man:2;/cm/local/apps/environment-modules/current/share/man:2
+_ModuleTable003_=TmFtZSJdPSJzaGFyZWQiLH0sc2x1cm09e1siZm4iXT0iL2NtL2xvY2FsL21vZHVsZWZpbGVzL3NsdXJtL2V4cGFuc2UvMjEuMDguOCIsWyJmdWxsTmFtZSJdPSJzbHVybS9leHBhbnNlLzIxLjA4LjgiLFsibG9hZE9yZGVyIl09Myxwcm9wVD17fSxbInN0YWNrRGVwdGgiXT0yLFsic3RhdHVzIl09ImFjdGl2ZSIsWyJ1c2VyTmFtZSJdPSJzbHVybSIsfSx9LG1wYXRoQT17Ii9jbS9zaGFyZWQvYXBwcy9zcGFjay8wLjE3LjMvY3B1L2Ivc2hhcmUvc3BhY2svbG1vZC9saW51eC1yb2NreTgteDg2XzY0L0NvcmUiLCIvY20vbG9jYWwvbW9kdWxlZmlsZXMiLCIvY20vc2hhcmVkL2FwcHMvYWNjZXNzL21vZHVsZWZpbGVzIiwiL2V0Yy9tb2R1bGVmaWxlcyIsIi91c3Ivc2hhcmUvbW9k
+SLURM_NODE_ALIASES=(null)
+LMOD_ROOT=/usr/share/lmod
+SLURM_JOB_QOS=ind-gpu-shared-normal
+SLURM_TOPOLOGY_ADDR_PATTERN=node
+SSH_TTY=/dev/pts/437
+MAIL=/var/spool/mail/spack_gpu
+SLURM_CPUS_ON_NODE=10
+LMOD_arch=x86_64
+SLURM_JOB_NUM_NODES=1
+__Init_Default_Modules=1
+CMD_WLM_CLUSTER_NAME=expanse
+SLURM_MEM_PER_NODE=95232
+SPACK_ROOT=/cm/shared/apps/spack/0.17.3/gpu/b
+TERM=xterm-256color
+SHELL=/bin/bash
+_ModuleTable_Sz_=2
+SLURM_JOB_UID=527835
+__LMOD_REF_COUNT_CPATH=/cm/shared/apps/slurm/current/include:1
+SLURM_JOB_PARTITION=ind-gpu-shared
+SLURM_PTY_WIN_ROW=24
+SLURM_CPU_BIND_LIST=0x0000055555
+SPACK_INSTANCE_NAME=gpu
+SLURM_JOB_USER=spack_gpu
+CUDA_VISIBLE_DEVICES=0
+SLURM_PTY_WIN_COL=80
+SLURM_NPROCS=1
+SHLVL=3
+SLURM_SUBMIT_HOST=exp-15-57
+UNIX_TIME=1695331370
+SLURM_JOB_ACCOUNT=use300
+MANPATH=/cm/shared/apps/slurm/current/man:/usr/share/lmod/lmod/share/man:/usr/local/share/man:/usr/share/man:/cm/local/apps/environment-modules/current/share/man
+LMOD_PREPEND_BLOCK=normal
+SLURM_STEP_LAUNCHER_PORT=32911
+MODULEPATH=/cm/local/modulefiles:/cm/shared/apps/access/modulefiles:/etc/modulefiles:/usr/share/modulefiles:/usr/share/Modules/modulefiles:/cm/shared/modulefiles
+SLURM_PTY_PORT=35617
+SLURM_GTIDS=0
+LOGNAME=spack_gpu
+DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/527835/bus
+XDG_RUNTIME_DIR=/run/user/527835
+MODULEPATH_ROOT=/usr/share/modulefiles
+LMOD_PACKAGE_PATH=/usr/share/lmod/etc/site/lmod
+PATH=/cm/shared/apps/spack/0.17.3/gpu/b/bin:/cm/shared/apps/slurm/current/sbin:/cm/shared/apps/slurm/current/bin:/home/spack_gpu/.local/bin:/home/spack_gpu/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin
+SLURM_JOB_ID=25319729
+_LMFILES_=/cm/local/modulefiles/slurm/expanse/21.08.8
+SLURM_CPU_BIND_TYPE=mask_cpu:
+DEBUGINFOD_URLS=https://debuginfod.centos.org/ 
+SLURM_STEP_NUM_TASKS=1
+SCHEDULER_MODULE=slurm
+MODULESHOME=/usr/share/lmod/lmod
+LMOD_SETTARG_FULL_SUPPORT=no
+HISTSIZE=-1
+LMOD_PKG=/usr/share/lmod/lmod
+SLURM_STEP_NUM_NODES=1
+SPACK_SPEC=kokkos@3.4.01 % gcc@8.4.0 ~aggressive_vectorization ~compiler_warnings +cuda cuda_arch=70 +cuda_constexpr +cuda_lambda +cuda_ldg_intrinsic ~cuda_relocatable_device_code ~cuda_uvm ~debug ~debug_bounds_check ~debug_dualview_modify_check ~deprecated_code ~examples ~explicit_instantiation ~hpx ~hpx_async_dispatch ~hwloc ~ipo ~memkind ~numactl ~openmp +pic +profiling ~profiling_load_print ~pthread ~qthread ~rocm +serial +shared ~sycl ~tests ~tuning +wrapper ^openmpi@4.1.3/v2ei3ge
+LMOD_CMD=/usr/share/lmod/lmod/libexec/lmod
+SLURM_LOCALID=0
+GPU_DEVICE_ORDINAL=0
+LESSOPEN=||/usr/bin/lesspipe.sh %s
+LMOD_FULL_SETTARG_SUPPORT=no
+LMOD_DIR=/usr/share/lmod/lmod/libexec
+BASH_FUNC_which%%=() {  ( alias;
+ eval ${which_declare} ) | /usr/bin/which --tty-only --read-alias --read-functions --show-tilde --show-dot $@
+}
+BASH_FUNC_module%%=() {  eval $($LMOD_CMD bash "$@") && eval $(${LMOD_SETTARG_CMD:-:} -s sh)
+}
+BASH_FUNC_spack%%=() {  : this is a shell function from: /cm/shared/apps/spack/0.17.3/gpu/b/share/spack/setup-env.sh;
+ : the real spack script is here: /cm/shared/apps/spack/0.17.3/gpu/b/bin/spack;
+ _spack_shell_wrapper "$@";
+ return $?
+}
+BASH_FUNC__spack_shell_wrapper%%=() {  for var in LD_LIBRARY_PATH DYLD_LIBRARY_PATH DYLD_FALLBACK_LIBRARY_PATH;
+ do
+ eval "if [ -n \"\${${var}-}\" ]; then export SPACK_$var=\${${var}}; fi";
+ done;
+ if [ -n "${ZSH_VERSION:-}" ]; then
+ emulate -L sh;
+ fi;
+ _sp_flags="";
+ while [ ! -z ${1+x} ] && [ "${1#-}" != "${1}" ]; do
+ _sp_flags="$_sp_flags $1";
+ shift;
+ done;
+ if [ -n "$_sp_flags" ] && [ "${_sp_flags#*h}" != "${_sp_flags}" ] || [ "${_sp_flags#*V}" != "${_sp_flags}" ]; then
+ command spack $_sp_flags "$@";
+ return;
+ fi;
+ _sp_subcommand="";
+ if [ ! -z ${1+x} ]; then
+ _sp_subcommand="$1";
+ shift;
+ fi;
+ case $_sp_subcommand in 
+ "cd")
+ _sp_arg="";
+ if [ -n "$1" ]; then
+ _sp_arg="$1";
+ shift;
+ fi;
+ if [ "$_sp_arg" = "-h" ] || [ "$_sp_arg" = "--help" ]; then
+ command spack cd -h;
+ else
+ LOC="$(spack location $_sp_arg "$@")";
+ if [ -d "$LOC" ]; then
+ cd "$LOC";
+ else
+ return 1;
+ fi;
+ fi;
+ return
+ ;;
+ "env")
+ _sp_arg="";
+ if [ -n "$1" ]; then
+ _sp_arg="$1";
+ shift;
+ fi;
+ if [ "$_sp_arg" = "-h" ] || [ "$_sp_arg" = "--help" ]; then
+ command spack env -h;
+ else
+ case $_sp_arg in 
+ activate)
+ _a=" $@";
+ if [ -z ${1+x} ] || [ "${_a#* --sh}" != "$_a" ] || [ "${_a#* --csh}" != "$_a" ] || [ "${_a#* -h}" != "$_a" ] || [ "${_a#* --help}" != "$_a" ]; then
+ command spack env activate "$@";
+ else
+ stdout="$(command spack $_sp_flags env activate --sh "$@")" || return;
+ eval "$stdout";
+ fi
+ ;;
+ deactivate)
+ _a=" $@";
+ if [ "${_a#* --sh}" != "$_a" ] || [ "${_a#* --csh}" != "$_a" ]; then
+ command spack env deactivate "$@";
+ else
+ if [ -n "$*" ]; then
+ command spack env deactivate -h;
+ else
+ stdout="$(command spack $_sp_flags env deactivate --sh)" || return;
+ eval "$stdout";
+ fi;
+ fi
+ ;;
+ *)
+ command spack env $_sp_arg "$@"
+ ;;
+ esac;
+ fi;
+ return
+ ;;
+ "load" | "unload")
+ _a=" $@";
+ if [ "${_a#* --sh}" != "$_a" ] || [ "${_a#* --csh}" != "$_a" ] || [ "${_a#* -h}" != "$_a" ] || [ "${_a#* --list}" != "$_a" ] || [ "${_a#* --help}" != "$_a" ]; then
+ command spack $_sp_flags $_sp_subcommand "$@";
+ else
+ stdout="$(command spack $_sp_flags $_sp_subcommand --sh "$@")" || return;
+ eval "$stdout";
+ fi
+ ;;
+ *)
+ command spack $_sp_flags $_sp_subcommand "$@"
+ ;;
+ esac
+}
+BASH_FUNC_ml%%=() {  eval $($LMOD_DIR/ml_cmd "$@")
+}
+_=/usr/bin/printenv
+compilers:
+- compiler:
+    spec: gcc@8.5.0
+    paths:
+      cc: /usr/bin/gcc
+      cxx: /usr/bin/g++
+      f77: /usr/bin/gfortran
+      fc: /usr/bin/gfortran
+    flags:
+      cflags: -O2 -march=native
+      cxxflags: -O2 -march=native
+      fflags: -O2 -march=native
+    operating_system: rocky8
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+- compiler:
+    spec: gcc@10.2.0
+    paths:
+      cc: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.5.0/gcc-10.2.0-i62tgsoexc6ya4h7urwhriiujk22nrnj/bin/gcc
+      cxx: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.5.0/gcc-10.2.0-i62tgsoexc6ya4h7urwhriiujk22nrnj/bin/g++
+      f77: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.5.0/gcc-10.2.0-i62tgsoexc6ya4h7urwhriiujk22nrnj/bin/gfortran
+      fc: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.5.0/gcc-10.2.0-i62tgsoexc6ya4h7urwhriiujk22nrnj/bin/gfortran
+    flags:
+      cflags: -O2 -march=native
+      cxxflags: -O2 -march=native
+      fflags: -O2 -march=native
+    operating_system: rocky8
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+- compiler:
+    spec: intel@19.1.3.304
+    paths:
+      cc: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.5.0/intel-19.1.3.304-vecir2bnonslbnjniwcxx6n5vfyeg4yf/bin/icc
+      cxx: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.5.0/intel-19.1.3.304-vecir2bnonslbnjniwcxx6n5vfyeg4yf/bin/icpc
+      f77: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.5.0/intel-19.1.3.304-vecir2bnonslbnjniwcxx6n5vfyeg4yf/bin/ifort
+      fc: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.5.0/intel-19.1.3.304-vecir2bnonslbnjniwcxx6n5vfyeg4yf/bin/ifort
+    flags:
+      cflags: -O2 -march=native
+      cxxflags: -O2 -march=native
+      fflags: -O2 -march=native
+    operating_system: rocky8
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+- compiler:
+    spec: nvhpc@21.9
+    paths:
+      cc: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.5.0/nvhpc-21.9-4xco23dnhjhodonoufuduj4obaewort7/Linux_x86_64/21.9/compilers/bin/nvc
+      cxx: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.5.0/nvhpc-21.9-4xco23dnhjhodonoufuduj4obaewort7/Linux_x86_64/21.9/compilers/bin/nvc++
+      f77: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.5.0/nvhpc-21.9-4xco23dnhjhodonoufuduj4obaewort7/Linux_x86_64/21.9/compilers/bin/nvfortran
+      fc: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.5.0/nvhpc-21.9-4xco23dnhjhodonoufuduj4obaewort7/Linux_x86_64/21.9/compilers/bin/nvfortran
+    flags:
+      cflags: -fast
+      cxxflags: -fast
+      fflags: -fast
+    operating_system: rocky8
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+- compiler:
+    spec: gcc@8.4.0
+    paths:
+      cc: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.5.0/gcc-8.4.0-xiuwkua7azmwsrwasgyr7khz4i2igii4/bin/gcc
+      cxx: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.5.0/gcc-8.4.0-xiuwkua7azmwsrwasgyr7khz4i2igii4/bin/g++
+      f77: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.5.0/gcc-8.4.0-xiuwkua7azmwsrwasgyr7khz4i2igii4/bin/gfortran
+      fc: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.5.0/gcc-8.4.0-xiuwkua7azmwsrwasgyr7khz4i2igii4/bin/gfortran
+    flags:
+      cflags: -O2 -march=native
+      cxxflags: -O2 -march=native
+      fflags: -O2 -march=native
+    operating_system: rocky8
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+config:
+  install_tree:
+    root: $spack/opt/spack
+    projections:
+      all: ${ARCHITECTURE}/${COMPILERNAME}-${COMPILERVER}/${PACKAGE}-${VERSION}-${HASH}
+  template_dirs:
+  - $spack/share/spack/templates
+
+  # Temporary locations Spack can try to use for builds.
+  #
+  # Recommended options are given below.
+  #
+  # Builds can be faster in temporary directories on some (e.g., HPC) systems.
+  # Specifying `$tempdir` will ensure use of the default temporary directory
+  # (i.e., ``$TMP` or ``$TMPDIR``).
+  #
+  # Another option that prevents conflicts and potential permission issues is
+  # to specify `$user_cache_path/stage`, which ensures each user builds in their
+  # home directory.
+  #
+  # A more traditional path uses the value of `$spack/var/spack/stage`, which
+  # builds directly inside Spack's instance without staging them in a
+  # temporary space.  Problems with specifying a path inside a Spack instance
+  # are that it precludes its use as a system package and its ability to be
+  # pip installable.
+  #
+  # In any case, if the username is not already in the path, Spack will append
+  # the value of `$user` in an attempt to avoid potential conflicts between
+  # users in shared temporary spaces.
+  #
+  # The build stage can be purged with `spack clean --stage` and
+  # `spack clean -a`, so it is important that the specified directory uniquely
+  # identifies Spack staging to avoid accidentally wiping out non-Spack work.
+  build_stage:
+  - $tempdir/$user/spack-stage
+  - $user_cache_path/stage
+  # - $spack/var/spack/stage
+
+  # Directory in which to run tests and store test results.
+  # Tests will be stored in directories named by date/time and package
+  # name/hash.
+  test_stage: $user_cache_path/test
+  source_cache: $spack/var/spack/cache
+  misc_cache: $user_cache_path/cache
+  connect_timeout: 10
+  verify_ssl: true
+  suppress_gpg_warnings: false
+  install_missing_compilers: false
+  checksum: true
+  deprecated: false
+  dirty: false
+  build_language: C
+  locks: true
+  url_fetch_method: urllib
+  ccache: false
+  concretizer: clingo
+  db_lock_timeout: 3
+  package_lock_timeout: null
+  shared_linking: rpath
+  allow_sgid: true
+  terminal_title: false
+  debug: false
+  build_jobs: 10
+mirrors:
+  spack-public: https://mirror.spack.io
+modules:
+  default:
+    'enable:':
+    - lmod
+    lmod:
+      core_compilers:
+      - gcc@8.5.0
+      hierarchy:
+      - mpi
+      hash_length: 0
+      blacklist_implicits: true
+      whitelist: [py-jupyter-core]
+      naming_scheme: '{name}/{version}/{hash:7}'
+      projections:
+        all: '{name}/{version}/{hash:7}'
+      all:
+        suffixes:
+          +openmp: omp
+          threads=openmp: omp
+          +ipl64: i64
+        environment:
+          set:
+            '{name}HOME': '{prefix}'
+      cuda:
+        environment:
+          prepend_path:
+            PATH: /cm/local/apps/cuda/libs/current/bin
+            LD_LIBRARY_PATH: /cm/local/apps/cuda/libs/current/lib64
+          set:
+            CUDATOOLKIT_HOME: /cm/local/apps/cuda
+      intel:
+        environment:
+          set:
+            INTEL_LICENSE_FILE: 40000@elprado.sdsc.edu:40200@elprado.sdsc.edu
+      petsc:
+        suffixes:
+          +complex: cmplx
+      slepc:
+        suffixes:
+          ^petsc +complex: cmplx
+      ^cuda:
+        autoload: direct
+      ^python:
+        autoload: direct
+      ^ucx:
+        autoload: direct
+  prefix_inspections:
+    lib:
+    - LD_LIBRARY_PATH
+    lib64:
+    - LD_LIBRARY_PATH
+    bin:
+    - PATH
+    man:
+    - MANPATH
+    share/man:
+    - MANPATH
+    share/aclocal:
+    - ACLOCAL_PATH
+    lib/pkgconfig:
+    - PKG_CONFIG_PATH
+    lib64/pkgconfig:
+    - PKG_CONFIG_PATH
+    share/pkgconfig:
+    - PKG_CONFIG_PATH
+    ? ''
+    : - CMAKE_PREFIX_PATH
+
+  # These are configurations for the module set named "default"
+packages:
+  lmod:
+    externals:
+    - spec: lmod@8.2.4
+      prefix: /usr
+    buildable: false
+  lustre:
+    externals:
+    - spec: lustre@2.15.2
+      prefix: /usr
+    buildable: false
+  openssl:
+    externals:
+    - spec: openssl@1.1.1k
+      prefix: /usr
+    buildable: false
+  rdma-core:
+    externals:
+    - spec: rdma-core@43.0
+      prefix: /usr
+    buildable: false
+  slurm:
+    externals:
+    - spec: slurm@21.08.8
+      prefix: /cm/shared/apps/slurm/21.08.8
+    buildable: false
+  librsvg:
+    externals:
+    - spec: librsvg@2.42.7
+      prefix: /usr
+    buildable: false
+  ghostscript:
+    externals:
+    - spec: ghostscript@9.27
+      prefix: /usr
+    buildable: false
+  gaussian:
+    permissions:
+      read: group
+      group: gaussian
+  vasp6:
+    permissions:
+      read: group
+      group: vasp-6
+  all:
+    compiler: [gcc, intel, pgi, clang, xl, nag, fj, aocc]
+    providers:
+      awk: [gawk]
+      blas: [openblas, amdblis]
+      D: [ldc]
+      daal: [intel-daal]
+      elf: [elfutils]
+      fftw-api: [fftw, amdfftw]
+      flame: [libflame, amdlibflame]
+      fuse: [libfuse]
+      gl: [mesa+opengl, mesa18, opengl]
+      glu: [mesa-glu, openglu]
+      glx: [mesa+glx, mesa18+glx, opengl]
+      golang: [gcc]
+      iconv: [libiconv]
+      ipp: [intel-ipp]
+      java: [openjdk, jdk, ibm-java]
+      jpeg: [libjpeg-turbo, libjpeg]
+      lapack: [openblas, amdlibflame]
+      lua-lang: [lua, lua-luajit]
+      mariadb-client: [mariadb-c-client, mariadb]
+      mkl: [intel-mkl]
+      mpe: [mpe2]
+      mpi: [openmpi, mpich]
+      mysql-client: [mysql, mariadb-c-client]
+      opencl: [pocl]
+      onedal: [intel-oneapi-dal]
+      osmesa: [mesa+osmesa, mesa18+osmesa]
+      pbs: [openpbs, torque]
+      pil: [py-pillow]
+      pkgconfig: [pkgconf, pkg-config]
+      rpc: [libtirpc]
+      scalapack: [netlib-scalapack, amdscalapack]
+      sycl: [hipsycl]
+      szip: [libaec, libszip]
+      tbb: [intel-tbb]
+      unwind: [libunwind]
+      uuid: [util-linux-uuid, libuuid]
+      xxd: [xxd-standalone, vim]
+      yacc: [bison, byacc]
+      ziglang: [zig]
+    permissions:
+      read: world
+      write: user
+repos:
+- $spack/var/spack/repos/sdsc
+- $spack/var/spack/repos/builtin
+upstreams: {}
+Input spec
+--------------------------------
+[    ]  .kokkos@3.4.01%gcc@8.4.0~aggressive_vectorization~compiler_warnings+cuda+cuda_constexpr+cuda_lambda+cuda_ldg_intrinsic~cuda_relocatable_device_code~cuda_uvm~debug~debug_bounds_check~debug_dualview_modify_check~deprecated_code~examples~explicit_instantiation~hpx~hpx_async_dispatch~hwloc~ipo~memkind~numactl~openmp+pic+profiling~profiling_load_print~pthread~qthread~rocm+serial+shared~sycl~tests~tuning+wrapper cuda_arch=70
+[    ]      ^sdsc.openmpi@4.1.3%gcc@8.4.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~atomics+cuda~cxx~cxx_exceptions~gpfs~internal-hwloc~java+legacylaunchers+lustre~memchecker+pmi+pmix+romio~rsh~singularity+static+vt+wrapper-rpath cuda_arch=70 fabrics=ucx schedulers=slurm arch=linux-rocky8-skylake_avx512
+[bl  ]          ^builtin.cuda@10.2.89%gcc@8.4.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~dev arch=linux-rocky8-skylake_avx512
+[bl  ]              ^builtin.libxml2@2.9.12%gcc@8.4.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~python arch=linux-rocky8-skylake_avx512
+[bl  ]                  ^builtin.libiconv@1.16%gcc@8.4.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  libs=shared,static arch=linux-rocky8-skylake_avx512
+[bl  ]                  ^builtin.xz@5.2.5%gcc@8.4.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~pic libs=shared,static arch=linux-rocky8-skylake_avx512
+[bl  ]                  ^builtin.zlib@1.2.11%gcc@8.4.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +optimize+pic+shared arch=linux-rocky8-skylake_avx512
+[bl  ]          ^builtin.hwloc@2.6.0%gcc@8.4.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~cairo+cuda~gl~libudev+libxml2~netloc~nvml~opencl+pci~rocm+shared arch=linux-rocky8-skylake_avx512
+[bl  ]              ^builtin.libpciaccess@0.16%gcc@8.4.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-skylake_avx512
+[bl  ]              ^builtin.ncurses@6.2%gcc@8.4.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~symlinks+termlib abi=none arch=linux-rocky8-skylake_avx512
+[bl  ]          ^builtin.libevent@2.1.8%gcc@8.4.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +openssl arch=linux-rocky8-skylake_avx512
+[bl  ]              ^builtin.openssl@1.1.1k%gcc@8.4.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~docs certs=system arch=linux-rocky8-skylake_avx512
+[bl  ]          ^builtin.lustre@2.15.2%gcc@8.4.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-skylake_avx512
+[bl  ]          ^builtin.numactl@2.0.14%gcc@8.4.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  patches=4e1d78cbbb85de625bad28705e748856033eaafab92a66dffd383a3d7e00cc94,62fc8a8bf7665a60e8f4c93ebbd535647cebf74198f7afafec4c085a8825c006,ff37630df599cfabf0740518b91ec8daaf18e8f288b19adaae5364dc1f6b2296 arch=linux-rocky8-skylake_avx512
+[bl  ]          ^builtin.pmix@3.2.1%gcc@8.4.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~docs+pmi_backwards_compatibility~restful arch=linux-rocky8-skylake_avx512
+[bl  ]          ^builtin.slurm@21.08.8%gcc@8.4.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~gtk~hdf5~hwloc~mariadb~pmix+readline~restd sysconfdir=PREFIX/etc arch=linux-rocky8-skylake_avx512
+[bl  ]          ^builtin.ucx@1.10.1%gcc@8.4.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~assertions~cm+cma+cuda+dc~debug+dm+gdrcopy+ib-hw-tm~java~knem~logging+mlx5-dv+optimizations~parameter_checking+pic+rc~rocm+thread_multiple+ud~xpmem cuda_arch=70 arch=linux-rocky8-skylake_avx512
+[bl  ]              ^builtin.gdrcopy@2.2%gcc@8.4.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-skylake_avx512
+[bl  ]              ^builtin.rdma-core@43.0%gcc@8.4.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~ipo build_type=RelWithDebInfo arch=linux-rocky8-skylake_avx512
+
+Concretized
+--------------------------------
+jh4pw54  [    ]  builtin.kokkos@3.4.01%gcc@8.4.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~aggressive_vectorization~compiler_warnings+cuda+cuda_constexpr+cuda_lambda+cuda_ldg_intrinsic~cuda_relocatable_device_code~cuda_uvm~debug~debug_bounds_check~debug_dualview_modify_check~deprecated_code~examples~explicit_instantiation~hpx~hpx_async_dispatch~hwloc~ipo~memkind~numactl~openmp+pic+profiling~profiling_load_print~pthread~qthread~rocm+serial+shared~sycl~tests~tuning+wrapper amdgpu_target=none build_type=RelWithDebInfo cuda_arch=70 std=14 arch=linux-rocky8-skylake_avx512
+p4inphz  [b   ]      ^builtin.cmake@3.21.4%gcc@8.4.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~doc+ncurses+openssl+ownlibs~qt build_type=Release arch=linux-rocky8-skylake_avx512
+fj4m6bg  [bl  ]          ^builtin.ncurses@6.2%gcc@8.4.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~symlinks+termlib abi=none arch=linux-rocky8-skylake_avx512
+um4do2r  [bl  ]          ^builtin.openssl@1.1.1k%gcc@8.4.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~docs certs=system arch=linux-rocky8-skylake_avx512
+yx5cxnu  [bl  ]      ^builtin.cuda@10.2.89%gcc@8.4.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~dev arch=linux-rocky8-skylake_avx512
+cctghrh  [bl  ]          ^builtin.libxml2@2.9.12%gcc@8.4.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~python arch=linux-rocky8-skylake_avx512
+ksynfmj  [bl  ]              ^builtin.libiconv@1.16%gcc@8.4.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  libs=shared,static arch=linux-rocky8-skylake_avx512
+udmvado  [bl  ]              ^builtin.xz@5.2.5%gcc@8.4.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~pic libs=shared,static arch=linux-rocky8-skylake_avx512
+7apv7tj  [bl  ]              ^builtin.zlib@1.2.11%gcc@8.4.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +optimize+pic+shared arch=linux-rocky8-skylake_avx512
+hxjlokx  [bl  ]      ^builtin.kokkos-nvcc-wrapper@3.2.00%gcc@8.4.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +mpi arch=linux-rocky8-skylake_avx512
+v2ei3ge  [bl  ]          ^sdsc.openmpi@4.1.3%gcc@8.4.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~atomics+cuda~cxx~cxx_exceptions~gpfs~internal-hwloc~java+legacylaunchers+lustre~memchecker+pmi+pmix+romio~rsh~singularity+static+vt+wrapper-rpath cuda_arch=70 fabrics=ucx schedulers=slurm arch=linux-rocky8-skylake_avx512
+7evhgqy  [bl  ]              ^builtin.hwloc@2.6.0%gcc@8.4.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~cairo+cuda~gl~libudev+libxml2~netloc~nvml~opencl+pci~rocm+shared arch=linux-rocky8-skylake_avx512
+dusortv  [bl  ]                  ^builtin.libpciaccess@0.16%gcc@8.4.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-skylake_avx512
+wgoayfz  [bl  ]              ^builtin.libevent@2.1.8%gcc@8.4.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +openssl arch=linux-rocky8-skylake_avx512
+dfynryt  [bl  ]              ^builtin.lustre@2.15.2%gcc@8.4.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-skylake_avx512
+gpjef7m  [bl  ]              ^builtin.numactl@2.0.14%gcc@8.4.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  patches=4e1d78cbbb85de625bad28705e748856033eaafab92a66dffd383a3d7e00cc94,62fc8a8bf7665a60e8f4c93ebbd535647cebf74198f7afafec4c085a8825c006,ff37630df599cfabf0740518b91ec8daaf18e8f288b19adaae5364dc1f6b2296 arch=linux-rocky8-skylake_avx512
+gl4mdry  [bl  ]              ^builtin.pmix@3.2.1%gcc@8.4.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~docs+pmi_backwards_compatibility~restful arch=linux-rocky8-skylake_avx512
+mctz53r  [bl  ]              ^builtin.slurm@21.08.8%gcc@8.4.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~gtk~hdf5~hwloc~mariadb~pmix+readline~restd sysconfdir=PREFIX/etc arch=linux-rocky8-skylake_avx512
+fkguskk  [bl  ]              ^builtin.ucx@1.10.1%gcc@8.4.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~assertions~cm+cma+cuda+dc~debug+dm+gdrcopy+ib-hw-tm~java~knem~logging+mlx5-dv+optimizations~parameter_checking+pic+rc~rocm+thread_multiple+ud~xpmem cuda_arch=70 arch=linux-rocky8-skylake_avx512
+ntvmzwk  [bl  ]                  ^builtin.gdrcopy@2.2%gcc@8.4.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-skylake_avx512
+53wlz3i  [bl  ]                  ^builtin.rdma-core@43.0%gcc@8.4.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~ipo build_type=RelWithDebInfo arch=linux-rocky8-skylake_avx512
+
+real 9.73
+user 8.15
+sys 0.31
+[+] /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/ncurses-6.2-fj4m6bg5rcjf5xx4nl426quz4qeu6vwm
+[+] /usr (external openssl-1.1.1k-um4do2r7m3okrzyrxlp7svwk4jfvtbka)
+[+] /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/libiconv-1.16-ksynfmj62hxmn4gt7vrei2ajttoet2v3
+[+] /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/xz-5.2.5-udmvadouapmhsbtoyf7audxqioiima57
+[+] /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/zlib-1.2.11-7apv7tjol3qvvn5dhh6kkjkzzyg2lne4
+[+] /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/libpciaccess-0.16-dusortvlyncnywznumtk56r65k372j6k
+[+] /usr (external lustre-2.15.2-dfynryttdx77mu5p5rtgo4k6dmozdluo)
+[+] /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/numactl-2.0.14-gpjef7mgabgbpwwilm7dcxnfnerfdede
+[+] /cm/shared/apps/slurm/21.08.8 (external slurm-21.08.8-mctz53rfz7cnvbqeqgdjtcbkkislfdyt)
+[+] /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/gdrcopy-2.2-ntvmzwkqmyds5svbzwz6t3iebysjvimd
+[+] /usr (external rdma-core-43.0-53wlz3izizwqwczkzielutaltkmdk3zg)
+[+] /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/libevent-2.1.8-wgoayfz2ekr5kmb3vxi5f44kh5xevzt5
+[+] /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/cmake-3.21.4-p4inphzga2e5cgbq3aqsewobxcgkqqyo
+[+] /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/libxml2-2.9.12-cctghrh2wb36eg5clkrfjtsmmcr57iyh
+[+] /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/cuda-10.2.89-yx5cxnumts5as2ldjgtbd7qph32shgdp
+[+] /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/hwloc-2.6.0-7evhgqyi6g3554fsza5qdau67eftcjbk
+[+] /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/ucx-1.10.1-fkguskkwm232lydkjbb3zxksdvivqs3q
+[+] /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/pmix-3.2.1-gl4mdrya5lgnaelpa24fuafpgdqpf5tg
+[+] /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/openmpi-4.1.3-v2ei3gevopnyr3jdn5bxhz4rvysipbdy
+==> Installing kokkos-nvcc-wrapper-3.2.00-hxjlokxwwp6gbm5w7fpnqvoiiiumpr5y
+==> No binary for kokkos-nvcc-wrapper-3.2.00-hxjlokxwwp6gbm5w7fpnqvoiiiumpr5y found: installing from source
+==> Warning: Expected user 527835 to own /scratch/spack_gpu, but it is owned by 0
+==> Fetching https://mirror.spack.io/_source-cache/archive/05/05e1b4dd1ef383ca56fe577913e1ff31614764e65de6d6f2a163b2bddb60b3e9.tar.gz
+==> No patches needed for kokkos-nvcc-wrapper
+==> kokkos-nvcc-wrapper: Executing phase: 'install'
+==> [2023-09-21-14:23:14.365178] Installing bin/nvcc_wrapper to /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-nvcc-wrapper-3.2.00-hxjlokxwwp6gbm5w7fpnqvoiiiumpr5y/bin
+==> kokkos-nvcc-wrapper: Successfully installed kokkos-nvcc-wrapper-3.2.00-hxjlokxwwp6gbm5w7fpnqvoiiiumpr5y
+  Fetch: 0.67s.  Build: 0.17s.  Total: 0.84s.
+[+] /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-nvcc-wrapper-3.2.00-hxjlokxwwp6gbm5w7fpnqvoiiiumpr5y
+==> Installing kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj
+==> No binary for kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj found: installing from source
+==> Fetching https://mirror.spack.io/_source-cache/archive/14/146d5e233228e75ef59ca497e8f5872d9b272cb93e8e9cdfe05ad34a23f483d1.tar.gz
+==> No patches needed for kokkos
+==> kokkos: Executing phase: 'cmake'
+==> [2023-09-21-14:23:16.299208] 'cmake' '-G' 'Unix Makefiles' '-DCMAKE_INSTALL_PREFIX:STRING=/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj' '-DCMAKE_BUILD_TYPE:STRING=RelWithDebInfo' '-DCMAKE_INTERPROCEDURAL_OPTIMIZATION:BOOL=OFF' '-DCMAKE_VERBOSE_MAKEFILE:BOOL=ON' '-DCMAKE_INSTALL_RPATH_USE_LINK_PATH:BOOL=OFF' '-DCMAKE_INSTALL_RPATH:STRING=/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/lib;/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/lib64;/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/libxml2-2.9.12-cctghrh2wb36eg5clkrfjtsmmcr57iyh/lib;/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/libiconv-1.16-ksynfmj62hxmn4gt7vrei2ajttoet2v3/lib;/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/xz-5.2.5-udmvadouapmhsbtoyf7audxqioiima57/lib;/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/zlib-1.2.11-7apv7tjol3qvvn5dhh6kkjkzzyg2lne4/lib;/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/openmpi-4.1.3-v2ei3gevopnyr3jdn5bxhz4rvysipbdy/lib;/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/hwloc-2.6.0-7evhgqyi6g3554fsza5qdau67eftcjbk/lib;/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/libpciaccess-0.16-dusortvlyncnywznumtk56r65k372j6k/lib;/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/ncurses-6.2-fj4m6bg5rcjf5xx4nl426quz4qeu6vwm/lib;/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/libevent-2.1.8-wgoayfz2ekr5kmb3vxi5f44kh5xevzt5/lib;/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/numactl-2.0.14-gpjef7mgabgbpwwilm7dcxnfnerfdede/lib;/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/pmix-3.2.1-gl4mdrya5lgnaelpa24fuafpgdqpf5tg/lib;/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/ucx-1.10.1-fkguskkwm232lydkjbb3zxksdvivqs3q/lib;/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/gdrcopy-2.2-ntvmzwkqmyds5svbzwz6t3iebysjvimd/lib;/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/cuda-10.2.89-yx5cxnumts5as2ldjgtbd7qph32shgdp/lib64;/cm/shared/apps/slurm/21.08.8/lib64;/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/gdrcopy-2.2-ntvmzwkqmyds5svbzwz6t3iebysjvimd/lib64' '-DCMAKE_PREFIX_PATH:STRING=/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-nvcc-wrapper-3.2.00-hxjlokxwwp6gbm5w7fpnqvoiiiumpr5y;/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/openmpi-4.1.3-v2ei3gevopnyr3jdn5bxhz4rvysipbdy;/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/ucx-1.10.1-fkguskkwm232lydkjbb3zxksdvivqs3q;/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/gdrcopy-2.2-ntvmzwkqmyds5svbzwz6t3iebysjvimd;/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/pmix-3.2.1-gl4mdrya5lgnaelpa24fuafpgdqpf5tg;/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/numactl-2.0.14-gpjef7mgabgbpwwilm7dcxnfnerfdede;/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/libevent-2.1.8-wgoayfz2ekr5kmb3vxi5f44kh5xevzt5;/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/hwloc-2.6.0-7evhgqyi6g3554fsza5qdau67eftcjbk;/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/libpciaccess-0.16-dusortvlyncnywznumtk56r65k372j6k;/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/cuda-10.2.89-yx5cxnumts5as2ldjgtbd7qph32shgdp;/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/libxml2-2.9.12-cctghrh2wb36eg5clkrfjtsmmcr57iyh;/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/zlib-1.2.11-7apv7tjol3qvvn5dhh6kkjkzzyg2lne4;/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/xz-5.2.5-udmvadouapmhsbtoyf7audxqioiima57;/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/libiconv-1.16-ksynfmj62hxmn4gt7vrei2ajttoet2v3;/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/cmake-3.21.4-p4inphzga2e5cgbq3aqsewobxcgkqqyo;/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/ncurses-6.2-fj4m6bg5rcjf5xx4nl426quz4qeu6vwm;/cm/shared/apps/slurm/21.08.8' '-DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=ON' '-DKokkos_CXX_STANDARD:STRING=14' '-DBUILD_SHARED_LIBS:BOOL=ON' '-DKokkos_ARCH_VOLTA70:BOOL=ON' '-DKokkos_ARCH_SKX:BOOL=ON' '-DKokkos_ENABLE_CUDA:BOOL=ON' '-DKokkos_ENABLE_OPENMP:BOOL=OFF' '-DKokkos_ENABLE_PTHREAD:BOOL=OFF' '-DKokkos_ENABLE_SERIAL:BOOL=ON' '-DKokkos_ENABLE_HIP:BOOL=OFF' '-DKokkos_ENABLE_SYCL:BOOL=OFF' '-DKokkos_ENABLE_AGGRESSIVE_VECTORIZATION:BOOL=OFF' '-DKokkos_ENABLE_COMPILER_WARNINGS:BOOL=OFF' '-DKokkos_ENABLE_CUDA_CONSTEXPR:BOOL=ON' '-DKokkos_ENABLE_CUDA_LAMBDA:BOOL=ON' '-DKokkos_ENABLE_CUDA_LDG_INTRINSIC:BOOL=ON' '-DKokkos_ENABLE_CUDA_RELOCATABLE_DEVICE_CODE:BOOL=OFF' '-DKokkos_ENABLE_CUDA_UVM:BOOL=OFF' '-DKokkos_ENABLE_DEBUG:BOOL=OFF' '-DKokkos_ENABLE_DEBUG_BOUNDS_CHECK:BOOL=OFF' '-DKokkos_ENABLE_DEBUG_DUALVIEW_MODIFY_CHECK:BOOL=OFF' '-DKokkos_ENABLE_DEPRECATED_CODE:BOOL=OFF' '-DKokkos_ENABLE_EXAMPLES:BOOL=OFF' '-DKokkos_ENABLE_EXPLICIT_INSTANTIATION:BOOL=OFF' '-DKokkos_ENABLE_HPX_ASYNC_DISPATCH:BOOL=OFF' '-DKokkos_ENABLE_PROFILING:BOOL=ON' '-DKokkos_ENABLE_TUNING:BOOL=OFF' '-DKokkos_ENABLE_PROFILING_LOAD_PRINT:BOOL=OFF' '-DKokkos_ENABLE_QTHREAD:BOOL=OFF' '-DKokkos_ENABLE_TESTS:BOOL=OFF' '-DKokkos_ENABLE_HPX:BOOL=OFF' '-DKokkos_ENABLE_HWLOC:BOOL=OFF' '-DKokkos_ENABLE_NUMACTL:BOOL=OFF' '-DKokkos_ENABLE_MEMKIND:BOOL=OFF' '-DCMAKE_CXX_COMPILER:STRING=/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-nvcc-wrapper-3.2.00-hxjlokxwwp6gbm5w7fpnqvoiiiumpr5y/bin/nvcc_wrapper' '/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-src'
+-- The CXX compiler identification is GNU 8.4.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-nvcc-wrapper-3.2.00-hxjlokxwwp6gbm5w7fpnqvoiiiumpr5y/bin/nvcc_wrapper - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Setting policy CMP0074 to use <Package>_ROOT variables
+-- The project name is: Kokkos
+-- Compiler Version: 10.2.89
+-- Using -std=c++14 for C++14 standard as feature
+-- Built-in Execution Spaces:
+--     Device Parallel: Kokkos::Cuda
+--     Host Parallel: NoTypeDefined
+--       Host Serial: SERIAL
+-- 
+-- Architectures:
+--  SKX
+--  VOLTA70
+-- Found CUDAToolkit: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/cuda-10.2.89-yx5cxnumts5as2ldjgtbd7qph32shgdp/include (found version "10.2.89") 
+-- Looking for C++ include pthread.h
+-- Looking for C++ include pthread.h - found
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE  
+-- Found TPLCUDA: TRUE  
+-- Found TPLLIBDL: /usr/lib64/libdl.so  
+-- Kokkos Devices: CUDA;SERIAL, Kokkos Backends: CUDA;SERIAL
+-- Configuring done
+-- Generating done
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    Kokkos_ENABLE_DEPRECATED_CODE
+    Kokkos_ENABLE_EXPLICIT_INSTANTIATION
+    Kokkos_ENABLE_NUMACTL
+    Kokkos_ENABLE_PROFILING
+    Kokkos_ENABLE_QTHREAD
+
+
+-- Build files have been written to: /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54
+==> kokkos: Executing phase: 'build'
+==> [2023-09-21-14:23:20.072342] 'make' '-j10'
+/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/cmake-3.21.4-p4inphzga2e5cgbq3aqsewobxcgkqqyo/bin/cmake -S/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-src -B/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54 --check-build-system CMakeFiles/Makefile.cmake 0
+/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/cmake-3.21.4-p4inphzga2e5cgbq3aqsewobxcgkqqyo/bin/cmake -E cmake_progress_start /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54/CMakeFiles /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54//CMakeFiles/progress.marks
+make  -f CMakeFiles/Makefile2 all
+make[1]: Entering directory '/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54'
+make  -f core/src/CMakeFiles/kokkoscore.dir/build.make core/src/CMakeFiles/kokkoscore.dir/depend
+make[2]: Entering directory '/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54'
+cd /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54 && /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/cmake-3.21.4-p4inphzga2e5cgbq3aqsewobxcgkqqyo/bin/cmake -E cmake_depends "Unix Makefiles" /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-src /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-src/core/src /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54 /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54/core/src /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54/core/src/CMakeFiles/kokkoscore.dir/DependInfo.cmake --color=
+make[2]: Leaving directory '/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54'
+make  -f core/src/CMakeFiles/kokkoscore.dir/build.make core/src/CMakeFiles/kokkoscore.dir/build
+make[2]: Entering directory '/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54'
+[  4%] Building CXX object core/src/CMakeFiles/kokkoscore.dir/impl/Kokkos_CPUDiscovery.cpp.o
+cd /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54/core/src && /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-nvcc-wrapper-3.2.00-hxjlokxwwp6gbm5w7fpnqvoiiiumpr5y/bin/nvcc_wrapper -DKOKKOS_DEPENDENCE -Dkokkoscore_EXPORTS -I/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54/core/src -I/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-src/core/src -I/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54 -O2 -g -DNDEBUG -fPIC -march=skylake-avx512 -mtune=skylake-avx512 -mrtm -expt-extended-lambda -expt-relaxed-constexpr -arch=sm_70 -std=c++14 -MD -MT core/src/CMakeFiles/kokkoscore.dir/impl/Kokkos_CPUDiscovery.cpp.o -MF CMakeFiles/kokkoscore.dir/impl/Kokkos_CPUDiscovery.cpp.o.d -o CMakeFiles/kokkoscore.dir/impl/Kokkos_CPUDiscovery.cpp.o -c /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-src/core/src/impl/Kokkos_CPUDiscovery.cpp
+[  8%] Building CXX object core/src/CMakeFiles/kokkoscore.dir/impl/Kokkos_Core.cpp.o
+cd /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54/core/src && /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-nvcc-wrapper-3.2.00-hxjlokxwwp6gbm5w7fpnqvoiiiumpr5y/bin/nvcc_wrapper -DKOKKOS_DEPENDENCE -Dkokkoscore_EXPORTS -I/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54/core/src -I/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-src/core/src -I/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54 -O2 -g -DNDEBUG -fPIC -march=skylake-avx512 -mtune=skylake-avx512 -mrtm -expt-extended-lambda -expt-relaxed-constexpr -arch=sm_70 -std=c++14 -MD -MT core/src/CMakeFiles/kokkoscore.dir/impl/Kokkos_Core.cpp.o -MF CMakeFiles/kokkoscore.dir/impl/Kokkos_Core.cpp.o.d -o CMakeFiles/kokkoscore.dir/impl/Kokkos_Core.cpp.o -c /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-src/core/src/impl/Kokkos_Core.cpp
+[ 12%] Building CXX object core/src/CMakeFiles/kokkoscore.dir/impl/Kokkos_Error.cpp.o
+cd /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54/core/src && /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-nvcc-wrapper-3.2.00-hxjlokxwwp6gbm5w7fpnqvoiiiumpr5y/bin/nvcc_wrapper -DKOKKOS_DEPENDENCE -Dkokkoscore_EXPORTS -I/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54/core/src -I/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-src/core/src -I/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54 -O2 -g -DNDEBUG -fPIC -march=skylake-avx512 -mtune=skylake-avx512 -mrtm -expt-extended-lambda -expt-relaxed-constexpr -arch=sm_70 -std=c++14 -MD -MT core/src/CMakeFiles/kokkoscore.dir/impl/Kokkos_Error.cpp.o -MF CMakeFiles/kokkoscore.dir/impl/Kokkos_Error.cpp.o.d -o CMakeFiles/kokkoscore.dir/impl/Kokkos_Error.cpp.o -c /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-src/core/src/impl/Kokkos_Error.cpp
+[ 16%] Building CXX object core/src/CMakeFiles/kokkoscore.dir/impl/Kokkos_ExecPolicy.cpp.o
+cd /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54/core/src && /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-nvcc-wrapper-3.2.00-hxjlokxwwp6gbm5w7fpnqvoiiiumpr5y/bin/nvcc_wrapper -DKOKKOS_DEPENDENCE -Dkokkoscore_EXPORTS -I/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54/core/src -I/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-src/core/src -I/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54 -O2 -g -DNDEBUG -fPIC -march=skylake-avx512 -mtune=skylake-avx512 -mrtm -expt-extended-lambda -expt-relaxed-constexpr -arch=sm_70 -std=c++14 -MD -MT core/src/CMakeFiles/kokkoscore.dir/impl/Kokkos_ExecPolicy.cpp.o -MF CMakeFiles/kokkoscore.dir/impl/Kokkos_ExecPolicy.cpp.o.d -o CMakeFiles/kokkoscore.dir/impl/Kokkos_ExecPolicy.cpp.o -c /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-src/core/src/impl/Kokkos_ExecPolicy.cpp
+[ 20%] Building CXX object core/src/CMakeFiles/kokkoscore.dir/impl/Kokkos_HostBarrier.cpp.o
+[ 24%] Building CXX object core/src/CMakeFiles/kokkoscore.dir/impl/Kokkos_HostSpace.cpp.o
+[ 28%] Building CXX object core/src/CMakeFiles/kokkoscore.dir/impl/Kokkos_HostSpace_deepcopy.cpp.o
+[ 32%] Building CXX object core/src/CMakeFiles/kokkoscore.dir/impl/Kokkos_HostThreadTeam.cpp.o
+[ 40%] Building CXX object core/src/CMakeFiles/kokkoscore.dir/impl/Kokkos_MemoryPool.cpp.o
+[ 40%] Building CXX object core/src/CMakeFiles/kokkoscore.dir/impl/Kokkos_MemorySpace.cpp.o
+cd /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54/core/src && /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-nvcc-wrapper-3.2.00-hxjlokxwwp6gbm5w7fpnqvoiiiumpr5y/bin/nvcc_wrapper -DKOKKOS_DEPENDENCE -Dkokkoscore_EXPORTS -I/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54/core/src -I/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-src/core/src -I/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54 -O2 -g -DNDEBUG -fPIC -march=skylake-avx512 -mtune=skylake-avx512 -mrtm -expt-extended-lambda -expt-relaxed-constexpr -arch=sm_70 -std=c++14 -MD -MT core/src/CMakeFiles/kokkoscore.dir/impl/Kokkos_HostBarrier.cpp.o -MF CMakeFiles/kokkoscore.dir/impl/Kokkos_HostBarrier.cpp.o.d -o CMakeFiles/kokkoscore.dir/impl/Kokkos_HostBarrier.cpp.o -c /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-src/core/src/impl/Kokkos_HostBarrier.cpp
+cd /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54/core/src && /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-nvcc-wrapper-3.2.00-hxjlokxwwp6gbm5w7fpnqvoiiiumpr5y/bin/nvcc_wrapper -DKOKKOS_DEPENDENCE -Dkokkoscore_EXPORTS -I/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54/core/src -I/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-src/core/src -I/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54 -O2 -g -DNDEBUG -fPIC -march=skylake-avx512 -mtune=skylake-avx512 -mrtm -expt-extended-lambda -expt-relaxed-constexpr -arch=sm_70 -std=c++14 -MD -MT core/src/CMakeFiles/kokkoscore.dir/impl/Kokkos_HostSpace.cpp.o -MF CMakeFiles/kokkoscore.dir/impl/Kokkos_HostSpace.cpp.o.d -o CMakeFiles/kokkoscore.dir/impl/Kokkos_HostSpace.cpp.o -c /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-src/core/src/impl/Kokkos_HostSpace.cpp
+cd /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54/core/src && /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-nvcc-wrapper-3.2.00-hxjlokxwwp6gbm5w7fpnqvoiiiumpr5y/bin/nvcc_wrapper -DKOKKOS_DEPENDENCE -Dkokkoscore_EXPORTS -I/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54/core/src -I/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-src/core/src -I/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54 -O2 -g -DNDEBUG -fPIC -march=skylake-avx512 -mtune=skylake-avx512 -mrtm -expt-extended-lambda -expt-relaxed-constexpr -arch=sm_70 -std=c++14 -MD -MT core/src/CMakeFiles/kokkoscore.dir/impl/Kokkos_HostSpace_deepcopy.cpp.o -MF CMakeFiles/kokkoscore.dir/impl/Kokkos_HostSpace_deepcopy.cpp.o.d -o CMakeFiles/kokkoscore.dir/impl/Kokkos_HostSpace_deepcopy.cpp.o -c /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-src/core/src/impl/Kokkos_HostSpace_deepcopy.cpp
+cd /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54/core/src && /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-nvcc-wrapper-3.2.00-hxjlokxwwp6gbm5w7fpnqvoiiiumpr5y/bin/nvcc_wrapper -DKOKKOS_DEPENDENCE -Dkokkoscore_EXPORTS -I/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54/core/src -I/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-src/core/src -I/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54 -O2 -g -DNDEBUG -fPIC -march=skylake-avx512 -mtune=skylake-avx512 -mrtm -expt-extended-lambda -expt-relaxed-constexpr -arch=sm_70 -std=c++14 -MD -MT core/src/CMakeFiles/kokkoscore.dir/impl/Kokkos_HostThreadTeam.cpp.o -MF CMakeFiles/kokkoscore.dir/impl/Kokkos_HostThreadTeam.cpp.o.d -o CMakeFiles/kokkoscore.dir/impl/Kokkos_HostThreadTeam.cpp.o -c /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-src/core/src/impl/Kokkos_HostThreadTeam.cpp
+cd /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54/core/src && /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-nvcc-wrapper-3.2.00-hxjlokxwwp6gbm5w7fpnqvoiiiumpr5y/bin/nvcc_wrapper -DKOKKOS_DEPENDENCE -Dkokkoscore_EXPORTS -I/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54/core/src -I/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-src/core/src -I/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54 -O2 -g -DNDEBUG -fPIC -march=skylake-avx512 -mtune=skylake-avx512 -mrtm -expt-extended-lambda -expt-relaxed-constexpr -arch=sm_70 -std=c++14 -MD -MT core/src/CMakeFiles/kokkoscore.dir/impl/Kokkos_MemoryPool.cpp.o -MF CMakeFiles/kokkoscore.dir/impl/Kokkos_MemoryPool.cpp.o.d -o CMakeFiles/kokkoscore.dir/impl/Kokkos_MemoryPool.cpp.o -c /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-src/core/src/impl/Kokkos_MemoryPool.cpp
+cd /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54/core/src && /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-nvcc-wrapper-3.2.00-hxjlokxwwp6gbm5w7fpnqvoiiiumpr5y/bin/nvcc_wrapper -DKOKKOS_DEPENDENCE -Dkokkoscore_EXPORTS -I/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54/core/src -I/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-src/core/src -I/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54 -O2 -g -DNDEBUG -fPIC -march=skylake-avx512 -mtune=skylake-avx512 -mrtm -expt-extended-lambda -expt-relaxed-constexpr -arch=sm_70 -std=c++14 -MD -MT core/src/CMakeFiles/kokkoscore.dir/impl/Kokkos_MemorySpace.cpp.o -MF CMakeFiles/kokkoscore.dir/impl/Kokkos_MemorySpace.cpp.o.d -o CMakeFiles/kokkoscore.dir/impl/Kokkos_MemorySpace.cpp.o -c /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-src/core/src/impl/Kokkos_MemorySpace.cpp
+[ 44%] Building CXX object core/src/CMakeFiles/kokkoscore.dir/impl/Kokkos_NumericTraits.cpp.o
+cd /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54/core/src && /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-nvcc-wrapper-3.2.00-hxjlokxwwp6gbm5w7fpnqvoiiiumpr5y/bin/nvcc_wrapper -DKOKKOS_DEPENDENCE -Dkokkoscore_EXPORTS -I/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54/core/src -I/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-src/core/src -I/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54 -O2 -g -DNDEBUG -fPIC -march=skylake-avx512 -mtune=skylake-avx512 -mrtm -expt-extended-lambda -expt-relaxed-constexpr -arch=sm_70 -std=c++14 -MD -MT core/src/CMakeFiles/kokkoscore.dir/impl/Kokkos_NumericTraits.cpp.o -MF CMakeFiles/kokkoscore.dir/impl/Kokkos_NumericTraits.cpp.o.d -o CMakeFiles/kokkoscore.dir/impl/Kokkos_NumericTraits.cpp.o -c /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-src/core/src/impl/Kokkos_NumericTraits.cpp
+[ 48%] Building CXX object core/src/CMakeFiles/kokkoscore.dir/impl/Kokkos_Profiling.cpp.o
+cd /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54/core/src && /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-nvcc-wrapper-3.2.00-hxjlokxwwp6gbm5w7fpnqvoiiiumpr5y/bin/nvcc_wrapper -DKOKKOS_DEPENDENCE -Dkokkoscore_EXPORTS -I/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54/core/src -I/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-src/core/src -I/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54 -O2 -g -DNDEBUG -fPIC -march=skylake-avx512 -mtune=skylake-avx512 -mrtm -expt-extended-lambda -expt-relaxed-constexpr -arch=sm_70 -std=c++14 -MD -MT core/src/CMakeFiles/kokkoscore.dir/impl/Kokkos_Profiling.cpp.o -MF CMakeFiles/kokkoscore.dir/impl/Kokkos_Profiling.cpp.o.d -o CMakeFiles/kokkoscore.dir/impl/Kokkos_Profiling.cpp.o -c /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-src/core/src/impl/Kokkos_Profiling.cpp
+[ 52%] Building CXX object core/src/CMakeFiles/kokkoscore.dir/impl/Kokkos_Serial.cpp.o
+cd /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54/core/src && /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-nvcc-wrapper-3.2.00-hxjlokxwwp6gbm5w7fpnqvoiiiumpr5y/bin/nvcc_wrapper -DKOKKOS_DEPENDENCE -Dkokkoscore_EXPORTS -I/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54/core/src -I/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-src/core/src -I/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54 -O2 -g -DNDEBUG -fPIC -march=skylake-avx512 -mtune=skylake-avx512 -mrtm -expt-extended-lambda -expt-relaxed-constexpr -arch=sm_70 -std=c++14 -MD -MT core/src/CMakeFiles/kokkoscore.dir/impl/Kokkos_Serial.cpp.o -MF CMakeFiles/kokkoscore.dir/impl/Kokkos_Serial.cpp.o.d -o CMakeFiles/kokkoscore.dir/impl/Kokkos_Serial.cpp.o -c /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-src/core/src/impl/Kokkos_Serial.cpp
+[ 56%] Building CXX object core/src/CMakeFiles/kokkoscore.dir/impl/Kokkos_Serial_Task.cpp.o
+cd /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54/core/src && /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-nvcc-wrapper-3.2.00-hxjlokxwwp6gbm5w7fpnqvoiiiumpr5y/bin/nvcc_wrapper -DKOKKOS_DEPENDENCE -Dkokkoscore_EXPORTS -I/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54/core/src -I/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-src/core/src -I/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54 -O2 -g -DNDEBUG -fPIC -march=skylake-avx512 -mtune=skylake-avx512 -mrtm -expt-extended-lambda -expt-relaxed-constexpr -arch=sm_70 -std=c++14 -MD -MT core/src/CMakeFiles/kokkoscore.dir/impl/Kokkos_Serial_Task.cpp.o -MF CMakeFiles/kokkoscore.dir/impl/Kokkos_Serial_Task.cpp.o.d -o CMakeFiles/kokkoscore.dir/impl/Kokkos_Serial_Task.cpp.o -c /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-src/core/src/impl/Kokkos_Serial_Task.cpp
+[ 60%] Building CXX object core/src/CMakeFiles/kokkoscore.dir/impl/Kokkos_SharedAlloc.cpp.o
+cd /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54/core/src && /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-nvcc-wrapper-3.2.00-hxjlokxwwp6gbm5w7fpnqvoiiiumpr5y/bin/nvcc_wrapper -DKOKKOS_DEPENDENCE -Dkokkoscore_EXPORTS -I/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54/core/src -I/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-src/core/src -I/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54 -O2 -g -DNDEBUG -fPIC -march=skylake-avx512 -mtune=skylake-avx512 -mrtm -expt-extended-lambda -expt-relaxed-constexpr -arch=sm_70 -std=c++14 -MD -MT core/src/CMakeFiles/kokkoscore.dir/impl/Kokkos_SharedAlloc.cpp.o -MF CMakeFiles/kokkoscore.dir/impl/Kokkos_SharedAlloc.cpp.o.d -o CMakeFiles/kokkoscore.dir/impl/Kokkos_SharedAlloc.cpp.o -c /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-src/core/src/impl/Kokkos_SharedAlloc.cpp
+[ 64%] Building CXX object core/src/CMakeFiles/kokkoscore.dir/impl/Kokkos_Spinwait.cpp.o
+cd /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54/core/src && /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-nvcc-wrapper-3.2.00-hxjlokxwwp6gbm5w7fpnqvoiiiumpr5y/bin/nvcc_wrapper -DKOKKOS_DEPENDENCE -Dkokkoscore_EXPORTS -I/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54/core/src -I/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-src/core/src -I/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54 -O2 -g -DNDEBUG -fPIC -march=skylake-avx512 -mtune=skylake-avx512 -mrtm -expt-extended-lambda -expt-relaxed-constexpr -arch=sm_70 -std=c++14 -MD -MT core/src/CMakeFiles/kokkoscore.dir/impl/Kokkos_Spinwait.cpp.o -MF CMakeFiles/kokkoscore.dir/impl/Kokkos_Spinwait.cpp.o.d -o CMakeFiles/kokkoscore.dir/impl/Kokkos_Spinwait.cpp.o -c /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-src/core/src/impl/Kokkos_Spinwait.cpp
+[ 68%] Building CXX object core/src/CMakeFiles/kokkoscore.dir/impl/Kokkos_Stacktrace.cpp.o
+cd /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54/core/src && /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-nvcc-wrapper-3.2.00-hxjlokxwwp6gbm5w7fpnqvoiiiumpr5y/bin/nvcc_wrapper -DKOKKOS_DEPENDENCE -Dkokkoscore_EXPORTS -I/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54/core/src -I/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-src/core/src -I/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54 -O2 -g -DNDEBUG -fPIC -march=skylake-avx512 -mtune=skylake-avx512 -mrtm -expt-extended-lambda -expt-relaxed-constexpr -arch=sm_70 -std=c++14 -MD -MT core/src/CMakeFiles/kokkoscore.dir/impl/Kokkos_Stacktrace.cpp.o -MF CMakeFiles/kokkoscore.dir/impl/Kokkos_Stacktrace.cpp.o.d -o CMakeFiles/kokkoscore.dir/impl/Kokkos_Stacktrace.cpp.o -c /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-src/core/src/impl/Kokkos_Stacktrace.cpp
+[ 72%] Building CXX object core/src/CMakeFiles/kokkoscore.dir/impl/Kokkos_hwloc.cpp.o
+cd /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54/core/src && /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-nvcc-wrapper-3.2.00-hxjlokxwwp6gbm5w7fpnqvoiiiumpr5y/bin/nvcc_wrapper -DKOKKOS_DEPENDENCE -Dkokkoscore_EXPORTS -I/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54/core/src -I/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-src/core/src -I/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54 -O2 -g -DNDEBUG -fPIC -march=skylake-avx512 -mtune=skylake-avx512 -mrtm -expt-extended-lambda -expt-relaxed-constexpr -arch=sm_70 -std=c++14 -MD -MT core/src/CMakeFiles/kokkoscore.dir/impl/Kokkos_hwloc.cpp.o -MF CMakeFiles/kokkoscore.dir/impl/Kokkos_hwloc.cpp.o.d -o CMakeFiles/kokkoscore.dir/impl/Kokkos_hwloc.cpp.o -c /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-src/core/src/impl/Kokkos_hwloc.cpp
+[ 76%] Building CXX object core/src/CMakeFiles/kokkoscore.dir/Cuda/Kokkos_CudaSpace.cpp.o
+cd /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54/core/src && /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-nvcc-wrapper-3.2.00-hxjlokxwwp6gbm5w7fpnqvoiiiumpr5y/bin/nvcc_wrapper -DKOKKOS_DEPENDENCE -Dkokkoscore_EXPORTS -I/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54/core/src -I/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-src/core/src -I/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54 -O2 -g -DNDEBUG -fPIC -march=skylake-avx512 -mtune=skylake-avx512 -mrtm -expt-extended-lambda -expt-relaxed-constexpr -arch=sm_70 -std=c++14 -MD -MT core/src/CMakeFiles/kokkoscore.dir/Cuda/Kokkos_CudaSpace.cpp.o -MF CMakeFiles/kokkoscore.dir/Cuda/Kokkos_CudaSpace.cpp.o.d -o CMakeFiles/kokkoscore.dir/Cuda/Kokkos_CudaSpace.cpp.o -c /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-src/core/src/Cuda/Kokkos_CudaSpace.cpp
+[ 80%] Building CXX object core/src/CMakeFiles/kokkoscore.dir/Cuda/Kokkos_Cuda_Instance.cpp.o
+cd /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54/core/src && /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-nvcc-wrapper-3.2.00-hxjlokxwwp6gbm5w7fpnqvoiiiumpr5y/bin/nvcc_wrapper -DKOKKOS_DEPENDENCE -Dkokkoscore_EXPORTS -I/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54/core/src -I/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-src/core/src -I/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54 -O2 -g -DNDEBUG -fPIC -march=skylake-avx512 -mtune=skylake-avx512 -mrtm -expt-extended-lambda -expt-relaxed-constexpr -arch=sm_70 -std=c++14 -MD -MT core/src/CMakeFiles/kokkoscore.dir/Cuda/Kokkos_Cuda_Instance.cpp.o -MF CMakeFiles/kokkoscore.dir/Cuda/Kokkos_Cuda_Instance.cpp.o.d -o CMakeFiles/kokkoscore.dir/Cuda/Kokkos_Cuda_Instance.cpp.o -c /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-src/core/src/Cuda/Kokkos_Cuda_Instance.cpp
+[ 84%] Building CXX object core/src/CMakeFiles/kokkoscore.dir/Cuda/Kokkos_Cuda_Locks.cpp.o
+cd /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54/core/src && /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-nvcc-wrapper-3.2.00-hxjlokxwwp6gbm5w7fpnqvoiiiumpr5y/bin/nvcc_wrapper -DKOKKOS_DEPENDENCE -Dkokkoscore_EXPORTS -I/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54/core/src -I/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-src/core/src -I/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54 -O2 -g -DNDEBUG -fPIC -march=skylake-avx512 -mtune=skylake-avx512 -mrtm -expt-extended-lambda -expt-relaxed-constexpr -arch=sm_70 -std=c++14 -MD -MT core/src/CMakeFiles/kokkoscore.dir/Cuda/Kokkos_Cuda_Locks.cpp.o -MF CMakeFiles/kokkoscore.dir/Cuda/Kokkos_Cuda_Locks.cpp.o.d -o CMakeFiles/kokkoscore.dir/Cuda/Kokkos_Cuda_Locks.cpp.o -c /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-src/core/src/Cuda/Kokkos_Cuda_Locks.cpp
+[ 88%] Building CXX object core/src/CMakeFiles/kokkoscore.dir/Cuda/Kokkos_Cuda_Task.cpp.o
+cd /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54/core/src && /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-nvcc-wrapper-3.2.00-hxjlokxwwp6gbm5w7fpnqvoiiiumpr5y/bin/nvcc_wrapper -DKOKKOS_DEPENDENCE -Dkokkoscore_EXPORTS -I/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54/core/src -I/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-src/core/src -I/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54 -O2 -g -DNDEBUG -fPIC -march=skylake-avx512 -mtune=skylake-avx512 -mrtm -expt-extended-lambda -expt-relaxed-constexpr -arch=sm_70 -std=c++14 -MD -MT core/src/CMakeFiles/kokkoscore.dir/Cuda/Kokkos_Cuda_Task.cpp.o -MF CMakeFiles/kokkoscore.dir/Cuda/Kokkos_Cuda_Task.cpp.o.d -o CMakeFiles/kokkoscore.dir/Cuda/Kokkos_Cuda_Task.cpp.o -c /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-src/core/src/Cuda/Kokkos_Cuda_Task.cpp
+[ 92%] Linking CXX shared library libkokkoscore.so
+cd /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54/core/src && /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/cmake-3.21.4-p4inphzga2e5cgbq3aqsewobxcgkqqyo/bin/cmake -E cmake_link_script CMakeFiles/kokkoscore.dir/link.txt --verbose=1
+/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-nvcc-wrapper-3.2.00-hxjlokxwwp6gbm5w7fpnqvoiiiumpr5y/bin/nvcc_wrapper -fPIC -O2 -g -DNDEBUG -DKOKKOS_DEPENDENCE -march=skylake-avx512 -mtune=skylake-avx512 -mrtm -arch=sm_70 -shared -Wl,-soname,libkokkoscore.so.3.4 -o libkokkoscore.so.3.4.01 CMakeFiles/kokkoscore.dir/impl/Kokkos_CPUDiscovery.cpp.o CMakeFiles/kokkoscore.dir/impl/Kokkos_Core.cpp.o CMakeFiles/kokkoscore.dir/impl/Kokkos_Error.cpp.o CMakeFiles/kokkoscore.dir/impl/Kokkos_ExecPolicy.cpp.o CMakeFiles/kokkoscore.dir/impl/Kokkos_HostBarrier.cpp.o CMakeFiles/kokkoscore.dir/impl/Kokkos_HostSpace.cpp.o CMakeFiles/kokkoscore.dir/impl/Kokkos_HostSpace_deepcopy.cpp.o CMakeFiles/kokkoscore.dir/impl/Kokkos_HostThreadTeam.cpp.o CMakeFiles/kokkoscore.dir/impl/Kokkos_MemoryPool.cpp.o CMakeFiles/kokkoscore.dir/impl/Kokkos_MemorySpace.cpp.o CMakeFiles/kokkoscore.dir/impl/Kokkos_NumericTraits.cpp.o CMakeFiles/kokkoscore.dir/impl/Kokkos_Profiling.cpp.o CMakeFiles/kokkoscore.dir/impl/Kokkos_Serial.cpp.o CMakeFiles/kokkoscore.dir/impl/Kokkos_Serial_Task.cpp.o CMakeFiles/kokkoscore.dir/impl/Kokkos_SharedAlloc.cpp.o CMakeFiles/kokkoscore.dir/impl/Kokkos_Spinwait.cpp.o CMakeFiles/kokkoscore.dir/impl/Kokkos_Stacktrace.cpp.o CMakeFiles/kokkoscore.dir/impl/Kokkos_hwloc.cpp.o CMakeFiles/kokkoscore.dir/Cuda/Kokkos_CudaSpace.cpp.o CMakeFiles/kokkoscore.dir/Cuda/Kokkos_Cuda_Instance.cpp.o CMakeFiles/kokkoscore.dir/Cuda/Kokkos_Cuda_Locks.cpp.o CMakeFiles/kokkoscore.dir/Cuda/Kokkos_Cuda_Task.cpp.o  -Wl,-rpath,:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: /usr/lib64/libdl.so /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/cuda-10.2.89-yx5cxnumts5as2ldjgtbd7qph32shgdp/lib64/stubs/libcuda.so /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/cuda-10.2.89-yx5cxnumts5as2ldjgtbd7qph32shgdp/lib64/libcudart.so 
+cd /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54/core/src && /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/cmake-3.21.4-p4inphzga2e5cgbq3aqsewobxcgkqqyo/bin/cmake -E cmake_symlink_library libkokkoscore.so.3.4.01 libkokkoscore.so.3.4 libkokkoscore.so
+make[2]: Leaving directory '/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54'
+[ 92%] Built target kokkoscore
+make  -f containers/src/CMakeFiles/kokkoscontainers.dir/build.make containers/src/CMakeFiles/kokkoscontainers.dir/depend
+make[2]: Entering directory '/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54'
+cd /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54 && /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/cmake-3.21.4-p4inphzga2e5cgbq3aqsewobxcgkqqyo/bin/cmake -E cmake_depends "Unix Makefiles" /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-src /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-src/containers/src /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54 /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54/containers/src /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54/containers/src/CMakeFiles/kokkoscontainers.dir/DependInfo.cmake --color=
+make[2]: Leaving directory '/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54'
+make  -f containers/src/CMakeFiles/kokkoscontainers.dir/build.make containers/src/CMakeFiles/kokkoscontainers.dir/build
+make[2]: Entering directory '/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54'
+[ 96%] Building CXX object containers/src/CMakeFiles/kokkoscontainers.dir/impl/Kokkos_UnorderedMap_impl.cpp.o
+cd /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54/containers/src && /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-nvcc-wrapper-3.2.00-hxjlokxwwp6gbm5w7fpnqvoiiiumpr5y/bin/nvcc_wrapper -DKOKKOS_DEPENDENCE -Dkokkoscontainers_EXPORTS -I/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54/containers/src -I/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-src/containers/src -I/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54 -I/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54/core/src -I/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-src/core/src -O2 -g -DNDEBUG -fPIC -march=skylake-avx512 -mtune=skylake-avx512 -mrtm -expt-extended-lambda -expt-relaxed-constexpr -arch=sm_70 -std=c++14 -MD -MT containers/src/CMakeFiles/kokkoscontainers.dir/impl/Kokkos_UnorderedMap_impl.cpp.o -MF CMakeFiles/kokkoscontainers.dir/impl/Kokkos_UnorderedMap_impl.cpp.o.d -o CMakeFiles/kokkoscontainers.dir/impl/Kokkos_UnorderedMap_impl.cpp.o -c /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-src/containers/src/impl/Kokkos_UnorderedMap_impl.cpp
+[100%] Linking CXX shared library libkokkoscontainers.so
+cd /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54/containers/src && /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/cmake-3.21.4-p4inphzga2e5cgbq3aqsewobxcgkqqyo/bin/cmake -E cmake_link_script CMakeFiles/kokkoscontainers.dir/link.txt --verbose=1
+/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-nvcc-wrapper-3.2.00-hxjlokxwwp6gbm5w7fpnqvoiiiumpr5y/bin/nvcc_wrapper -fPIC -O2 -g -DNDEBUG -DKOKKOS_DEPENDENCE -march=skylake-avx512 -mtune=skylake-avx512 -mrtm -arch=sm_70 -shared -Wl,-soname,libkokkoscontainers.so.3.4 -o libkokkoscontainers.so.3.4.01 CMakeFiles/kokkoscontainers.dir/impl/Kokkos_UnorderedMap_impl.cpp.o  -Wl,-rpath,/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54/core/src::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: ../../core/src/libkokkoscore.so.3.4.01 /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/cuda-10.2.89-yx5cxnumts5as2ldjgtbd7qph32shgdp/lib64/stubs/libcuda.so /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/cuda-10.2.89-yx5cxnumts5as2ldjgtbd7qph32shgdp/lib64/libcudart.so /usr/lib64/libdl.so 
+cd /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54/containers/src && /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/cmake-3.21.4-p4inphzga2e5cgbq3aqsewobxcgkqqyo/bin/cmake -E cmake_symlink_library libkokkoscontainers.so.3.4.01 libkokkoscontainers.so.3.4 libkokkoscontainers.so
+make[2]: Leaving directory '/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54'
+[100%] Built target kokkoscontainers
+make[1]: Leaving directory '/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54'
+/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/cmake-3.21.4-p4inphzga2e5cgbq3aqsewobxcgkqqyo/bin/cmake -E cmake_progress_start /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54/CMakeFiles 0
+==> kokkos: Executing phase: 'install'
+==> [2023-09-21-14:23:36.149330] 'make' '-j10' 'install'
+/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/cmake-3.21.4-p4inphzga2e5cgbq3aqsewobxcgkqqyo/bin/cmake -S/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-src -B/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54 --check-build-system CMakeFiles/Makefile.cmake 0
+/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/cmake-3.21.4-p4inphzga2e5cgbq3aqsewobxcgkqqyo/bin/cmake -E cmake_progress_start /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54/CMakeFiles /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54//CMakeFiles/progress.marks
+make  -f CMakeFiles/Makefile2 all
+make[1]: Entering directory '/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54'
+make  -f core/src/CMakeFiles/kokkoscore.dir/build.make core/src/CMakeFiles/kokkoscore.dir/depend
+make[2]: Entering directory '/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54'
+cd /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54 && /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/cmake-3.21.4-p4inphzga2e5cgbq3aqsewobxcgkqqyo/bin/cmake -E cmake_depends "Unix Makefiles" /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-src /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-src/core/src /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54 /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54/core/src /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54/core/src/CMakeFiles/kokkoscore.dir/DependInfo.cmake --color=
+Consolidate compiler generated dependencies of target kokkoscore
+make[2]: Leaving directory '/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54'
+make  -f core/src/CMakeFiles/kokkoscore.dir/build.make core/src/CMakeFiles/kokkoscore.dir/build
+make[2]: Entering directory '/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54'
+make[2]: Nothing to be done for 'core/src/CMakeFiles/kokkoscore.dir/build'.
+make[2]: Leaving directory '/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54'
+[ 92%] Built target kokkoscore
+make  -f containers/src/CMakeFiles/kokkoscontainers.dir/build.make containers/src/CMakeFiles/kokkoscontainers.dir/depend
+make[2]: Entering directory '/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54'
+cd /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54 && /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/cmake-3.21.4-p4inphzga2e5cgbq3aqsewobxcgkqqyo/bin/cmake -E cmake_depends "Unix Makefiles" /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-src /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-src/containers/src /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54 /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54/containers/src /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54/containers/src/CMakeFiles/kokkoscontainers.dir/DependInfo.cmake --color=
+Consolidate compiler generated dependencies of target kokkoscontainers
+make[2]: Leaving directory '/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54'
+make  -f containers/src/CMakeFiles/kokkoscontainers.dir/build.make containers/src/CMakeFiles/kokkoscontainers.dir/build
+make[2]: Entering directory '/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54'
+make[2]: Nothing to be done for 'containers/src/CMakeFiles/kokkoscontainers.dir/build'.
+make[2]: Leaving directory '/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54'
+[100%] Built target kokkoscontainers
+make[1]: Leaving directory '/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54'
+/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/cmake-3.21.4-p4inphzga2e5cgbq3aqsewobxcgkqqyo/bin/cmake -E cmake_progress_start /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54/CMakeFiles 0
+make  -f CMakeFiles/Makefile2 preinstall
+make[1]: Entering directory '/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54'
+make[1]: Nothing to be done for 'preinstall'.
+make[1]: Leaving directory '/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-build-jh4pw54'
+Install the project...
+/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/cmake-3.21.4-p4inphzga2e5cgbq3aqsewobxcgkqqyo/bin/cmake -P cmake_install.cmake
+-- Install configuration: "RelWithDebInfo"
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Kokkos_PointerOwnership.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Kokkos_AnonymousSpace.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Kokkos_TaskPolicy.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Kokkos_Vectorization.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Kokkos_HBWSpace.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/SYCL
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/SYCL/Kokkos_SYCL_UniqueToken.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/SYCL/Kokkos_SYCL_MDRangePolicy.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/SYCL/Kokkos_SYCL_Parallel_Scan.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/SYCL/Kokkos_SYCL_Parallel_Team.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/SYCL/Kokkos_SYCL_Parallel_Range.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/SYCL/Kokkos_SYCL_Parallel_Reduce.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/SYCL/Kokkos_SYCL_Team.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/SYCL/Kokkos_SYCL_Abort.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/SYCL/Kokkos_SYCL_DeepCopy.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/SYCL/Kokkos_SYCL_Instance.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Kokkos_Crs.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Kokkos_HostSpace.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/HIP
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/HIP/Kokkos_HIP_Vectorization.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/HIP/Kokkos_HIP_KernelLaunch.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/HIP/Kokkos_HIP_Shuffle_Reduce.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/HIP/Kokkos_HIP_Parallel_MDRange.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/HIP/Kokkos_HIP_Error.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/HIP/Kokkos_HIP_Team.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/HIP/Kokkos_HIP_MDRangePolicy.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/HIP/Kokkos_HIP_WorkGraphPolicy.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/HIP/Kokkos_HIP_UniqueToken.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/HIP/Kokkos_HIP_Atomic.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/HIP/Kokkos_HIP_BlockSize_Deduction.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/HIP/Kokkos_HIP_Instance.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/HIP/Kokkos_HIP_Parallel_Team.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/HIP/Kokkos_HIP_Locks.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/HIP/Kokkos_HIP_Abort.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/HIP/Kokkos_HIP_Parallel_Range.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/HIP/Kokkos_HIP_ReduceScan.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Kokkos_SYCL.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Kokkos_OpenMP.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Kokkos_View.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Kokkos_MemoryPool.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/KokkosExp_MDRangePolicy.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Kokkos_SYCL_Space.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Kokkos_hwloc.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Kokkos_Cuda.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Kokkos_Concepts.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Kokkos_Extents.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Kokkos_Tuners.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Kokkos_WorkGraphPolicy.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Kokkos_Future.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Kokkos_AcquireUniqueTokenImpl.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Kokkos_Threads.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/setup
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/setup/Kokkos_Setup_SYCL.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/setup/Kokkos_Setup_HIP.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/setup/Kokkos_Setup_Cuda.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Kokkos_Core_fwd.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Kokkos_Graph.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Kokkos_Pair.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Kokkos_Layout.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Kokkos_OpenMPTargetSpace.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Kokkos_MathematicalFunctions.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Kokkos_TaskScheduler.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Kokkos_Atomic.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Kokkos_Graph_fwd.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Kokkos_HIP.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/fwd
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/fwd/Kokkos_Fwd_HBWSpace.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/fwd/Kokkos_Fwd_SYCL.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/fwd/Kokkos_Fwd_OPENMP.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/fwd/Kokkos_Fwd_THREADS.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/fwd/Kokkos_Fwd_CUDA.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/fwd/Kokkos_Fwd_HPX.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/fwd/Kokkos_Fwd_OPENMPTARGET.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/fwd/Kokkos_Fwd_SERIAL.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/fwd/Kokkos_Fwd_HIP.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Kokkos_UniqueToken.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Kokkos_LogicalSpaces.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/OpenMP
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/OpenMP/Kokkos_OpenMP_Team.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/OpenMP/Kokkos_OpenMP_Exec.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/OpenMP/Kokkos_OpenMP_Task.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/OpenMP/Kokkos_OpenMP_Parallel.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/OpenMP/Kokkos_OpenMP_WorkGraphPolicy.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/traits
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/traits/Kokkos_GraphKernelTrait.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/traits/Kokkos_PolicyTraitAdaptor.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/traits/Kokkos_IterationPatternTrait.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/traits/Kokkos_WorkTagTrait.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/traits/Kokkos_LaunchBoundsTrait.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/traits/Kokkos_ExecutionSpaceTrait.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/traits/Kokkos_OccupancyControlTrait.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/traits/Kokkos_IndexTypeTrait.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/traits/Kokkos_ScheduleTrait.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/traits/Kokkos_WorkItemPropertyTrait.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/traits/Kokkos_Traits_fwd.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Kokkos_CudaSpace.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Kokkos_TaskScheduler_fwd.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/OpenMPTarget
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/OpenMPTarget/Kokkos_OpenMPTarget_Instance.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/OpenMPTarget/Kokkos_OpenMPTarget_UniqueToken.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/OpenMPTarget/Kokkos_OpenMPTarget_Parallel.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/OpenMPTarget/Kokkos_OpenMPTarget_Abort.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/OpenMPTarget/Kokkos_OpenMPTarget_Task.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/OpenMPTarget/Kokkos_OpenMPTarget_Error.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/OpenMPTarget/Kokkos_OpenMPTarget_Exec.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/OpenMPTarget/Kokkos_OpenMPTarget_Parallel_MDRange.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Kokkos_Core.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Cuda
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Cuda/Kokkos_Cuda_ReduceScan.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Cuda/Kokkos_Cuda_Parallel.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Cuda/Kokkos_Cuda_abort.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Cuda/Kokkos_Cuda_MDRangePolicy.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Cuda/Kokkos_Cuda_Version_9_8_Compatibility.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Cuda/Kokkos_Cuda_View.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Cuda/Kokkos_Cuda_Atomic_Intrinsics.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Cuda/Kokkos_Cuda_Locks.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Cuda/Kokkos_Cuda_Task.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Cuda/Kokkos_Cuda_Error.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Cuda/Kokkos_Cuda_KernelLaunch.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Cuda/Kokkos_Cuda_GraphNodeKernel.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Cuda/Kokkos_Cuda_WorkGraphPolicy.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Cuda/Kokkos_Cuda_UniqueToken.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Cuda/Kokkos_Cuda_Alloc.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Cuda/Kokkos_Cuda_Team.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Cuda/Kokkos_Cuda_Atomic_Intrinsics_Restore_Builtins.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Cuda/Kokkos_Cuda_GraphNode_Impl.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Cuda/Kokkos_Cuda_Vectorization.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Cuda/Kokkos_Cuda_Graph_Impl.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Cuda/Kokkos_Cuda_Instance.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Cuda/Kokkos_Cuda_Half.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Cuda/Kokkos_Cuda_BlockSize_Deduction.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Kokkos_ExecPolicy.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Kokkos_Profiling_ProfileSection.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Kokkos_Array.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Kokkos_MasterLock.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Kokkos_HIP_Space.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Kokkos_OpenMPTarget.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Kokkos_Macros.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Kokkos_NumericTraits.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Kokkos_Half.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Kokkos_Parallel.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_ViewArray.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_LinkedListNode.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_Atomic_Fetch_Sub.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_Combined_Reducer.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_TaskResult.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_Atomic_Compare_Exchange_Weak.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_ViewUniformType.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_EBO.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_GraphNodeCustomization.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_Atomic_Fetch_And.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_VLAEmulation.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_TaskQueueCommon.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_FixedBufferMemoryPool.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_TaskPolicyData.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_Traits.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_Atomic_Decrement.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/KokkosExp_IterateTileGPU.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_MemorySpace.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_Atomic_Assembly.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_Volatile_Load.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_Atomic_Generic.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_ViewLayoutTiled.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_SimpleTaskScheduler.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_Serial_Task.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_Atomic_Windows.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_Atomic_MinMax.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_ViewMapping.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_Tools.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_Profiling_Interface.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_HostSharedPtr.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_TaskTeamMember.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_Utilities.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_Spinwait.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_Profiling_DeviceInfo.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_ClockTic.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_Default_Graph_Impl.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_TaskNode.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_SharedAlloc.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_ExecSpaceInitializer.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_FunctorAnalysis.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_GraphImpl_Utilities.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_Atomic_Memory_Order.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_HostBarrier.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_MemoryPoolAllocator.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/KokkosExp_Host_IterateTile.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_ViewTracker.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_Profiling_C_Interface.h
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_FunctorAdapter.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_Error.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_Atomic_Load.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_TaskQueue_impl.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_Atomic_Generic_Secondary.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_Atomic_Exchange.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/KokkosExp_ViewMapping.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_BitOps.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_Default_GraphNode_Impl.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_Atomic_Store.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_GraphImpl.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_GraphNodeImpl.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_Memory_Fence.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_Atomic_View.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_Atomic_Increment.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_Stacktrace.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_PhysicalLayout.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_CPUDiscovery.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_TaskQueueMultiple.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_SharedAlloc_timpl.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_HostThreadTeam.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_Default_Graph_fwd.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_TaskQueueMemoryManager.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_TaskQueueMultiple_impl.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_Profiling.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_AnalyzePolicy.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_Default_GraphNodeKernel.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_OptionalRef.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_HostSpace_deepcopy.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_ChaseLev.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_Atomic_Compare_Exchange_Strong.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_TaskBase.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_Atomic_Fetch_Or.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_Atomic_Fetch_Add.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_ViewCtor.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_TaskQueue.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_MultipleTaskQueue.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_LIFO.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_Tags.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_ConcurrentBitset.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_Timer.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_SingleTaskQueue.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_GraphImpl_fwd.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_Serial_WorkGraphPolicy.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Kokkos_Parallel_Reduce.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Kokkos_HPX.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Kokkos_CopyViews.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Kokkos_GraphNode.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Kokkos_Timer.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Kokkos_Serial.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Kokkos_MemoryTraits.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/HPX
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/HPX/Kokkos_HPX_ChunkedRoundRobinExecutor.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/HPX/Kokkos_HPX_Task.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/HPX/Kokkos_HPX_WorkGraphPolicy.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Threads
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Threads/Kokkos_Threads_WorkGraphPolicy.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Threads/Kokkos_ThreadsExec.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Threads/Kokkos_ThreadsTeam.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Threads/Kokkos_Threads_Parallel.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/decl
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/decl/Kokkos_Declare_HBWSpace.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/decl/Kokkos_Declare_OPENMP.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/decl/Kokkos_Declare_HIP.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/decl/Kokkos_Declare_SERIAL.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/decl/Kokkos_Declare_HPX.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/decl/Kokkos_Declare_OPENMPTARGET.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/decl/Kokkos_Declare_THREADS.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/decl/Kokkos_Declare_CUDA.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/decl/Kokkos_Declare_SYCL.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Kokkos_ScratchSpace.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Kokkos_Complex.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/lib64/libkokkoscore.so.3.4.01
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/lib64/libkokkoscore.so.3.4
+-- Set runtime path of "/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/lib64/libkokkoscore.so.3.4.01" to "/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/lib:/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/lib64:/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/libxml2-2.9.12-cctghrh2wb36eg5clkrfjtsmmcr57iyh/lib:/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/libiconv-1.16-ksynfmj62hxmn4gt7vrei2ajttoet2v3/lib:/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/xz-5.2.5-udmvadouapmhsbtoyf7audxqioiima57/lib:/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/zlib-1.2.11-7apv7tjol3qvvn5dhh6kkjkzzyg2lne4/lib:/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/openmpi-4.1.3-v2ei3gevopnyr3jdn5bxhz4rvysipbdy/lib:/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/hwloc-2.6.0-7evhgqyi6g3554fsza5qdau67eftcjbk/lib:/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/libpciaccess-0.16-dusortvlyncnywznumtk56r65k372j6k/lib:/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/ncurses-6.2-fj4m6bg5rcjf5xx4nl426quz4qeu6vwm/lib:/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/libevent-2.1.8-wgoayfz2ekr5kmb3vxi5f44kh5xevzt5/lib:/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/numactl-2.0.14-gpjef7mgabgbpwwilm7dcxnfnerfdede/lib:/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/pmix-3.2.1-gl4mdrya5lgnaelpa24fuafpgdqpf5tg/lib:/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/ucx-1.10.1-fkguskkwm232lydkjbb3zxksdvivqs3q/lib:/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/gdrcopy-2.2-ntvmzwkqmyds5svbzwz6t3iebysjvimd/lib:/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/cuda-10.2.89-yx5cxnumts5as2ldjgtbd7qph32shgdp/lib64:/cm/shared/apps/slurm/21.08.8/lib64:/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/gdrcopy-2.2-ntvmzwkqmyds5svbzwz6t3iebysjvimd/lib64"
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/lib64/libkokkoscore.so
+-- Up-to-date: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/lib64/libkokkoscore.so.3.4.01
+-- Up-to-date: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/lib64/libkokkoscore.so.3.4
+-- Up-to-date: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/lib64/libkokkoscore.so
+-- Up-to-date: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Kokkos_DualView.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Kokkos_UnorderedMap.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Kokkos_ErrorReporter.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Kokkos_DynamicView.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Kokkos_DynRankView.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Kokkos_ScatterView.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Kokkos_Vector.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Kokkos_StaticCrsGraph.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Kokkos_OffsetView.hpp
+-- Up-to-date: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_Functional_impl.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_UnorderedMap_impl.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_Bitset_impl.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/impl/Kokkos_StaticCrsGraph_factory.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Kokkos_Bitset.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Kokkos_Functional.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/lib64/libkokkoscontainers.so.3.4.01
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/lib64/libkokkoscontainers.so.3.4
+-- Set runtime path of "/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/lib64/libkokkoscontainers.so.3.4.01" to "/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/lib:/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/lib64:/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/libxml2-2.9.12-cctghrh2wb36eg5clkrfjtsmmcr57iyh/lib:/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/libiconv-1.16-ksynfmj62hxmn4gt7vrei2ajttoet2v3/lib:/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/xz-5.2.5-udmvadouapmhsbtoyf7audxqioiima57/lib:/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/zlib-1.2.11-7apv7tjol3qvvn5dhh6kkjkzzyg2lne4/lib:/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/openmpi-4.1.3-v2ei3gevopnyr3jdn5bxhz4rvysipbdy/lib:/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/hwloc-2.6.0-7evhgqyi6g3554fsza5qdau67eftcjbk/lib:/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/libpciaccess-0.16-dusortvlyncnywznumtk56r65k372j6k/lib:/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/ncurses-6.2-fj4m6bg5rcjf5xx4nl426quz4qeu6vwm/lib:/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/libevent-2.1.8-wgoayfz2ekr5kmb3vxi5f44kh5xevzt5/lib:/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/numactl-2.0.14-gpjef7mgabgbpwwilm7dcxnfnerfdede/lib:/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/pmix-3.2.1-gl4mdrya5lgnaelpa24fuafpgdqpf5tg/lib:/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/ucx-1.10.1-fkguskkwm232lydkjbb3zxksdvivqs3q/lib:/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/gdrcopy-2.2-ntvmzwkqmyds5svbzwz6t3iebysjvimd/lib:/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/cuda-10.2.89-yx5cxnumts5as2ldjgtbd7qph32shgdp/lib64:/cm/shared/apps/slurm/21.08.8/lib64:/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/gdrcopy-2.2-ntvmzwkqmyds5svbzwz6t3iebysjvimd/lib64"
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/lib64/libkokkoscontainers.so
+-- Up-to-date: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/lib64/libkokkoscontainers.so.3.4.01
+-- Up-to-date: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/lib64/libkokkoscontainers.so.3.4
+-- Up-to-date: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/lib64/libkokkoscontainers.so
+-- Up-to-date: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Kokkos_Sort.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/Kokkos_Random.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/lib64/cmake/Kokkos/KokkosConfig.cmake
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/lib64/cmake/Kokkos/KokkosConfigCommon.cmake
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/lib64/cmake/Kokkos/KokkosConfigVersion.cmake
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/lib64/cmake/Kokkos/KokkosTargets.cmake
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/lib64/cmake/Kokkos/KokkosTargets-relwithdebinfo.cmake
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/KokkosCore_config.h
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/bin/nvcc_wrapper
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/bin/hpcbind
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/bin/kokkos_launch_compiler
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/bin/kokkos_launch_compiler
+-- Up-to-date: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/KokkosCore_config.h
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/KokkosCore_Config_FwdBackend.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/KokkosCore_Config_SetupBackend.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/KokkosCore_Config_DeclareBackend.hpp
+-- Installing: /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/include/KokkosCore_Config_PostInclude.hpp
+==> [2023-09-21-14:23:36.438000] 'cmake' '/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-src/scripts/spack_test' '-DSPACK_PACKAGE_SOURCE_DIR:PATH=/scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-src' '-DSPACK_PACKAGE_TEST_ROOT_DIR:PATH=/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/.spack/test/scripts/spack_test/out' '-DSPACK_PACKAGE_INSTALL_DIR:PATH=/cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj'
+-- The C compiler identification is GNU 8.4.0
+-- The CXX compiler identification is GNU 8.4.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /cm/shared/apps/spack/0.17.3/gpu/b/lib/spack/env/gcc/gcc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /cm/shared/apps/spack/0.17.3/gpu/b/lib/spack/env/gcc/g++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done
+-- Generating done
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    SPACK_PACKAGE_INSTALL_DIR
+    SPACK_PACKAGE_TEST_ROOT_DIR
+
+
+-- Build files have been written to: /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-src
+==> [2023-09-21-14:23:36.840832] Installing /scratch/spack_gpu/job_25319729/spack-stage/spack-stage-kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/spack-src/scripts/spack_test/out to /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj/.spack/test/scripts/spack_test/out
+==> kokkos: Successfully installed kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj
+  Fetch: 0.72s.  Build: 20.72s.  Total: 21.44s.
+[+] /cm/shared/apps/spack/0.17.3/gpu/b/opt/spack/linux-rocky8-skylake_avx512/gcc-8.4.0/kokkos-3.4.01-jh4pw54gvzyyawtm3aqhwozzpuaddxjj
+real 33.13
+user 69.50
+sys 46.58
+==> Regenerating lmod module files
