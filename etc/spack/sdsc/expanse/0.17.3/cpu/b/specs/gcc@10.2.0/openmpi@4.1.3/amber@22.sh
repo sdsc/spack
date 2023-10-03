@@ -2,7 +2,7 @@
 
 #SBATCH --job-name=amber@22
 #SBATCH --account=use300
-#SBATCH --reservation=rocky8u7_testing
+#SBATCH --reservation=root_73
 #SBATCH --partition=ind-shared
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
@@ -48,30 +48,6 @@ module load "${MPI_MODULE}"
 module load "${CMAKE_MODULE}"
 module list
 
-# 49387    [ 27%] Building CXX object AmberTools/src/cpptraj/src/CMakeFiles/
-#              cpptraj_common_obj.dir/Action_Box.cpp.o
-#  >> 49388    /home/mkandes/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-roc
-#              ky8-cascadelake/gcc-10.2.0/cuda-11.2.2-blza2psofa3wr2zumqrnh4je2f
-#              7ze3mx/include/thrust/detail/allocator/allocator_traits.h(245): e
-#              rror: class "thrust::detail::device_delete_allocator" has no memb
-#              er "value_type"
-#     49389              detected during:
-#     49390                instantiation of class "thrust::detail::allocator_tra
-#              its<Alloc> [with Alloc=thrust::detail::device_delete_allocator]"
-#     49391    (402): here
-#     49392                instantiation of class "thrust::detail::allocator_sys
-#              tem<Alloc> [with Alloc=thrust::detail::device_delete_allocator]"
-#     49393    /home/mkandes/cm/shared/apps/spack/0.17.3/gpu/opt/spack/linux-roc
-#              ky8-cascadelake/gcc-10.2.0/cuda-11.2.2-blza2psofa3wr2zumqrnh4je2f
-#              7ze3mx/include/thrust/detail/allocator/destroy_range.inl(137): he
-#              re
-#
-# Fix? Use cuda/10.2.89?
-#
-# Currently Amber supports CUDA versions from 7.5 to 11.x inclusive (tested only up to 11.2). However, older
-# versions are less well tested and more likely to cause issues, and you may also run into trouble with the CUDA
-# SDK being incompatible with newer compilers on your machine.
-
 declare -xr SPACK_PACKAGE='amber@22'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
 declare -xr SPACK_VARIANTS='~cuda +mpi +openmp +update'
@@ -88,19 +64,19 @@ spack config get packages
 spack config get repos
 spack config get upstreams
 
-time -p spack spec --long --namespaces --types "${SPACK_SPEC}"
+time -p spack spec --long --namespaces --types --reuse $(echo "${SPACK_SPEC}")
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack concretization failed.'
   exit 1
 fi
 
-time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all "${SPACK_SPEC}"
+time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all --reuse $(echo "${SPACK_SPEC}")
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
   exit 1
 fi
 
-#spack module lmod refresh --delete-tree -y
+spack -d module lmod refresh -y $(echo "${SPACK_SPEC}")
 
 #sbatch --dependency="afterok:${SLURM_JOB_ID}" 'vasp6@6.2.1.sh'
 
