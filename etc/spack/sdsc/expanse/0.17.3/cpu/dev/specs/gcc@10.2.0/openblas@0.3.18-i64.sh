@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=openblas@0.3.18
+#SBATCH --job-name=openblas@0.3.18-i64
 #SBATCH --account=use300
 #SBATCH --clusters=expanse
 #SBATCH --partition=ind-shared
@@ -41,7 +41,7 @@ declare -xr TMP="${TMPDIR}"
 
 declare -xr SPACK_PACKAGE='openblas@0.3.18'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS='~bignuma ~consistent_fpcsr ~ilp64 +locking +pic +shared threads=none'
+declare -xr SPACK_VARIANTS='~bignuma ~consistent_fpcsr +ilp64 +locking +pic +shared threads=none'
 declare -xr SPACK_DEPENDENCIES=''
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
@@ -73,6 +73,6 @@ if [[ "${?}" -ne 0 ]]; then
   exit 1
 fi
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'openblas@0.3.18-i64.sh'
+#sbatch --dependency="afterok:${SLURM_JOB_ID}" ''
 
 sleep 30
