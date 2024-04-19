@@ -1,0 +1,26 @@
+packages:
+  lmod:
+    externals:
+      - spec: 'lmod@8.2.4'
+        prefix: /usr
+    buildable: false
+  lustre:
+    externals:
+      - spec: 'lustre@2.15.2'
+        prefix: /usr
+    buildable: false
+  openssl:
+    externals:
+      - spec: 'openssl@1.1.1k'
+        prefix: /usr
+    buildable: false
+  rdma-core:
+    externals:
+      - spec: 'rdma-core@43.0'
+        prefix: /usr
+    buildable: false
+  slurm:
+    externals:
+      - spec: 'slurm@23.02.7'
+        prefix: /cm/shared/apps/slurm/current
+    buildable: false
