@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=amdlibflame@3.1-omp
+#SBATCH --job-name=amdlibflame@3.1-i64-omp
 #SBATCH --account=use300
 #SBATCH --clusters=expanse
 #SBATCH --partition=ind-shared
@@ -49,8 +49,8 @@ module list
 
 declare -xr SPACK_PACKAGE='amdlibflame@3.1'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS='~debug ~ilp64 +lapack2flame +shared +static'
-declare -xr SPACK_DEPENDENCIES="^amdblis@3.1/$(spack find --format '{hash:7}' amdblis@3.1 % ${SPACK_COMPILER} ~ilp64 threads=openmp)"
+declare -xr SPACK_VARIANTS='~debug +ilp64 +lapack2flame +shared +static'
+declare -xr SPACK_DEPENDENCIES="^amdblis@3.1/$(spack find --format '{hash:7}' amdblis@3.1 % ${SPACK_COMPILER} +ilp64 threads=openmp)"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -77,6 +77,6 @@ if [[ "${?}" -ne 0 ]]; then
   exit 1
 fi
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'amdlibflame@3.1-i64-omp.sh'
+#sbatch --dependency="afterok:${SLURM_JOB_ID}" ''
 
 sleep 30
