@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=amdblis@3.1
+#SBATCH --job-name=amdblis@3.1-i64
 #SBATCH --account=use300
 #SBATCH --clusters=expanse
 #SBATCH --partition=ind-shared
@@ -41,7 +41,7 @@ declare -xr TMP="${TMPDIR}"
 
 declare -xr SPACK_PACKAGE='amdblis@3.1'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS='+blas +cblas ~ilp64 +shared +static threads=none'
+declare -xr SPACK_VARIANTS='+blas +cblas +ilp64 +shared +static threads=none'
 declare -xr SPACK_DEPENDENCIES=''
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
@@ -73,6 +73,6 @@ if [[ "${?}" -ne 0 ]]; then
   exit 1
 fi
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'amdblis@3.1-i64.sh'
+#sbatch --dependency="afterok:${SLURM_JOB_ID}" ''
 
 sleep 30
