@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=openblas@0.3.18-i64-omp
+#SBATCH --job-name=amdblis@3.1
 #SBATCH --account=use300
 #SBATCH --clusters=expanse
 #SBATCH --partition=ind-shared
@@ -8,7 +8,7 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=16
 #SBATCH --mem=32G
-#SBATCH --time=00:30:00
+#SBATCH --time=01:00:00
 #SBATCH --output=%x.o%j.%N
 
 declare -xir UNIX_TIME="$(date +'%s')"
@@ -39,14 +39,11 @@ declare -xr SPACK_INSTANCE_DIR='/home/mkandes/software/spack/repositories/mkande
 declare -xr TMPDIR="${LOCAL_SCRATCH_DIR}/spack-stage"
 declare -xr TMP="${TMPDIR}"
 
-declare -xr SPACK_PACKAGE='openblas@0.3.18'
+declare -xr SPACK_PACKAGE='amdblis@3.1'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS='~bignuma ~consistent_fpcsr +ilp64 +locking +pic +shared threads=openmp'
+declare -xr SPACK_VARIANTS='+blas +cblas ~ilp64 +shared +static threads=none'
 declare -xr SPACK_DEPENDENCIES=''
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
-
-echo "${UNIX_TIME} ${LOCAL_TIME} ${SLURM_JOB_ID} ${JOB_SCRIPT_MD5} ${JOB_SCRIPT_SHA256} ${JOB_SCRIPT_NUMBER_OF_LINES} ${JOB_SCRIPT}"
-cat  "${JOB_SCRIPT}"
 
 module purge
 module load "${SCHEDULER_MODULE}"
@@ -76,6 +73,6 @@ if [[ "${?}" -ne 0 ]]; then
   exit 1
 fi
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'amdblis@3.1.sh'
+#sbatch --dependency="afterok:${SLURM_JOB_ID}" ''
 
 sleep 30
