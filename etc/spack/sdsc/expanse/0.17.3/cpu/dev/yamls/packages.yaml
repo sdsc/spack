@@ -19,6 +19,21 @@ packages:
       - spec: 'rdma-core@43.0'
         prefix: /usr
     buildable: false
+  hcoll:
+    externals:
+      - spec: 'hcoll@4.8.3220'
+        prefix: /opt/mellanox/hcoll
+    buildable: false
+  knem:
+    externals:
+      - spec: 'knem@1.1.4'
+        prefix: /opt/knem-1.1.4.90mlnx1
+    buildable: false
+  xpmem:
+    externals:
+      - spec: 'xpmem@2.4.6'
+        prefix: /usr
+    buildable: false
   slurm:
     externals:
       - spec: 'slurm@23.02.7'

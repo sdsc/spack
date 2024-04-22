@@ -77,4 +77,6 @@ if [[ "${?}" -ne 0 ]]; then
   exit 1
 fi
 
+#sbatch --dependency="afterok:${SLURM_JOB_ID}" ''
+
 sleep 30
