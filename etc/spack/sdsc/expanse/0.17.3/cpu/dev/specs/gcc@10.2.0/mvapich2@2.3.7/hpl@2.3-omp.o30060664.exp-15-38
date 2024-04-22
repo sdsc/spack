@@ -1,4 +1,4 @@
-1713808261 20240422T105101-0700 30060294 cb90c9bc9d1bb3c5c315f1f1f3e183d7 42bf75db40fadb42976cfd68fb0d6ec6e7ffa107858c5aa0dcf8d87a09df58d9 82 /home/mkandes/software/spack/repositories/mkandes/spack/etc/spack/sdsc/expanse/0.17.3/cpu/dev/specs/gcc@10.2.0/mvapich2@2.3.7/hpl@2.3-omp.sh
+1713808749 20240422T105909-0700 30060664 fef64114c6f299efc36a7c199d8b3aac 68e802e046a9875de348c089eeb46a4ae0d0f2df7f96487b177d038561aeb8cf 82 /home/mkandes/software/spack/repositories/mkandes/spack/etc/spack/sdsc/expanse/0.17.3/cpu/dev/specs/gcc@10.2.0/mvapich2@2.3.7/hpl@2.3-omp.sh
 #!/usr/bin/env bash
 
 #SBATCH --job-name=hpl@2.3-omp
@@ -50,7 +50,7 @@ module list
 
 declare -xr SPACK_PACKAGE='hpl@2.3'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS='~openmp'
+declare -xr SPACK_VARIANTS='+openmp'
 declare -xr SPACK_DEPENDENCIES="^openblas@0.3.18/$(spack find --format '{hash:7}' openblas@0.3.18 % ${SPACK_COMPILER} ~ilp64 threads=openmp) ^mvapich2@2.3.7/$(spack find --format '{hash:7}' mvapich2@2.3.7 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
@@ -91,9 +91,9 @@ CONDA_SHLVL=0
 LD_LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:/cm/shared/apps/slurm/current/lib64
 LS_COLORS=rs=0:di=38;5;33:ln=38;5;51:mh=00:pi=40;38;5;11:so=38;5;13:do=38;5;5:bd=48;5;232;38;5;11:cd=48;5;232;38;5;3:or=48;5;232;38;5;9:mi=01;05;37;41:su=48;5;196;38;5;15:sg=48;5;11;38;5;16:ca=48;5;196;38;5;226:tw=48;5;10;38;5;16:ow=48;5;10;38;5;21:st=48;5;21;38;5;15:ex=38;5;40:*.tar=38;5;9:*.tgz=38;5;9:*.arc=38;5;9:*.arj=38;5;9:*.taz=38;5;9:*.lha=38;5;9:*.lz4=38;5;9:*.lzh=38;5;9:*.lzma=38;5;9:*.tlz=38;5;9:*.txz=38;5;9:*.tzo=38;5;9:*.t7z=38;5;9:*.zip=38;5;9:*.z=38;5;9:*.dz=38;5;9:*.gz=38;5;9:*.lrz=38;5;9:*.lz=38;5;9:*.lzo=38;5;9:*.xz=38;5;9:*.zst=38;5;9:*.tzst=38;5;9:*.bz2=38;5;9:*.bz=38;5;9:*.tbz=38;5;9:*.tbz2=38;5;9:*.tz=38;5;9:*.deb=38;5;9:*.rpm=38;5;9:*.jar=38;5;9:*.war=38;5;9:*.ear=38;5;9:*.sar=38;5;9:*.rar=38;5;9:*.alz=38;5;9:*.ace=38;5;9:*.zoo=38;5;9:*.cpio=38;5;9:*.7z=38;5;9:*.rz=38;5;9:*.cab=38;5;9:*.wim=38;5;9:*.swm=38;5;9:*.dwm=38;5;9:*.esd=38;5;9:*.jpg=38;5;13:*.jpeg=38;5;13:*.mjpg=38;5;13:*.mjpeg=38;5;13:*.gif=38;5;13:*.bmp=38;5;13:*.pbm=38;5;13:*.pgm=38;5;13:*.ppm=38;5;13:*.tga=38;5;13:*.xbm=38;5;13:*.xpm=38;5;13:*.tif=38;5;13:*.tiff=38;5;13:*.png=38;5;13:*.svg=38;5;13:*.svgz=38;5;13:*.mng=38;5;13:*.pcx=38;5;13:*.mov=38;5;13:*.mpg=38;5;13:*.mpeg=38;5;13:*.m2v=38;5;13:*.mkv=38;5;13:*.webm=38;5;13:*.ogm=38;5;13:*.mp4=38;5;13:*.m4v=38;5;13:*.mp4v=38;5;13:*.vob=38;5;13:*.qt=38;5;13:*.nuv=38;5;13:*.wmv=38;5;13:*.asf=38;5;13:*.rm=38;5;13:*.rmvb=38;5;13:*.flc=38;5;13:*.avi=38;5;13:*.fli=38;5;13:*.flv=38;5;13:*.gl=38;5;13:*.dl=38;5;13:*.xcf=38;5;13:*.xwd=38;5;13:*.yuv=38;5;13:*.cgm=38;5;13:*.emf=38;5;13:*.ogv=38;5;13:*.ogx=38;5;13:*.aac=38;5;45:*.au=38;5;45:*.flac=38;5;45:*.m4a=38;5;45:*.mid=38;5;45:*.midi=38;5;45:*.mka=38;5;45:*.mp3=38;5;45:*.mpc=38;5;45:*.ogg=38;5;45:*.ra=38;5;45:*.wav=38;5;45:*.oga=38;5;45:*.opus=38;5;45:*.spx=38;5;45:*.xspf=38;5;45:
 CONDA_EXE=/home/mkandes/software/miniconda/Miniconda3-py312_24.1.2-0-Linux-x86_64/bin/conda
-LOCAL_SCRATCH_DIR=/scratch/mkandes/job_30060294
+LOCAL_SCRATCH_DIR=/scratch/mkandes/job_30060664
 SLURM_NODEID=0
-SLURM_TASK_PID=1820634
+SLURM_TASK_PID=1824925
 __LMOD_REF_COUNT_PATH=/cm/shared/apps/slurm/current/sbin:1;/cm/shared/apps/slurm/current/bin:1;/home/mkandes/software/miniconda/Miniconda3-py312_24.1.2-0-Linux-x86_64/condabin:1;/home/mkandes/.local/bin:1;/home/mkandes/bin:1;/usr/local/bin:1;/usr/bin:1;/usr/local/sbin:1;/usr/sbin:1
 _ModuleTable002_=L2V0Yy9tb2R1bGVmaWxlcyIsIi91c3Ivc2hhcmUvbW9kdWxlZmlsZXMiLCIvdXNyL3NoYXJlL01vZHVsZXMvbW9kdWxlZmlsZXMiLCIvY20vc2hhcmVkL21vZHVsZWZpbGVzIix9LFsic3lzdGVtQmFzZU1QQVRIIl09Ii9jbS9sb2NhbC9tb2R1bGVmaWxlczovY20vc2hhcmVkL2FwcHMvYWNjZXNzL21vZHVsZWZpbGVzOi9jbS9zaGFyZWQvbW9kdWxlZmlsZXM6L2V0Yy9tb2R1bGVmaWxlczovdXNyL3NoYXJlL21vZHVsZWZpbGVzOi91c3Ivc2hhcmUvTW9kdWxlcy9tb2R1bGVmaWxlcyIsfQ==
 SSH_CONNECTION=208.58.212.11 39928 198.202.100.14 22
@@ -117,14 +117,14 @@ SPACK_MINOR=17
 SLURM_PROCID=0
 SPACK_INSTANCE_VERSION=dev
 SLURM_JOB_GID=300
-SPACK_VARIANTS=~openmp
+SPACK_VARIANTS=+openmp
 SCHEDULER_REVISION=7
 SPACK_INSTANCE_DIR=/home/mkandes/software/spack/repositories/mkandes/spack
 __LMOD_REF_COUNT_LD_LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:1;/cm/shared/apps/slurm/current/lib64:1
 SCHEDULER_VERSION=23.02.7
 SLURMD_NODENAME=exp-15-38
-SLURM_JOB_END_TIME=1713810060
-JOB_SCRIPT_MD5=cb90c9bc9d1bb3c5c315f1f1f3e183d7
+SLURM_JOB_END_TIME=1713810548
+JOB_SCRIPT_MD5=fef64114c6f299efc36a7c199d8b3aac
 SLURM_TASKS_PER_NODE=1
 S_COLORS=auto
 _CE_M=
@@ -133,10 +133,10 @@ SPACK_COMPILER=gcc@10.2.0
 XDG_SESSION_ID=551970
 SLURM_NNODES=1
 USER=mkandes
-SLURM_PMIX_TMPDIR=/scratch/mkandes/job_30060294
-SLURM_TMPDIR=/scratch/mkandes/job_30060294
+SLURM_PMIX_TMPDIR=/scratch/mkandes/job_30060664
+SLURM_TMPDIR=/scratch/mkandes/job_30060664
 JOB_SCRIPT_NUMBER_OF_LINES=82
-SLURM_JOB_START_TIME=1713808260
+SLURM_JOB_START_TIME=1713808748
 SLURM_NTASKS_PER_NODE=1
 __LMOD_REF_COUNT_MODULEPATH=/cm/local/modulefiles:1;/cm/shared/apps/access/modulefiles:1;/etc/modulefiles:1;/usr/share/modulefiles:1;/usr/share/Modules/modulefiles:1;/cm/shared/modulefiles:1
 __LMOD_REF_COUNT_LOADEDMODULES=slurm/expanse/23.02.7:1
@@ -146,10 +146,10 @@ ENABLE_LMOD=1
 SLURM_JOB_NODELIST=exp-15-38
 HOME=/home/mkandes
 SLURM_CLUSTER_NAME=expanse
-TMP=/scratch/mkandes/job_30060294/spack-stage
+TMP=/scratch/mkandes/job_30060664/spack-stage
 CONDA_PYTHON_EXE=/home/mkandes/software/miniconda/Miniconda3-py312_24.1.2-0-Linux-x86_64/bin/python
 LMOD_COLORIZE=yes
-LOCAL_TIME=20240422T105101-0700
+LOCAL_TIME=20240422T105909-0700
 SLURM_NODELIST=exp-15-38
 LMOD_SYSHOST=expanse
 SSH_CLIENT=208.58.212.11 39928 22
@@ -162,14 +162,14 @@ BASH_ENV=/usr/share/lmod/lmod/init/bash
 SLURM_TOPOLOGY_ADDR=exp-15-38
 _CE_CONDA=
 SLURM_WORKING_CLUSTER=expanse:mgr1:6817:9984:109
-JOB_SCRIPT_SHA256=42bf75db40fadb42976cfd68fb0d6ec6e7ffa107858c5aa0dcf8d87a09df58d9
+JOB_SCRIPT_SHA256=68e802e046a9875de348c089eeb46a4ae0d0f2df7f96487b177d038561aeb8cf
 SPACK_PACKAGE=hpl@2.3
 __LMOD_REF_COUNT_LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:1;/cm/shared/apps/slurm/current/lib64:1
 SLURM_JOB_NAME=hpl@2.3-omp
-TMPDIR=/scratch/mkandes/job_30060294/spack-stage
+TMPDIR=/scratch/mkandes/job_30060664/spack-stage
 LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:/cm/shared/apps/slurm/current/lib64
 LMOD_sys=Linux
-SLURM_JOBID=30060294
+SLURM_JOBID=30060664
 _ModuleTable001_=X01vZHVsZVRhYmxlXz17WyJNVHZlcnNpb24iXT0zLFsiY19yZWJ1aWxkVGltZSJdPWZhbHNlLFsiY19zaG9ydFRpbWUiXT1mYWxzZSxkZXB0aFQ9e30sZmFtaWx5PXt9LG1UPXtbInNsdXJtL2V4cGFuc2UiXT17WyJmbiJdPSIvY20vc2hhcmVkL21vZHVsZWZpbGVzL3NsdXJtL2V4cGFuc2UvMjMuMDIuNyIsWyJmdWxsTmFtZSJdPSJzbHVybS9leHBhbnNlLzIzLjAyLjciLFsibG9hZE9yZGVyIl09MSxwcm9wVD17fSxbInN0YWNrRGVwdGgiXT0wLFsic3RhdHVzIl09ImFjdGl2ZSIsWyJ1c2VyTmFtZSJdPSJzbHVybS9leHBhbnNlLzIzLjAyLjciLH0sfSxtcGF0aEE9eyIvY20vbG9jYWwvbW9kdWxlZmlsZXMiLCIvY20vc2hhcmVkL2FwcHMvYWNjZXNzL21vZHVsZWZpbGVzIiwi
 SLURM_CONF=/cm/shared/apps/slurm/var/etc/expanse/slurm.conf
 LOADEDMODULES=slurm/expanse/23.02.7
@@ -201,7 +201,7 @@ JOB_SCRIPT=/home/mkandes/software/spack/repositories/mkandes/spack/etc/spack/sds
 SLURM_NPROCS=1
 SHLVL=2
 SLURM_SUBMIT_HOST=login02
-UNIX_TIME=1713808261
+UNIX_TIME=1713808749
 SLURM_JOB_ACCOUNT=use300
 MANPATH=/cm/shared/apps/slurm/current/man:/usr/share/lmod/lmod/share/man::/usr/local/share/man:/usr/share/man:/cm/local/apps/environment-modules/current/share/man
 LMOD_PREPEND_BLOCK=normal
@@ -213,7 +213,7 @@ XDG_RUNTIME_DIR=/run/user/501506
 MODULEPATH_ROOT=/usr/share/modulefiles
 LMOD_PACKAGE_PATH=/usr/share/lmod/etc/site/lmod
 PATH=/home/mkandes/software/spack/repositories/mkandes/spack/bin:/cm/shared/apps/slurm/current/sbin:/cm/shared/apps/slurm/current/bin:/home/mkandes/software/miniconda/Miniconda3-py312_24.1.2-0-Linux-x86_64/condabin:/home/mkandes/.local/bin:/home/mkandes/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin
-SLURM_JOB_ID=30060294
+SLURM_JOB_ID=30060664
 _LMFILES_=/cm/shared/modulefiles/slurm/expanse/23.02.7
 SPACK_REVISION=3
 DEBUGINFOD_URLS=https://debuginfod.centos.org/ 
@@ -222,7 +222,7 @@ MODULESHOME=/usr/share/lmod/lmod
 LMOD_SETTARG_FULL_SUPPORT=no
 HISTSIZE=-1
 LMOD_PKG=/usr/share/lmod/lmod
-SPACK_SPEC=hpl@2.3 % gcc@10.2.0 ~openmp ^openblas@0.3.18/ombsn4y ^mvapich2@2.3.7/fete7cu
+SPACK_SPEC=hpl@2.3 % gcc@10.2.0 +openmp ^openblas@0.3.18/ombsn4y ^mvapich2@2.3.7/fete7cu
 LMOD_CMD=/usr/share/lmod/lmod/libexec/lmod
 SLURM_LOCALID=0
 LESSOPEN=||/usr/bin/lesspipe.sh %s
@@ -599,7 +599,7 @@ repos:
 upstreams: {}
 Input spec
 --------------------------------
-[    ]  .hpl@2.3%gcc@10.2.0~openmp
+[    ]  .hpl@2.3%gcc@10.2.0+openmp
 [    ]      ^sdsc.mvapich2@2.3.7%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~alloca~cuda~debug+regcache+wrapperrpath ch3_rank_bits=32 fabrics=mrail file_systems=lustre,nfs process_managers=slurm threads=multiple arch=linux-rocky8-zen2
 [bl  ]          ^builtin.libpciaccess@0.16%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
 [bl  ]          ^builtin.libxml2@2.9.12%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~python arch=linux-rocky8-zen2
@@ -612,7 +612,7 @@ Input spec
 
 Concretized
 --------------------------------
-atw72k7  [    ]  builtin.hpl@2.3%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~openmp arch=linux-rocky8-zen2
+3bhqzc4  [    ]  builtin.hpl@2.3%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +openmp arch=linux-rocky8-zen2
 fete7cu  [bl  ]      ^sdsc.mvapich2@2.3.7%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~alloca~cuda~debug+regcache+wrapperrpath ch3_rank_bits=32 fabrics=mrail file_systems=lustre,nfs process_managers=slurm threads=multiple arch=linux-rocky8-zen2
 ykynzrw  [bl  ]          ^builtin.libpciaccess@0.16%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
 mgovjpj  [bl  ]          ^builtin.libxml2@2.9.12%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~python arch=linux-rocky8-zen2
@@ -623,9 +623,9 @@ xjr3cuj  [bl  ]          ^builtin.rdma-core@43.0%gcc@10.2.0 cflags="-O2 -march=n
 bga4e2a  [bl  ]          ^builtin.slurm@23.02.7%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~gtk~hdf5~hwloc~mariadb~pmix+readline~restd sysconfdir=PREFIX/etc arch=linux-rocky8-zen2
 ombsn4y  [bl  ]      ^builtin.openblas@0.3.18%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~bignuma~consistent_fpcsr~ilp64+locking+pic+shared threads=openmp arch=linux-rocky8-zen2
 
-real 9.66
-user 7.67
-sys 0.41
+real 9.73
+user 7.71
+sys 0.38
 [+] /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/gcc-10.2.0/libpciaccess-0.16-ykynzrw4owqljbwyhyouig4rbf7hxdqz
 [+] /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/gcc-10.2.0/libiconv-1.16-zduoj2duq26hlfta4shqtafuq42gp3rq
 [+] /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/gcc-10.2.0/xz-5.2.5-paz7hxzjnp6khsfch7dm66ytubmw5v5j
@@ -635,8 +635,8 @@ sys 0.41
 [+] /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/gcc-10.2.0/openblas-0.3.18-ombsn4yhhl3x2q3v6th7d4hvmkjnq2sk
 [+] /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/gcc-10.2.0/libxml2-2.9.12-mgovjpj47znwb45ityck57ufrgu57mcc
 [+] /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/gcc-10.2.0/mvapich2-2.3.7-fete7cumh776enk524yp52ftlfjrbvsk
-==> Installing hpl-2.3-atw72k7fkwxhgjxaeynf4az5jqngkqvk
-==> No binary for hpl-2.3-atw72k7fkwxhgjxaeynf4az5jqngkqvk found: installing from source
+==> Installing hpl-2.3-3bhqzc45yc3d7ar7zkd3y5j5bsjbslv7
+==> No binary for hpl-2.3-3bhqzc45yc3d7ar7zkd3y5j5bsjbslv7 found: installing from source
 ==> Warning: Expected user 501506 to own /scratch/mkandes, but it is owned by 0
 ==> Using cached archive: /home/mkandes/software/spack/repositories/mkandes/spack/var/spack/cache/_source-cache/archive/32/32c5c17d22330e6f2337b681aded51637fb6008d3f0eb7c277b163fadd612830.tar.gz
 ==> No patches needed for hpl
@@ -644,9 +644,9 @@ sys 0.41
 ==> hpl: Executing phase: 'configure'
 ==> hpl: Executing phase: 'build'
 ==> hpl: Executing phase: 'install'
-==> hpl: Successfully installed hpl-2.3-atw72k7fkwxhgjxaeynf4az5jqngkqvk
-  Fetch: 0.00s.  Build: 16.68s.  Total: 16.68s.
-[+] /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/gcc-10.2.0/hpl-2.3-atw72k7fkwxhgjxaeynf4az5jqngkqvk
-real 27.03
-user 16.43
-sys 4.16
+==> hpl: Successfully installed hpl-2.3-3bhqzc45yc3d7ar7zkd3y5j5bsjbslv7
+  Fetch: 0.00s.  Build: 24.61s.  Total: 24.61s.
+[+] /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/gcc-10.2.0/hpl-2.3-3bhqzc45yc3d7ar7zkd3y5j5bsjbslv7
+real 35.47
+user 16.56
+sys 3.61
