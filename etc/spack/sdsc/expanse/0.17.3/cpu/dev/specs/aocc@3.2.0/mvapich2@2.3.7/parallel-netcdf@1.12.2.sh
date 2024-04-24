@@ -48,7 +48,7 @@ module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
 declare -xr SPACK_PACKAGE='parallel-netcdf@1.12.2'
-declare -xr SPACK_COMPILER='gcc@10.2.0'
+declare -xr SPACK_COMPILER='aocc@3.2.0'
 declare -xr SPACK_VARIANTS='~burstbuffer +cxx +fortran +pic +shared'
 declare -xr SPACK_DEPENDENCIES="^mvapich2@2.3.7/$(spack find --format '{hash:7}' mvapich2@2.3.7 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
@@ -77,6 +77,6 @@ if [[ "${?}" -ne 0 ]]; then
   exit 1
 fi
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'ior@3.3.0.sh'
+#sbatch --dependency="afterok:${SLURM_JOB_ID}" ''
 
 sleep 30
