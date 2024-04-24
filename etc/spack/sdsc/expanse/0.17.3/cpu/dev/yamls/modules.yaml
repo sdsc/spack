@@ -16,7 +16,7 @@ modules:
         suffixes:
           '+openmp': omp
           'threads=openmp': omp
-          '+ipl64': i64
+          '+ilp64': i64
         environment:
           set:
             '{name}_ROOT': '{prefix}'
