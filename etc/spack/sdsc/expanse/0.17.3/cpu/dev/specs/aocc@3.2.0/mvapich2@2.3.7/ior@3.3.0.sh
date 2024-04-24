@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=openmpi@4.1.3
+#SBATCH --job-name=ior@3.3.0
 #SBATCH --account=use300
 #SBATCH --clusters=expanse
 #SBATCH --partition=ind-shared
@@ -47,10 +47,10 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-declare -xr SPACK_PACKAGE='openmpi@4.1.3'
-declare -xr SPACK_COMPILER='aocc@3.2.0'
-declare -xr SPACK_VARIANTS='~atomics~cuda~cxx~cxx_exceptions~gpfs~internal-hwloc~java+legacylaunchers+lustre~memchecker+pmi+pmix+romio~rsh~singularity+static+vt+wrapper-rpath cuda_arch=none fabrics=ucx schedulers=slurm'
-declare -xr SPACK_DEPENDENCIES="^lustre ^slurm ^rdma-core ^ucx@1.10.1/$(spack find --format '{hash:7}' ucx@1.10.1 % aocc@3.2.0)"
+declare -xr SPACK_PACKAGE='ior@3.3.0'
+declare -xr SPACK_COMPILER='gcc@10.2.0'
+declare -xr SPACK_VARIANTS='+hdf5 +ncmpi'
+declare -xr SPACK_DEPENDENCIES="^mvapich2@2.3.7/$(spack find --format '{hash:7}' mvapich2@2.3.7 % ${SPACK_COMPILER}) ^hdf5@1.10.7/$(spack find --format '{hash:7}' hdf5@1.10.7 % ${SPACK_COMPILER} +mpi ^mvapich2@2.3.7) ^parallel-netcdf@1.12.2/$(spack find --format '{hash:7}' parallel-netcdf@1.12.2 % ${SPACK_COMPILER} ^mvapich2@2.3.7)"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -63,7 +63,7 @@ spack config get packages
 spack config get repos
 spack config get upstreams
 
-time -p spack spec --long --namespaces --types --reuse openmpi@4.1.3 % aocc@3.2.0 ~atomics~cuda~cxx~cxx_exceptions~gpfs~internal-hwloc~java+legacylaunchers+lustre~memchecker+pmi+pmix+romio~rsh~singularity+static+vt+wrapper-rpath cuda_arch=none fabrics=ucx schedulers=slurm "^lustre ^slurm ^rdma-core ^ucx@1.10.1/$(spack find --format '{hash:7}' ucx@1.10.1 % aocc@3.2.0)"
+time -p spack spec --long --namespaces --types --reuse "$(echo ${SPACK_SPEC})"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack concretization failed.'
   exit 1
@@ -71,12 +71,12 @@ fi
 
 mkdir -p "${TMPDIR}"
 
-time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all --reuse openmpi@4.1.3 % aocc@3.2.0 ~atomics~cuda~cxx~cxx_exceptions~gpfs~internal-hwloc~java+legacylaunchers+lustre~memchecker+pmi+pmix+romio~rsh~singularity+static+vt+wrapper-rpath cuda_arch=none fabrics=ucx schedulers=slurm "^lustre ^slurm ^rdma-core ^ucx@1.10.1/$(spack find --format '{hash:7}' ucx@1.10.1 % aocc@3.2.0)"
+time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all --reuse "$(echo ${SPACK_SPEC})"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
   exit 1
 fi
 
-#sbatch --dependency="afterok:${SLURM_JOB_ID}" ''
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'osu-micro-benchmarks@5.7.1.sh'
 
 sleep 30
