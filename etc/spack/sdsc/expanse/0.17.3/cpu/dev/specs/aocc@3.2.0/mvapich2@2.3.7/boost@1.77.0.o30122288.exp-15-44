@@ -1,0 +1,695 @@
+1714070605 20240425T114325-0700 30122288 a6b03edb97ff0ee753fab7022ce39852 a2ff1acdb324292defc090a21e8e71773cf06673f87b6b2257606707ac3739b0 82 /home/mkandes/software/spack/repositories/mkandes/spack/etc/spack/sdsc/expanse/0.17.3/cpu/dev/specs/aocc@3.2.0/mvapich2@2.3.7/boost@1.77.0.sh
+#!/usr/bin/env bash
+
+#SBATCH --job-name=boost@1.77.0
+#SBATCH --account=use300
+#SBATCH --clusters=expanse
+#SBATCH --partition=ind-shared
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=1
+#SBATCH --cpus-per-task=16
+#SBATCH --mem=32G
+#SBATCH --time=00:30:00
+#SBATCH --output=%x.o%j.%N
+
+declare -xir UNIX_TIME="$(date +'%s')"
+declare -xr LOCAL_TIME="$(date +'%Y%m%dT%H%M%S%z')"
+
+declare -xr LOCAL_SCRATCH_DIR="/scratch/${USER}/job_${SLURM_JOB_ID}"
+
+declare -xr JOB_SCRIPT="$(scontrol show job ${SLURM_JOB_ID} | awk -F= '/Command=/{print $2}')"
+declare -xr JOB_SCRIPT_MD5="$(md5sum ${JOB_SCRIPT} | awk '{print $1}')"
+declare -xr JOB_SCRIPT_SHA256="$(sha256sum ${JOB_SCRIPT} | awk '{print $1}')"
+declare -xr JOB_SCRIPT_NUMBER_OF_LINES="$(wc -l ${JOB_SCRIPT} | awk '{print $1}')"
+
+declare -xr SCHEDULER_NAME='slurm'
+declare -xr SCHEDULER_MAJOR='23'
+declare -xr SCHEDULER_MINOR='02'
+declare -xr SCHEDULER_REVISION='7'
+declare -xr SCHEDULER_VERSION="${SCHEDULER_MAJOR}.${SCHEDULER_MINOR}.${SCHEDULER_REVISION}"
+declare -xr SCHEDULER_MODULE="${SCHEDULER_NAME}/${SLURM_CLUSTER_NAME}/${SCHEDULER_VERSION}"
+
+declare -xr SPACK_MAJOR='0'
+declare -xr SPACK_MINOR='17'
+declare -xr SPACK_REVISION='3'
+declare -xr SPACK_VERSION="${SPACK_MAJOR}.${SPACK_MINOR}.${SPACK_REVISION}"
+declare -xr SPACK_INSTANCE_NAME='cpu'
+declare -xr SPACK_INSTANCE_VERSION='dev'
+declare -xr SPACK_INSTANCE_DIR='/home/mkandes/software/spack/repositories/mkandes/spack'
+
+declare -xr TMPDIR="${LOCAL_SCRATCH_DIR}/spack-stage"
+declare -xr TMP="${TMPDIR}"
+
+echo "${UNIX_TIME} ${LOCAL_TIME} ${SLURM_JOB_ID} ${JOB_SCRIPT_MD5} ${JOB_SCRIPT_SHA256} ${JOB_SCRIPT_NUMBER_OF_LINES} ${JOB_SCRIPT}"
+cat  "${JOB_SCRIPT}"
+
+module purge
+module load "${SCHEDULER_MODULE}"
+module list
+. "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
+
+declare -xr SPACK_PACKAGE='boost@1.77.0'
+declare -xr SPACK_COMPILER='aocc@3.2.0'
+declare -xr SPACK_VARIANTS='+atomic +chrono ~clanglibcpp ~container ~context ~coroutine +date_time ~debug +exception ~fiber +filesystem +graph ~icu +iostreams +locale +log +math +mpi +multithreaded ~numpy +pic +program_options +python +random +regex +serialization +shared +signals ~singlethreaded +system ~taggedlayout +test +thread +timer ~versionedlayout +wave'
+declare -xr SPACK_DEPENDENCIES="^python@3.8.12/$(spack find --format '{hash:7}' python@3.8.12 % ${SPACK_COMPILER}) ^mvapich2@2.3.7/$(spack find --format '{hash:7}' mvapich2@2.3.7 % ${SPACK_COMPILER})"
+declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
+
+printenv
+
+spack config get compilers  
+spack config get config  
+spack config get mirrors
+spack config get modules
+spack config get packages
+spack config get repos
+spack config get upstreams
+
+time -p spack spec --long --namespaces --types --reuse "$(echo ${SPACK_SPEC})"
+if [[ "${?}" -ne 0 ]]; then
+  echo 'ERROR: spack concretization failed.'
+  exit 1
+fi
+
+mkdir -p "${TMPDIR}"
+
+time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all --reuse "$(echo ${SPACK_SPEC})"
+if [[ "${?}" -ne 0 ]]; then
+  echo 'ERROR: spack install failed.'
+  exit 1
+fi
+
+#sbatch --dependency="afterok:${SLURM_JOB_ID}" ''
+
+sleep 30
+
+Currently Loaded Modules:
+  1) slurm/expanse/23.02.7
+
+ 
+
+CONDA_SHLVL=0
+LD_LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:/cm/shared/apps/slurm/current/lib64
+LS_COLORS=rs=0:di=38;5;33:ln=38;5;51:mh=00:pi=40;38;5;11:so=38;5;13:do=38;5;5:bd=48;5;232;38;5;11:cd=48;5;232;38;5;3:or=48;5;232;38;5;9:mi=01;05;37;41:su=48;5;196;38;5;15:sg=48;5;11;38;5;16:ca=48;5;196;38;5;226:tw=48;5;10;38;5;16:ow=48;5;10;38;5;21:st=48;5;21;38;5;15:ex=38;5;40:*.tar=38;5;9:*.tgz=38;5;9:*.arc=38;5;9:*.arj=38;5;9:*.taz=38;5;9:*.lha=38;5;9:*.lz4=38;5;9:*.lzh=38;5;9:*.lzma=38;5;9:*.tlz=38;5;9:*.txz=38;5;9:*.tzo=38;5;9:*.t7z=38;5;9:*.zip=38;5;9:*.z=38;5;9:*.dz=38;5;9:*.gz=38;5;9:*.lrz=38;5;9:*.lz=38;5;9:*.lzo=38;5;9:*.xz=38;5;9:*.zst=38;5;9:*.tzst=38;5;9:*.bz2=38;5;9:*.bz=38;5;9:*.tbz=38;5;9:*.tbz2=38;5;9:*.tz=38;5;9:*.deb=38;5;9:*.rpm=38;5;9:*.jar=38;5;9:*.war=38;5;9:*.ear=38;5;9:*.sar=38;5;9:*.rar=38;5;9:*.alz=38;5;9:*.ace=38;5;9:*.zoo=38;5;9:*.cpio=38;5;9:*.7z=38;5;9:*.rz=38;5;9:*.cab=38;5;9:*.wim=38;5;9:*.swm=38;5;9:*.dwm=38;5;9:*.esd=38;5;9:*.jpg=38;5;13:*.jpeg=38;5;13:*.mjpg=38;5;13:*.mjpeg=38;5;13:*.gif=38;5;13:*.bmp=38;5;13:*.pbm=38;5;13:*.pgm=38;5;13:*.ppm=38;5;13:*.tga=38;5;13:*.xbm=38;5;13:*.xpm=38;5;13:*.tif=38;5;13:*.tiff=38;5;13:*.png=38;5;13:*.svg=38;5;13:*.svgz=38;5;13:*.mng=38;5;13:*.pcx=38;5;13:*.mov=38;5;13:*.mpg=38;5;13:*.mpeg=38;5;13:*.m2v=38;5;13:*.mkv=38;5;13:*.webm=38;5;13:*.ogm=38;5;13:*.mp4=38;5;13:*.m4v=38;5;13:*.mp4v=38;5;13:*.vob=38;5;13:*.qt=38;5;13:*.nuv=38;5;13:*.wmv=38;5;13:*.asf=38;5;13:*.rm=38;5;13:*.rmvb=38;5;13:*.flc=38;5;13:*.avi=38;5;13:*.fli=38;5;13:*.flv=38;5;13:*.gl=38;5;13:*.dl=38;5;13:*.xcf=38;5;13:*.xwd=38;5;13:*.yuv=38;5;13:*.cgm=38;5;13:*.emf=38;5;13:*.ogv=38;5;13:*.ogx=38;5;13:*.aac=38;5;45:*.au=38;5;45:*.flac=38;5;45:*.m4a=38;5;45:*.mid=38;5;45:*.midi=38;5;45:*.mka=38;5;45:*.mp3=38;5;45:*.mpc=38;5;45:*.ogg=38;5;45:*.ra=38;5;45:*.wav=38;5;45:*.oga=38;5;45:*.opus=38;5;45:*.spx=38;5;45:*.xspf=38;5;45:
+CONDA_EXE=/home/mkandes/software/miniconda/Miniconda3-py312_24.1.2-0-Linux-x86_64/bin/conda
+LOCAL_SCRATCH_DIR=/scratch/mkandes/job_30122288
+SLURM_NODEID=0
+SLURM_TASK_PID=1356305
+__LMOD_REF_COUNT_PATH=/cm/shared/apps/slurm/current/sbin:1;/cm/shared/apps/slurm/current/bin:1;/home/mkandes/software/miniconda/Miniconda3-py312_24.1.2-0-Linux-x86_64/condabin:1;/home/mkandes/.local/bin:1;/home/mkandes/bin:1;/usr/local/bin:1;/usr/bin:1;/usr/local/sbin:1;/usr/sbin:1
+_ModuleTable002_=L2V0Yy9tb2R1bGVmaWxlcyIsIi91c3Ivc2hhcmUvbW9kdWxlZmlsZXMiLCIvdXNyL3NoYXJlL01vZHVsZXMvbW9kdWxlZmlsZXMiLCIvY20vc2hhcmVkL21vZHVsZWZpbGVzIix9LFsic3lzdGVtQmFzZU1QQVRIIl09Ii9jbS9sb2NhbC9tb2R1bGVmaWxlczovY20vc2hhcmVkL2FwcHMvYWNjZXNzL21vZHVsZWZpbGVzOi9jbS9zaGFyZWQvbW9kdWxlZmlsZXM6L2V0Yy9tb2R1bGVmaWxlczovdXNyL3NoYXJlL21vZHVsZWZpbGVzOi91c3Ivc2hhcmUvTW9kdWxlcy9tb2R1bGVmaWxlcyIsfQ==
+SSH_CONNECTION=208.58.212.11 51672 198.202.100.13 22
+SPACK_PYTHON=/usr/bin/python3
+SPACK_MAJOR=0
+SLURM_PRIO_PROCESS=0
+LANG=en_US.UTF-8
+SLURM_SUBMIT_DIR=/home/mkandes/software/spack/repositories/mkandes/spack/etc/spack/sdsc/expanse/0.17.3/cpu/dev/specs/aocc@3.2.0/mvapich2@2.3.7
+HISTCONTROL=ignoredups
+SCHEDULER_NAME=slurm
+HOSTNAME=exp-15-44
+LMOD_SYSTEM_DEFAULT_MODULES=DefaultModules
+OLDPWD=/home/mkandes/software/spack/repositories/mkandes/spack/etc/spack/sdsc/expanse/0.17.3/cpu/dev/specs/aocc@3.2.0
+__LMOD_REF_COUNT__LMFILES_=/cm/shared/modulefiles/slurm/expanse/23.02.7:1
+SLURM_CPUS_PER_TASK=16
+SPACK_DEPENDENCIES=^python@3.8.12/2gd6i3o ^mvapich2@2.3.7/7q54c52
+SCHEDULER_MINOR=02
+ENVIRONMENT=BATCH
+SPACK_VERSION=0.17.3
+SPACK_MINOR=17
+SLURM_PROCID=0
+SPACK_INSTANCE_VERSION=dev
+SLURM_JOB_GID=300
+SPACK_VARIANTS=+atomic +chrono ~clanglibcpp ~container ~context ~coroutine +date_time ~debug +exception ~fiber +filesystem +graph ~icu +iostreams +locale +log +math +mpi +multithreaded ~numpy +pic +program_options +python +random +regex +serialization +shared +signals ~singlethreaded +system ~taggedlayout +test +thread +timer ~versionedlayout +wave
+SCHEDULER_REVISION=7
+SPACK_INSTANCE_DIR=/home/mkandes/software/spack/repositories/mkandes/spack
+__LMOD_REF_COUNT_LD_LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:1;/cm/shared/apps/slurm/current/lib64:1
+SCHEDULER_VERSION=23.02.7
+SLURMD_NODENAME=exp-15-44
+SLURM_JOB_END_TIME=1714072378
+JOB_SCRIPT_MD5=a6b03edb97ff0ee753fab7022ce39852
+SLURM_TASKS_PER_NODE=1
+S_COLORS=auto
+_CE_M=
+which_declare=declare -f
+SPACK_COMPILER=aocc@3.2.0
+XDG_SESSION_ID=101890
+SLURM_NNODES=1
+USER=mkandes
+SLURM_PMIX_TMPDIR=/scratch/mkandes/job_30122288
+SLURM_TMPDIR=/scratch/mkandes/job_30122288
+JOB_SCRIPT_NUMBER_OF_LINES=82
+SLURM_JOB_START_TIME=1714070578
+SLURM_NTASKS_PER_NODE=1
+__LMOD_REF_COUNT_MODULEPATH=/cm/local/modulefiles:1;/cm/shared/apps/access/modulefiles:1;/etc/modulefiles:1;/usr/share/modulefiles:1;/usr/share/Modules/modulefiles:1;/cm/shared/modulefiles:1
+__LMOD_REF_COUNT_LOADEDMODULES=slurm/expanse/23.02.7:1
+SCHEDULER_MAJOR=23
+PWD=/home/mkandes/software/spack/repositories/mkandes/spack/etc/spack/sdsc/expanse/0.17.3/cpu/dev/specs/aocc@3.2.0/mvapich2@2.3.7
+ENABLE_LMOD=1
+SLURM_JOB_NODELIST=exp-15-44
+HOME=/home/mkandes
+SLURM_CLUSTER_NAME=expanse
+TMP=/scratch/mkandes/job_30122288/spack-stage
+CONDA_PYTHON_EXE=/home/mkandes/software/miniconda/Miniconda3-py312_24.1.2-0-Linux-x86_64/bin/python
+LMOD_COLORIZE=yes
+LOCAL_TIME=20240425T114325-0700
+SLURM_NODELIST=exp-15-44
+LMOD_SYSHOST=expanse
+SSH_CLIENT=208.58.212.11 51672 22
+LMOD_VERSION=8.2.4
+CPATH=/cm/shared/apps/slurm/current/include
+SLURM_NTASKS=1
+LMOD_SETTARG_CMD=:
+SLURM_JOB_CPUS_PER_NODE=16
+BASH_ENV=/usr/share/lmod/lmod/init/bash
+SLURM_TOPOLOGY_ADDR=exp-15-44
+_CE_CONDA=
+SLURM_WORKING_CLUSTER=expanse:mgr1:6817:9984:109
+JOB_SCRIPT_SHA256=a2ff1acdb324292defc090a21e8e71773cf06673f87b6b2257606707ac3739b0
+SPACK_PACKAGE=boost@1.77.0
+__LMOD_REF_COUNT_LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:1;/cm/shared/apps/slurm/current/lib64:1
+SLURM_JOB_NAME=boost@1.77.0
+TMPDIR=/scratch/mkandes/job_30122288/spack-stage
+LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:/cm/shared/apps/slurm/current/lib64
+LMOD_sys=Linux
+SLURM_JOBID=30122288
+_ModuleTable001_=X01vZHVsZVRhYmxlXz17WyJNVHZlcnNpb24iXT0zLFsiY19yZWJ1aWxkVGltZSJdPWZhbHNlLFsiY19zaG9ydFRpbWUiXT1mYWxzZSxkZXB0aFQ9e30sZmFtaWx5PXt9LG1UPXtbInNsdXJtL2V4cGFuc2UiXT17WyJmbiJdPSIvY20vc2hhcmVkL21vZHVsZWZpbGVzL3NsdXJtL2V4cGFuc2UvMjMuMDIuNyIsWyJmdWxsTmFtZSJdPSJzbHVybS9leHBhbnNlLzIzLjAyLjciLFsibG9hZE9yZGVyIl09MSxwcm9wVD17fSxbInN0YWNrRGVwdGgiXT0wLFsic3RhdHVzIl09ImFjdGl2ZSIsWyJ1c2VyTmFtZSJdPSJzbHVybS9leHBhbnNlLzIzLjAyLjciLH0sfSxtcGF0aEE9eyIvY20vbG9jYWwvbW9kdWxlZmlsZXMiLCIvY20vc2hhcmVkL2FwcHMvYWNjZXNzL21vZHVsZWZpbGVzIiwi
+SLURM_CONF=/cm/shared/apps/slurm/var/etc/expanse/slurm.conf
+LOADEDMODULES=slurm/expanse/23.02.7
+__LMOD_REF_COUNT_MANPATH=/cm/shared/apps/slurm/current/man:2;/usr/share/lmod/lmod/share/man:1;/usr/local/share/man:1;/usr/share/man:1;/cm/local/apps/environment-modules/current/share/man:1
+_ModuleTable003_=TmFtZSJdPSJzaGFyZWQiLH0sc2x1cm09e1siZm4iXT0iL2NtL2xvY2FsL21vZHVsZWZpbGVzL3NsdXJtL2V4cGFuc2UvMjMuMDIuNyIsWyJmdWxsTmFtZSJdPSJzbHVybS9leHBhbnNlLzIzLjAyLjciLFsibG9hZE9yZGVyIl09Myxwcm9wVD17fSxbInN0YWNrRGVwdGgiXT0yLFsic3RhdHVzIl09ImFjdGl2ZSIsWyJ1c2VyTmFtZSJdPSJzbHVybSIsfSx9LG1wYXRoQT17Ii9jbS9zaGFyZWQvYXBwcy9zcGFjay8wLjE3LjMvY3B1L2Ivc2hhcmUvc3BhY2svbG1vZC9saW51eC1yb2NreTgteDg2XzY0L0NvcmUiLCIvY20vbG9jYWwvbW9kdWxlZmlsZXMiLCIvY20vc2hhcmVkL2FwcHMvYWNjZXNzL21vZHVsZWZpbGVzIiwiL2V0Yy9tb2R1bGVmaWxlcyIsIi91c3Ivc2hhcmUvbW9k
+SLURM_NODE_ALIASES=(null)
+SLURM_JOB_QOS=ind-shared-normal
+LMOD_ROOT=/usr/share/lmod
+SLURM_TOPOLOGY_ADDR_PATTERN=node
+SSH_TTY=/dev/pts/160
+MAIL=/var/spool/mail/mkandes
+SLURM_CPUS_ON_NODE=16
+LMOD_arch=x86_64
+SLURM_JOB_NUM_NODES=1
+__Init_Default_Modules=1
+CMD_WLM_CLUSTER_NAME=expanse
+SLURM_MEM_PER_NODE=32768
+SPACK_ROOT=/home/mkandes/software/spack/repositories/mkandes/spack
+SHELL=/bin/bash
+TERM=xterm-256color
+SLURM_JOB_UID=501506
+_ModuleTable_Sz_=2
+__LMOD_REF_COUNT_CPATH=/cm/shared/apps/slurm/current/include:1
+SLURM_JOB_PARTITION=ind-shared
+SLURM_SCRIPT_CONTEXT=prolog_task
+SPACK_INSTANCE_NAME=cpu
+SLURM_JOB_USER=mkandes
+JOB_SCRIPT=/home/mkandes/software/spack/repositories/mkandes/spack/etc/spack/sdsc/expanse/0.17.3/cpu/dev/specs/aocc@3.2.0/mvapich2@2.3.7/boost@1.77.0.sh
+SLURM_NPROCS=1
+SHLVL=2
+SLURM_SUBMIT_HOST=login01
+UNIX_TIME=1714070605
+SLURM_JOB_ACCOUNT=use300
+MANPATH=/cm/shared/apps/slurm/current/man:/usr/share/lmod/lmod/share/man::/usr/local/share/man:/usr/share/man:/cm/local/apps/environment-modules/current/share/man
+LMOD_PREPEND_BLOCK=normal
+MODULEPATH=/cm/local/modulefiles:/cm/shared/apps/access/modulefiles:/etc/modulefiles:/usr/share/modulefiles:/usr/share/Modules/modulefiles:/cm/shared/modulefiles
+SLURM_GTIDS=0
+LOGNAME=mkandes
+DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/501506/bus
+XDG_RUNTIME_DIR=/run/user/501506
+MODULEPATH_ROOT=/usr/share/modulefiles
+LMOD_PACKAGE_PATH=/usr/share/lmod/etc/site/lmod
+PATH=/home/mkandes/software/spack/repositories/mkandes/spack/bin:/cm/shared/apps/slurm/current/sbin:/cm/shared/apps/slurm/current/bin:/home/mkandes/software/miniconda/Miniconda3-py312_24.1.2-0-Linux-x86_64/condabin:/home/mkandes/.local/bin:/home/mkandes/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin
+SLURM_JOB_ID=30122288
+_LMFILES_=/cm/shared/modulefiles/slurm/expanse/23.02.7
+SPACK_REVISION=3
+DEBUGINFOD_URLS=https://debuginfod.centos.org/ 
+SCHEDULER_MODULE=slurm/expanse/23.02.7
+MODULESHOME=/usr/share/lmod/lmod
+LMOD_SETTARG_FULL_SUPPORT=no
+HISTSIZE=-1
+LMOD_PKG=/usr/share/lmod/lmod
+SPACK_SPEC=boost@1.77.0 % aocc@3.2.0 +atomic +chrono ~clanglibcpp ~container ~context ~coroutine +date_time ~debug +exception ~fiber +filesystem +graph ~icu +iostreams +locale +log +math +mpi +multithreaded ~numpy +pic +program_options +python +random +regex +serialization +shared +signals ~singlethreaded +system ~taggedlayout +test +thread +timer ~versionedlayout +wave ^python@3.8.12/2gd6i3o ^mvapich2@2.3.7/7q54c52
+LMOD_CMD=/usr/share/lmod/lmod/libexec/lmod
+SLURM_LOCALID=0
+LESSOPEN=||/usr/bin/lesspipe.sh %s
+LMOD_FULL_SETTARG_SUPPORT=no
+LMOD_DIR=/usr/share/lmod/lmod/libexec
+BASH_FUNC_which%%=() {  ( alias;
+ eval ${which_declare} ) | /usr/bin/which --tty-only --read-alias --read-functions --show-tilde --show-dot $@
+}
+BASH_FUNC_module%%=() {  eval $($LMOD_CMD bash "$@") && eval $(${LMOD_SETTARG_CMD:-:} -s sh)
+}
+BASH_FUNC_spack%%=() {  : this is a shell function from: /home/mkandes/software/spack/repositories/mkandes/spack/share/spack/setup-env.sh;
+ : the real spack script is here: /home/mkandes/software/spack/repositories/mkandes/spack/bin/spack;
+ _spack_shell_wrapper "$@";
+ return $?
+}
+BASH_FUNC__spack_shell_wrapper%%=() {  for var in LD_LIBRARY_PATH DYLD_LIBRARY_PATH DYLD_FALLBACK_LIBRARY_PATH;
+ do
+ eval "if [ -n \"\${${var}-}\" ]; then export SPACK_$var=\${${var}}; fi";
+ done;
+ if [ -n "${ZSH_VERSION:-}" ]; then
+ emulate -L sh;
+ fi;
+ _sp_flags="";
+ while [ ! -z ${1+x} ] && [ "${1#-}" != "${1}" ]; do
+ _sp_flags="$_sp_flags $1";
+ shift;
+ done;
+ if [ -n "$_sp_flags" ] && [ "${_sp_flags#*h}" != "${_sp_flags}" ] || [ "${_sp_flags#*V}" != "${_sp_flags}" ]; then
+ command spack $_sp_flags "$@";
+ return;
+ fi;
+ _sp_subcommand="";
+ if [ ! -z ${1+x} ]; then
+ _sp_subcommand="$1";
+ shift;
+ fi;
+ case $_sp_subcommand in 
+ "cd")
+ _sp_arg="";
+ if [ -n "$1" ]; then
+ _sp_arg="$1";
+ shift;
+ fi;
+ if [ "$_sp_arg" = "-h" ] || [ "$_sp_arg" = "--help" ]; then
+ command spack cd -h;
+ else
+ LOC="$(spack location $_sp_arg "$@")";
+ if [ -d "$LOC" ]; then
+ cd "$LOC";
+ else
+ return 1;
+ fi;
+ fi;
+ return
+ ;;
+ "env")
+ _sp_arg="";
+ if [ -n "$1" ]; then
+ _sp_arg="$1";
+ shift;
+ fi;
+ if [ "$_sp_arg" = "-h" ] || [ "$_sp_arg" = "--help" ]; then
+ command spack env -h;
+ else
+ case $_sp_arg in 
+ activate)
+ _a=" $@";
+ if [ -z ${1+x} ] || [ "${_a#* --sh}" != "$_a" ] || [ "${_a#* --csh}" != "$_a" ] || [ "${_a#* -h}" != "$_a" ] || [ "${_a#* --help}" != "$_a" ]; then
+ command spack env activate "$@";
+ else
+ stdout="$(command spack $_sp_flags env activate --sh "$@")" || return;
+ eval "$stdout";
+ fi
+ ;;
+ deactivate)
+ _a=" $@";
+ if [ "${_a#* --sh}" != "$_a" ] || [ "${_a#* --csh}" != "$_a" ]; then
+ command spack env deactivate "$@";
+ else
+ if [ -n "$*" ]; then
+ command spack env deactivate -h;
+ else
+ stdout="$(command spack $_sp_flags env deactivate --sh)" || return;
+ eval "$stdout";
+ fi;
+ fi
+ ;;
+ *)
+ command spack env $_sp_arg "$@"
+ ;;
+ esac;
+ fi;
+ return
+ ;;
+ "load" | "unload")
+ _a=" $@";
+ if [ "${_a#* --sh}" != "$_a" ] || [ "${_a#* --csh}" != "$_a" ] || [ "${_a#* -h}" != "$_a" ] || [ "${_a#* --list}" != "$_a" ] || [ "${_a#* --help}" != "$_a" ]; then
+ command spack $_sp_flags $_sp_subcommand "$@";
+ else
+ stdout="$(command spack $_sp_flags $_sp_subcommand --sh "$@")" || return;
+ eval "$stdout";
+ fi
+ ;;
+ *)
+ command spack $_sp_flags $_sp_subcommand "$@"
+ ;;
+ esac
+}
+BASH_FUNC_ml%%=() {  eval $($LMOD_DIR/ml_cmd "$@")
+}
+_=/usr/bin/printenv
+compilers:
+- compiler:
+    spec: gcc@8.5.0
+    paths:
+      cc: /usr/bin/gcc
+      cxx: /usr/bin/g++
+      f77: /usr/bin/gfortran
+      fc: /usr/bin/gfortran
+    flags:
+      cflags: -O2 -march=native
+      cxxflags: -O2 -march=native
+      fflags: -O2 -march=native
+    operating_system: rocky8
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+- compiler:
+    spec: gcc@10.2.0
+    paths:
+      cc: /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen/gcc-8.5.0/gcc-10.2.0-npcyll4gxjhf4tejksmdzlsl3d3usqpd/bin/gcc
+      cxx: /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen/gcc-8.5.0/gcc-10.2.0-npcyll4gxjhf4tejksmdzlsl3d3usqpd/bin/g++
+      f77: /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen/gcc-8.5.0/gcc-10.2.0-npcyll4gxjhf4tejksmdzlsl3d3usqpd/bin/gfortran
+      fc: /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen/gcc-8.5.0/gcc-10.2.0-npcyll4gxjhf4tejksmdzlsl3d3usqpd/bin/gfortran
+    flags:
+      cflags: -O2 -march=native
+      cxxflags: -O2 -march=native
+      fflags: -O2 -march=native
+    operating_system: rocky8
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+- compiler:
+    spec: aocc@3.2.0
+    paths:
+      cc: /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen/gcc-8.5.0/aocc-3.2.0-io3s466wsnnichqc2o2rikbuloev5bmq/bin/clang
+      cxx: /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen/gcc-8.5.0/aocc-3.2.0-io3s466wsnnichqc2o2rikbuloev5bmq/bin/clang++
+      f77: /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen/gcc-8.5.0/aocc-3.2.0-io3s466wsnnichqc2o2rikbuloev5bmq/bin/flang
+      fc: /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen/gcc-8.5.0/aocc-3.2.0-io3s466wsnnichqc2o2rikbuloev5bmq/bin/flang
+    flags:
+      cflags: -O2 -march=native
+      cxxflags: -O2 -march=native
+      fflags: -O2 -march=native
+    operating_system: rocky8
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+config:
+  install_tree:
+    root: $spack/opt/spack
+    projections:
+      all: ${ARCHITECTURE}/${COMPILERNAME}-${COMPILERVER}/${PACKAGE}-${VERSION}-${HASH}
+  template_dirs:
+  - $spack/share/spack/templates
+
+  # Temporary locations Spack can try to use for builds.
+  #
+  # Recommended options are given below.
+  #
+  # Builds can be faster in temporary directories on some (e.g., HPC) systems.
+  # Specifying `$tempdir` will ensure use of the default temporary directory
+  # (i.e., ``$TMP` or ``$TMPDIR``).
+  #
+  # Another option that prevents conflicts and potential permission issues is
+  # to specify `$user_cache_path/stage`, which ensures each user builds in their
+  # home directory.
+  #
+  # A more traditional path uses the value of `$spack/var/spack/stage`, which
+  # builds directly inside Spack's instance without staging them in a
+  # temporary space.  Problems with specifying a path inside a Spack instance
+  # are that it precludes its use as a system package and its ability to be
+  # pip installable.
+  #
+  # In any case, if the username is not already in the path, Spack will append
+  # the value of `$user` in an attempt to avoid potential conflicts between
+  # users in shared temporary spaces.
+  #
+  # The build stage can be purged with `spack clean --stage` and
+  # `spack clean -a`, so it is important that the specified directory uniquely
+  # identifies Spack staging to avoid accidentally wiping out non-Spack work.
+  build_stage:
+  - $tempdir/$user/spack-stage
+  - $user_cache_path/stage
+  # - $spack/var/spack/stage
+
+  # Directory in which to run tests and store test results.
+  # Tests will be stored in directories named by date/time and package
+  # name/hash.
+  test_stage: $user_cache_path/test
+  source_cache: $spack/var/spack/cache
+  misc_cache: $user_cache_path/cache
+  connect_timeout: 10
+  verify_ssl: true
+  suppress_gpg_warnings: false
+  install_missing_compilers: false
+  checksum: true
+  deprecated: false
+  dirty: false
+  build_language: C
+  locks: true
+  url_fetch_method: urllib
+  ccache: false
+  concretizer: clingo
+  db_lock_timeout: 3
+  package_lock_timeout: null
+  shared_linking: rpath
+  allow_sgid: true
+  terminal_title: false
+  debug: false
+  build_jobs: 16
+mirrors:
+  spack-public: https://mirror.spack.io
+modules:
+  default:
+    'enable:':
+    - lmod
+    lmod:
+      core_compilers:
+      - gcc@8.5.0
+      hierarchy:
+      - mpi
+      hash_length: 0
+      blacklist_implicits: true
+      naming_scheme: '{name}/{version}-{hash:7}'
+      projections:
+        all: '{name}/{version}-{hash:7}'
+      all:
+        suffixes:
+          +openmp: omp
+          threads=openmp: omp
+          +ilp64: i64
+        environment:
+          set:
+            '{name}_ROOT': '{prefix}'
+      intel:
+        environment:
+          set:
+            INTEL_LICENSE_FILE: 40000@elprado.sdsc.edu:40200@elprado.sdsc.edu
+      petsc:
+        suffixes:
+          +complex: cmplx
+      slepc:
+        suffixes:
+          ^petsc +complex: cmplx
+      ^python:
+        autoload: direct
+      ^ucx:
+        autoload: direct
+  prefix_inspections:
+    lib:
+    - LD_LIBRARY_PATH
+    lib64:
+    - LD_LIBRARY_PATH
+    bin:
+    - PATH
+    man:
+    - MANPATH
+    share/man:
+    - MANPATH
+    share/aclocal:
+    - ACLOCAL_PATH
+    lib/pkgconfig:
+    - PKG_CONFIG_PATH
+    lib64/pkgconfig:
+    - PKG_CONFIG_PATH
+    share/pkgconfig:
+    - PKG_CONFIG_PATH
+    ? ''
+    : - CMAKE_PREFIX_PATH
+
+  # These are configurations for the module set named "default"
+packages:
+  lmod:
+    externals:
+    - spec: lmod@8.2.4
+      prefix: /usr
+    buildable: false
+  lustre:
+    externals:
+    - spec: lustre@2.15.2
+      prefix: /usr
+    buildable: false
+  openssl:
+    externals:
+    - spec: openssl@1.1.1k
+      prefix: /usr
+    buildable: false
+  rdma-core:
+    externals:
+    - spec: rdma-core@43.0
+      prefix: /usr
+    buildable: false
+  hcoll:
+    externals:
+    - spec: hcoll@4.8.3220
+      prefix: /opt/mellanox/hcoll
+    buildable: false
+  knem:
+    externals:
+    - spec: knem@1.1.4
+      prefix: /opt/knem-1.1.4.90mlnx1
+    buildable: false
+  xpmem:
+    externals:
+    - spec: xpmem@2.4.6
+      prefix: /usr
+    buildable: false
+  slurm:
+    externals:
+    - spec: slurm@23.02.7
+      prefix: /cm/shared/apps/slurm/current
+    buildable: false
+  all:
+    compiler: [gcc, intel, pgi, clang, xl, nag, fj, aocc]
+    providers:
+      awk: [gawk]
+      blas: [openblas, amdblis]
+      D: [ldc]
+      daal: [intel-daal]
+      elf: [elfutils]
+      fftw-api: [fftw, amdfftw]
+      flame: [libflame, amdlibflame]
+      fuse: [libfuse]
+      gl: [mesa+opengl, mesa18, opengl]
+      glu: [mesa-glu, openglu]
+      glx: [mesa+glx, mesa18+glx, opengl]
+      golang: [gcc]
+      iconv: [libiconv]
+      ipp: [intel-ipp]
+      java: [openjdk, jdk, ibm-java]
+      jpeg: [libjpeg-turbo, libjpeg]
+      lapack: [openblas, amdlibflame]
+      lua-lang: [lua, lua-luajit]
+      mariadb-client: [mariadb-c-client, mariadb]
+      mkl: [intel-mkl]
+      mpe: [mpe2]
+      mpi: [openmpi, mpich]
+      mysql-client: [mysql, mariadb-c-client]
+      opencl: [pocl]
+      onedal: [intel-oneapi-dal]
+      osmesa: [mesa+osmesa, mesa18+osmesa]
+      pbs: [openpbs, torque]
+      pil: [py-pillow]
+      pkgconfig: [pkgconf, pkg-config]
+      rpc: [libtirpc]
+      scalapack: [netlib-scalapack, amdscalapack]
+      sycl: [hipsycl]
+      szip: [libaec, libszip]
+      tbb: [intel-tbb]
+      unwind: [libunwind]
+      uuid: [util-linux-uuid, libuuid]
+      xxd: [xxd-standalone, vim]
+      yacc: [bison, byacc]
+      ziglang: [zig]
+    permissions:
+      read: world
+      write: user
+repos:
+- $spack/var/spack/repos/sdsc
+- $spack/var/spack/repos/builtin
+upstreams: {}
+Input spec
+--------------------------------
+[    ]  .boost@1.77.0%aocc@3.2.0+atomic+chrono~clanglibcpp~container~context~coroutine+date_time~debug+exception~fiber+filesystem+graph~icu+iostreams+locale+log+math+mpi+multithreaded~numpy+pic+program_options+python+random+regex+serialization+shared+signals~singlethreaded+system~taggedlayout+test+thread+timer~versionedlayout+wave
+[    ]      ^sdsc.mvapich2@2.3.7%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~alloca~cuda~debug+regcache+wrapperrpath ch3_rank_bits=32 fabrics=mrail file_systems=lustre,nfs process_managers=slurm threads=multiple arch=linux-rocky8-zen2
+[bl  ]          ^builtin.libpciaccess@0.16%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+[bl  ]          ^builtin.libxml2@2.9.12%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~python arch=linux-rocky8-zen2
+[bl  ]              ^builtin.libiconv@1.16%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  libs=shared,static arch=linux-rocky8-zen2
+[bl  ]              ^builtin.xz@5.2.5%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~pic libs=shared,static arch=linux-rocky8-zen2
+[bl  ]              ^builtin.zlib@1.2.11%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +optimize+pic+shared arch=linux-rocky8-zen2
+[bl  ]          ^builtin.rdma-core@43.0%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~ipo build_type=RelWithDebInfo arch=linux-rocky8-zen2
+[bl  ]          ^builtin.slurm@23.02.7%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~gtk~hdf5~hwloc~mariadb~pmix+readline~restd sysconfdir=PREFIX/etc arch=linux-rocky8-zen2
+[    ]      ^builtin.python@3.8.12%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +bz2+ctypes+dbm~debug+libxml2+lzma~nis~optimizations+pic+pyexpat+pythoncmd+readline+shared+sqlite3+ssl~tix~tkinter~ucs4+uuid+zlib patches=0d98e93189bc278fbc37a50ed7f183bd8aaf249a8e1670a465f0db6bb4f8cf87,4c2457325f2b608b1b6a2c63087df8c26e07db3e3d493caf36a56f0ecf6fb768,f2fd060afc4b4618fe8104c4c5d771f36dc55b1db5a4623785a4ea707ec72fb4 arch=linux-rocky8-zen2
+[bl  ]          ^builtin.bzip2@1.0.8%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~debug~pic+shared arch=linux-rocky8-zen2
+[bl  ]          ^builtin.expat@2.4.1%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +libbsd arch=linux-rocky8-zen2
+[bl  ]              ^builtin.libbsd@0.11.3%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+[bl  ]                  ^builtin.libmd@1.0.3%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+[bl  ]          ^sdsc.gdbm@1.19%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+[bl  ]              ^builtin.readline@8.1%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+[bl  ]                  ^builtin.ncurses@6.2%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~symlinks+termlib abi=none arch=linux-rocky8-zen2
+[bl  ]          ^builtin.gettext@0.21%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +bzip2+curses+git~libunistring+libxml2+tar+xz arch=linux-rocky8-zen2
+[bl  ]              ^builtin.libiconv@1.16%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  libs=shared,static arch=linux-rocky8-zen2
+[bl  ]              ^builtin.libxml2@2.9.12%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~python arch=linux-rocky8-zen2
+[blr ]                  ^builtin.xz@5.2.5%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~pic libs=shared,static arch=linux-rocky8-zen2
+[bl  ]                  ^builtin.zlib@1.2.11%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +optimize+pic+shared arch=linux-rocky8-zen2
+[bl  ]              ^builtin.tar@1.34%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+[bl  ]          ^builtin.libffi@3.3%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  patches=26f26c6f29a7ce9bf370ad3ab2610f99365b4bdd7b82e7c31df41a3370d685c0 arch=linux-rocky8-zen2
+[bl  ]          ^builtin.openssl@1.1.1k%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~docs certs=system arch=linux-rocky8-zen2
+[bl  ]          ^builtin.sqlite@3.36.0%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +column_metadata+fts~functions~rtree arch=linux-rocky8-zen2
+[bl  ]          ^builtin.util-linux-uuid@2.36.2%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+
+Concretized
+--------------------------------
+ojg3kv7  [    ]  builtin.boost@1.77.0%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +atomic+chrono~clanglibcpp~container~context~coroutine+date_time~debug+exception~fiber+filesystem+graph~icu+iostreams+locale+log+math+mpi+multithreaded~numpy+pic+program_options+python+random+regex+serialization+shared+signals~singlethreaded+system~taggedlayout+test+thread+timer~versionedlayout+wave cxxstd=98 patches=93f4aad8f88d1437e50d95a2d066390ef3753b99ef5de24f7a46bc083bd6df06,b8569d7d4c3ef0501a39857126a2b0a88519bf256c29f3252a6958916ce82255 visibility=hidden arch=linux-rocky8-zen2
+pvpmqs4  [bl  ]      ^builtin.bzip2@1.0.8%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~debug~pic+shared arch=linux-rocky8-zen2
+7q54c52  [bl  ]      ^sdsc.mvapich2@2.3.7%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~alloca~cuda~debug+regcache+wrapperrpath ch3_rank_bits=32 fabrics=mrail file_systems=lustre,nfs process_managers=slurm threads=multiple arch=linux-rocky8-zen2
+whgqok2  [bl  ]          ^builtin.libpciaccess@0.16%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+6xxubr4  [bl  ]          ^builtin.libxml2@2.9.12%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~python arch=linux-rocky8-zen2
+wsl5g6s  [bl  ]              ^builtin.libiconv@1.16%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  libs=shared,static arch=linux-rocky8-zen2
+pc3ghll  [blr ]              ^builtin.xz@5.2.5%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~pic libs=shared,static arch=linux-rocky8-zen2
+4flcxn7  [bl  ]              ^builtin.zlib@1.2.11%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +optimize+pic+shared arch=linux-rocky8-zen2
+gmae2bb  [bl  ]          ^builtin.rdma-core@43.0%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~ipo build_type=RelWithDebInfo arch=linux-rocky8-zen2
+uj7pfgq  [bl  ]          ^builtin.slurm@23.02.7%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~gtk~hdf5~hwloc~mariadb~pmix+readline~restd sysconfdir=PREFIX/etc arch=linux-rocky8-zen2
+2gd6i3o  [bl  ]      ^builtin.python@3.8.12%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +bz2+ctypes+dbm~debug+libxml2+lzma~nis~optimizations+pic+pyexpat+pythoncmd+readline+shared+sqlite3+ssl~tix~tkinter~ucs4+uuid+zlib patches=0d98e93189bc278fbc37a50ed7f183bd8aaf249a8e1670a465f0db6bb4f8cf87,4c2457325f2b608b1b6a2c63087df8c26e07db3e3d493caf36a56f0ecf6fb768,f2fd060afc4b4618fe8104c4c5d771f36dc55b1db5a4623785a4ea707ec72fb4 arch=linux-rocky8-zen2
+d4wiitw  [bl  ]          ^builtin.expat@2.4.1%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +libbsd arch=linux-rocky8-zen2
+zpca44r  [bl  ]              ^builtin.libbsd@0.11.3%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+tlqbjjl  [bl  ]                  ^builtin.libmd@1.0.3%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+fwban2n  [bl  ]          ^sdsc.gdbm@1.19%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+zcvyw4d  [bl  ]              ^builtin.readline@8.1%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+vrkfn5j  [bl  ]                  ^builtin.ncurses@6.2%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~symlinks+termlib abi=none arch=linux-rocky8-zen2
+a5ype3y  [bl  ]          ^builtin.gettext@0.21%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +bzip2+curses+git~libunistring+libxml2+tar+xz arch=linux-rocky8-zen2
+zn3a5tk  [bl  ]              ^builtin.tar@1.34%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+34w374u  [bl  ]          ^builtin.libffi@3.3%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  patches=26f26c6f29a7ce9bf370ad3ab2610f99365b4bdd7b82e7c31df41a3370d685c0 arch=linux-rocky8-zen2
+tcqf4zl  [bl  ]          ^builtin.openssl@1.1.1k%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~docs certs=system arch=linux-rocky8-zen2
+5h6inaj  [bl  ]          ^builtin.sqlite@3.36.0%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +column_metadata+fts~functions~rtree arch=linux-rocky8-zen2
+bj7ksgi  [bl  ]          ^builtin.util-linux-uuid@2.36.2%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+
+real 9.62
+user 7.60
+sys 0.45
+[+] /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/aocc-3.2.0/bzip2-1.0.8-pvpmqs4qb64szb4x53ihiwodo5loh7b2
+[+] /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/aocc-3.2.0/libpciaccess-0.16-whgqok2xjb5etklrj4dbq4cgluhz6lkx
+[+] /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/aocc-3.2.0/libiconv-1.16-wsl5g6st5jyapuwm6v4kcmqfwk4rgv4o
+[+] /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/aocc-3.2.0/xz-5.2.5-pc3ghlluedfbvdez3zy5lhgi36fkpgkv
+[+] /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/aocc-3.2.0/zlib-1.2.11-4flcxn7lslkefdgzznnuze45gsyvxwgh
+[+] /usr (external rdma-core-43.0-gmae2bb3dadxef7biqqxqfl7nw7e5fde)
+[+] /cm/shared/apps/slurm/current (external slurm-23.02.7-uj7pfgq6rctrgj7numej5q2h35aih2c2)
+[+] /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/aocc-3.2.0/libmd-1.0.3-tlqbjjl6svdsfo67us7wufkvihzu4gmq
+[+] /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/aocc-3.2.0/ncurses-6.2-vrkfn5jb4tcajusp2qyzifpbodxlfwui
+[+] /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/aocc-3.2.0/libffi-3.3-34w374upqmarumyeqlhq7t4cx5yfurei
+[+] /usr (external openssl-1.1.1k-tcqf4zl5m4adhoiknjk6lkmevl5nuhlm)
+[+] /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/aocc-3.2.0/util-linux-uuid-2.36.2-bj7ksgi35jpcp2uvpczt5px2hglxvwmh
+[+] /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/aocc-3.2.0/tar-1.34-zn3a5tkx6mrvb7yg5ggfddsb3izaxn3a
+[+] /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/aocc-3.2.0/libxml2-2.9.12-6xxubr4qhvvonxrfmyomn5kcjzqru6b6
+[+] /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/aocc-3.2.0/libbsd-0.11.3-zpca44rjvopphwief3cstodeknbsvn3f
+[+] /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/aocc-3.2.0/readline-8.1-zcvyw4dxzoa4aoawktt6xdvghq2g7ilp
+[+] /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/aocc-3.2.0/mvapich2-2.3.7-7q54c52jzcdyd7nkbfegcwn5toigal4h
+[+] /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/aocc-3.2.0/gettext-0.21-a5ype3yd6xbddv6tl2f6qr3urwg2gevp
+[+] /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/aocc-3.2.0/expat-2.4.1-d4wiitwext7ubq4kqj6bpajzu42xdzq7
+[+] /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/aocc-3.2.0/sqlite-3.36.0-5h6inajon6ra5cam6pr4lvq5ei65y72t
+[+] /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/aocc-3.2.0/gdbm-1.19-fwban2n2jwnwygj5ospckd2wdxslf3ln
+[+] /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/aocc-3.2.0/python-3.8.12-2gd6i3opvdjyeyfohhwy5yt2e7b7ejat
+==> Installing boost-1.77.0-ojg3kv7hwcsgpy5ufd22fvd3f2k3gvfl
+==> No binary for boost-1.77.0-ojg3kv7hwcsgpy5ufd22fvd3f2k3gvfl found: installing from source
+==> Warning: Expected user 501506 to own /scratch/mkandes, but it is owned by 0
+==> Using cached archive: /home/mkandes/software/spack/repositories/mkandes/spack/var/spack/cache/_source-cache/archive/fc/fc9f85fc030e233142908241af7a846e60630aa7388de9a5fafb1f3a26840854.tar.bz2
+==> Using cached archive: /home/mkandes/software/spack/repositories/mkandes/spack/var/spack/cache/_source-cache/archive/93/93f4aad8f88d1437e50d95a2d066390ef3753b99ef5de24f7a46bc083bd6df06
+==> Applied patch /home/mkandes/software/spack/repositories/mkandes/spack/var/spack/repos/builtin/packages/boost/python_jam-1_77.patch
+==> Applied patch https://github.com/bfgroup/b2/commit/23212066f0f20358db54568bb16b3fe1d76f88ce.patch
+==> Ran patch() for boost
+==> boost: Executing phase: 'install'
+==> boost: Successfully installed boost-1.77.0-ojg3kv7hwcsgpy5ufd22fvd3f2k3gvfl
+  Fetch: 0.14s.  Build: 5m 7.51s.  Total: 5m 7.65s.
+[+] /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/aocc-3.2.0/boost-1.77.0-ojg3kv7hwcsgpy5ufd22fvd3f2k3gvfl
+real 432.29
+user 1038.27
+sys 78.34
