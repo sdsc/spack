@@ -8,7 +8,7 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=16
 #SBATCH --mem=32G
-#SBATCH --time=00:30:00
+#SBATCH --time=48:00:00
 #SBATCH --output=%x.o%j.%N
 
 declare -xir UNIX_TIME="$(date +'%s')"
@@ -63,7 +63,7 @@ spack config get packages
 spack config get repos
 spack config get upstreams
 
-time -p spack spec --long --namespaces --types --reuse "$(echo ${SPACK_SPEC})"
+time -p spack --show-cores=minimized spec --long --namespaces --types --reuse "$(echo ${SPACK_SPEC})"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack concretization failed.'
   exit 1
@@ -77,6 +77,6 @@ if [[ "${?}" -ne 0 ]]; then
   exit 1
 fi
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'amdlibflame@3.1-i64-omp.sh'
+#sbatch --dependency="afterok:${SLURM_JOB_ID}" ''
 
 sleep 30
