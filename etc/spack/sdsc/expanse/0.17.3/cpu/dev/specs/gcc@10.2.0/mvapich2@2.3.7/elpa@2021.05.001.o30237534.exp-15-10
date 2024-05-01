@@ -1,4 +1,4 @@
-1714587546 20240501T111906-0700 30237433 66631106e25aea7e3b4ce0695a3c9d58 bb63588e136b7e8ed52b2e2af84a47e488aa7f8e09de040200a24ce9f67fa96f 85 /home/mkandes/software/spack/repositories/mkandes/spack/etc/spack/sdsc/expanse/0.17.3/cpu/dev/specs/gcc@10.2.0/mvapich2@2.3.7/elpa@2021.05.001.sh
+1714588242 20240501T113042-0700 30237534 8cc71a159cfcee6ec0715b4dd52cb0cd 49ba44ace572169a0c90e8e0ead502ca1fa02a6bc549c24b06d7cec26ddf6c70 82 /home/mkandes/software/spack/repositories/mkandes/spack/etc/spack/sdsc/expanse/0.17.3/cpu/dev/specs/gcc@10.2.0/mvapich2@2.3.7/elpa@2021.05.001.sh
 #!/usr/bin/env bash
 
 #SBATCH --job-name=elpa@2021.05.001
@@ -50,7 +50,7 @@ module list
 
 declare -xr SPACK_PACKAGE='elpa@2021.05.001'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS='~cuda +mpi +openmp ~rocm'
+declare -xr SPACK_VARIANTS='~cuda +mpi ~openmp ~rocm'
 declare -xr SPACK_DEPENDENCIES="^openblas@0.3.18/$(spack find --format '{hash:7}' openblas@0.3.18 % ${SPACK_COMPILER} ~ilp64 threads=none) ^python@3.8.12/$(spack find --format '{hash:7}' python@3.8.12 % ${SPACK_COMPILER}) ^netlib-scalapack@2.1.0/$(spack find --format '{hash:7}' netlib-scalapack@2.1.0 % ${SPACK_COMPILER} ^mvapich2@2.3.7)"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
@@ -73,9 +73,6 @@ fi
 mkdir -p "${TMPDIR}"
 
 time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all --reuse "$(echo ${SPACK_SPEC})"
-
-
-sleep 600
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
   exit 1
@@ -94,9 +91,9 @@ CONDA_SHLVL=0
 LD_LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:/cm/shared/apps/slurm/current/lib64
 LS_COLORS=rs=0:di=38;5;33:ln=38;5;51:mh=00:pi=40;38;5;11:so=38;5;13:do=38;5;5:bd=48;5;232;38;5;11:cd=48;5;232;38;5;3:or=48;5;232;38;5;9:mi=01;05;37;41:su=48;5;196;38;5;15:sg=48;5;11;38;5;16:ca=48;5;196;38;5;226:tw=48;5;10;38;5;16:ow=48;5;10;38;5;21:st=48;5;21;38;5;15:ex=38;5;40:*.tar=38;5;9:*.tgz=38;5;9:*.arc=38;5;9:*.arj=38;5;9:*.taz=38;5;9:*.lha=38;5;9:*.lz4=38;5;9:*.lzh=38;5;9:*.lzma=38;5;9:*.tlz=38;5;9:*.txz=38;5;9:*.tzo=38;5;9:*.t7z=38;5;9:*.zip=38;5;9:*.z=38;5;9:*.dz=38;5;9:*.gz=38;5;9:*.lrz=38;5;9:*.lz=38;5;9:*.lzo=38;5;9:*.xz=38;5;9:*.zst=38;5;9:*.tzst=38;5;9:*.bz2=38;5;9:*.bz=38;5;9:*.tbz=38;5;9:*.tbz2=38;5;9:*.tz=38;5;9:*.deb=38;5;9:*.rpm=38;5;9:*.jar=38;5;9:*.war=38;5;9:*.ear=38;5;9:*.sar=38;5;9:*.rar=38;5;9:*.alz=38;5;9:*.ace=38;5;9:*.zoo=38;5;9:*.cpio=38;5;9:*.7z=38;5;9:*.rz=38;5;9:*.cab=38;5;9:*.wim=38;5;9:*.swm=38;5;9:*.dwm=38;5;9:*.esd=38;5;9:*.jpg=38;5;13:*.jpeg=38;5;13:*.mjpg=38;5;13:*.mjpeg=38;5;13:*.gif=38;5;13:*.bmp=38;5;13:*.pbm=38;5;13:*.pgm=38;5;13:*.ppm=38;5;13:*.tga=38;5;13:*.xbm=38;5;13:*.xpm=38;5;13:*.tif=38;5;13:*.tiff=38;5;13:*.png=38;5;13:*.svg=38;5;13:*.svgz=38;5;13:*.mng=38;5;13:*.pcx=38;5;13:*.mov=38;5;13:*.mpg=38;5;13:*.mpeg=38;5;13:*.m2v=38;5;13:*.mkv=38;5;13:*.webm=38;5;13:*.ogm=38;5;13:*.mp4=38;5;13:*.m4v=38;5;13:*.mp4v=38;5;13:*.vob=38;5;13:*.qt=38;5;13:*.nuv=38;5;13:*.wmv=38;5;13:*.asf=38;5;13:*.rm=38;5;13:*.rmvb=38;5;13:*.flc=38;5;13:*.avi=38;5;13:*.fli=38;5;13:*.flv=38;5;13:*.gl=38;5;13:*.dl=38;5;13:*.xcf=38;5;13:*.xwd=38;5;13:*.yuv=38;5;13:*.cgm=38;5;13:*.emf=38;5;13:*.ogv=38;5;13:*.ogx=38;5;13:*.aac=38;5;45:*.au=38;5;45:*.flac=38;5;45:*.m4a=38;5;45:*.mid=38;5;45:*.midi=38;5;45:*.mka=38;5;45:*.mp3=38;5;45:*.mpc=38;5;45:*.ogg=38;5;45:*.ra=38;5;45:*.wav=38;5;45:*.oga=38;5;45:*.opus=38;5;45:*.spx=38;5;45:*.xspf=38;5;45:
 CONDA_EXE=/home/mkandes/software/miniconda/Miniconda3-py312_24.1.2-0-Linux-x86_64/bin/conda
-LOCAL_SCRATCH_DIR=/scratch/mkandes/job_30237433
+LOCAL_SCRATCH_DIR=/scratch/mkandes/job_30237534
 SLURM_NODEID=0
-SLURM_TASK_PID=1900159
+SLURM_TASK_PID=1668447
 __LMOD_REF_COUNT_PATH=/cm/shared/apps/slurm/current/sbin:1;/cm/shared/apps/slurm/current/bin:1;/home/mkandes/software/miniconda/Miniconda3-py312_24.1.2-0-Linux-x86_64/condabin:1;/home/mkandes/.local/bin:1;/home/mkandes/bin:1;/usr/local/bin:1;/usr/bin:1;/usr/local/sbin:1;/usr/sbin:1
 _ModuleTable002_=L2V0Yy9tb2R1bGVmaWxlcyIsIi91c3Ivc2hhcmUvbW9kdWxlZmlsZXMiLCIvdXNyL3NoYXJlL01vZHVsZXMvbW9kdWxlZmlsZXMiLCIvY20vc2hhcmVkL21vZHVsZWZpbGVzIix9LFsic3lzdGVtQmFzZU1QQVRIIl09Ii9jbS9sb2NhbC9tb2R1bGVmaWxlczovY20vc2hhcmVkL2FwcHMvYWNjZXNzL21vZHVsZWZpbGVzOi9jbS9zaGFyZWQvbW9kdWxlZmlsZXM6L2V0Yy9tb2R1bGVmaWxlczovdXNyL3NoYXJlL21vZHVsZWZpbGVzOi91c3Ivc2hhcmUvTW9kdWxlcy9tb2R1bGVmaWxlcyIsfQ==
 SSH_CONNECTION=208.58.212.11 40964 198.202.100.14 22
@@ -107,9 +104,9 @@ LANG=en_US.UTF-8
 SLURM_SUBMIT_DIR=/home/mkandes/software/spack/repositories/mkandes/spack/etc/spack/sdsc/expanse/0.17.3/cpu/dev/specs/gcc@10.2.0/mvapich2@2.3.7
 HISTCONTROL=ignoredups
 SCHEDULER_NAME=slurm
-HOSTNAME=exp-15-09
+HOSTNAME=exp-15-10
 LMOD_SYSTEM_DEFAULT_MODULES=DefaultModules
-OLDPWD=/home/mkandes/software/spack/repositories/mkandes/spack/etc/spack/sdsc/expanse/0.17.3/cpu/dev/specs/gcc@10.2.0/openmpi@4.1.3
+OLDPWD=/home/mkandes/software/spack/repositories/mkandes/spack/etc/spack/sdsc/expanse/0.17.3/cpu/dev/specs/aocc@3.2.0
 __LMOD_REF_COUNT__LMFILES_=/cm/shared/modulefiles/slurm/expanse/23.02.7:1
 SLURM_CPUS_PER_TASK=16
 SPACK_DEPENDENCIES=^openblas@0.3.18/fgk2tlu ^python@3.8.12/3bzfdfl ^netlib-scalapack@2.1.0/h5wnqdl
@@ -120,14 +117,14 @@ SPACK_MINOR=17
 SLURM_PROCID=0
 SPACK_INSTANCE_VERSION=dev
 SLURM_JOB_GID=300
-SPACK_VARIANTS=~cuda +mpi +openmp ~rocm
+SPACK_VARIANTS=~cuda +mpi ~openmp ~rocm
 SCHEDULER_REVISION=7
 SPACK_INSTANCE_DIR=/home/mkandes/software/spack/repositories/mkandes/spack
 __LMOD_REF_COUNT_LD_LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:1;/cm/shared/apps/slurm/current/lib64:1
 SCHEDULER_VERSION=23.02.7
-SLURMD_NODENAME=exp-15-09
-SLURM_JOB_END_TIME=1714589346
-JOB_SCRIPT_MD5=66631106e25aea7e3b4ce0695a3c9d58
+SLURMD_NODENAME=exp-15-10
+SLURM_JOB_END_TIME=1714590042
+JOB_SCRIPT_MD5=8cc71a159cfcee6ec0715b4dd52cb0cd
 SLURM_TASKS_PER_NODE=1
 S_COLORS=auto
 _CE_M=
@@ -136,24 +133,24 @@ SPACK_COMPILER=gcc@10.2.0
 XDG_SESSION_ID=663708
 SLURM_NNODES=1
 USER=mkandes
-SLURM_PMIX_TMPDIR=/scratch/mkandes/job_30237433
-SLURM_TMPDIR=/scratch/mkandes/job_30237433
-JOB_SCRIPT_NUMBER_OF_LINES=85
-SLURM_JOB_START_TIME=1714587546
+SLURM_PMIX_TMPDIR=/scratch/mkandes/job_30237534
+SLURM_TMPDIR=/scratch/mkandes/job_30237534
+JOB_SCRIPT_NUMBER_OF_LINES=82
+SLURM_JOB_START_TIME=1714588242
 SLURM_NTASKS_PER_NODE=1
 __LMOD_REF_COUNT_MODULEPATH=/cm/local/modulefiles:1;/cm/shared/apps/access/modulefiles:1;/etc/modulefiles:1;/usr/share/modulefiles:1;/usr/share/Modules/modulefiles:1;/cm/shared/modulefiles:1
 __LMOD_REF_COUNT_LOADEDMODULES=slurm/expanse/23.02.7:1
 SCHEDULER_MAJOR=23
 PWD=/home/mkandes/software/spack/repositories/mkandes/spack/etc/spack/sdsc/expanse/0.17.3/cpu/dev/specs/gcc@10.2.0/mvapich2@2.3.7
 ENABLE_LMOD=1
-SLURM_JOB_NODELIST=exp-15-09
+SLURM_JOB_NODELIST=exp-15-10
 HOME=/home/mkandes
 SLURM_CLUSTER_NAME=expanse
-TMP=/scratch/mkandes/job_30237433/spack-stage
+TMP=/scratch/mkandes/job_30237534/spack-stage
 CONDA_PYTHON_EXE=/home/mkandes/software/miniconda/Miniconda3-py312_24.1.2-0-Linux-x86_64/bin/python
 LMOD_COLORIZE=yes
-LOCAL_TIME=20240501T111906-0700
-SLURM_NODELIST=exp-15-09
+LOCAL_TIME=20240501T113042-0700
+SLURM_NODELIST=exp-15-10
 LMOD_SYSHOST=expanse
 SSH_CLIENT=208.58.212.11 40964 22
 LMOD_VERSION=8.2.4
@@ -162,17 +159,17 @@ SLURM_NTASKS=1
 LMOD_SETTARG_CMD=:
 SLURM_JOB_CPUS_PER_NODE=16
 BASH_ENV=/usr/share/lmod/lmod/init/bash
-SLURM_TOPOLOGY_ADDR=exp-15-09
+SLURM_TOPOLOGY_ADDR=exp-15-10
 _CE_CONDA=
 SLURM_WORKING_CLUSTER=expanse:mgr1:6817:9984:109
-JOB_SCRIPT_SHA256=bb63588e136b7e8ed52b2e2af84a47e488aa7f8e09de040200a24ce9f67fa96f
+JOB_SCRIPT_SHA256=49ba44ace572169a0c90e8e0ead502ca1fa02a6bc549c24b06d7cec26ddf6c70
 SPACK_PACKAGE=elpa@2021.05.001
 __LMOD_REF_COUNT_LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:1;/cm/shared/apps/slurm/current/lib64:1
 SLURM_JOB_NAME=elpa@2021.05.001
-TMPDIR=/scratch/mkandes/job_30237433/spack-stage
+TMPDIR=/scratch/mkandes/job_30237534/spack-stage
 LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:/cm/shared/apps/slurm/current/lib64
 LMOD_sys=Linux
-SLURM_JOBID=30237433
+SLURM_JOBID=30237534
 _ModuleTable001_=X01vZHVsZVRhYmxlXz17WyJNVHZlcnNpb24iXT0zLFsiY19yZWJ1aWxkVGltZSJdPWZhbHNlLFsiY19zaG9ydFRpbWUiXT1mYWxzZSxkZXB0aFQ9e30sZmFtaWx5PXt9LG1UPXtbInNsdXJtL2V4cGFuc2UiXT17WyJmbiJdPSIvY20vc2hhcmVkL21vZHVsZWZpbGVzL3NsdXJtL2V4cGFuc2UvMjMuMDIuNyIsWyJmdWxsTmFtZSJdPSJzbHVybS9leHBhbnNlLzIzLjAyLjciLFsibG9hZE9yZGVyIl09MSxwcm9wVD17fSxbInN0YWNrRGVwdGgiXT0wLFsic3RhdHVzIl09ImFjdGl2ZSIsWyJ1c2VyTmFtZSJdPSJzbHVybS9leHBhbnNlLzIzLjAyLjciLH0sfSxtcGF0aEE9eyIvY20vbG9jYWwvbW9kdWxlZmlsZXMiLCIvY20vc2hhcmVkL2FwcHMvYWNjZXNzL21vZHVsZWZpbGVzIiwi
 SLURM_CONF=/cm/shared/apps/slurm/var/etc/expanse/slurm.conf
 LOADEDMODULES=slurm/expanse/23.02.7
@@ -204,7 +201,7 @@ JOB_SCRIPT=/home/mkandes/software/spack/repositories/mkandes/spack/etc/spack/sds
 SLURM_NPROCS=1
 SHLVL=2
 SLURM_SUBMIT_HOST=login02
-UNIX_TIME=1714587546
+UNIX_TIME=1714588242
 SLURM_JOB_ACCOUNT=use300
 MANPATH=/cm/shared/apps/slurm/current/man:/usr/share/lmod/lmod/share/man::/usr/local/share/man:/usr/share/man:/cm/local/apps/environment-modules/current/share/man
 LMOD_PREPEND_BLOCK=normal
@@ -216,7 +213,7 @@ XDG_RUNTIME_DIR=/run/user/501506
 MODULEPATH_ROOT=/usr/share/modulefiles
 LMOD_PACKAGE_PATH=/usr/share/lmod/etc/site/lmod
 PATH=/home/mkandes/software/spack/repositories/mkandes/spack/bin:/cm/shared/apps/slurm/current/sbin:/cm/shared/apps/slurm/current/bin:/home/mkandes/software/miniconda/Miniconda3-py312_24.1.2-0-Linux-x86_64/condabin:/home/mkandes/.local/bin:/home/mkandes/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin
-SLURM_JOB_ID=30237433
+SLURM_JOB_ID=30237534
 _LMFILES_=/cm/shared/modulefiles/slurm/expanse/23.02.7
 SPACK_REVISION=3
 DEBUGINFOD_URLS=https://debuginfod.centos.org/ 
@@ -225,7 +222,7 @@ MODULESHOME=/usr/share/lmod/lmod
 LMOD_SETTARG_FULL_SUPPORT=no
 HISTSIZE=-1
 LMOD_PKG=/usr/share/lmod/lmod
-SPACK_SPEC=elpa@2021.05.001 % gcc@10.2.0 ~cuda +mpi +openmp ~rocm ^openblas@0.3.18/fgk2tlu ^python@3.8.12/3bzfdfl ^netlib-scalapack@2.1.0/h5wnqdl
+SPACK_SPEC=elpa@2021.05.001 % gcc@10.2.0 ~cuda +mpi ~openmp ~rocm ^openblas@0.3.18/fgk2tlu ^python@3.8.12/3bzfdfl ^netlib-scalapack@2.1.0/h5wnqdl
 LMOD_CMD=/usr/share/lmod/lmod/libexec/lmod
 SLURM_LOCALID=0
 LESSOPEN=||/usr/bin/lesspipe.sh %s
@@ -602,7 +599,7 @@ repos:
 upstreams: {}
 Input spec
 --------------------------------
-[    ]  .elpa@2021.05.001%gcc@10.2.0~cuda+mpi+openmp~rocm
+[    ]  .elpa@2021.05.001%gcc@10.2.0~cuda+mpi~openmp~rocm
 [    ]      ^builtin.netlib-scalapack@2.1.0%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~ipo+pic+shared build_type=Release patches=1c9ce5fee1451a08c2de3cc87f446aeda0b818ebbce4ad0d980ddf2f2a0b2dc4,f2baedde688ffe4c20943c334f580eb298e04d6f35c86b90a1f4e8cb7ae344a2 arch=linux-rocky8-zen2
 [bl  ]          ^sdsc.mvapich2@2.3.7%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~alloca~cuda~debug+regcache+wrapperrpath ch3_rank_bits=32 fabrics=mrail file_systems=lustre,nfs process_managers=slurm threads=multiple arch=linux-rocky8-zen2
 [bl  ]              ^builtin.libpciaccess@0.16%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
@@ -635,7 +632,7 @@ Input spec
 
 Concretized
 --------------------------------
-74t7s55  [    ]  builtin.elpa@2021.05.001%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~cuda+mpi+openmp~rocm amdgpu_target=none cuda_arch=none arch=linux-rocky8-zen2
+xtxwtmk  [    ]  builtin.elpa@2021.05.001%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~cuda+mpi~openmp~rocm amdgpu_target=none cuda_arch=none arch=linux-rocky8-zen2
 pukdyjk  [b   ]      ^builtin.libtool@2.4.6%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
 fete7cu  [bl  ]      ^sdsc.mvapich2@2.3.7%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~alloca~cuda~debug+regcache+wrapperrpath ch3_rank_bits=32 fabrics=mrail file_systems=lustre,nfs process_managers=slurm threads=multiple arch=linux-rocky8-zen2
 ykynzrw  [bl  ]          ^builtin.libpciaccess@0.16%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
@@ -662,9 +659,9 @@ tcqf4zl  [bl  ]          ^builtin.openssl@1.1.1k%aocc@3.2.0 cflags="-O2 -march=n
 fxmvvsx  [bl  ]          ^builtin.sqlite@3.36.0%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +column_metadata+fts~functions~rtree arch=linux-rocky8-zen2
 vncpkij  [bl  ]          ^builtin.util-linux-uuid@2.36.2%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
 
-real 8.97
-user 7.99
-sys 0.24
+real 8.95
+user 7.92
+sys 0.25
 [+] /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/gcc-10.2.0/libtool-2.4.6-pukdyjku222sun3sbafpdue2h7gzxofj
 [+] /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/gcc-10.2.0/libpciaccess-0.16-ykynzrw4owqljbwyhyouig4rbf7hxdqz
 [+] /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/gcc-10.2.0/libiconv-1.16-zduoj2duq26hlfta4shqtafuq42gp3rq
@@ -683,46 +680,25 @@ sys 0.24
 [+] /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/gcc-10.2.0/libxml2-2.9.12-mgovjpj47znwb45ityck57ufrgu57mcc
 [+] /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/gcc-10.2.0/libbsd-0.11.3-wblxldxgzmcyjm2l6htct6do3bk5vcdl
 [+] /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/gcc-10.2.0/readline-8.1-clxlnwzk5ujzaul2giwamfatsgqbprc7
-[+] /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/gcc-10.2.0/mvapich2-2.3.7-fete7cumh776enk524yp52ftlfjrbvsk
 [+] /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/gcc-10.2.0/gettext-0.21-ey3k6dvq5bpidcova3wnruxfbfku6mit
+[+] /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/gcc-10.2.0/mvapich2-2.3.7-fete7cumh776enk524yp52ftlfjrbvsk
 [+] /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/gcc-10.2.0/expat-2.4.1-tawwsnwy62kp6qd77ly6ik2wgxcrcw7i
-[+] /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/gcc-10.2.0/gdbm-1.19-clf6bmrgapuzdnchri2wzrrad7fkjdvl
 [+] /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/gcc-10.2.0/sqlite-3.36.0-fxmvvsxyjcdwzqj2judxbw47nzi4zkow
+[+] /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/gcc-10.2.0/gdbm-1.19-clf6bmrgapuzdnchri2wzrrad7fkjdvl
 [+] /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/gcc-10.2.0/netlib-scalapack-2.1.0-h5wnqdl3ohenn6e2ftgz4rofj47fknwg
 [+] /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/gcc-10.2.0/python-3.8.12-3bzfdflqkb4i4iclzfhfsdw7fvgucd5p
-==> Installing elpa-2021.05.001-74t7s55q3vyudda3toqsz7eyk3a7t7rc
-==> No binary for elpa-2021.05.001-74t7s55q3vyudda3toqsz7eyk3a7t7rc found: installing from source
+==> Installing elpa-2021.05.001-xtxwtmki2aljgtqcv5huiohpmu7hdn4t
+==> No binary for elpa-2021.05.001-xtxwtmki2aljgtqcv5huiohpmu7hdn4t found: installing from source
 ==> Warning: Expected user 501506 to own /scratch/mkandes, but it is owned by 0
 ==> Using cached archive: /home/mkandes/software/spack/repositories/mkandes/spack/var/spack/cache/_source-cache/archive/a4/a4f1a4e3964f2473a5f8177f2091a9da5c6b5ef9280b8272dfefcbc3aad44d41.tar.gz
 ==> No patches needed for elpa
 ==> elpa: Executing phase: 'autoreconf'
 ==> elpa: Executing phase: 'configure'
-==> Error: ProcessError: Command exited with status 1:
-    '/scratch/mkandes/job_30237433/spack-stage/spack-stage/spack-stage-elpa-2021.05.001-74t7s55q3vyudda3toqsz7eyk3a7t7rc/spack-src/configure' '--prefix=/home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/gcc-10.2.0/elpa-2021.05.001-74t7s55q3vyudda3toqsz7eyk3a7t7rc' '--with-mpi' '--disable-vsx' '--enable-sse' '--enable-avx' '--enable-avx2' '--disable-avx512' '--disable-sve128' '--disable-sve256' '--disable-sve512' 'CFLAGS=' 'FCFLAGS=-ffree-line-length-none' '--disable-nvidia-gpu' '--disable-amd-gpu' '--enable-openmp' 'LDFLAGS=-L/home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/gcc-10.2.0/openblas-0.3.18-fgk2tlu7bbymzbnkresz4zt5tyfmnbbs/lib' 'LIBS=-lopenblas -lopenblas' 'CC=/home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/gcc-10.2.0/mvapich2-2.3.7-fete7cumh776enk524yp52ftlfjrbvsk/bin/mpicc' 'CXX=/home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/gcc-10.2.0/mvapich2-2.3.7-fete7cumh776enk524yp52ftlfjrbvsk/bin/mpicxx' 'FC=/home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/gcc-10.2.0/mvapich2-2.3.7-fete7cumh776enk524yp52ftlfjrbvsk/bin/mpif90' 'SCALAPACK_LDFLAGS=/home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/gcc-10.2.0/netlib-scalapack-2.1.0-h5wnqdl3ohenn6e2ftgz4rofj47fknwg/lib/libscalapack.so' '--disable-silent-rules'
-
-1 error found in build log:
-     183    configure: WARNING:  * allow ELPA at runtime to change the number o
-            f threads to 1 by setting "--enable-runtime-threading-support-check
-            s
-     184    configure: WARNING:     --enable-allow-thread-limiting --without-th
-            reading-support-check-during-build": this will ensure correct resul
-            ts, but
-     185    configure: WARNING:     maybe not the best performance (depends on 
-            the threading of your blas/lapack libraries), see the USER_GUIDE
-     186    configure: WARNING:  * switch of the checking of threading support 
-            "--disable-runtime-threading-support-checks
-     187    configure: WARNING:    --without-threading-support-check-during-bui
-            ld: DO THIS AT YOUR OWN RISK! This will be fast, but might
-     188    configure: WARNING:    (depending on your MPI library sometimes) le
-            ad to wrong results
-  >> 189    configure: error: You do have to take an action of the choices abov
-            e!
-
-See build log for details:
-  /scratch/mkandes/job_30237433/spack-stage/spack-stage/spack-stage-elpa-2021.05.001-74t7s55q3vyudda3toqsz7eyk3a7t7rc/spack-build-out.txt
-
-==> Error: Terminating after first install failure: ProcessError: Command exited with status 1:
-    '/scratch/mkandes/job_30237433/spack-stage/spack-stage/spack-stage-elpa-2021.05.001-74t7s55q3vyudda3toqsz7eyk3a7t7rc/spack-src/configure' '--prefix=/home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/gcc-10.2.0/elpa-2021.05.001-74t7s55q3vyudda3toqsz7eyk3a7t7rc' '--with-mpi' '--disable-vsx' '--enable-sse' '--enable-avx' '--enable-avx2' '--disable-avx512' '--disable-sve128' '--disable-sve256' '--disable-sve512' 'CFLAGS=' 'FCFLAGS=-ffree-line-length-none' '--disable-nvidia-gpu' '--disable-amd-gpu' '--enable-openmp' 'LDFLAGS=-L/home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/gcc-10.2.0/openblas-0.3.18-fgk2tlu7bbymzbnkresz4zt5tyfmnbbs/lib' 'LIBS=-lopenblas -lopenblas' 'CC=/home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/gcc-10.2.0/mvapich2-2.3.7-fete7cumh776enk524yp52ftlfjrbvsk/bin/mpicc' 'CXX=/home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/gcc-10.2.0/mvapich2-2.3.7-fete7cumh776enk524yp52ftlfjrbvsk/bin/mpicxx' 'FC=/home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/gcc-10.2.0/mvapich2-2.3.7-fete7cumh776enk524yp52ftlfjrbvsk/bin/mpif90' 'SCALAPACK_LDFLAGS=/home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/gcc-10.2.0/netlib-scalapack-2.1.0-h5wnqdl3ohenn6e2ftgz4rofj47fknwg/lib/libscalapack.so' '--disable-silent-rules'
-real 18.69
-user 12.77
-sys 3.67
+==> elpa: Executing phase: 'build'
+==> elpa: Executing phase: 'install'
+==> elpa: Successfully installed elpa-2021.05.001-xtxwtmki2aljgtqcv5huiohpmu7hdn4t
+  Fetch: 0.00s.  Build: 2m 26.17s.  Total: 2m 26.18s.
+[+] /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/gcc-10.2.0/elpa-2021.05.001-xtxwtmki2aljgtqcv5huiohpmu7hdn4t
+real 158.29
+user 119.54
+sys 29.14
