@@ -49,8 +49,8 @@ module list
 
 declare -xr SPACK_PACKAGE='quantum-espresso@7.0'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS='+cmake +elpa ~environ +epw ~ipo +libxc +mpi ~openmp +patch +qmcpack +scalapack'
-declare -xr SPACK_DEPENDENCIES="^openblas@0.3.18/$(spack find --format '{hash:7}' openblas@0.3.18 % ${SPACK_COMPILER} ~ilp64 threads=none) ^fftw@3.3.10/$(spack find --format '{hash:7}' fftw@3.3.10 % ${SPACK_COMPILER} ~mpi ~openmp) ^python@3.8.12/$(spack find --format '{hash:7}' python@3.8.12 % ${SPACK_COMPILER}) ^openmpi@4.1.3/$(spack find --format '{hash:7}' openmpi@4.1.3 % ${SPACK_COMPILER}) ^netlib-scalapack@2.1.0/$(spack find --format '{hash:7}' netlib-scalapack@2.1.0 % ${SPACK_COMPILER} ^openblas@0.3.18 ^openmpi@4.1.3) ^elpa@2021.05.001/$(spack find --format '{hash:7}' elpa@2021.05.001 % ${SPACK_COMPILER} +mpi ~openmp ^openmpi@4.1.3)"
+declare -xr SPACK_VARIANTS='+cmake +elpa ~environ +epw ~ipo hdf5=parallel +libxc +mpi ~openmp +patch +qmcpack +scalapack'
+declare -xr SPACK_DEPENDENCIES="^openblas@0.3.18/$(spack find --format '{hash:7}' openblas@0.3.18 % ${SPACK_COMPILER} ~ilp64 threads=none) ^fftw@3.3.10/$(spack find --format '{hash:7}' fftw@3.3.10 % ${SPACK_COMPILER} ~mpi ~openmp) ^python@3.8.12/$(spack find --format '{hash:7}' python@3.8.12 % ${SPACK_COMPILER}) ^libxc@5.1.5/$(spack find --format '{hash:7}' libxc@5.1.5 % ${SPACK_COMPILER}) ^openmpi@4.1.3/$(spack find --format '{hash:7}' openmpi@4.1.3 % ${SPACK_COMPILER}) ^hdf5@1.10.7/$(spack find --format '{hash:7}' hdf5@1.10.7 % ${SPACK_COMPILER} +mpi ^openmpi@4.1.3) ^netlib-scalapack@2.1.0/$(spack find --format '{hash:7}' netlib-scalapack@2.1.0 % ${SPACK_COMPILER} ^openblas@0.3.18 ^openmpi@4.1.3) ^elpa@2021.05.001/$(spack find --format '{hash:7}' elpa@2021.05.001 % ${SPACK_COMPILER} +mpi ~openmp ^openmpi@4.1.3)"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -63,7 +63,7 @@ spack config get packages
 spack config get repos
 spack config get upstreams
 
-time -p spack spec --long --namespaces --types --reuse "$(echo ${SPACK_SPEC})"
+time -p spack spec --long --namespaces --types --reuse quantum-espresso@7.0 % gcc@10.2.0 +cmake +elpa ~environ +epw ~ipo hdf5=parallel +libxc +mpi ~openmp +patch +qmcpack +scalapack "${SPACK_DEPENDENCIES}"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack concretization failed.'
   exit 1
@@ -71,7 +71,7 @@ fi
 
 mkdir -p "${TMPDIR}"
 
-time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all --reuse "$(echo ${SPACK_SPEC})"
+time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all --reuse quantum-espresso@7.0 % gcc@10.2.0 +cmake +elpa ~environ +epw ~ipo hdf5=parallel +libxc +mpi ~openmp +patch +qmcpack +scalapack "${SPACK_DEPENDENCIES}"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
   exit 1
