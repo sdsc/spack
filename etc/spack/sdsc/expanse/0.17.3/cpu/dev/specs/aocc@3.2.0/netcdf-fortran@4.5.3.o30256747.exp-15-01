@@ -1,4 +1,4 @@
-1714415399 20240429T112959-0700 30207854 3736eaa0978ce48e9690cff3556d52d6 3c98bc626788576344cf0b8e98aa9ed0ac230468062bca0493be221965a1f430 83 /home/mkandes/software/spack/repositories/mkandes/spack/etc/spack/sdsc/expanse/0.17.3/cpu/dev/specs/aocc@3.2.0/netcdf-fortran@4.5.3.sh
+1714704634 20240502T195034-0700 30256747 4c46169681f338a10bc73f45bc9bb3a3 98edcb00230050a9695899c9bc8fda45d8b0c2733e3e8e1d57bdacde8158e072 83 /home/mkandes/software/spack/repositories/mkandes/spack/etc/spack/sdsc/expanse/0.17.3/cpu/dev/specs/aocc@3.2.0/netcdf-fortran@4.5.3.sh
 #!/usr/bin/env bash
 
 #SBATCH --job-name=netcdf-fortran@4.5.3
@@ -49,7 +49,7 @@ module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
 declare -xr SPACK_PACKAGE='netcdf-fortran@4.5.3'
-declare -xr SPACK_COMPILER='gcc@10.2.0'
+declare -xr SPACK_COMPILER='aocc@3.2.0'
 declare -xr SPACK_VARIANTS='~doc +pic +shared'
 declare -xr SPACK_DEPENDENCIES="^netcdf-c@4.8.1/$(spack find --format '{hash:7}' netcdf-c@4.8.1 % ${SPACK_COMPILER} ~mpi)"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
@@ -92,12 +92,12 @@ CONDA_SHLVL=0
 LD_LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:/cm/shared/apps/slurm/current/lib64
 LS_COLORS=rs=0:di=38;5;33:ln=38;5;51:mh=00:pi=40;38;5;11:so=38;5;13:do=38;5;5:bd=48;5;232;38;5;11:cd=48;5;232;38;5;3:or=48;5;232;38;5;9:mi=01;05;37;41:su=48;5;196;38;5;15:sg=48;5;11;38;5;16:ca=48;5;196;38;5;226:tw=48;5;10;38;5;16:ow=48;5;10;38;5;21:st=48;5;21;38;5;15:ex=38;5;40:*.tar=38;5;9:*.tgz=38;5;9:*.arc=38;5;9:*.arj=38;5;9:*.taz=38;5;9:*.lha=38;5;9:*.lz4=38;5;9:*.lzh=38;5;9:*.lzma=38;5;9:*.tlz=38;5;9:*.txz=38;5;9:*.tzo=38;5;9:*.t7z=38;5;9:*.zip=38;5;9:*.z=38;5;9:*.dz=38;5;9:*.gz=38;5;9:*.lrz=38;5;9:*.lz=38;5;9:*.lzo=38;5;9:*.xz=38;5;9:*.zst=38;5;9:*.tzst=38;5;9:*.bz2=38;5;9:*.bz=38;5;9:*.tbz=38;5;9:*.tbz2=38;5;9:*.tz=38;5;9:*.deb=38;5;9:*.rpm=38;5;9:*.jar=38;5;9:*.war=38;5;9:*.ear=38;5;9:*.sar=38;5;9:*.rar=38;5;9:*.alz=38;5;9:*.ace=38;5;9:*.zoo=38;5;9:*.cpio=38;5;9:*.7z=38;5;9:*.rz=38;5;9:*.cab=38;5;9:*.wim=38;5;9:*.swm=38;5;9:*.dwm=38;5;9:*.esd=38;5;9:*.jpg=38;5;13:*.jpeg=38;5;13:*.mjpg=38;5;13:*.mjpeg=38;5;13:*.gif=38;5;13:*.bmp=38;5;13:*.pbm=38;5;13:*.pgm=38;5;13:*.ppm=38;5;13:*.tga=38;5;13:*.xbm=38;5;13:*.xpm=38;5;13:*.tif=38;5;13:*.tiff=38;5;13:*.png=38;5;13:*.svg=38;5;13:*.svgz=38;5;13:*.mng=38;5;13:*.pcx=38;5;13:*.mov=38;5;13:*.mpg=38;5;13:*.mpeg=38;5;13:*.m2v=38;5;13:*.mkv=38;5;13:*.webm=38;5;13:*.ogm=38;5;13:*.mp4=38;5;13:*.m4v=38;5;13:*.mp4v=38;5;13:*.vob=38;5;13:*.qt=38;5;13:*.nuv=38;5;13:*.wmv=38;5;13:*.asf=38;5;13:*.rm=38;5;13:*.rmvb=38;5;13:*.flc=38;5;13:*.avi=38;5;13:*.fli=38;5;13:*.flv=38;5;13:*.gl=38;5;13:*.dl=38;5;13:*.xcf=38;5;13:*.xwd=38;5;13:*.yuv=38;5;13:*.cgm=38;5;13:*.emf=38;5;13:*.ogv=38;5;13:*.ogx=38;5;13:*.aac=38;5;45:*.au=38;5;45:*.flac=38;5;45:*.m4a=38;5;45:*.mid=38;5;45:*.midi=38;5;45:*.mka=38;5;45:*.mp3=38;5;45:*.mpc=38;5;45:*.ogg=38;5;45:*.ra=38;5;45:*.wav=38;5;45:*.oga=38;5;45:*.opus=38;5;45:*.spx=38;5;45:*.xspf=38;5;45:
 CONDA_EXE=/home/mkandes/software/miniconda/Miniconda3-py312_24.1.2-0-Linux-x86_64/bin/conda
-LOCAL_SCRATCH_DIR=/scratch/mkandes/job_30207854
+LOCAL_SCRATCH_DIR=/scratch/mkandes/job_30256747
 SLURM_NODEID=0
-SLURM_TASK_PID=2811117
+SLURM_TASK_PID=1155876
 __LMOD_REF_COUNT_PATH=/cm/shared/apps/slurm/current/sbin:1;/cm/shared/apps/slurm/current/bin:1;/home/mkandes/software/miniconda/Miniconda3-py312_24.1.2-0-Linux-x86_64/condabin:1;/home/mkandes/.local/bin:1;/home/mkandes/bin:1;/usr/local/bin:1;/usr/bin:1;/usr/local/sbin:1;/usr/sbin:1
 _ModuleTable002_=L2V0Yy9tb2R1bGVmaWxlcyIsIi91c3Ivc2hhcmUvbW9kdWxlZmlsZXMiLCIvdXNyL3NoYXJlL01vZHVsZXMvbW9kdWxlZmlsZXMiLCIvY20vc2hhcmVkL21vZHVsZWZpbGVzIix9LFsic3lzdGVtQmFzZU1QQVRIIl09Ii9jbS9sb2NhbC9tb2R1bGVmaWxlczovY20vc2hhcmVkL2FwcHMvYWNjZXNzL21vZHVsZWZpbGVzOi9jbS9zaGFyZWQvbW9kdWxlZmlsZXM6L2V0Yy9tb2R1bGVmaWxlczovdXNyL3NoYXJlL21vZHVsZWZpbGVzOi91c3Ivc2hhcmUvTW9kdWxlcy9tb2R1bGVmaWxlcyIsfQ==
-SSH_CONNECTION=208.58.212.11 38412 198.202.100.13 22
+SSH_CONNECTION=208.58.212.11 38642 198.202.100.14 22
 SPACK_PYTHON=/usr/bin/python3
 SPACK_MAJOR=0
 SLURM_PRIO_PROCESS=0
@@ -107,10 +107,10 @@ HISTCONTROL=ignoredups
 SCHEDULER_NAME=slurm
 HOSTNAME=exp-15-01
 LMOD_SYSTEM_DEFAULT_MODULES=DefaultModules
-OLDPWD=/home/mkandes/software/spack/repositories/mkandes/spack/etc/spack/sdsc/expanse/0.17.3/cpu/dev/specs/gcc@10.2.0
+OLDPWD=/home/mkandes/software/spack/repositories/mkandes/spack/etc/spack/sdsc/expanse/0.17.3/cpu/dev/specs/aocc@3.2.0/mvapich2@2.3.7
 __LMOD_REF_COUNT__LMFILES_=/cm/shared/modulefiles/slurm/expanse/23.02.7:1
 SLURM_CPUS_PER_TASK=16
-SPACK_DEPENDENCIES=^netcdf-c@4.8.1/dloekuk
+SPACK_DEPENDENCIES=^netcdf-c@4.8.1/v2zwa5h
 SCHEDULER_MINOR=02
 ENVIRONMENT=BATCH
 SPACK_VERSION=0.17.3
@@ -124,20 +124,20 @@ SPACK_INSTANCE_DIR=/home/mkandes/software/spack/repositories/mkandes/spack
 __LMOD_REF_COUNT_LD_LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:1;/cm/shared/apps/slurm/current/lib64:1
 SCHEDULER_VERSION=23.02.7
 SLURMD_NODENAME=exp-15-01
-SLURM_JOB_END_TIME=1714417187
-JOB_SCRIPT_MD5=3736eaa0978ce48e9690cff3556d52d6
+SLURM_JOB_END_TIME=1714706417
+JOB_SCRIPT_MD5=4c46169681f338a10bc73f45bc9bb3a3
 SLURM_TASKS_PER_NODE=1
 S_COLORS=auto
 _CE_M=
 which_declare=declare -f
-SPACK_COMPILER=gcc@10.2.0
-XDG_SESSION_ID=154265
+SPACK_COMPILER=aocc@3.2.0
+XDG_SESSION_ID=670900
 SLURM_NNODES=1
 USER=mkandes
-SLURM_PMIX_TMPDIR=/scratch/mkandes/job_30207854
-SLURM_TMPDIR=/scratch/mkandes/job_30207854
+SLURM_PMIX_TMPDIR=/scratch/mkandes/job_30256747
+SLURM_TMPDIR=/scratch/mkandes/job_30256747
 JOB_SCRIPT_NUMBER_OF_LINES=83
-SLURM_JOB_START_TIME=1714415387
+SLURM_JOB_START_TIME=1714704617
 SLURM_NTASKS_PER_NODE=1
 __LMOD_REF_COUNT_MODULEPATH=/cm/local/modulefiles:1;/cm/shared/apps/access/modulefiles:1;/etc/modulefiles:1;/usr/share/modulefiles:1;/usr/share/Modules/modulefiles:1;/cm/shared/modulefiles:1
 __LMOD_REF_COUNT_LOADEDMODULES=slurm/expanse/23.02.7:1
@@ -147,13 +147,13 @@ ENABLE_LMOD=1
 SLURM_JOB_NODELIST=exp-15-01
 HOME=/home/mkandes
 SLURM_CLUSTER_NAME=expanse
-TMP=/scratch/mkandes/job_30207854/spack-stage
+TMP=/scratch/mkandes/job_30256747/spack-stage
 CONDA_PYTHON_EXE=/home/mkandes/software/miniconda/Miniconda3-py312_24.1.2-0-Linux-x86_64/bin/python
 LMOD_COLORIZE=yes
-LOCAL_TIME=20240429T112959-0700
+LOCAL_TIME=20240502T195034-0700
 SLURM_NODELIST=exp-15-01
 LMOD_SYSHOST=expanse
-SSH_CLIENT=208.58.212.11 38412 22
+SSH_CLIENT=208.58.212.11 38642 22
 LMOD_VERSION=8.2.4
 CPATH=/cm/shared/apps/slurm/current/include
 SLURM_NTASKS=1
@@ -163,14 +163,14 @@ BASH_ENV=/usr/share/lmod/lmod/init/bash
 SLURM_TOPOLOGY_ADDR=exp-15-01
 _CE_CONDA=
 SLURM_WORKING_CLUSTER=expanse:mgr1:6817:9984:109
-JOB_SCRIPT_SHA256=3c98bc626788576344cf0b8e98aa9ed0ac230468062bca0493be221965a1f430
+JOB_SCRIPT_SHA256=98edcb00230050a9695899c9bc8fda45d8b0c2733e3e8e1d57bdacde8158e072
 SPACK_PACKAGE=netcdf-fortran@4.5.3
 __LMOD_REF_COUNT_LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:1;/cm/shared/apps/slurm/current/lib64:1
 SLURM_JOB_NAME=netcdf-fortran@4.5.3
-TMPDIR=/scratch/mkandes/job_30207854/spack-stage
+TMPDIR=/scratch/mkandes/job_30256747/spack-stage
 LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:/cm/shared/apps/slurm/current/lib64
 LMOD_sys=Linux
-SLURM_JOBID=30207854
+SLURM_JOBID=30256747
 _ModuleTable001_=X01vZHVsZVRhYmxlXz17WyJNVHZlcnNpb24iXT0zLFsiY19yZWJ1aWxkVGltZSJdPWZhbHNlLFsiY19zaG9ydFRpbWUiXT1mYWxzZSxkZXB0aFQ9e30sZmFtaWx5PXt9LG1UPXtbInNsdXJtL2V4cGFuc2UiXT17WyJmbiJdPSIvY20vc2hhcmVkL21vZHVsZWZpbGVzL3NsdXJtL2V4cGFuc2UvMjMuMDIuNyIsWyJmdWxsTmFtZSJdPSJzbHVybS9leHBhbnNlLzIzLjAyLjciLFsibG9hZE9yZGVyIl09MSxwcm9wVD17fSxbInN0YWNrRGVwdGgiXT0wLFsic3RhdHVzIl09ImFjdGl2ZSIsWyJ1c2VyTmFtZSJdPSJzbHVybS9leHBhbnNlLzIzLjAyLjciLH0sfSxtcGF0aEE9eyIvY20vbG9jYWwvbW9kdWxlZmlsZXMiLCIvY20vc2hhcmVkL2FwcHMvYWNjZXNzL21vZHVsZWZpbGVzIiwi
 SLURM_CONF=/cm/shared/apps/slurm/var/etc/expanse/slurm.conf
 LOADEDMODULES=slurm/expanse/23.02.7
@@ -180,7 +180,7 @@ SLURM_NODE_ALIASES=(null)
 SLURM_JOB_QOS=ind-shared-normal
 LMOD_ROOT=/usr/share/lmod
 SLURM_TOPOLOGY_ADDR_PATTERN=node
-SSH_TTY=/dev/pts/199
+SSH_TTY=/dev/pts/491
 MAIL=/var/spool/mail/mkandes
 SLURM_CPUS_ON_NODE=16
 LMOD_arch=x86_64
@@ -201,8 +201,8 @@ SLURM_JOB_USER=mkandes
 JOB_SCRIPT=/home/mkandes/software/spack/repositories/mkandes/spack/etc/spack/sdsc/expanse/0.17.3/cpu/dev/specs/aocc@3.2.0/netcdf-fortran@4.5.3.sh
 SLURM_NPROCS=1
 SHLVL=2
-SLURM_SUBMIT_HOST=login01
-UNIX_TIME=1714415399
+SLURM_SUBMIT_HOST=login02
+UNIX_TIME=1714704634
 SLURM_JOB_ACCOUNT=use300
 MANPATH=/cm/shared/apps/slurm/current/man:/usr/share/lmod/lmod/share/man::/usr/local/share/man:/usr/share/man:/cm/local/apps/environment-modules/current/share/man
 LMOD_PREPEND_BLOCK=normal
@@ -214,7 +214,7 @@ XDG_RUNTIME_DIR=/run/user/501506
 MODULEPATH_ROOT=/usr/share/modulefiles
 LMOD_PACKAGE_PATH=/usr/share/lmod/etc/site/lmod
 PATH=/home/mkandes/software/spack/repositories/mkandes/spack/bin:/cm/shared/apps/slurm/current/sbin:/cm/shared/apps/slurm/current/bin:/home/mkandes/software/miniconda/Miniconda3-py312_24.1.2-0-Linux-x86_64/condabin:/home/mkandes/.local/bin:/home/mkandes/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin
-SLURM_JOB_ID=30207854
+SLURM_JOB_ID=30256747
 _LMFILES_=/cm/shared/modulefiles/slurm/expanse/23.02.7
 SPACK_REVISION=3
 DEBUGINFOD_URLS=https://debuginfod.centos.org/ 
@@ -223,7 +223,7 @@ MODULESHOME=/usr/share/lmod/lmod
 LMOD_SETTARG_FULL_SUPPORT=no
 HISTSIZE=-1
 LMOD_PKG=/usr/share/lmod/lmod
-SPACK_SPEC=netcdf-fortran@4.5.3 % gcc@10.2.0 ~doc +pic +shared ^netcdf-c@4.8.1/dloekuk
+SPACK_SPEC=netcdf-fortran@4.5.3 % aocc@3.2.0 ~doc +pic +shared ^netcdf-c@4.8.1/v2zwa5h
 LMOD_CMD=/usr/share/lmod/lmod/libexec/lmod
 SLURM_LOCALID=0
 LESSOPEN=||/usr/bin/lesspipe.sh %s
@@ -600,35 +600,45 @@ repos:
 upstreams: {}
 Input spec
 --------------------------------
-[    ]  .netcdf-fortran@4.5.3%gcc@10.2.0~doc+pic+shared
-[    ]      ^builtin.netcdf-c@4.8.1%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~dap~fsync~hdf4~jna~mpi~parallel-netcdf+pic+shared arch=linux-rocky8-zen2
-[bl  ]          ^builtin.hdf5@1.10.7%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +cxx+fortran+hl~ipo+java~mpi+shared+szip~threadsafe+tools api=default build_type=RelWithDebInfo arch=linux-rocky8-zen2
-[bl  ]              ^builtin.libaec@1.0.5%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~ipo build_type=RelWithDebInfo arch=linux-rocky8-zen2
-[b r ]              ^builtin.openjdk@11.0.12_7%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
-[  r ]              ^builtin.pkgconf@1.8.0%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
-[bl  ]              ^builtin.zlib@1.2.11%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +optimize+pic+shared arch=linux-rocky8-zen2
+[    ]  .netcdf-fortran@4.5.3%aocc@3.2.0~doc+pic+shared
+[    ]      ^builtin.netcdf-c@4.8.1%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~dap~fsync~hdf4~jna~mpi~parallel-netcdf+pic+shared arch=linux-rocky8-zen2
+[bl  ]          ^builtin.hdf5@1.10.7%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +cxx+fortran+hl~ipo+java~mpi+shared+szip~threadsafe+tools api=default build_type=RelWithDebInfo arch=linux-rocky8-zen2
+[bl  ]              ^builtin.libaec@1.0.5%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~ipo build_type=RelWithDebInfo arch=linux-rocky8-zen2
+[b r ]              ^builtin.openjdk@11.0.12_7%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+[  r ]              ^builtin.pkgconf@1.8.0%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+[bl  ]              ^builtin.zlib@1.2.11%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +optimize+pic+shared arch=linux-rocky8-zen2
 
 Concretized
 --------------------------------
-cglhixx  [    ]  builtin.netcdf-fortran@4.5.3%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~doc+pic+shared arch=linux-rocky8-zen2
-dloekuk  [bl  ]      ^builtin.netcdf-c@4.8.1%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~dap~fsync~hdf4~jna~mpi~parallel-netcdf+pic+shared arch=linux-rocky8-zen2
-m2o3pzf  [bl  ]          ^builtin.hdf5@1.10.7%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +cxx+fortran+hl~ipo+java~mpi+shared+szip~threadsafe+tools api=default build_type=RelWithDebInfo arch=linux-rocky8-zen2
-nqhtzbx  [bl  ]              ^builtin.libaec@1.0.5%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~ipo build_type=RelWithDebInfo arch=linux-rocky8-zen2
-27cv2ps  [b r ]              ^builtin.openjdk@11.0.12_7%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
-qftywfd  [  r ]              ^builtin.pkgconf@1.8.0%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
-ws4iari  [bl  ]              ^builtin.zlib@1.2.11%gcc@10.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +optimize+pic+shared arch=linux-rocky8-zen2
+wetisr3  [    ]  builtin.netcdf-fortran@4.5.3%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~doc+pic+shared arch=linux-rocky8-zen2
+v2zwa5h  [bl  ]      ^builtin.netcdf-c@4.8.1%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~dap~fsync~hdf4~jna~mpi~parallel-netcdf+pic+shared arch=linux-rocky8-zen2
+c23wjq7  [bl  ]          ^builtin.hdf5@1.10.7%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +cxx+fortran+hl~ipo+java~mpi+shared+szip~threadsafe+tools api=default build_type=RelWithDebInfo arch=linux-rocky8-zen2
+u7m765v  [bl  ]              ^builtin.libaec@1.0.5%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~ipo build_type=RelWithDebInfo arch=linux-rocky8-zen2
+35f7g73  [b r ]              ^builtin.openjdk@11.0.12_7%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+tv7okri  [  r ]              ^builtin.pkgconf@1.8.0%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+4flcxn7  [bl  ]              ^builtin.zlib@1.2.11%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +optimize+pic+shared arch=linux-rocky8-zen2
 
-real 10.05
-user 8.19
-sys 0.49
+real 10.24
+user 8.24
+sys 0.38
+[+] /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/aocc-3.2.0/libaec-1.0.5-u7m765vfkraxnnw2ohwsguortopg5bea
+[+] /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/aocc-3.2.0/openjdk-11.0.12_7-35f7g733f5gig774qh43frenb6il2m5s
+[+] /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/aocc-3.2.0/pkgconf-1.8.0-tv7okri5hrw42ipfld7jaux4dtdyhqmo
+[+] /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/aocc-3.2.0/zlib-1.2.11-4flcxn7lslkefdgzznnuze45gsyvxwgh
+[+] /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/aocc-3.2.0/hdf5-1.10.7-c23wjq7z3vp3f37l6dvn7djibbhvbvlh
+[+] /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/aocc-3.2.0/netcdf-c-4.8.1-v2zwa5hpae5pkjyfuu26jj5nqwx5rbcp
+==> Installing netcdf-fortran-4.5.3-wetisr3qbgskepm47wgaw4sl4rgyp7co
+==> No binary for netcdf-fortran-4.5.3-wetisr3qbgskepm47wgaw4sl4rgyp7co found: installing from source
 ==> Warning: Expected user 501506 to own /scratch/mkandes, but it is owned by 0
-[+] /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/gcc-10.2.0/libaec-1.0.5-nqhtzbxzvchsb4rbhffswzti7afpcstk
-[+] /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/gcc-10.2.0/openjdk-11.0.12_7-27cv2psb6xthjbwmjlx53otdbjxch6wg
-[+] /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/gcc-10.2.0/pkgconf-1.8.0-qftywfdvtf3vvb7ilifrvhgjcvyldcjc
-[+] /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/gcc-10.2.0/zlib-1.2.11-ws4iari52j2lphd52i7kd72yj37o32zt
-[+] /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/gcc-10.2.0/hdf5-1.10.7-m2o3pzfmkeo2smgpu4ojj3b5j3lkm5nd
-[+] /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/gcc-10.2.0/netcdf-c-4.8.1-dloekuk7wn2to4yjscihqfqm6o4jy75u
-[+] /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/gcc-10.2.0/netcdf-fortran-4.5.3-cglhixxlab5alxo5h5aevyki7rqdm627
-real 9.33
-user 8.20
-sys 0.32
+==> Fetching https://mirror.spack.io/_source-cache/archive/12/123a5c6184336891e62cf2936b9f2d1c54e8dee299cfd9d2c1a1eb05dd668a74.tar.gz
+==> No patches needed for netcdf-fortran
+==> netcdf-fortran: Executing phase: 'autoreconf'
+==> netcdf-fortran: Executing phase: 'configure'
+==> netcdf-fortran: Executing phase: 'build'
+==> netcdf-fortran: Executing phase: 'install'
+==> netcdf-fortran: Successfully installed netcdf-fortran-4.5.3-wetisr3qbgskepm47wgaw4sl4rgyp7co
+  Fetch: 0.57s.  Build: 45.63s.  Total: 46.20s.
+[+] /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/aocc-3.2.0/netcdf-fortran-4.5.3-wetisr3qbgskepm47wgaw4sl4rgyp7co
+real 57.05
+user 64.74
+sys 11.40
