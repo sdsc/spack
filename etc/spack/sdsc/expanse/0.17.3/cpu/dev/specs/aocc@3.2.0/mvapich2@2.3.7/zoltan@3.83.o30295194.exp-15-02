@@ -1,0 +1,1536 @@
+1714840359 20240504T093239-0700 30295194 b5997c7f6d20df6fb4f32124b962721a b2c0ea858c350f398a135e6b5acbf3691421571f2bfe1132c7d51b2ba6f06b33 82 /home/mkandes/software/spack/repositories/mkandes/spack/etc/spack/sdsc/expanse/0.17.3/cpu/dev/specs/aocc@3.2.0/mvapich2@2.3.7/zoltan@3.83.sh
+#!/usr/bin/env bash
+
+#SBATCH --job-name=zoltan@3.83
+#SBATCH --account=use300
+#SBATCH --clusters=expanse
+#SBATCH --partition=ind-shared
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=1
+#SBATCH --cpus-per-task=16
+#SBATCH --mem=32G
+#SBATCH --time=00:30:00
+#SBATCH --output=%x.o%j.%N
+
+declare -xir UNIX_TIME="$(date +'%s')"
+declare -xr LOCAL_TIME="$(date +'%Y%m%dT%H%M%S%z')"
+
+declare -xr LOCAL_SCRATCH_DIR="/scratch/${USER}/job_${SLURM_JOB_ID}"
+
+declare -xr JOB_SCRIPT="$(scontrol show job ${SLURM_JOB_ID} | awk -F= '/Command=/{print $2}')"
+declare -xr JOB_SCRIPT_MD5="$(md5sum ${JOB_SCRIPT} | awk '{print $1}')"
+declare -xr JOB_SCRIPT_SHA256="$(sha256sum ${JOB_SCRIPT} | awk '{print $1}')"
+declare -xr JOB_SCRIPT_NUMBER_OF_LINES="$(wc -l ${JOB_SCRIPT} | awk '{print $1}')"
+
+declare -xr SCHEDULER_NAME='slurm'
+declare -xr SCHEDULER_MAJOR='23'
+declare -xr SCHEDULER_MINOR='02'
+declare -xr SCHEDULER_REVISION='7'
+declare -xr SCHEDULER_VERSION="${SCHEDULER_MAJOR}.${SCHEDULER_MINOR}.${SCHEDULER_REVISION}"
+declare -xr SCHEDULER_MODULE="${SCHEDULER_NAME}/${SLURM_CLUSTER_NAME}/${SCHEDULER_VERSION}"
+
+declare -xr SPACK_MAJOR='0'
+declare -xr SPACK_MINOR='17'
+declare -xr SPACK_REVISION='3'
+declare -xr SPACK_VERSION="${SPACK_MAJOR}.${SPACK_MINOR}.${SPACK_REVISION}"
+declare -xr SPACK_INSTANCE_NAME='cpu'
+declare -xr SPACK_INSTANCE_VERSION='dev'
+declare -xr SPACK_INSTANCE_DIR='/home/mkandes/software/spack/repositories/mkandes/spack'
+
+declare -xr TMPDIR="${LOCAL_SCRATCH_DIR}/spack-stage"
+declare -xr TMP="${TMPDIR}"
+
+echo "${UNIX_TIME} ${LOCAL_TIME} ${SLURM_JOB_ID} ${JOB_SCRIPT_MD5} ${JOB_SCRIPT_SHA256} ${JOB_SCRIPT_NUMBER_OF_LINES} ${JOB_SCRIPT}"
+cat  "${JOB_SCRIPT}"
+
+module purge
+module load "${SCHEDULER_MODULE}"
+module list
+. "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
+
+declare -xr SPACK_PACKAGE='zoltan@3.83'
+declare -xr SPACK_COMPILER='aocc@3.2.0'
+declare -xr SPACK_VARIANTS='~debug +fortran ~int64 +mpi +parmetis +shared'
+declare -xr SPACK_DEPENDENCIES="^parmetis@4.0.3/$(spack find --format '{hash:7}' parmetis@4.0.3 % ${SPACK_COMPILER} ^mvapich2@2.3.7)"
+declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
+
+printenv
+
+spack config get compilers  
+spack config get config  
+spack config get mirrors
+spack config get modules
+spack config get packages
+spack config get repos
+spack config get upstreams
+
+time -p spack spec --long --namespaces --types --reuse "$(echo ${SPACK_SPEC})"
+if [[ "${?}" -ne 0 ]]; then
+  echo 'ERROR: spack concretization failed.'
+  exit 1
+fi
+
+mkdir -p "${TMPDIR}"
+
+time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all --reuse "$(echo ${SPACK_SPEC})"
+if [[ "${?}" -ne 0 ]]; then
+  echo 'ERROR: spack install failed.'
+  exit 1
+fi
+
+#sbatch --dependency="afterok:${SLURM_JOB_ID}" ''
+
+sleep 30
+
+Currently Loaded Modules:
+  1) slurm/expanse/23.02.7
+
+ 
+
+CONDA_SHLVL=0
+LD_LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:/cm/shared/apps/slurm/current/lib64
+LS_COLORS=rs=0:di=38;5;33:ln=38;5;51:mh=00:pi=40;38;5;11:so=38;5;13:do=38;5;5:bd=48;5;232;38;5;11:cd=48;5;232;38;5;3:or=48;5;232;38;5;9:mi=01;05;37;41:su=48;5;196;38;5;15:sg=48;5;11;38;5;16:ca=48;5;196;38;5;226:tw=48;5;10;38;5;16:ow=48;5;10;38;5;21:st=48;5;21;38;5;15:ex=38;5;40:*.tar=38;5;9:*.tgz=38;5;9:*.arc=38;5;9:*.arj=38;5;9:*.taz=38;5;9:*.lha=38;5;9:*.lz4=38;5;9:*.lzh=38;5;9:*.lzma=38;5;9:*.tlz=38;5;9:*.txz=38;5;9:*.tzo=38;5;9:*.t7z=38;5;9:*.zip=38;5;9:*.z=38;5;9:*.dz=38;5;9:*.gz=38;5;9:*.lrz=38;5;9:*.lz=38;5;9:*.lzo=38;5;9:*.xz=38;5;9:*.zst=38;5;9:*.tzst=38;5;9:*.bz2=38;5;9:*.bz=38;5;9:*.tbz=38;5;9:*.tbz2=38;5;9:*.tz=38;5;9:*.deb=38;5;9:*.rpm=38;5;9:*.jar=38;5;9:*.war=38;5;9:*.ear=38;5;9:*.sar=38;5;9:*.rar=38;5;9:*.alz=38;5;9:*.ace=38;5;9:*.zoo=38;5;9:*.cpio=38;5;9:*.7z=38;5;9:*.rz=38;5;9:*.cab=38;5;9:*.wim=38;5;9:*.swm=38;5;9:*.dwm=38;5;9:*.esd=38;5;9:*.jpg=38;5;13:*.jpeg=38;5;13:*.mjpg=38;5;13:*.mjpeg=38;5;13:*.gif=38;5;13:*.bmp=38;5;13:*.pbm=38;5;13:*.pgm=38;5;13:*.ppm=38;5;13:*.tga=38;5;13:*.xbm=38;5;13:*.xpm=38;5;13:*.tif=38;5;13:*.tiff=38;5;13:*.png=38;5;13:*.svg=38;5;13:*.svgz=38;5;13:*.mng=38;5;13:*.pcx=38;5;13:*.mov=38;5;13:*.mpg=38;5;13:*.mpeg=38;5;13:*.m2v=38;5;13:*.mkv=38;5;13:*.webm=38;5;13:*.ogm=38;5;13:*.mp4=38;5;13:*.m4v=38;5;13:*.mp4v=38;5;13:*.vob=38;5;13:*.qt=38;5;13:*.nuv=38;5;13:*.wmv=38;5;13:*.asf=38;5;13:*.rm=38;5;13:*.rmvb=38;5;13:*.flc=38;5;13:*.avi=38;5;13:*.fli=38;5;13:*.flv=38;5;13:*.gl=38;5;13:*.dl=38;5;13:*.xcf=38;5;13:*.xwd=38;5;13:*.yuv=38;5;13:*.cgm=38;5;13:*.emf=38;5;13:*.ogv=38;5;13:*.ogx=38;5;13:*.aac=38;5;45:*.au=38;5;45:*.flac=38;5;45:*.m4a=38;5;45:*.mid=38;5;45:*.midi=38;5;45:*.mka=38;5;45:*.mp3=38;5;45:*.mpc=38;5;45:*.ogg=38;5;45:*.ra=38;5;45:*.wav=38;5;45:*.oga=38;5;45:*.opus=38;5;45:*.spx=38;5;45:*.xspf=38;5;45:
+CONDA_EXE=/home/mkandes/software/miniconda/Miniconda3-py312_24.1.2-0-Linux-x86_64/bin/conda
+LOCAL_SCRATCH_DIR=/scratch/mkandes/job_30295194
+SLURM_NODEID=0
+SLURM_TASK_PID=218699
+__LMOD_REF_COUNT_PATH=/cm/shared/apps/slurm/current/sbin:1;/cm/shared/apps/slurm/current/bin:1;/home/mkandes/software/miniconda/Miniconda3-py312_24.1.2-0-Linux-x86_64/condabin:1;/home/mkandes/.local/bin:1;/home/mkandes/bin:1;/usr/local/bin:1;/usr/bin:1;/usr/local/sbin:1;/usr/sbin:1
+_ModuleTable002_=L2V0Yy9tb2R1bGVmaWxlcyIsIi91c3Ivc2hhcmUvbW9kdWxlZmlsZXMiLCIvdXNyL3NoYXJlL01vZHVsZXMvbW9kdWxlZmlsZXMiLCIvY20vc2hhcmVkL21vZHVsZWZpbGVzIix9LFsic3lzdGVtQmFzZU1QQVRIIl09Ii9jbS9sb2NhbC9tb2R1bGVmaWxlczovY20vc2hhcmVkL2FwcHMvYWNjZXNzL21vZHVsZWZpbGVzOi9jbS9zaGFyZWQvbW9kdWxlZmlsZXM6L2V0Yy9tb2R1bGVmaWxlczovdXNyL3NoYXJlL21vZHVsZWZpbGVzOi91c3Ivc2hhcmUvTW9kdWxlcy9tb2R1bGVmaWxlcyIsfQ==
+SSH_CONNECTION=208.58.212.11 55694 198.202.100.13 22
+SPACK_PYTHON=/usr/bin/python3
+SPACK_MAJOR=0
+SLURM_PRIO_PROCESS=0
+LANG=en_US.UTF-8
+SLURM_SUBMIT_DIR=/home/mkandes/software/spack/repositories/mkandes/spack/etc/spack/sdsc/expanse/0.17.3/cpu/dev/specs/aocc@3.2.0/mvapich2@2.3.7
+HISTCONTROL=ignoredups
+SCHEDULER_NAME=slurm
+HOSTNAME=exp-15-02
+LMOD_SYSTEM_DEFAULT_MODULES=DefaultModules
+OLDPWD=/home/mkandes/software/spack/repositories/mkandes/spack/etc/spack/sdsc/expanse/0.17.3/cpu/dev/specs/gcc@10.2.0/mvapich2@2.3.7
+__LMOD_REF_COUNT__LMFILES_=/cm/shared/modulefiles/slurm/expanse/23.02.7:1
+SLURM_CPUS_PER_TASK=16
+SPACK_DEPENDENCIES=^parmetis@4.0.3/yhw22bp
+SCHEDULER_MINOR=02
+ENVIRONMENT=BATCH
+SPACK_VERSION=0.17.3
+SPACK_MINOR=17
+SLURM_PROCID=0
+SPACK_INSTANCE_VERSION=dev
+SLURM_JOB_GID=300
+SPACK_VARIANTS=~debug +fortran ~int64 +mpi +parmetis +shared
+SCHEDULER_REVISION=7
+SPACK_INSTANCE_DIR=/home/mkandes/software/spack/repositories/mkandes/spack
+__LMOD_REF_COUNT_LD_LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:1;/cm/shared/apps/slurm/current/lib64:1
+SCHEDULER_VERSION=23.02.7
+SLURMD_NODENAME=exp-15-02
+SLURM_JOB_END_TIME=1714842159
+JOB_SCRIPT_MD5=b5997c7f6d20df6fb4f32124b962721a
+SLURM_TASKS_PER_NODE=1
+S_COLORS=auto
+_CE_M=
+which_declare=declare -f
+SPACK_COMPILER=aocc@3.2.0
+XDG_SESSION_ID=204145
+SLURM_NNODES=1
+USER=mkandes
+SLURM_PMIX_TMPDIR=/scratch/mkandes/job_30295194
+SLURM_TMPDIR=/scratch/mkandes/job_30295194
+JOB_SCRIPT_NUMBER_OF_LINES=82
+SLURM_JOB_START_TIME=1714840359
+SLURM_NTASKS_PER_NODE=1
+__LMOD_REF_COUNT_MODULEPATH=/cm/local/modulefiles:1;/cm/shared/apps/access/modulefiles:1;/etc/modulefiles:1;/usr/share/modulefiles:1;/usr/share/Modules/modulefiles:1;/cm/shared/modulefiles:1
+__LMOD_REF_COUNT_LOADEDMODULES=slurm/expanse/23.02.7:1
+SCHEDULER_MAJOR=23
+PWD=/home/mkandes/software/spack/repositories/mkandes/spack/etc/spack/sdsc/expanse/0.17.3/cpu/dev/specs/aocc@3.2.0/mvapich2@2.3.7
+ENABLE_LMOD=1
+SLURM_JOB_NODELIST=exp-15-02
+HOME=/home/mkandes
+SLURM_CLUSTER_NAME=expanse
+TMP=/scratch/mkandes/job_30295194/spack-stage
+CONDA_PYTHON_EXE=/home/mkandes/software/miniconda/Miniconda3-py312_24.1.2-0-Linux-x86_64/bin/python
+LMOD_COLORIZE=yes
+LOCAL_TIME=20240504T093239-0700
+SLURM_NODELIST=exp-15-02
+LMOD_SYSHOST=expanse
+SSH_CLIENT=208.58.212.11 55694 22
+LMOD_VERSION=8.2.4
+CPATH=/cm/shared/apps/slurm/current/include
+SLURM_NTASKS=1
+LMOD_SETTARG_CMD=:
+SLURM_JOB_CPUS_PER_NODE=16
+BASH_ENV=/usr/share/lmod/lmod/init/bash
+SLURM_TOPOLOGY_ADDR=exp-15-02
+_CE_CONDA=
+SLURM_WORKING_CLUSTER=expanse:mgr1:6817:9984:109
+JOB_SCRIPT_SHA256=b2c0ea858c350f398a135e6b5acbf3691421571f2bfe1132c7d51b2ba6f06b33
+SPACK_PACKAGE=zoltan@3.83
+__LMOD_REF_COUNT_LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:1;/cm/shared/apps/slurm/current/lib64:1
+SLURM_JOB_NAME=zoltan@3.83
+TMPDIR=/scratch/mkandes/job_30295194/spack-stage
+LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:/cm/shared/apps/slurm/current/lib64
+LMOD_sys=Linux
+SLURM_JOBID=30295194
+_ModuleTable001_=X01vZHVsZVRhYmxlXz17WyJNVHZlcnNpb24iXT0zLFsiY19yZWJ1aWxkVGltZSJdPWZhbHNlLFsiY19zaG9ydFRpbWUiXT1mYWxzZSxkZXB0aFQ9e30sZmFtaWx5PXt9LG1UPXtbInNsdXJtL2V4cGFuc2UiXT17WyJmbiJdPSIvY20vc2hhcmVkL21vZHVsZWZpbGVzL3NsdXJtL2V4cGFuc2UvMjMuMDIuNyIsWyJmdWxsTmFtZSJdPSJzbHVybS9leHBhbnNlLzIzLjAyLjciLFsibG9hZE9yZGVyIl09MSxwcm9wVD17fSxbInN0YWNrRGVwdGgiXT0wLFsic3RhdHVzIl09ImFjdGl2ZSIsWyJ1c2VyTmFtZSJdPSJzbHVybS9leHBhbnNlLzIzLjAyLjciLH0sfSxtcGF0aEE9eyIvY20vbG9jYWwvbW9kdWxlZmlsZXMiLCIvY20vc2hhcmVkL2FwcHMvYWNjZXNzL21vZHVsZWZpbGVzIiwi
+SLURM_CONF=/cm/shared/apps/slurm/var/etc/expanse/slurm.conf
+LOADEDMODULES=slurm/expanse/23.02.7
+__LMOD_REF_COUNT_MANPATH=/cm/shared/apps/slurm/current/man:2;/usr/share/lmod/lmod/share/man:1;/usr/local/share/man:1;/usr/share/man:1;/cm/local/apps/environment-modules/current/share/man:1
+_ModuleTable003_=TmFtZSJdPSJzaGFyZWQiLH0sc2x1cm09e1siZm4iXT0iL2NtL2xvY2FsL21vZHVsZWZpbGVzL3NsdXJtL2V4cGFuc2UvMjMuMDIuNyIsWyJmdWxsTmFtZSJdPSJzbHVybS9leHBhbnNlLzIzLjAyLjciLFsibG9hZE9yZGVyIl09Myxwcm9wVD17fSxbInN0YWNrRGVwdGgiXT0yLFsic3RhdHVzIl09ImFjdGl2ZSIsWyJ1c2VyTmFtZSJdPSJzbHVybSIsfSx9LG1wYXRoQT17Ii9jbS9zaGFyZWQvYXBwcy9zcGFjay8wLjE3LjMvY3B1L2Ivc2hhcmUvc3BhY2svbG1vZC9saW51eC1yb2NreTgteDg2XzY0L0NvcmUiLCIvY20vbG9jYWwvbW9kdWxlZmlsZXMiLCIvY20vc2hhcmVkL2FwcHMvYWNjZXNzL21vZHVsZWZpbGVzIiwiL2V0Yy9tb2R1bGVmaWxlcyIsIi91c3Ivc2hhcmUvbW9k
+SLURM_NODE_ALIASES=(null)
+SLURM_JOB_QOS=ind-shared-normal
+LMOD_ROOT=/usr/share/lmod
+SLURM_TOPOLOGY_ADDR_PATTERN=node
+SSH_TTY=/dev/pts/58
+MAIL=/var/spool/mail/mkandes
+SLURM_CPUS_ON_NODE=16
+LMOD_arch=x86_64
+SLURM_JOB_NUM_NODES=1
+__Init_Default_Modules=1
+CMD_WLM_CLUSTER_NAME=expanse
+SLURM_MEM_PER_NODE=32768
+SPACK_ROOT=/home/mkandes/software/spack/repositories/mkandes/spack
+SHELL=/bin/bash
+TERM=xterm-256color
+SLURM_JOB_UID=501506
+_ModuleTable_Sz_=2
+__LMOD_REF_COUNT_CPATH=/cm/shared/apps/slurm/current/include:1
+SLURM_JOB_PARTITION=ind-shared
+SLURM_SCRIPT_CONTEXT=prolog_task
+SPACK_INSTANCE_NAME=cpu
+SLURM_JOB_USER=mkandes
+JOB_SCRIPT=/home/mkandes/software/spack/repositories/mkandes/spack/etc/spack/sdsc/expanse/0.17.3/cpu/dev/specs/aocc@3.2.0/mvapich2@2.3.7/zoltan@3.83.sh
+SLURM_NPROCS=1
+SHLVL=2
+SLURM_SUBMIT_HOST=login01
+UNIX_TIME=1714840359
+SLURM_JOB_ACCOUNT=use300
+MANPATH=/cm/shared/apps/slurm/current/man:/usr/share/lmod/lmod/share/man::/usr/local/share/man:/usr/share/man:/cm/local/apps/environment-modules/current/share/man
+LMOD_PREPEND_BLOCK=normal
+MODULEPATH=/cm/local/modulefiles:/cm/shared/apps/access/modulefiles:/etc/modulefiles:/usr/share/modulefiles:/usr/share/Modules/modulefiles:/cm/shared/modulefiles
+SLURM_GTIDS=0
+LOGNAME=mkandes
+DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/501506/bus
+XDG_RUNTIME_DIR=/run/user/501506
+MODULEPATH_ROOT=/usr/share/modulefiles
+LMOD_PACKAGE_PATH=/usr/share/lmod/etc/site/lmod
+PATH=/home/mkandes/software/spack/repositories/mkandes/spack/bin:/cm/shared/apps/slurm/current/sbin:/cm/shared/apps/slurm/current/bin:/home/mkandes/software/miniconda/Miniconda3-py312_24.1.2-0-Linux-x86_64/condabin:/home/mkandes/.local/bin:/home/mkandes/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin
+SLURM_JOB_ID=30295194
+_LMFILES_=/cm/shared/modulefiles/slurm/expanse/23.02.7
+SPACK_REVISION=3
+DEBUGINFOD_URLS=https://debuginfod.centos.org/ 
+SCHEDULER_MODULE=slurm/expanse/23.02.7
+MODULESHOME=/usr/share/lmod/lmod
+LMOD_SETTARG_FULL_SUPPORT=no
+HISTSIZE=-1
+LMOD_PKG=/usr/share/lmod/lmod
+SPACK_SPEC=zoltan@3.83 % aocc@3.2.0 ~debug +fortran ~int64 +mpi +parmetis +shared ^parmetis@4.0.3/yhw22bp
+LMOD_CMD=/usr/share/lmod/lmod/libexec/lmod
+SLURM_LOCALID=0
+LESSOPEN=||/usr/bin/lesspipe.sh %s
+LMOD_FULL_SETTARG_SUPPORT=no
+LMOD_DIR=/usr/share/lmod/lmod/libexec
+BASH_FUNC_which%%=() {  ( alias;
+ eval ${which_declare} ) | /usr/bin/which --tty-only --read-alias --read-functions --show-tilde --show-dot $@
+}
+BASH_FUNC_module%%=() {  eval $($LMOD_CMD bash "$@") && eval $(${LMOD_SETTARG_CMD:-:} -s sh)
+}
+BASH_FUNC_spack%%=() {  : this is a shell function from: /home/mkandes/software/spack/repositories/mkandes/spack/share/spack/setup-env.sh;
+ : the real spack script is here: /home/mkandes/software/spack/repositories/mkandes/spack/bin/spack;
+ _spack_shell_wrapper "$@";
+ return $?
+}
+BASH_FUNC__spack_shell_wrapper%%=() {  for var in LD_LIBRARY_PATH DYLD_LIBRARY_PATH DYLD_FALLBACK_LIBRARY_PATH;
+ do
+ eval "if [ -n \"\${${var}-}\" ]; then export SPACK_$var=\${${var}}; fi";
+ done;
+ if [ -n "${ZSH_VERSION:-}" ]; then
+ emulate -L sh;
+ fi;
+ _sp_flags="";
+ while [ ! -z ${1+x} ] && [ "${1#-}" != "${1}" ]; do
+ _sp_flags="$_sp_flags $1";
+ shift;
+ done;
+ if [ -n "$_sp_flags" ] && [ "${_sp_flags#*h}" != "${_sp_flags}" ] || [ "${_sp_flags#*V}" != "${_sp_flags}" ]; then
+ command spack $_sp_flags "$@";
+ return;
+ fi;
+ _sp_subcommand="";
+ if [ ! -z ${1+x} ]; then
+ _sp_subcommand="$1";
+ shift;
+ fi;
+ case $_sp_subcommand in 
+ "cd")
+ _sp_arg="";
+ if [ -n "$1" ]; then
+ _sp_arg="$1";
+ shift;
+ fi;
+ if [ "$_sp_arg" = "-h" ] || [ "$_sp_arg" = "--help" ]; then
+ command spack cd -h;
+ else
+ LOC="$(spack location $_sp_arg "$@")";
+ if [ -d "$LOC" ]; then
+ cd "$LOC";
+ else
+ return 1;
+ fi;
+ fi;
+ return
+ ;;
+ "env")
+ _sp_arg="";
+ if [ -n "$1" ]; then
+ _sp_arg="$1";
+ shift;
+ fi;
+ if [ "$_sp_arg" = "-h" ] || [ "$_sp_arg" = "--help" ]; then
+ command spack env -h;
+ else
+ case $_sp_arg in 
+ activate)
+ _a=" $@";
+ if [ -z ${1+x} ] || [ "${_a#* --sh}" != "$_a" ] || [ "${_a#* --csh}" != "$_a" ] || [ "${_a#* -h}" != "$_a" ] || [ "${_a#* --help}" != "$_a" ]; then
+ command spack env activate "$@";
+ else
+ stdout="$(command spack $_sp_flags env activate --sh "$@")" || return;
+ eval "$stdout";
+ fi
+ ;;
+ deactivate)
+ _a=" $@";
+ if [ "${_a#* --sh}" != "$_a" ] || [ "${_a#* --csh}" != "$_a" ]; then
+ command spack env deactivate "$@";
+ else
+ if [ -n "$*" ]; then
+ command spack env deactivate -h;
+ else
+ stdout="$(command spack $_sp_flags env deactivate --sh)" || return;
+ eval "$stdout";
+ fi;
+ fi
+ ;;
+ *)
+ command spack env $_sp_arg "$@"
+ ;;
+ esac;
+ fi;
+ return
+ ;;
+ "load" | "unload")
+ _a=" $@";
+ if [ "${_a#* --sh}" != "$_a" ] || [ "${_a#* --csh}" != "$_a" ] || [ "${_a#* -h}" != "$_a" ] || [ "${_a#* --list}" != "$_a" ] || [ "${_a#* --help}" != "$_a" ]; then
+ command spack $_sp_flags $_sp_subcommand "$@";
+ else
+ stdout="$(command spack $_sp_flags $_sp_subcommand --sh "$@")" || return;
+ eval "$stdout";
+ fi
+ ;;
+ *)
+ command spack $_sp_flags $_sp_subcommand "$@"
+ ;;
+ esac
+}
+BASH_FUNC_ml%%=() {  eval $($LMOD_DIR/ml_cmd "$@")
+}
+_=/usr/bin/printenv
+compilers:
+- compiler:
+    spec: gcc@8.5.0
+    paths:
+      cc: /usr/bin/gcc
+      cxx: /usr/bin/g++
+      f77: /usr/bin/gfortran
+      fc: /usr/bin/gfortran
+    flags:
+      cflags: -O2 -march=native
+      cxxflags: -O2 -march=native
+      fflags: -O2 -march=native
+    operating_system: rocky8
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+- compiler:
+    spec: gcc@10.2.0
+    paths:
+      cc: /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen/gcc-8.5.0/gcc-10.2.0-npcyll4gxjhf4tejksmdzlsl3d3usqpd/bin/gcc
+      cxx: /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen/gcc-8.5.0/gcc-10.2.0-npcyll4gxjhf4tejksmdzlsl3d3usqpd/bin/g++
+      f77: /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen/gcc-8.5.0/gcc-10.2.0-npcyll4gxjhf4tejksmdzlsl3d3usqpd/bin/gfortran
+      fc: /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen/gcc-8.5.0/gcc-10.2.0-npcyll4gxjhf4tejksmdzlsl3d3usqpd/bin/gfortran
+    flags:
+      cflags: -O2 -march=native
+      cxxflags: -O2 -march=native
+      fflags: -O2 -march=native
+    operating_system: rocky8
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+- compiler:
+    spec: aocc@3.2.0
+    paths:
+      cc: /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen/gcc-8.5.0/aocc-3.2.0-io3s466wsnnichqc2o2rikbuloev5bmq/bin/clang
+      cxx: /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen/gcc-8.5.0/aocc-3.2.0-io3s466wsnnichqc2o2rikbuloev5bmq/bin/clang++
+      f77: /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen/gcc-8.5.0/aocc-3.2.0-io3s466wsnnichqc2o2rikbuloev5bmq/bin/flang
+      fc: /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen/gcc-8.5.0/aocc-3.2.0-io3s466wsnnichqc2o2rikbuloev5bmq/bin/flang
+    flags:
+      cflags: -O2 -march=native
+      cxxflags: -O2 -march=native
+      fflags: -O2 -march=native
+    operating_system: rocky8
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+config:
+  install_tree:
+    root: $spack/opt/spack
+    projections:
+      all: ${ARCHITECTURE}/${COMPILERNAME}-${COMPILERVER}/${PACKAGE}-${VERSION}-${HASH}
+  template_dirs:
+  - $spack/share/spack/templates
+
+  # Temporary locations Spack can try to use for builds.
+  #
+  # Recommended options are given below.
+  #
+  # Builds can be faster in temporary directories on some (e.g., HPC) systems.
+  # Specifying `$tempdir` will ensure use of the default temporary directory
+  # (i.e., ``$TMP` or ``$TMPDIR``).
+  #
+  # Another option that prevents conflicts and potential permission issues is
+  # to specify `$user_cache_path/stage`, which ensures each user builds in their
+  # home directory.
+  #
+  # A more traditional path uses the value of `$spack/var/spack/stage`, which
+  # builds directly inside Spack's instance without staging them in a
+  # temporary space.  Problems with specifying a path inside a Spack instance
+  # are that it precludes its use as a system package and its ability to be
+  # pip installable.
+  #
+  # In any case, if the username is not already in the path, Spack will append
+  # the value of `$user` in an attempt to avoid potential conflicts between
+  # users in shared temporary spaces.
+  #
+  # The build stage can be purged with `spack clean --stage` and
+  # `spack clean -a`, so it is important that the specified directory uniquely
+  # identifies Spack staging to avoid accidentally wiping out non-Spack work.
+  build_stage:
+  - $tempdir/$user/spack-stage
+  - $user_cache_path/stage
+  # - $spack/var/spack/stage
+
+  # Directory in which to run tests and store test results.
+  # Tests will be stored in directories named by date/time and package
+  # name/hash.
+  test_stage: $user_cache_path/test
+  source_cache: $spack/var/spack/cache
+  misc_cache: $user_cache_path/cache
+  connect_timeout: 10
+  verify_ssl: true
+  suppress_gpg_warnings: false
+  install_missing_compilers: false
+  checksum: true
+  deprecated: false
+  dirty: false
+  build_language: C
+  locks: true
+  url_fetch_method: urllib
+  ccache: false
+  concretizer: clingo
+  db_lock_timeout: 3
+  package_lock_timeout: null
+  shared_linking: rpath
+  allow_sgid: true
+  terminal_title: false
+  debug: false
+  build_jobs: 16
+mirrors:
+  spack-public: https://mirror.spack.io
+modules:
+  default:
+    'enable:':
+    - lmod
+    lmod:
+      core_compilers:
+      - gcc@8.5.0
+      hierarchy:
+      - mpi
+      hash_length: 0
+      blacklist_implicits: true
+      naming_scheme: '{name}/{version}-{hash:7}'
+      projections:
+        all: '{name}/{version}-{hash:7}'
+      all:
+        suffixes:
+          +openmp: omp
+          threads=openmp: omp
+          +ilp64: i64
+        environment:
+          set:
+            '{name}_ROOT': '{prefix}'
+      intel:
+        environment:
+          set:
+            INTEL_LICENSE_FILE: 40000@elprado.sdsc.edu:40200@elprado.sdsc.edu
+      petsc:
+        suffixes:
+          +complex: cmplx
+      slepc:
+        suffixes:
+          ^petsc +complex: cmplx
+      ^python:
+        autoload: direct
+      ^ucx:
+        autoload: direct
+  prefix_inspections:
+    lib:
+    - LD_LIBRARY_PATH
+    lib64:
+    - LD_LIBRARY_PATH
+    bin:
+    - PATH
+    man:
+    - MANPATH
+    share/man:
+    - MANPATH
+    share/aclocal:
+    - ACLOCAL_PATH
+    lib/pkgconfig:
+    - PKG_CONFIG_PATH
+    lib64/pkgconfig:
+    - PKG_CONFIG_PATH
+    share/pkgconfig:
+    - PKG_CONFIG_PATH
+    ? ''
+    : - CMAKE_PREFIX_PATH
+
+  # These are configurations for the module set named "default"
+packages:
+  lmod:
+    externals:
+    - spec: lmod@8.2.4
+      prefix: /usr
+    buildable: false
+  lustre:
+    externals:
+    - spec: lustre@2.15.2
+      prefix: /usr
+    buildable: false
+  openssl:
+    externals:
+    - spec: openssl@1.1.1k
+      prefix: /usr
+    buildable: false
+  rdma-core:
+    externals:
+    - spec: rdma-core@43.0
+      prefix: /usr
+    buildable: false
+  hcoll:
+    externals:
+    - spec: hcoll@4.8.3220
+      prefix: /opt/mellanox/hcoll
+    buildable: false
+  knem:
+    externals:
+    - spec: knem@1.1.4
+      prefix: /opt/knem-1.1.4.90mlnx1
+    buildable: false
+  xpmem:
+    externals:
+    - spec: xpmem@2.4.6
+      prefix: /usr
+    buildable: false
+  slurm:
+    externals:
+    - spec: slurm@23.02.7
+      prefix: /cm/shared/apps/slurm/current
+    buildable: false
+  all:
+    compiler: [gcc, intel, pgi, clang, xl, nag, fj, aocc]
+    providers:
+      awk: [gawk]
+      blas: [openblas, amdblis]
+      D: [ldc]
+      daal: [intel-daal]
+      elf: [elfutils]
+      fftw-api: [fftw, amdfftw]
+      flame: [libflame, amdlibflame]
+      fuse: [libfuse]
+      gl: [mesa+opengl, mesa18, opengl]
+      glu: [mesa-glu, openglu]
+      glx: [mesa+glx, mesa18+glx, opengl]
+      golang: [gcc]
+      iconv: [libiconv]
+      ipp: [intel-ipp]
+      java: [openjdk, jdk, ibm-java]
+      jpeg: [libjpeg-turbo, libjpeg]
+      lapack: [openblas, amdlibflame]
+      lua-lang: [lua, lua-luajit]
+      mariadb-client: [mariadb-c-client, mariadb]
+      mkl: [intel-mkl]
+      mpe: [mpe2]
+      mpi: [openmpi, mpich]
+      mysql-client: [mysql, mariadb-c-client]
+      opencl: [pocl]
+      onedal: [intel-oneapi-dal]
+      osmesa: [mesa+osmesa, mesa18+osmesa]
+      pbs: [openpbs, torque]
+      pil: [py-pillow]
+      pkgconfig: [pkgconf, pkg-config]
+      rpc: [libtirpc]
+      scalapack: [netlib-scalapack, amdscalapack]
+      sycl: [hipsycl]
+      szip: [libaec, libszip]
+      tbb: [intel-tbb]
+      unwind: [libunwind]
+      uuid: [util-linux-uuid, libuuid]
+      xxd: [xxd-standalone, vim]
+      yacc: [bison, byacc]
+      ziglang: [zig]
+    permissions:
+      read: world
+      write: user
+repos:
+- $spack/var/spack/repos/sdsc
+- $spack/var/spack/repos/builtin
+upstreams: {}
+Input spec
+--------------------------------
+[    ]  .zoltan@3.83%aocc@3.2.0~debug+fortran~int64+mpi+parmetis+shared
+[    ]      ^builtin.parmetis@4.0.3%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~gdb~int64~ipo+shared build_type=RelWithDebInfo patches=4f892531eb0a807eb1b82e683a416d3e35154a455274cf9b162fb02054d11a5b,50ed2081bc939269689789942067c58b3e522c269269a430d5d34c00edbc5870,704b84f7c7444d4372cb59cca6e1209df4ef3b033bc4ee3cf50f369bce972a9d arch=linux-rocky8-zen2
+[bl  ]          ^builtin.metis@5.1.0%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~gdb~int64~real64+shared build_type=Release patches=4991da938c1d3a1d3dea78e49bbebecba00273f98df2a656e38b83d55b281da1 arch=linux-rocky8-zen2
+[bl  ]          ^sdsc.mvapich2@2.3.7%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~alloca~cuda~debug+regcache+wrapperrpath ch3_rank_bits=32 fabrics=mrail file_systems=lustre,nfs process_managers=slurm threads=multiple arch=linux-rocky8-zen2
+[bl  ]              ^builtin.libpciaccess@0.16%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+[bl  ]              ^builtin.libxml2@2.9.12%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~python arch=linux-rocky8-zen2
+[bl  ]                  ^builtin.libiconv@1.16%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  libs=shared,static arch=linux-rocky8-zen2
+[bl  ]                  ^builtin.xz@5.2.5%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~pic libs=shared,static arch=linux-rocky8-zen2
+[bl  ]                  ^builtin.zlib@1.2.11%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +optimize+pic+shared arch=linux-rocky8-zen2
+[bl  ]              ^builtin.rdma-core@43.0%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~ipo build_type=RelWithDebInfo arch=linux-rocky8-zen2
+[bl  ]              ^builtin.slurm@23.02.7%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~gtk~hdf5~hwloc~mariadb~pmix+readline~restd sysconfdir=PREFIX/etc arch=linux-rocky8-zen2
+
+Concretized
+--------------------------------
+7ba56yx  [    ]  builtin.zoltan@3.83%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~debug+fortran~int64+mpi+parmetis+shared arch=linux-rocky8-zen2
+77tykk5  [b   ]      ^builtin.autoconf@2.69%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  patches=35c449281546376449766f92d49fc121ca50e330e60fefcfc9be2af3253082c2,7793209b33013dc0f81208718c68440c5aae80e7a1c4b8d336e382525af791a7,a49dd5bac3b62daa0ff688ab4d508d71dbd2f4f8d7e2a02321926346161bf3ee arch=linux-rocky8-zen2
+knwgq3w  [b r ]          ^builtin.m4@1.4.19%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +sigsegv patches=9dc5fbd0d5cb1037ab1e6d0ecc74a30df218d0a94bdd5a02759a97f62daca573,bfdffa7c2eb01021d5849b36972c069693654ad826c1a20b53534009a4ec7a89 arch=linux-rocky8-zen2
+udaib53  [bl  ]              ^builtin.libsigsegv@2.13%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+cytiibn  [b r ]          ^sdsc.perl@5.32.0%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +cpanm+shared+threads arch=linux-rocky8-zen2
+cthafj2  [bl  ]              ^builtin.berkeley-db@18.1.40%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +cxx~docs+stl patches=b231fcc4d5cff05e5c3a4814f6a5af0e9a966428dc2176540d2c05aff41de522 arch=linux-rocky8-zen2
+pvpmqs4  [bl  ]              ^builtin.bzip2@1.0.8%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~debug~pic+shared arch=linux-rocky8-zen2
+fwban2n  [bl  ]              ^sdsc.gdbm@1.19%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+zcvyw4d  [bl  ]                  ^builtin.readline@8.1%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+vrkfn5j  [bl  ]                      ^builtin.ncurses@6.2%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~symlinks+termlib abi=none arch=linux-rocky8-zen2
+4flcxn7  [bl  ]              ^builtin.zlib@1.2.11%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +optimize+pic+shared arch=linux-rocky8-zen2
+d6rkfit  [b   ]      ^builtin.automake@1.16.3%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+lijcgi3  [bl  ]      ^builtin.metis@5.1.0%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~gdb~int64~real64+shared build_type=Release patches=4991da938c1d3a1d3dea78e49bbebecba00273f98df2a656e38b83d55b281da1 arch=linux-rocky8-zen2
+7q54c52  [bl  ]      ^sdsc.mvapich2@2.3.7%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~alloca~cuda~debug+regcache+wrapperrpath ch3_rank_bits=32 fabrics=mrail file_systems=lustre,nfs process_managers=slurm threads=multiple arch=linux-rocky8-zen2
+whgqok2  [bl  ]          ^builtin.libpciaccess@0.16%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  arch=linux-rocky8-zen2
+6xxubr4  [bl  ]          ^builtin.libxml2@2.9.12%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~python arch=linux-rocky8-zen2
+wsl5g6s  [bl  ]              ^builtin.libiconv@1.16%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  libs=shared,static arch=linux-rocky8-zen2
+pc3ghll  [bl  ]              ^builtin.xz@5.2.5%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~pic libs=shared,static arch=linux-rocky8-zen2
+gmae2bb  [bl  ]          ^builtin.rdma-core@43.0%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~ipo build_type=RelWithDebInfo arch=linux-rocky8-zen2
+uj7pfgq  [bl  ]          ^builtin.slurm@23.02.7%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~gtk~hdf5~hwloc~mariadb~pmix+readline~restd sysconfdir=PREFIX/etc arch=linux-rocky8-zen2
+yhw22bp  [bl  ]      ^builtin.parmetis@4.0.3%aocc@3.2.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~gdb~int64~ipo+shared build_type=RelWithDebInfo patches=4f892531eb0a807eb1b82e683a416d3e35154a455274cf9b162fb02054d11a5b,50ed2081bc939269689789942067c58b3e522c269269a430d5d34c00edbc5870,704b84f7c7444d4372cb59cca6e1209df4ef3b033bc4ee3cf50f369bce972a9d arch=linux-rocky8-zen2
+
+real 9.83
+user 7.88
+sys 0.26
+[+] /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/aocc-3.2.0/libsigsegv-2.13-udaib53fp5ctuqilubwlax3rg6oqxbva
+[+] /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/aocc-3.2.0/berkeley-db-18.1.40-cthafj2bcj5xwvbbwamdxhwgtjy7zhqp
+[+] /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/aocc-3.2.0/bzip2-1.0.8-pvpmqs4qb64szb4x53ihiwodo5loh7b2
+[+] /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/aocc-3.2.0/ncurses-6.2-vrkfn5jb4tcajusp2qyzifpbodxlfwui
+[+] /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/aocc-3.2.0/zlib-1.2.11-4flcxn7lslkefdgzznnuze45gsyvxwgh
+[+] /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/aocc-3.2.0/metis-5.1.0-lijcgi3vqli5szsv54ad7th5ywnb52wo
+[+] /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/aocc-3.2.0/libpciaccess-0.16-whgqok2xjb5etklrj4dbq4cgluhz6lkx
+[+] /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/aocc-3.2.0/libiconv-1.16-wsl5g6st5jyapuwm6v4kcmqfwk4rgv4o
+[+] /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/aocc-3.2.0/xz-5.2.5-pc3ghlluedfbvdez3zy5lhgi36fkpgkv
+[+] /usr (external rdma-core-43.0-gmae2bb3dadxef7biqqxqfl7nw7e5fde)
+[+] /cm/shared/apps/slurm/current (external slurm-23.02.7-uj7pfgq6rctrgj7numej5q2h35aih2c2)
+[+] /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/aocc-3.2.0/m4-1.4.19-knwgq3ws7t5yorxgdzbtxvdov7sfnwg5
+[+] /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/aocc-3.2.0/readline-8.1-zcvyw4dxzoa4aoawktt6xdvghq2g7ilp
+[+] /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/aocc-3.2.0/libxml2-2.9.12-6xxubr4qhvvonxrfmyomn5kcjzqru6b6
+[+] /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/aocc-3.2.0/gdbm-1.19-fwban2n2jwnwygj5ospckd2wdxslf3ln
+[+] /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/aocc-3.2.0/mvapich2-2.3.7-7q54c52jzcdyd7nkbfegcwn5toigal4h
+[+] /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/aocc-3.2.0/perl-5.32.0-cytiibn6rrhqpkrmlsyzu36p42achxhl
+[+] /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/aocc-3.2.0/parmetis-4.0.3-yhw22bp6slgvckekjd3cccywd5o4avb6
+[+] /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/aocc-3.2.0/automake-1.16.3-d6rkfitbpotizhtz2jxo7ukp6r3nhzsn
+[+] /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/aocc-3.2.0/autoconf-2.69-77tykk5lr7bzvn5wx6cgixtpxmppu5sp
+==> Installing zoltan-3.83-7ba56yxo4ghe23c4q46q3akkehlkeug2
+==> No binary for zoltan-3.83-7ba56yxo4ghe23c4q46q3akkehlkeug2 found: installing from source
+==> Warning: Expected user 501506 to own /scratch/mkandes, but it is owned by 0
+==> Using cached archive: /home/mkandes/software/spack/repositories/mkandes/spack/var/spack/cache/_source-cache/archive/17/17320a9f08e47f30f6f3846a74d15bfea6f3c1b937ca93c0ab759ca02c40e56c.tar.gz
+==> No patches needed for zoltan
+==> zoltan: Executing phase: 'autoreconf'
+==> zoltan: Executing phase: 'configure'
+==> zoltan: Executing phase: 'build'
+==> Error: ProcessError: Command exited with status 2:
+    'make' '-j16' 'V=1'
+
+236 errors found in build log:
+     1       ==> zoltan: Executing phase: 'autoreconf'
+     2       ==> [2024-05-04-09:33:04.732506] '/home/mkandes/software/spack/rep
+             ositories/mkandes/spack/opt/spack/linux-rocky8-zen2/aocc-3.2.0/aut
+             oconf-2.69-77tykk5lr7bzvn5wx6cgixtpxmppu5sp/bin/autoreconf' '-ivf'
+     3       autoreconf: Entering directory `.'
+     4       autoreconf: configure.ac: not using Gettext
+     5       autoreconf: running: aclocal --force -I config
+     6       configure.ac:382: warning: AC_CACHE_VAL(ax_cv_f90_modulecase, ...)
+             : suspicious presence of an AC_SUBST in the second argument, where
+              no actions should be taken
+  >> 7       /scratch/mkandes/job_30079875/spack-stage/spack-stage/spack-stage-
+             autoconf-2.69-77tykk5lr7bzvn5wx6cgixtpxmppu5sp/spack-src/lib/autoc
+             onf/general.m4:2031: AC_CACHE_VAL is expanded from...
+  >> 8       /scratch/mkandes/job_30079875/spack-stage/spack-stage/spack-stage-
+             autoconf-2.69-77tykk5lr7bzvn5wx6cgixtpxmppu5sp/spack-src/lib/autoc
+             onf/general.m4:2052: AC_CACHE_CHECK is expanded from...
+  >> 9       config/ax_f90_module_case.m4:3: AX_F90_MODULE_CASE is expanded fro
+             m...
+  >> 10      configure.ac:382: the top level
+     11      autoreconf: configure.ac: tracing
+     12      configure.ac:382: warning: AC_CACHE_VAL(ax_cv_f90_modulecase, ...)
+             : suspicious presence of an AC_SUBST in the second argument, where
+              no actions should be taken
+  >> 13      /scratch/mkandes/job_30079875/spack-stage/spack-stage/spack-stage-
+             autoconf-2.69-77tykk5lr7bzvn5wx6cgixtpxmppu5sp/spack-src/lib/autoc
+             onf/general.m4:2031: AC_CACHE_VAL is expanded from...
+  >> 14      /scratch/mkandes/job_30079875/spack-stage/spack-stage/spack-stage-
+             autoconf-2.69-77tykk5lr7bzvn5wx6cgixtpxmppu5sp/spack-src/lib/autoc
+             onf/general.m4:2052: AC_CACHE_CHECK is expanded from...
+  >> 15      config/ax_f90_module_case.m4:3: AX_F90_MODULE_CASE is expanded fro
+             m...
+  >> 16      configure.ac:382: the top level
+     17      autoreconf: configure.ac: not using Libtool
+     18      autoreconf: running: /home/mkandes/software/spack/repositories/mka
+             ndes/spack/opt/spack/linux-rocky8-zen2/aocc-3.2.0/autoconf-2.69-77
+             tykk5lr7bzvn5wx6cgixtpxmppu5sp/bin/autoconf --force
+     19      configure.ac:382: warning: AC_CACHE_VAL(ax_cv_f90_modulecase, ...)
+             : suspicious presence of an AC_SUBST in the second argument, where
+              no actions should be taken
+  >> 20      /scratch/mkandes/job_30079875/spack-stage/spack-stage/spack-stage-
+             autoconf-2.69-77tykk5lr7bzvn5wx6cgixtpxmppu5sp/spack-src/lib/autoc
+             onf/general.m4:2031: AC_CACHE_VAL is expanded from...
+  >> 21      /scratch/mkandes/job_30079875/spack-stage/spack-stage/spack-stage-
+             autoconf-2.69-77tykk5lr7bzvn5wx6cgixtpxmppu5sp/spack-src/lib/autoc
+             onf/general.m4:2052: AC_CACHE_CHECK is expanded from...
+  >> 22      config/ax_f90_module_case.m4:3: AX_F90_MODULE_CASE is expanded fro
+             m...
+  >> 23      configure.ac:382: the top level
+     24      autoreconf: running: /home/mkandes/software/spack/repositories/mka
+             ndes/spack/opt/spack/linux-rocky8-zen2/aocc-3.2.0/autoconf-2.69-77
+             tykk5lr7bzvn5wx6cgixtpxmppu5sp/bin/autoheader --force
+     25      configure.ac:382: warning: AC_CACHE_VAL(ax_cv_f90_modulecase, ...)
+             : suspicious presence of an AC_SUBST in the second argument, where
+              no actions should be taken
+  >> 26      /scratch/mkandes/job_30079875/spack-stage/spack-stage/spack-stage-
+             autoconf-2.69-77tykk5lr7bzvn5wx6cgixtpxmppu5sp/spack-src/lib/autoc
+             onf/general.m4:2031: AC_CACHE_VAL is expanded from...
+  >> 27      /scratch/mkandes/job_30079875/spack-stage/spack-stage/spack-stage-
+             autoconf-2.69-77tykk5lr7bzvn5wx6cgixtpxmppu5sp/spack-src/lib/autoc
+             onf/general.m4:2052: AC_CACHE_CHECK is expanded from...
+  >> 28      config/ax_f90_module_case.m4:3: AX_F90_MODULE_CASE is expanded fro
+             m...
+  >> 29      configure.ac:382: the top level
+     30      autoreconf: running: automake --add-missing --copy --force-missing
+     31      configure.ac:382: warning: AC_CACHE_VAL(ax_cv_f90_modulecase, ...)
+             : suspicious presence of an AC_SUBST in the second argument, where
+              no actions should be taken
+  >> 32      /scratch/mkandes/job_30079875/spack-stage/spack-stage/spack-stage-
+             autoconf-2.69-77tykk5lr7bzvn5wx6cgixtpxmppu5sp/spack-src/lib/autoc
+             onf/general.m4:2031: AC_CACHE_VAL is expanded from...
+  >> 33      /scratch/mkandes/job_30079875/spack-stage/spack-stage/spack-stage-
+             autoconf-2.69-77tykk5lr7bzvn5wx6cgixtpxmppu5sp/spack-src/lib/autoc
+             onf/general.m4:2052: AC_CACHE_CHECK is expanded from...
+  >> 34      config/ax_f90_module_case.m4:3: AX_F90_MODULE_CASE is expanded fro
+             m...
+  >> 35      configure.ac:382: the top level
+     36      parallel-tests: installing 'config/test-driver'
+     37      src/Makefile.am:55: warning: source file '$(srcdir)/all/all_allo.c
+             ' is in a subdirectory,
+  >> 38      src/Makefile.am:55: but option 'subdir-objects' is disabled
+     39      automake: warning: possible forward-incompatibility.
+     40      automake: At least a source file is in a subdirectory, but the 'su
+             bdir-objects'
+     41      automake: automake option hasn't been enabled.  For now, the corre
+             sponding output
+     42      automake: object file(s) will be placed in the top-level directory
+             .  However,
+     43      automake: this behaviour will change in future Automake versions: 
+             they will
+     44      automake: unconditionally cause object files to be placed in the s
+             ame subdirectory
+     45      automake: of the corresponding sources.
+     46      automake: You are advised to start using 'subdir-objects' option t
+             hroughout your
+     47      automake: project, to avoid future incompatibilities.
+     48      src/Makefile.am:64: warning: source file '$(srcdir)/coloring/color
+             ing.c' is in a subdirectory,
+  >> 49      src/Makefile.am:64: but option 'subdir-objects' is disabled
+     50      src/Makefile.am:64: warning: source file '$(srcdir)/coloring/color
+             _test.c' is in a subdirectory,
+  >> 51      src/Makefile.am:64: but option 'subdir-objects' is disabled
+     52      src/Makefile.am:64: warning: source file '$(srcdir)/coloring/bucke
+             t.c' is in a subdirectory,
+  >> 53      src/Makefile.am:64: but option 'subdir-objects' is disabled
+     54      src/Makefile.am:64: warning: source file '$(srcdir)/coloring/g2l_h
+             ash.c' is in a subdirectory,
+  >> 55      src/Makefile.am:64: but option 'subdir-objects' is disabled
+     56      src/Makefile.am:74: warning: source file '$(srcdir)/graph/graph.c'
+              is in a subdirectory,
+  >> 57      src/Makefile.am:74: but option 'subdir-objects' is disabled
+     58      src/Makefile.am:81: warning: source file '$(srcdir)/ha/divide_mach
+             ine.c' is in a subdirectory,
+  >> 59      src/Makefile.am:81: but option 'subdir-objects' is disabled
+     60      src/Makefile.am:81: warning: source file '$(srcdir)/ha/get_process
+             or_name.c' is in a subdirectory,
+  >> 61      src/Makefile.am:81: but option 'subdir-objects' is disabled
+     62      src/Makefile.am:81: warning: source file '$(srcdir)/ha/ha_ovis.c' 
+             is in a subdirectory,
+  >> 63      src/Makefile.am:81: but option 'subdir-objects' is disabled
+     64      src/Makefile.am:89: warning: source file '$(srcdir)/hier/hier.c' i
+             s in a subdirectory,
+  >> 65      src/Makefile.am:89: but option 'subdir-objects' is disabled
+     66      src/Makefile.am:89: warning: source file '$(srcdir)/hier/hier_free
+             _struct.c' is in a subdirectory,
+  >> 67      src/Makefile.am:89: but option 'subdir-objects' is disabled
+     68      src/Makefile.am:98: warning: source file '$(srcdir)/hsfc/hsfc_box_
+             assign.c' is in a subdirectory,
+  >> 69      src/Makefile.am:98: but option 'subdir-objects' is disabled
+     70      src/Makefile.am:98: warning: source file '$(srcdir)/hsfc/hsfc.c' i
+             s in a subdirectory,
+  >> 71      src/Makefile.am:98: but option 'subdir-objects' is disabled
+     72      src/Makefile.am:98: warning: source file '$(srcdir)/hsfc/hsfc_hilb
+             ert.c' is in a subdirectory,
+  >> 73      src/Makefile.am:98: but option 'subdir-objects' is disabled
+     74      src/Makefile.am:98: warning: source file '$(srcdir)/hsfc/hsfc_poin
+             t_assign.c' is in a subdirectory,
+  >> 75      src/Makefile.am:98: but option 'subdir-objects' is disabled
+     76      src/Makefile.am:125: warning: source file '$(srcdir)/lb/lb_balance
+             .c' is in a subdirectory,
+  >> 77      src/Makefile.am:125: but option 'subdir-objects' is disabled
+     78      src/Makefile.am:125: warning: source file '$(srcdir)/lb/lb_box_ass
+             ign.c' is in a subdirectory,
+  >> 79      src/Makefile.am:125: but option 'subdir-objects' is disabled
+     80      src/Makefile.am:125: warning: source file '$(srcdir)/lb/lb_copy.c'
+              is in a subdirectory,
+  >> 81      src/Makefile.am:125: but option 'subdir-objects' is disabled
+     82      src/Makefile.am:125: warning: source file '$(srcdir)/lb/lb_eval.c'
+              is in a subdirectory,
+  >> 83      src/Makefile.am:125: but option 'subdir-objects' is disabled
+     84      src/Makefile.am:125: warning: source file '$(srcdir)/lb/lb_free.c'
+              is in a subdirectory,
+  >> 85      src/Makefile.am:125: but option 'subdir-objects' is disabled
+     86      src/Makefile.am:125: warning: source file '$(srcdir)/lb/lb_init.c'
+              is in a subdirectory,
+  >> 87      src/Makefile.am:125: but option 'subdir-objects' is disabled
+     88      src/Makefile.am:125: warning: source file '$(srcdir)/lb/lb_invert.
+             c' is in a subdirectory,
+  >> 89      src/Makefile.am:125: but option 'subdir-objects' is disabled
+     90      src/Makefile.am:125: warning: source file '$(srcdir)/lb/lb_migrate
+             .c' is in a subdirectory,
+  >> 91      src/Makefile.am:125: but option 'subdir-objects' is disabled
+     92      src/Makefile.am:125: warning: source file '$(srcdir)/lb/lb_part2pr
+             oc.c' is in a subdirectory,
+  >> 93      src/Makefile.am:125: but option 'subdir-objects' is disabled
+     94      src/Makefile.am:125: warning: source file '$(srcdir)/lb/lb_point_a
+             ssign.c' is in a subdirectory,
+  >> 95      src/Makefile.am:125: but option 'subdir-objects' is disabled
+     96      src/Makefile.am:125: warning: source file '$(srcdir)/lb/lb_remap.c
+             ' is in a subdirectory,
+  >> 97      src/Makefile.am:125: but option 'subdir-objects' is disabled
+     98      src/Makefile.am:125: warning: source file '$(srcdir)/lb/lb_set_fn.
+             c' is in a subdirectory,
+  >> 99      src/Makefile.am:125: but option 'subdir-objects' is disabled
+     100     src/Makefile.am:125: warning: source file '$(srcdir)/lb/lb_set_met
+             hod.c' is in a subdirectory,
+  >> 101     src/Makefile.am:125: but option 'subdir-objects' is disabled
+     102     src/Makefile.am:125: warning: source file '$(srcdir)/lb/lb_set_par
+             t_sizes.c' is in a subdirectory,
+  >> 103     src/Makefile.am:125: but option 'subdir-objects' is disabled
+     104     src/Makefile.am:144: warning: source file '$(srcdir)/matrix/matrix
+             _build.c' is in a subdirectory,
+  >> 105     src/Makefile.am:144: but option 'subdir-objects' is disabled
+     106     src/Makefile.am:144: warning: source file '$(srcdir)/matrix/matrix
+             _distribute.c' is in a subdirectory,
+  >> 107     src/Makefile.am:144: but option 'subdir-objects' is disabled
+     108     src/Makefile.am:144: warning: source file '$(srcdir)/matrix/matrix
+             _operations.c' is in a subdirectory,
+  >> 109     src/Makefile.am:144: but option 'subdir-objects' is disabled
+     110     src/Makefile.am:144: warning: source file '$(srcdir)/matrix/matrix
+             _sym.c' is in a subdirectory,
+  >> 111     src/Makefile.am:144: but option 'subdir-objects' is disabled
+     112     src/Makefile.am:144: warning: source file '$(srcdir)/matrix/matrix
+             _utils.c' is in a subdirectory,
+  >> 113     src/Makefile.am:144: but option 'subdir-objects' is disabled
+     114     src/Makefile.am:155: warning: source file '$(srcdir)/order/order.c
+             ' is in a subdirectory,
+  >> 115     src/Makefile.am:155: but option 'subdir-objects' is disabled
+     116     src/Makefile.am:155: warning: source file '$(srcdir)/order/order_s
+             truct.c' is in a subdirectory,
+  >> 117     src/Makefile.am:155: but option 'subdir-objects' is disabled
+     118     src/Makefile.am:155: warning: source file '$(srcdir)/order/order_t
+             ools.c' is in a subdirectory,
+  >> 119     src/Makefile.am:155: but option 'subdir-objects' is disabled
+     120     src/Makefile.am:155: warning: source file '$(srcdir)/order/hsfcOrd
+             er.c' is in a subdirectory,
+  >> 121     src/Makefile.am:155: but option 'subdir-objects' is disabled
+     122     src/Makefile.am:155: warning: source file '$(srcdir)/order/perm.c'
+              is in a subdirectory,
+  >> 123     src/Makefile.am:155: but option 'subdir-objects' is disabled
+     124     src/Makefile.am:169: warning: source file '$(srcdir)/par/par_avera
+             ge.c' is in a subdirectory,
+  >> 125     src/Makefile.am:169: but option 'subdir-objects' is disabled
+     126     src/Makefile.am:169: warning: source file '$(srcdir)/par/par_bisec
+             t.c' is in a subdirectory,
+  >> 127     src/Makefile.am:169: but option 'subdir-objects' is disabled
+     128     src/Makefile.am:169: warning: source file '$(srcdir)/par/par_media
+             n.c' is in a subdirectory,
+  >> 129     src/Makefile.am:169: but option 'subdir-objects' is disabled
+     130     src/Makefile.am:169: warning: source file '$(srcdir)/par/par_media
+             n_randomized.c' is in a subdirectory,
+  >> 131     src/Makefile.am:169: but option 'subdir-objects' is disabled
+     132     src/Makefile.am:169: warning: source file '$(srcdir)/par/par_stats
+             .c' is in a subdirectory,
+  >> 133     src/Makefile.am:169: but option 'subdir-objects' is disabled
+     134     src/Makefile.am:169: warning: source file '$(srcdir)/par/par_sync.
+             c' is in a subdirectory,
+  >> 135     src/Makefile.am:169: but option 'subdir-objects' is disabled
+     136     src/Makefile.am:169: warning: source file '$(srcdir)/par/par_tflop
+             s_special.c' is in a subdirectory,
+  >> 137     src/Makefile.am:169: but option 'subdir-objects' is disabled
+     138     src/Makefile.am:182: warning: source file '$(srcdir)/params/assign
+             _param_vals.c' is in a subdirectory,
+  >> 139     src/Makefile.am:182: but option 'subdir-objects' is disabled
+     140     src/Makefile.am:182: warning: source file '$(srcdir)/params/bind_p
+             aram.c' is in a subdirectory,
+  >> 141     src/Makefile.am:182: but option 'subdir-objects' is disabled
+     142     src/Makefile.am:182: warning: source file '$(srcdir)/params/check_
+             param.c' is in a subdirectory,
+  >> 143     src/Makefile.am:182: but option 'subdir-objects' is disabled
+     144     src/Makefile.am:182: warning: source file '$(srcdir)/params/free_p
+             arams.c' is in a subdirectory,
+  >> 145     src/Makefile.am:182: but option 'subdir-objects' is disabled
+     146     src/Makefile.am:182: warning: source file '$(srcdir)/params/key_pa
+             rams.c' is in a subdirectory,
+  >> 147     src/Makefile.am:182: but option 'subdir-objects' is disabled
+     148     src/Makefile.am:182: warning: source file '$(srcdir)/params/print_
+             params.c' is in a subdirectory,
+  >> 149     src/Makefile.am:182: but option 'subdir-objects' is disabled
+     150     src/Makefile.am:182: warning: source file '$(srcdir)/params/set_pa
+             ram.c' is in a subdirectory,
+  >> 151     src/Makefile.am:182: but option 'subdir-objects' is disabled
+     152     src/Makefile.am:197: warning: source file '$(srcdir)/tpls/build_gr
+             aph.c' is in a subdirectory,
+  >> 153     src/Makefile.am:197: but option 'subdir-objects' is disabled
+     154     src/Makefile.am:197: warning: source file '$(srcdir)/tpls/postproc
+             essing.c' is in a subdirectory,
+  >> 155     src/Makefile.am:197: but option 'subdir-objects' is disabled
+     156     src/Makefile.am:197: warning: source file '$(srcdir)/tpls/preproce
+             ssing.c' is in a subdirectory,
+  >> 157     src/Makefile.am:197: but option 'subdir-objects' is disabled
+     158     src/Makefile.am:197: warning: source file '$(srcdir)/tpls/scatter_
+             graph.c' is in a subdirectory,
+  >> 159     src/Makefile.am:197: but option 'subdir-objects' is disabled
+     160     src/Makefile.am:197: warning: source file '$(srcdir)/tpls/third_li
+             brary.c' is in a subdirectory,
+  >> 161     src/Makefile.am:197: but option 'subdir-objects' is disabled
+     162     src/Makefile.am:197: warning: source file '$(srcdir)/tpls/verify_g
+             raph.c' is in a subdirectory,
+  >> 163     src/Makefile.am:197: but option 'subdir-objects' is disabled
+     164     src/Makefile.am:208: warning: source file '$(srcdir)/tpls/parmetis
+             _interface.c' is in a subdirectory,
+  >> 165     src/Makefile.am:208: but option 'subdir-objects' is disabled
+     166     src/Makefile.am:256: warning: source file '$(srcdir)/phg/phg_build
+             .c' is in a subdirectory,
+  >> 167     src/Makefile.am:256: but option 'subdir-objects' is disabled
+     168     src/Makefile.am:256: warning: source file '$(srcdir)/phg/phg_build
+             _calls.c' is in a subdirectory,
+  >> 169     src/Makefile.am:256: but option 'subdir-objects' is disabled
+     170     src/Makefile.am:256: warning: source file '$(srcdir)/phg/phg.c' is
+              in a subdirectory,
+  >> 171     src/Makefile.am:256: but option 'subdir-objects' is disabled
+     172     src/Makefile.am:256: warning: source file '$(srcdir)/phg/phg_looku
+             p.c' is in a subdirectory,
+  >> 173     src/Makefile.am:256: but option 'subdir-objects' is disabled
+     174     src/Makefile.am:256: warning: source file '$(srcdir)/phg/phg_verbo
+             se.c' is in a subdirectory,
+  >> 175     src/Makefile.am:256: but option 'subdir-objects' is disabled
+     176     src/Makefile.am:256: warning: source file '$(srcdir)/phg/phg_coars
+             e.c' is in a subdirectory,
+  >> 177     src/Makefile.am:256: but option 'subdir-objects' is disabled
+     178     src/Makefile.am:256: warning: source file '$(srcdir)/phg/phg_comm.
+             c' is in a subdirectory,
+  >> 179     src/Makefile.am:256: but option 'subdir-objects' is disabled
+     180     src/Makefile.am:256: warning: source file '$(srcdir)/phg/phg_distr
+             ib.c' is in a subdirectory,
+  >> 181     src/Makefile.am:256: but option 'subdir-objects' is disabled
+     182     src/Makefile.am:256: warning: source file '$(srcdir)/phg/phg_gathe
+             r.c' is in a subdirectory,
+  >> 183     src/Makefile.am:256: but option 'subdir-objects' is disabled
+     184     src/Makefile.am:256: warning: source file '$(srcdir)/phg/phg_hyper
+             graph.c' is in a subdirectory,
+  >> 185     src/Makefile.am:256: but option 'subdir-objects' is disabled
+     186     src/Makefile.am:256: warning: source file '$(srcdir)/phg/phg_match
+             .c' is in a subdirectory,
+  >> 187     src/Makefile.am:256: but option 'subdir-objects' is disabled
+     188     src/Makefile.am:256: warning: source file '$(srcdir)/phg/phg_order
+             .c' is in a subdirectory,
+  >> 189     src/Makefile.am:256: but option 'subdir-objects' is disabled
+     190     src/Makefile.am:256: warning: source file '$(srcdir)/phg/phg_parkw
+             ay.c' is in a subdirectory,
+  >> 191     src/Makefile.am:256: but option 'subdir-objects' is disabled
+     192     src/Makefile.am:256: warning: source file '$(srcdir)/phg/phg_patoh
+             .c' is in a subdirectory,
+  >> 193     src/Makefile.am:256: but option 'subdir-objects' is disabled
+     194     src/Makefile.am:256: warning: source file '$(srcdir)/phg/phg_plot.
+             c' is in a subdirectory,
+  >> 195     src/Makefile.am:256: but option 'subdir-objects' is disabled
+     196     src/Makefile.am:256: warning: source file '$(srcdir)/phg/phg_rdivi
+             de.c' is in a subdirectory,
+  >> 197     src/Makefile.am:256: but option 'subdir-objects' is disabled
+     198     src/Makefile.am:256: warning: source file '$(srcdir)/phg/phg_refin
+             ement.c' is in a subdirectory,
+  >> 199     src/Makefile.am:256: but option 'subdir-objects' is disabled
+     200     src/Makefile.am:256: warning: source file '$(srcdir)/phg/phg_scale
+             .c' is in a subdirectory,
+  >> 201     src/Makefile.am:256: but option 'subdir-objects' is disabled
+     202     src/Makefile.am:256: warning: source file '$(srcdir)/phg/phg_seria
+             lpartition.c' is in a subdirectory,
+  >> 203     src/Makefile.am:256: but option 'subdir-objects' is disabled
+     204     src/Makefile.am:256: warning: source file '$(srcdir)/phg/phg_util.
+             c' is in a subdirectory,
+  >> 205     src/Makefile.am:256: but option 'subdir-objects' is disabled
+     206     src/Makefile.am:256: warning: source file '$(srcdir)/phg/phg_tree.
+             c' is in a subdirectory,
+  >> 207     src/Makefile.am:256: but option 'subdir-objects' is disabled
+     208     src/Makefile.am:256: warning: source file '$(srcdir)/phg/phg_Vcycl
+             e.c' is in a subdirectory,
+  >> 209     src/Makefile.am:256: but option 'subdir-objects' is disabled
+     210     src/Makefile.am:288: warning: source file '$(srcdir)/rcb/box_assig
+             n.c' is in a subdirectory,
+  >> 211     src/Makefile.am:288: but option 'subdir-objects' is disabled
+     212     src/Makefile.am:288: warning: source file '$(srcdir)/rcb/create_pr
+             oc_list.c' is in a subdirectory,
+  >> 213     src/Makefile.am:288: but option 'subdir-objects' is disabled
+     214     src/Makefile.am:288: warning: source file '$(srcdir)/rcb/inertial1
+             d.c' is in a subdirectory,
+  >> 215     src/Makefile.am:288: but option 'subdir-objects' is disabled
+     216     src/Makefile.am:288: warning: source file '$(srcdir)/rcb/inertial2
+             d.c' is in a subdirectory,
+  >> 217     src/Makefile.am:288: but option 'subdir-objects' is disabled
+     218     src/Makefile.am:288: warning: source file '$(srcdir)/rcb/inertial3
+             d.c' is in a subdirectory,
+  >> 219     src/Makefile.am:288: but option 'subdir-objects' is disabled
+     220     src/Makefile.am:288: warning: source file '$(srcdir)/rcb/point_ass
+             ign.c' is in a subdirectory,
+  >> 221     src/Makefile.am:288: but option 'subdir-objects' is disabled
+     222     src/Makefile.am:288: warning: source file '$(srcdir)/rcb/rcb_box.c
+             ' is in a subdirectory,
+  >> 223     src/Makefile.am:288: but option 'subdir-objects' is disabled
+     224     src/Makefile.am:288: warning: source file '$(srcdir)/rcb/rcb.c' is
+              in a subdirectory,
+  >> 225     src/Makefile.am:288: but option 'subdir-objects' is disabled
+     226     src/Makefile.am:288: warning: source file '$(srcdir)/rcb/rcb_util.
+             c' is in a subdirectory,
+  >> 227     src/Makefile.am:288: but option 'subdir-objects' is disabled
+     228     src/Makefile.am:288: warning: source file '$(srcdir)/rcb/rib.c' is
+              in a subdirectory,
+  >> 229     src/Makefile.am:288: but option 'subdir-objects' is disabled
+     230     src/Makefile.am:288: warning: source file '$(srcdir)/rcb/rib_util.
+             c' is in a subdirectory,
+  >> 231     src/Makefile.am:288: but option 'subdir-objects' is disabled
+     232     src/Makefile.am:288: warning: source file '$(srcdir)/rcb/shared.c'
+              is in a subdirectory,
+  >> 233     src/Makefile.am:288: but option 'subdir-objects' is disabled
+     234     src/Makefile.am:306: warning: source file '$(srcdir)/reftree/reftr
+             ee_build.c' is in a subdirectory,
+  >> 235     src/Makefile.am:306: but option 'subdir-objects' is disabled
+     236     src/Makefile.am:306: warning: source file '$(srcdir)/reftree/reftr
+             ee_coarse_path.c' is in a subdirectory,
+  >> 237     src/Makefile.am:306: but option 'subdir-objects' is disabled
+     238     src/Makefile.am:306: warning: source file '$(srcdir)/reftree/reftr
+             ee_hash.c' is in a subdirectory,
+  >> 239     src/Makefile.am:306: but option 'subdir-objects' is disabled
+     240     src/Makefile.am:306: warning: source file '$(srcdir)/reftree/reftr
+             ee_part.c' is in a subdirectory,
+  >> 241     src/Makefile.am:306: but option 'subdir-objects' is disabled
+     242     src/Makefile.am:228: warning: source file '$(srcdir)/tpls/scotch_i
+             nterface.c' is in a subdirectory,
+  >> 243     src/Makefile.am:228: but option 'subdir-objects' is disabled
+     244     src/Makefile.am:312: warning: source file '$(srcdir)/simple/block.
+             c' is in a subdirectory,
+  >> 245     src/Makefile.am:312: but option 'subdir-objects' is disabled
+     246     src/Makefile.am:312: warning: source file '$(srcdir)/simple/cyclic
+             .c' is in a subdirectory,
+  >> 247     src/Makefile.am:312: but option 'subdir-objects' is disabled
+     248     src/Makefile.am:312: warning: source file '$(srcdir)/simple/random
+             .c' is in a subdirectory,
+  >> 249     src/Makefile.am:312: but option 'subdir-objects' is disabled
+     250     src/Makefile.am:323: warning: source file '$(srcdir)/timer/timer_p
+             arams.c' is in a subdirectory,
+  >> 251     src/Makefile.am:323: but option 'subdir-objects' is disabled
+     252     src/Makefile.am:333: warning: source file '$(srcdir)/Utilities/Com
+             munication/comm_exchange_sizes.c' is in a subdirectory,
+  >> 253     src/Makefile.am:333: but option 'subdir-objects' is disabled
+     254     src/Makefile.am:333: warning: source file '$(srcdir)/Utilities/Com
+             munication/comm_invert_map.c' is in a subdirectory,
+  >> 255     src/Makefile.am:333: but option 'subdir-objects' is disabled
+     256     src/Makefile.am:333: warning: source file '$(srcdir)/Utilities/Com
+             munication/comm_do.c' is in a subdirectory,
+  >> 257     src/Makefile.am:333: but option 'subdir-objects' is disabled
+     258     src/Makefile.am:333: warning: source file '$(srcdir)/Utilities/Com
+             munication/comm_do_reverse.c' is in a subdirectory,
+  >> 259     src/Makefile.am:333: but option 'subdir-objects' is disabled
+     260     src/Makefile.am:333: warning: source file '$(srcdir)/Utilities/Com
+             munication/comm_info.c' is in a subdirectory,
+  >> 261     src/Makefile.am:333: but option 'subdir-objects' is disabled
+     262     src/Makefile.am:333: warning: source file '$(srcdir)/Utilities/Com
+             munication/comm_create.c' is in a subdirectory,
+  >> 263     src/Makefile.am:333: but option 'subdir-objects' is disabled
+     264     src/Makefile.am:333: warning: source file '$(srcdir)/Utilities/Com
+             munication/comm_resize.c' is in a subdirectory,
+  >> 265     src/Makefile.am:333: but option 'subdir-objects' is disabled
+     266     src/Makefile.am:333: warning: source file '$(srcdir)/Utilities/Com
+             munication/comm_sort_ints.c' is in a subdirectory,
+  >> 267     src/Makefile.am:333: but option 'subdir-objects' is disabled
+     268     src/Makefile.am:333: warning: source file '$(srcdir)/Utilities/Com
+             munication/comm_destroy.c' is in a subdirectory,
+  >> 269     src/Makefile.am:333: but option 'subdir-objects' is disabled
+     270     src/Makefile.am:333: warning: source file '$(srcdir)/Utilities/Com
+             munication/comm_invert_plan.c' is in a subdirectory,
+  >> 271     src/Makefile.am:333: but option 'subdir-objects' is disabled
+     272     src/Makefile.am:333: warning: source file '$(srcdir)/Utilities/Tim
+             er/zoltan_timer.c' is in a subdirectory,
+  >> 273     src/Makefile.am:333: but option 'subdir-objects' is disabled
+     274     src/Makefile.am:333: warning: source file '$(srcdir)/Utilities/Tim
+             er/timer.c' is in a subdirectory,
+  >> 275     src/Makefile.am:333: but option 'subdir-objects' is disabled
+     276     src/Makefile.am:333: warning: source file '$(srcdir)/Utilities/DDi
+             rectory/DD_Memory.c' is in a subdirectory,
+  >> 277     src/Makefile.am:333: but option 'subdir-objects' is disabled
+     278     src/Makefile.am:333: warning: source file '$(srcdir)/Utilities/DDi
+             rectory/DD_Find.c' is in a subdirectory,
+  >> 279     src/Makefile.am:333: but option 'subdir-objects' is disabled
+     280     src/Makefile.am:333: warning: source file '$(srcdir)/Utilities/DDi
+             rectory/DD_Destroy.c' is in a subdirectory,
+  >> 281     src/Makefile.am:333: but option 'subdir-objects' is disabled
+     282     src/Makefile.am:333: warning: source file '$(srcdir)/Utilities/DDi
+             rectory/DD_Set_Neighbor_Hash_Fn3.c' is in a subdirectory,
+  >> 283     src/Makefile.am:333: but option 'subdir-objects' is disabled
+     284     src/Makefile.am:333: warning: source file '$(srcdir)/Utilities/DDi
+             rectory/DD_Remove.c' is in a subdirectory,
+  >> 285     src/Makefile.am:333: but option 'subdir-objects' is disabled
+     286     src/Makefile.am:333: warning: source file '$(srcdir)/Utilities/DDi
+             rectory/DD_Create.c' is in a subdirectory,
+  >> 287     src/Makefile.am:333: but option 'subdir-objects' is disabled
+     288     src/Makefile.am:333: warning: source file '$(srcdir)/Utilities/DDi
+             rectory/DD_Update.c' is in a subdirectory,
+  >> 289     src/Makefile.am:333: but option 'subdir-objects' is disabled
+     290     src/Makefile.am:333: warning: source file '$(srcdir)/Utilities/DDi
+             rectory/DD_Stats.c' is in a subdirectory,
+  >> 291     src/Makefile.am:333: but option 'subdir-objects' is disabled
+     292     src/Makefile.am:333: warning: source file '$(srcdir)/Utilities/DDi
+             rectory/DD_Hash2.c' is in a subdirectory,
+  >> 293     src/Makefile.am:333: but option 'subdir-objects' is disabled
+     294     src/Makefile.am:333: warning: source file '$(srcdir)/Utilities/DDi
+             rectory/DD_Print.c' is in a subdirectory,
+  >> 295     src/Makefile.am:333: but option 'subdir-objects' is disabled
+     296     src/Makefile.am:333: warning: source file '$(srcdir)/Utilities/DDi
+             rectory/DD_Set_Neighbor_Hash_Fn2.c' is in a subdirectory,
+  >> 297     src/Makefile.am:333: but option 'subdir-objects' is disabled
+     298     src/Makefile.am:333: warning: source file '$(srcdir)/Utilities/DDi
+             rectory/DD_Set_Hash_Fn.c' is in a subdirectory,
+  >> 299     src/Makefile.am:333: but option 'subdir-objects' is disabled
+     300     src/Makefile.am:333: warning: source file '$(srcdir)/Utilities/DDi
+             rectory/DD_Set_Neighbor_Hash_Fn1.c' is in a subdirectory,
+  >> 301     src/Makefile.am:333: but option 'subdir-objects' is disabled
+     302     src/Makefile.am:333: warning: source file '$(srcdir)/Utilities/Mem
+             ory/mem.c' is in a subdirectory,
+  >> 303     src/Makefile.am:333: but option 'subdir-objects' is disabled
+     304     src/Makefile.am:333: warning: source file '$(srcdir)/Utilities/sha
+             red/zoltan_align.c' is in a subdirectory,
+  >> 305     src/Makefile.am:333: but option 'subdir-objects' is disabled
+     306     src/Makefile.am:333: warning: source file '$(srcdir)/Utilities/sha
+             red/zoltan_id.c' is in a subdirectory,
+  >> 307     src/Makefile.am:333: but option 'subdir-objects' is disabled
+     308     src/Makefile.am:377: warning: source file '$(srcdir)/zz/zz_coord.c
+             ' is in a subdirectory,
+  >> 309     src/Makefile.am:377: but option 'subdir-objects' is disabled
+     310     src/Makefile.am:377: warning: source file '$(srcdir)/zz/zz_gen_fil
+             es.c' is in a subdirectory,
+  >> 311     src/Makefile.am:377: but option 'subdir-objects' is disabled
+     312     src/Makefile.am:377: warning: source file '$(srcdir)/zz/zz_hash.c'
+              is in a subdirectory,
+  >> 313     src/Makefile.am:377: but option 'subdir-objects' is disabled
+     314     src/Makefile.am:377: warning: source file '$(srcdir)/zz/murmur3.c'
+              is in a subdirectory,
+  >> 315     src/Makefile.am:377: but option 'subdir-objects' is disabled
+     316     src/Makefile.am:377: warning: source file '$(srcdir)/zz/zz_map.c' 
+             is in a subdirectory,
+  >> 317     src/Makefile.am:377: but option 'subdir-objects' is disabled
+     318     src/Makefile.am:377: warning: source file '$(srcdir)/zz/zz_heap.c'
+              is in a subdirectory,
+  >> 319     src/Makefile.am:377: but option 'subdir-objects' is disabled
+     320     src/Makefile.am:377: warning: source file '$(srcdir)/zz/zz_init.c'
+              is in a subdirectory,
+  >> 321     src/Makefile.am:377: but option 'subdir-objects' is disabled
+     322     src/Makefile.am:377: warning: source file '$(srcdir)/zz/zz_obj_lis
+             t.c' is in a subdirectory,
+  >> 323     src/Makefile.am:377: but option 'subdir-objects' is disabled
+     324     src/Makefile.am:377: warning: source file '$(srcdir)/zz/zz_rand.c'
+              is in a subdirectory,
+  >> 325     src/Makefile.am:377: but option 'subdir-objects' is disabled
+     326     src/Makefile.am:377: warning: source file '$(srcdir)/zz/zz_set_fn.
+             c' is in a subdirectory,
+  >> 327     src/Makefile.am:377: but option 'subdir-objects' is disabled
+     328     src/Makefile.am:377: warning: source file '$(srcdir)/zz/zz_sort.c'
+              is in a subdirectory,
+  >> 329     src/Makefile.am:377: but option 'subdir-objects' is disabled
+     330     src/Makefile.am:377: warning: source file '$(srcdir)/zz/zz_struct.
+             c' is in a subdirectory,
+  >> 331     src/Makefile.am:377: but option 'subdir-objects' is disabled
+     332     src/Makefile.am:377: warning: source file '$(srcdir)/zz/zz_back_tr
+             ace.c' is in a subdirectory,
+  >> 333     src/Makefile.am:377: but option 'subdir-objects' is disabled
+     334     src/Makefile.am:377: warning: source file '$(srcdir)/zz/zz_util.c'
+              is in a subdirectory,
+  >> 335     src/Makefile.am:377: but option 'subdir-objects' is disabled
+     336     src/Makefile.am:486: warning: source file '$(srcdir)/fort/ztypes.f
+             90' is in a subdirectory,
+  >> 337     src/Makefile.am:486: but option 'subdir-objects' is disabled
+     338     src/Makefile.am:486: warning: source file '$(srcdir)/fort/cwrap.c'
+              is in a subdirectory,
+  >> 339     src/Makefile.am:486: but option 'subdir-objects' is disabled
+     340     src/Makefile.am:486: warning: source file '$(srcdir)/fort/zoltan_u
+             ser_data.f90' is in a subdirectory,
+  >> 341     src/Makefile.am:486: but option 'subdir-objects' is disabled
+     342     src/Makefile.am:486: warning: source file '$(srcdir)/fort/fwrap.f9
+             0' is in a subdirectory,
+  >> 343     src/Makefile.am:486: but option 'subdir-objects' is disabled
+     344     src/driver/Makefile.am:61: warning: source file '$(srcdir)/dr_err.
+             c' is in a subdirectory,
+  >> 345     src/driver/Makefile.am:61: but option 'subdir-objects' is disabled
+     346     src/driver/Makefile.am:61: warning: source file '$(srcdir)/dr_inpu
+             t.c' is in a subdirectory,
+  >> 347     src/driver/Makefile.am:61: but option 'subdir-objects' is disabled
+     348     src/driver/Makefile.am:61: warning: source file '$(srcdir)/dr_par_
+             util.c' is in a subdirectory,
+  >> 349     src/driver/Makefile.am:61: but option 'subdir-objects' is disabled
+     350     src/driver/Makefile.am:61: warning: source file '$(srcdir)/dr_util
+             .c' is in a subdirectory,
+  >> 351     src/driver/Makefile.am:61: but option 'subdir-objects' is disabled
+     352     src/driver/Makefile.am:61: warning: source file '$(srcdir)/dr_elem
+             .c' is in a subdirectory,
+  >> 353     src/driver/Makefile.am:61: but option 'subdir-objects' is disabled
+     354     src/driver/Makefile.am:61: warning: source file '$(srcdir)/dr_setf
+             ixed.c' is in a subdirectory,
+  >> 355     src/driver/Makefile.am:61: but option 'subdir-objects' is disabled
+     356     src/driver/Makefile.am:61: warning: source file '$(srcdir)/dr_outp
+             ut.c' is in a subdirectory,
+  >> 357     src/driver/Makefile.am:61: but option 'subdir-objects' is disabled
+     358     src/driver/Makefile.am:61: warning: source file '$(srcdir)/dr_chac
+             o_io.c' is in a subdirectory,
+  >> 359     src/driver/Makefile.am:61: but option 'subdir-objects' is disabled
+     360     src/driver/Makefile.am:61: warning: source file '$(srcdir)/dr_rand
+             om_io.c' is in a subdirectory,
+  >> 361     src/driver/Makefile.am:61: but option 'subdir-objects' is disabled
+     362     src/driver/Makefile.am:61: warning: source file '$(srcdir)/dr_elem
+             _util.c' is in a subdirectory,
+  >> 363     src/driver/Makefile.am:61: but option 'subdir-objects' is disabled
+     364     src/driver/Makefile.am:61: warning: source file '$(srcdir)/dr_eval
+             .c' is in a subdirectory,
+  >> 365     src/driver/Makefile.am:61: but option 'subdir-objects' is disabled
+     366     src/driver/Makefile.am:61: warning: source file '$(srcdir)/dr_gnup
+             lot.c' is in a subdirectory,
+  >> 367     src/driver/Makefile.am:61: but option 'subdir-objects' is disabled
+     368     src/driver/Makefile.am:61: warning: source file '$(srcdir)/dr_hg_i
+             o.c' is in a subdirectory,
+  >> 369     src/driver/Makefile.am:61: but option 'subdir-objects' is disabled
+     370     src/driver/Makefile.am:61: warning: source file '$(srcdir)/dr_hg_r
+             eadfile.c' is in a subdirectory,
+  >> 371     src/driver/Makefile.am:61: but option 'subdir-objects' is disabled
+     372     src/driver/Makefile.am:61: warning: source file '$(srcdir)/dr_mm_r
+             eadfile.c' is in a subdirectory,
+  >> 373     src/driver/Makefile.am:61: but option 'subdir-objects' is disabled
+     374     src/driver/Makefile.am:61: warning: source file '$(srcdir)/dr_mmio
+             .c' is in a subdirectory,
+  >> 375     src/driver/Makefile.am:61: but option 'subdir-objects' is disabled
+     376     src/driver/Makefile.am:61: warning: source file '$(top_srcdir)/src
+             /ch/ch_dist_graph.c' is in a subdirectory,
+  >> 377     src/driver/Makefile.am:61: but option 'subdir-objects' is disabled
+     378     src/driver/Makefile.am:61: warning: source file '$(top_srcdir)/src
+             /ch/ch_input_assign.c' is in a subdirectory,
+  >> 379     src/driver/Makefile.am:61: but option 'subdir-objects' is disabled
+     380     src/driver/Makefile.am:61: warning: source file '$(top_srcdir)/src
+             /ch/ch_input_graph.c' is in a subdirectory,
+  >> 381     src/driver/Makefile.am:61: but option 'subdir-objects' is disabled
+     382     src/driver/Makefile.am:61: warning: source file '$(top_srcdir)/src
+             /ch/ch_init_dist.c' is in a subdirectory,
+  >> 383     src/driver/Makefile.am:61: but option 'subdir-objects' is disabled
+     384     src/driver/Makefile.am:61: warning: source file '$(top_srcdir)/src
+             /ch/ch_input_geom.c' is in a subdirectory,
+  >> 385     src/driver/Makefile.am:61: but option 'subdir-objects' is disabled
+     386     src/driver/Makefile.am:61: warning: source file '$(top_srcdir)/src
+             /ch/ch_input_read.c' is in a subdirectory,
+  >> 387     src/driver/Makefile.am:61: but option 'subdir-objects' is disabled
+     388     src/driver/Makefile.am:77: warning: source file '$(srcdir)/dr_comp
+             ress.c' is in a subdirectory,
+  >> 389     src/driver/Makefile.am:77: but option 'subdir-objects' is disabled
+     390     src/driver/Makefile.am:101: warning: source file '$(srcdir)/dr_mai
+             nCPP.cpp' is in a subdirectory,
+  >> 391     src/driver/Makefile.am:101: but option 'subdir-objects' is disable
+             d
+     392     src/driver/Makefile.am:101: warning: source file '$(srcdir)/dr_exo
+             II_ioCPP.cpp' is in a subdirectory,
+  >> 393     src/driver/Makefile.am:101: but option 'subdir-objects' is disable
+             d
+     394     src/driver/Makefile.am:101: warning: source file '$(srcdir)/dr_loa
+             dbalCPP.cpp' is in a subdirectory,
+  >> 395     src/driver/Makefile.am:101: but option 'subdir-objects' is disable
+             d
+     396     src/driver/Makefile.am:101: warning: source file '$(srcdir)/dr_mig
+             rateCPP.cpp' is in a subdirectory,
+  >> 397     src/driver/Makefile.am:101: but option 'subdir-objects' is disable
+             d
+     398     src/driver/Makefile.am:101: warning: source file '$(srcdir)/dr_map
+             sCPP.cpp' is in a subdirectory,
+  >> 399     src/driver/Makefile.am:101: but option 'subdir-objects' is disable
+             d
+     400     src/driver/Makefile.am:101: warning: source file '$(srcdir)/dr_ddC
+             PP.cpp' is in a subdirectory,
+  >> 401     src/driver/Makefile.am:101: but option 'subdir-objects' is disable
+             d
+     402     src/driver/Makefile.am:101: warning: source file '$(srcdir)/dr_par
+             am_fileCPP.cpp' is in a subdirectory,
+  >> 403     src/driver/Makefile.am:101: but option 'subdir-objects' is disable
+             d
+     404     src/driver/Makefile.am:93: warning: source file '$(srcdir)/dr_main
+             .c' is in a subdirectory,
+  >> 405     src/driver/Makefile.am:93: but option 'subdir-objects' is disabled
+     406     src/driver/Makefile.am:93: warning: source file '$(srcdir)/dr_exoI
+             I_io.c' is in a subdirectory,
+  >> 407     src/driver/Makefile.am:93: but option 'subdir-objects' is disabled
+     408     src/driver/Makefile.am:93: warning: source file '$(srcdir)/dr_load
+             bal.c' is in a subdirectory,
+  >> 409     src/driver/Makefile.am:93: but option 'subdir-objects' is disabled
+     410     src/driver/Makefile.am:93: warning: source file '$(srcdir)/dr_migr
+             ate.c' is in a subdirectory,
+  >> 411     src/driver/Makefile.am:93: but option 'subdir-objects' is disabled
+     412     src/driver/Makefile.am:93: warning: source file '$(srcdir)/dr_maps
+             .c' is in a subdirectory,
+  >> 413     src/driver/Makefile.am:93: but option 'subdir-objects' is disabled
+     414     src/driver/Makefile.am:93: warning: source file '$(srcdir)/dr_dd.c
+             ' is in a subdirectory,
+  >> 415     src/driver/Makefile.am:93: but option 'subdir-objects' is disabled
+     416     src/driver/Makefile.am:93: warning: source file '$(srcdir)/dr_para
+             m_file.c' is in a subdirectory,
+  >> 417     src/driver/Makefile.am:93: but option 'subdir-objects' is disabled
+     418     src/driver/Makefile.am:93: warning: source file '$(srcdir)/order_t
+             est.c' is in a subdirectory,
+  >> 419     src/driver/Makefile.am:93: but option 'subdir-objects' is disabled
+     420     src/fdriver/Makefile.am:70: warning: source file '$(srcdir)/mpi_h.
+             f' is in a subdirectory,
+  >> 421     src/fdriver/Makefile.am:70: but option 'subdir-objects' is disable
+             d
+     422     src/fdriver/Makefile.am:65: warning: source file '$(srcdir)/farg_t
+             ypical.f' is in a subdirectory,
+  >> 423     src/fdriver/Makefile.am:65: but option 'subdir-objects' is disable
+             d
+     424     src/fdriver/Makefile.am:65: warning: source file '$(srcdir)/farg_n
+             agf95.f' is in a subdirectory,
+  >> 425     src/fdriver/Makefile.am:65: but option 'subdir-objects' is disable
+             d
+     426     src/fdriver/Makefile.am:70: warning: source file '$(srcdir)/mmio.f
+             ' is in a subdirectory,
+  >> 427     src/fdriver/Makefile.am:70: but option 'subdir-objects' is disable
+             d
+     428     src/fdriver/Makefile.am:70: warning: source file '$(srcdir)/fdr_so
+             rt.f90' is in a subdirectory,
+  >> 429     src/fdriver/Makefile.am:70: but option 'subdir-objects' is disable
+             d
+     430     src/fdriver/Makefile.am:70: warning: source file '$(srcdir)/fdr_co
+             nst.f90' is in a subdirectory,
+  >> 431     src/fdriver/Makefile.am:70: but option 'subdir-objects' is disable
+             d
+     432     src/fdriver/Makefile.am:70: warning: source file '$(srcdir)/fdr_in
+             put.f90' is in a subdirectory,
+  >> 433     src/fdriver/Makefile.am:70: but option 'subdir-objects' is disable
+             d
+     434     src/fdriver/Makefile.am:70: warning: source file '$(srcdir)/fdr_ch
+             aco_io.f90' is in a subdirectory,
+  >> 435     src/fdriver/Makefile.am:70: but option 'subdir-objects' is disable
+             d
+     436     src/fdriver/Makefile.am:70: warning: source file '$(srcdir)/fdr_pa
+             ram_file.f90' is in a subdirectory,
+  >> 437     src/fdriver/Makefile.am:70: but option 'subdir-objects' is disable
+             d
+     438     src/fdriver/Makefile.am:70: warning: source file '$(srcdir)/fdr_mm
+             _io.f90' is in a subdirectory,
+  >> 439     src/fdriver/Makefile.am:70: but option 'subdir-objects' is disable
+             d
+     440     src/fdriver/Makefile.am:70: warning: source file '$(srcdir)/fdr_mi
+             grate.f90' is in a subdirectory,
+  >> 441     src/fdriver/Makefile.am:70: but option 'subdir-objects' is disable
+             d
+     442     src/fdriver/Makefile.am:70: warning: source file '$(srcdir)/fdr_lo
+             adbal.f90' is in a subdirectory,
+  >> 443     src/fdriver/Makefile.am:70: but option 'subdir-objects' is disable
+             d
+     444     src/fdriver/Makefile.am:70: warning: source file '$(srcdir)/fdr_ma
+             in.f90' is in a subdirectory,
+  >> 445     src/fdriver/Makefile.am:70: but option 'subdir-objects' is disable
+             d
+     446     autoreconf: Leaving directory `.'
+     447     ==> zoltan: Executing phase: 'configure'
+     448     ==> [2024-05-04-09:33:08.518856] '/scratch/mkandes/job_30295194/sp
+             ack-stage/spack-stage/spack-stage-zoltan-3.83-7ba56yxo4ghe23c4q46q
+             3akkehlkeug2/spack-src/configure' '--prefix=/home/mkandes/software
+             /spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/aocc
+             -3.2.0/zoltan-3.83-7ba56yxo4ghe23c4q46q3akkehlkeug2' '--enable-f90
+             interface' '--enable-mpi' 'RANLIB=echo' '--with-ar=$(CXX) -shared 
+             $(LDFLAGS) -o' '--with-parmetis' '--with-parmetis-libdir=/home/mka
+             ndes/software/spack/repositories/mkandes/spack/opt/spack/linux-roc
+             ky8-zen2/aocc-3.2.0/parmetis-4.0.3-yhw22bp6slgvckekjd3cccywd5o4avb
+             6/lib' '--with-parmetis-incdir=/home/mkandes/software/spack/reposi
+             tories/mkandes/spack/opt/spack/linux-rocky8-zen2/aocc-3.2.0/parmet
+             is-4.0.3-yhw22bp6slgvckekjd3cccywd5o4avb6/include' '--with-incdirs
+             =-I/home/mkandes/software/spack/repositories/mkandes/spack/opt/spa
+             ck/linux-rocky8-zen2/aocc-3.2.0/metis-5.1.0-lijcgi3vqli5szsv54ad7t
+             h5ywnb52wo/include' '--with-ldflags=-L/home/mkandes/software/spack
+             /repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/aocc-3.2.0
+             /metis-5.1.0-lijcgi3vqli5szsv54ad7th5ywnb52wo/lib' '--with-id-type
+             =uint' 'CC=/home/mkandes/software/spack/repositories/mkandes/spack
+             /opt/spack/linux-rocky8-zen2/aocc-3.2.0/mvapich2-2.3.7-7q54c52jzcd
+             yd7nkbfegcwn5toigal4h/bin/mpicc' 'CXX=/home/mkandes/software/spack
+             /repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/aocc-3.2.0
+             /mvapich2-2.3.7-7q54c52jzcdyd7nkbfegcwn5toigal4h/bin/mpicxx' 'FC=/
+             home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/l
+             inux-rocky8-zen2/aocc-3.2.0/mvapich2-2.3.7-7q54c52jzcdyd7nkbfegcwn
+             5toigal4h/bin/mpif90' '--with-mpi=/home/mkandes/software/spack/rep
+             ositories/mkandes/spack/opt/spack/linux-rocky8-zen2/aocc-3.2.0/mva
+             pich2-2.3.7-7q54c52jzcdyd7nkbfegcwn5toigal4h' '--with-mpi-libs= ' 
+             '--with-cflags=-O3  -fPIC' '--with-cxxflags=-O3  -fPIC' '--with-fc
+             flags=-O3  -fPIC' '--with-ldflags='
+     449     ----------------------------------------
+     450     Running Zoltan Configure Script
+     451     ----------------------------------------
+
+     ...
+
+     1687    mv -f .deps/zCPPdrive-dr_param_fileCPP.Tpo .deps/zCPPdrive-dr_para
+             m_fileCPP.Po
+     1688    mv -f .deps/zCPPdrive-dr_mainCPP.Tpo .deps/zCPPdrive-dr_mainCPP.Po
+     1689    mv -f .deps/zCPPdrive-dr_migrateCPP.Tpo .deps/zCPPdrive-dr_migrate
+             CPP.Po
+     1690    mv -f .deps/zCPPdrive-dr_hg_io.Tpo .deps/zCPPdrive-dr_hg_io.Po
+     1691    mv -f .deps/zCPPdrive-dr_loadbalCPP.Tpo .deps/zCPPdrive-dr_loadbal
+             CPP.Po
+     1692    /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/
+             linux-rocky8-zen2/aocc-3.2.0/mvapich2-2.3.7-7q54c52jzcdyd7nkbfegcw
+             n5toigal4h/bin/mpicxx  -DMPICH_IGNORE_CXX_SEEK  -O3  -fPIC -g -O2 
+              -L/home/mkandes/software/spack/repositories/mkandes/spack/opt/spa
+             ck/linux-rocky8-zen2/aocc-3.2.0/mvapich2-2.3.7-7q54c52jzcdyd7nkbfe
+             gcwn5toigal4h/lib -o zCPPdrive.exe zCPPdrive-dr_err.o zCPPdrive-dr
+             _input.o zCPPdrive-dr_par_util.o zCPPdrive-dr_util.o zCPPdrive-dr_
+             elem.o zCPPdrive-dr_setfixed.o zCPPdrive-dr_output.o zCPPdrive-dr_
+             chaco_io.o zCPPdrive-dr_random_io.o zCPPdrive-dr_elem_util.o zCPPd
+             rive-dr_eval.o zCPPdrive-dr_gnuplot.o zCPPdrive-dr_hg_io.o zCPPdri
+             ve-dr_hg_readfile.o zCPPdrive-dr_mm_readfile.o zCPPdrive-dr_mmio.o
+              zCPPdrive-ch_dist_graph.o zCPPdrive-ch_input_assign.o zCPPdrive-c
+             h_input_graph.o zCPPdrive-ch_init_dist.o zCPPdrive-ch_input_geom.o
+              zCPPdrive-ch_input_read.o  zCPPdrive-dr_mainCPP.o zCPPdrive-dr_ex
+             oII_ioCPP.o zCPPdrive-dr_loadbalCPP.o zCPPdrive-dr_migrateCPP.o zC
+             PPdrive-dr_mapsCPP.o zCPPdrive-dr_ddCPP.o zCPPdrive-dr_param_fileC
+             PP.o -L/home/mkandes/software/spack/repositories/mkandes/spack/opt
+             /spack/linux-rocky8-zen2/aocc-3.2.0/mvapich2-2.3.7-7q54c52jzcdyd7n
+             kbfegcwn5toigal4h/lib -L/scratch/mkandes/job_30295194/spack-stage/
+             spack-stage/spack-stage-zoltan-3.83-7ba56yxo4ghe23c4q46q3akkehlkeu
+             g2/spack-src/spack-build/src -lzoltan -L/home/mkandes/software/spa
+             ck/repositories/mkandes/spack/opt/spack/linux-rocky8-zen2/aocc-3.2
+             .0/parmetis-4.0.3-yhw22bp6slgvckekjd3cccywd5o4avb6/lib -lparmetis 
+             -lmetis    -lm    -L/home/mkandes/software/spack/repositories/mkan
+             des/spack/opt/spack/linux-rocky8-zen2/aocc-3.2.0/parmetis-4.0.3-yh
+             w22bp6slgvckekjd3cccywd5o4avb6/lib -lparmetis -lmetis    -lm
+  >> 1693    ld.lld: error: /scratch/mkandes/job_30295194/spack-stage/spack-sta
+             ge/spack-stage-zoltan-3.83-7ba56yxo4ghe23c4q46q3akkehlkeug2/spack-
+             src/spack-build/src/libzoltan.a: undefined reference to f90_set_in
+             trin_type_i8 [--no-allow-shlib-undefined]
+  >> 1694    ld.lld: error: /scratch/mkandes/job_30295194/spack-stage/spack-sta
+             ge/spack-stage-zoltan-3.83-7ba56yxo4ghe23c4q46q3akkehlkeug2/spack-
+             src/spack-build/src/libzoltan.a: undefined reference to f90_alloc0
+             4a_i8 [--no-allow-shlib-undefined]
+  >> 1695    ld.lld: error: /scratch/mkandes/job_30295194/spack-stage/spack-sta
+             ge/spack-stage-zoltan-3.83-7ba56yxo4ghe23c4q46q3akkehlkeug2/spack-
+             src/spack-build/src/libzoltan.a: undefined reference to f90_ptrcp 
+             [--no-allow-shlib-undefined]
+  >> 1696    ld.lld: error: /scratch/mkandes/job_30295194/spack-stage/spack-sta
+             ge/spack-stage-zoltan-3.83-7ba56yxo4ghe23c4q46q3akkehlkeug2/spack-
+             src/spack-build/src/libzoltan.a: undefined reference to f90io_src_
+             info03a [--no-allow-shlib-undefined]
+  >> 1697    ld.lld: error: /scratch/mkandes/job_30295194/spack-stage/spack-sta
+             ge/spack-stage-zoltan-3.83-7ba56yxo4ghe23c4q46q3akkehlkeug2/spack-
+             src/spack-build/src/libzoltan.a: undefined reference to f90io_ldw_
+             init [--no-allow-shlib-undefined]
+  >> 1698    ld.lld: error: /scratch/mkandes/job_30295194/spack-stage/spack-sta
+             ge/spack-stage-zoltan-3.83-7ba56yxo4ghe23c4q46q3akkehlkeug2/spack-
+             src/spack-build/src/libzoltan.a: undefined reference to f90io_sc_c
+             h_ldw [--no-allow-shlib-undefined]
+  >> 1699    ld.lld: error: /scratch/mkandes/job_30295194/spack-stage/spack-sta
+             ge/spack-stage-zoltan-3.83-7ba56yxo4ghe23c4q46q3akkehlkeug2/spack-
+             src/spack-build/src/libzoltan.a: undefined reference to f90io_ldw_
+             end [--no-allow-shlib-undefined]
+  >> 1700    ld.lld: error: /scratch/mkandes/job_30295194/spack-stage/spack-sta
+             ge/spack-stage-zoltan-3.83-7ba56yxo4ghe23c4q46q3akkehlkeug2/spack-
+             src/spack-build/src/libzoltan.a: undefined reference to f90_deallo
+             c03a_i8 [--no-allow-shlib-undefined]
+  >> 1701    ld.lld: error: /scratch/mkandes/job_30295194/spack-stage/spack-sta
+             ge/spack-stage-zoltan-3.83-7ba56yxo4ghe23c4q46q3akkehlkeug2/spack-
+             src/spack-build/src/libzoltan.a: undefined reference to f90_alloc0
+             4_chka_i8 [--no-allow-shlib-undefined]
+  >> 1702    ld.lld: error: /scratch/mkandes/job_30295194/spack-stage/spack-sta
+             ge/spack-stage-zoltan-3.83-7ba56yxo4ghe23c4q46q3akkehlkeug2/spack-
+             src/spack-build/src/libzoltan.a: undefined reference to f90_lentri
+             ma [--no-allow-shlib-undefined]
+  >> 1703    ld.lld: error: /scratch/mkandes/job_30295194/spack-stage/spack-sta
+             ge/spack-stage-zoltan-3.83-7ba56yxo4ghe23c4q46q3akkehlkeug2/spack-
+             src/spack-build/src/libzoltan.a: undefined reference to f90_alloca
+             ted_i8 [--no-allow-shlib-undefined]
+  >> 1704    ld.lld: error: /scratch/mkandes/job_30295194/spack-stage/spack-sta
+             ge/spack-stage-zoltan-3.83-7ba56yxo4ghe23c4q46q3akkehlkeug2/spack-
+             src/spack-build/src/libzoltan.a: undefined reference to f90_ptr_al
+             loc04a_i8 [--no-allow-shlib-undefined]
+  >> 1705    ld.lld: error: /scratch/mkandes/job_30295194/spack-stage/spack-sta
+             ge/spack-stage-zoltan-3.83-7ba56yxo4ghe23c4q46q3akkehlkeug2/spack-
+             src/spack-build/src/libzoltan.a: undefined reference to f90_auto_a
+             lloc04_i8 [--no-allow-shlib-undefined]
+  >> 1706    ld.lld: error: /scratch/mkandes/job_30295194/spack-stage/spack-sta
+             ge/spack-stage-zoltan-3.83-7ba56yxo4ghe23c4q46q3akkehlkeug2/spack-
+             src/spack-build/src/libzoltan.a: undefined reference to f90_auto_d
+             ealloc_i8 [--no-allow-shlib-undefined]
+  >> 1707    ld.lld: error: /scratch/mkandes/job_30295194/spack-stage/spack-sta
+             ge/spack-stage-zoltan-3.83-7ba56yxo4ghe23c4q46q3akkehlkeug2/spack-
+             src/spack-build/src/libzoltan.a: undefined reference to f90_copy_f
+             77_argl_i8 [--no-allow-shlib-undefined]
+  >> 1708    clang-13: error: linker command failed with exit code 1 (use -v to
+              see invocation)
+     1709    make[2]: *** [Makefile:610: zCPPdrive.exe] Error 1
+     1710    make[2]: Leaving directory '/scratch/mkandes/job_30295194/spack-st
+             age/spack-stage/spack-stage-zoltan-3.83-7ba56yxo4ghe23c4q46q3akkeh
+             lkeug2/spack-src/spack-build/src/driver'
+     1711    make[1]: *** [Makefile:3744: all-recursive] Error 1
+     1712    make[1]: Leaving directory '/scratch/mkandes/job_30295194/spack-st
+             age/spack-stage/spack-stage-zoltan-3.83-7ba56yxo4ghe23c4q46q3akkeh
+             lkeug2/spack-src/spack-build/src'
+     1713    make: *** [Makefile:635: all-recursive] Error 1
+
+See build log for details:
+  /scratch/mkandes/job_30295194/spack-stage/spack-stage/spack-stage-zoltan-3.83-7ba56yxo4ghe23c4q46q3akkehlkeug2/spack-build-out.txt
+
+==> Error: Terminating after first install failure: ProcessError: Command exited with status 2:
+    'make' '-j16' 'V=1'
+real 87.43
+user 89.99
+sys 15.04
+ERROR: spack install failed.
