@@ -49,7 +49,7 @@ module list
 
 declare -xr SPACK_PACKAGE='scotch@6.1.1'
 declare -xr SPACK_COMPILER='aocc@3.2.0'
-declare -xr SPACK_VARIANTS='+compression +esmumps ~int64 +metis ~mpi +shared'
+declare -xr SPACK_VARIANTS='+compression +esmumps ~int64 ~metis ~mpi +shared'
 declare -xr SPACK_DEPENDENCIES=''
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
