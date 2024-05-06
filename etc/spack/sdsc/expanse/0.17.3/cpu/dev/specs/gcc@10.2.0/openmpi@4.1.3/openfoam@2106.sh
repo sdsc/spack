@@ -8,7 +8,7 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=16
 #SBATCH --mem=32G
-#SBATCH --time=48:00:00
+#SBATCH --time=02:00:00
 #SBATCH --output=%x.o%j.%N
 
 declare -xir UNIX_TIME="$(date +'%s')"
@@ -49,7 +49,7 @@ module list
 
 declare -xr SPACK_PACKAGE='openfoam@2106'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS='~float32 ~int64 +kahip ~knl +metis ~mgridgen +paraview +scotch +source ~spdp ~vtk +zoltan'
+declare -xr SPACK_VARIANTS='~float32 ~int64 +kahip ~knl +metis ~mgridgen ~paraview +scotch +source ~spdp ~vtk +zoltan'
 declare -xr SPACK_DEPENDENCIES="^adios2@2.7.1/$(spack find --format '{hash:7}' adios2@2.7.1 % ${SPACK_COMPILER} +mpi ^openmpi@4.1.3) ^cgal@4.13/$(spack find --format '{hash:7}' cgal@4.13 % ${SPACK_COMPILER}) ^fftw@3.3.10/$(spack find --format '{hash:7}' fftw@3.3.10 % ${SPACK_COMPILER} ~mpi ~openmp) ^kahip@3.11/$(spack find --format '{hash:7}' kahip@3.11 % ${SPACK_COMPILER} ^openmpi@4.1.3) ^scotch@6.1.1/$(spack find --format '{hash:7}' scotch@6.1.1 % ${SPACK_COMPILER} +mpi ^openmpi@4.1.3) ^zoltan@3.83/$(spack find --format '{hash:7}' zoltan@3.83 % ${SPACK_COMPILER} +fortran +mpi +parmetis ^openmpi@4.1.3)"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
@@ -63,7 +63,7 @@ spack config get packages
 spack config get repos
 spack config get upstreams
 
-time -p spack --show-cores=minimized spec --long --namespaces --types --reuse "$(echo ${SPACK_SPEC})"
+time -p spack spec --long --namespaces --types --reuse "$(echo ${SPACK_SPEC})"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack concretization failed.'
   exit 1
