@@ -75,7 +75,3 @@ if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
   exit 1
 fi
-
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'openblas@0.3.18-i64.sh'
-
-sleep 30
