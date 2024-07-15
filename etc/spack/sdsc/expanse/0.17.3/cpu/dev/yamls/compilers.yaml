@@ -16,12 +16,12 @@ compilers:
     environment: {}
     extra_rpaths: []
 - compiler:
-    spec: gcc@10.2.0
+    spec: aocc@3.2.0
     paths:
-      cc: /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen/gcc-8.5.0/gcc-10.2.0-npcyll4gxjhf4tejksmdzlsl3d3usqpd/bin/gcc
-      cxx: /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen/gcc-8.5.0/gcc-10.2.0-npcyll4gxjhf4tejksmdzlsl3d3usqpd/bin/g++
-      f77: /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen/gcc-8.5.0/gcc-10.2.0-npcyll4gxjhf4tejksmdzlsl3d3usqpd/bin/gfortran
-      fc: /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen/gcc-8.5.0/gcc-10.2.0-npcyll4gxjhf4tejksmdzlsl3d3usqpd/bin/gfortran
+      cc: PATH_TO_AMD_CLANG_3_2_0
+      cxx: PATH_TO_AMD_CLANG++_3_2_0
+      f77: PATH_TO_AMD_FLANG_3_2_0
+      fc: PATH_TO_AMD_FLANG_3_2_0
     flags:
       cflags: -O2 -march=native
       cxxflags: -O2 -march=native
@@ -32,12 +32,12 @@ compilers:
     environment: {}
     extra_rpaths: []
 - compiler:
-    spec: aocc@3.2.0
+    spec: gcc@10.2.0
     paths:
-      cc: /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen/gcc-8.5.0/aocc-3.2.0-io3s466wsnnichqc2o2rikbuloev5bmq/bin/clang
-      cxx: /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen/gcc-8.5.0/aocc-3.2.0-io3s466wsnnichqc2o2rikbuloev5bmq/bin/clang++
-      f77: /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen/gcc-8.5.0/aocc-3.2.0-io3s466wsnnichqc2o2rikbuloev5bmq/bin/flang
-      fc: /home/mkandes/software/spack/repositories/mkandes/spack/opt/spack/linux-rocky8-zen/gcc-8.5.0/aocc-3.2.0-io3s466wsnnichqc2o2rikbuloev5bmq/bin/flang
+      cc: PATH_TO_GCC_10_2_0
+      cxx: PATH_TO_G++_10_2_0
+      f77: PATH_TO_GFORTRAN_10_2_0
+      fc: PATH_TO_GFORTRAN_10_2_0
     flags:
       cflags: -O2 -march=native
       cxxflags: -O2 -march=native

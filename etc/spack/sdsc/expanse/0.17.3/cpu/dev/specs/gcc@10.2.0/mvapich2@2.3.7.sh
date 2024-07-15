@@ -63,7 +63,7 @@ spack config get packages
 spack config get repos
 spack config get upstreams
 
-time -p spack spec --long --namespaces --types --reuse mvapich2@2.3.7 % gcc@10.2.0 ~alloca ch3_rank_bits=32 ~cuda ~debug file_systems=nfs,lustre process_managers=slurm +regcache threads=multiple +wrapperrpath ^slurm ^rdma-core
+time -p spack spec --long --namespaces --types --reuse mvapich2@2.3.7 % gcc@10.2.0 ~alloca ch3_rank_bits=32 ~cuda ~debug file_systems=nfs,lustre process_managers=slurm +regcache threads=multiple +wrapperrpath "${SPACK_DEPENDENCIES}"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack concretization failed.'
   exit 1
@@ -71,7 +71,7 @@ fi
 
 mkdir -p "${TMPDIR}"
 
-time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all --reuse mvapich2@2.3.7 % gcc@10.2.0 ~alloca ch3_rank_bits=32 ~cuda ~debug file_systems=nfs,lustre process_managers=slurm +regcache threads=multiple +wrapperrpath ^slurm ^rdma-core
+time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all --reuse mvapich2@2.3.7 % gcc@10.2.0 ~alloca ch3_rank_bits=32 ~cuda ~debug file_systems=nfs,lustre process_managers=slurm +regcache threads=multiple +wrapperrpath "${SPACK_DEPENDENCIES}"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
   exit 1

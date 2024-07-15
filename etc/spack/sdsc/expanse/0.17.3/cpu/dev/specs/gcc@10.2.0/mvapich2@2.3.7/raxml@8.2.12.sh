@@ -76,7 +76,3 @@ if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
   exit 1
 fi
-
-#sbatch --dependency="afterok:${SLURM_JOB_ID}" ''
-
-sleep 30
