@@ -54,6 +54,8 @@ module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 printenv
 
+mkdir -p "${TMPDIR}"
+
 spack config get compilers  
 spack config get config  
 spack config get mirrors
@@ -68,10 +70,13 @@ if [[ "${?}" -ne 0 ]]; then
   exit 1
 fi
 
-mkdir -p "${TMPDIR}"
-
 time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all --reuse "$(echo ${SPACK_SPEC})"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
   exit 1
 fi
+
+sed -i "s|PATH_TO_GCC_10_2_0|$(spack location -i 'gcc@10.2.0')/bin/gcc|g" "${SPACK_INSTANCE_DIR}/etc/spack/compilers.yaml"
+sed -i "s|PATH_TO_G++_10_2_0|$(spack location -i 'gcc@10.2.0')/bin/g++|g" "${SPACK_INSTANCE_DIR}/etc/spack/compilers.yaml"
+sed -i "s|PATH_TO_GFORTRAN_10_2_0|$(spack location -i 'gcc@10.2.0')/bin/gfortran|g" "${SPACK_INSTANCE_DIR}/etc/spack/compilers.yaml"
+sed -i "s|PATH_TO_GFORTRAN_10_2_0|$(spack location -i 'gcc@10.2.0')/bin/gfortran|g" "${SPACK_INSTANCE_DIR}/etc/spack/compilers.yaml"
