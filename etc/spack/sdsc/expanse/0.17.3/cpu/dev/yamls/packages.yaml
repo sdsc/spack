@@ -27,7 +27,7 @@ packages:
   knem:
     externals:
       - spec: 'knem@1.1.4'
-        prefix: /opt/knem-1.1.4.90mlnx1
+        prefix: /opt/knem-1.1.4.90mlnx3
     buildable: false
   xpmem:
     externals:
