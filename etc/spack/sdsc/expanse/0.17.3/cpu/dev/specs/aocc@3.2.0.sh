@@ -76,6 +76,7 @@ if [[ "${?}" -ne 0 ]]; then
   exit 1
 fi
 
-spack compiler add --scope site "$(spack location -i ${SPACK_PACKAGE})"
-
-sleep 30
+sed -i "s|PATH_TO_AMD_CLANG_3_2_0|$(spack location -i 'aocc@3.2.0')/bin/clang|g" "${SPACK_INSTANCE_DIR}/etc/spack/compilers.yaml"
+sed -i "s|PATH_TO_AMD_CLANG++_3_2_0|$(spack location -i 'aocc@3.2.0')/bin/clang++|g" "${SPACK_INSTANCE_DIR}/etc/spack/compilers.yaml"
+sed -i "s|PATH_TO_AMD_FLANG_3_2_0|$(spack location -i 'aocc@3.2.0')/bin/flang|g" "${SPACK_INSTANCE_DIR}/etc/spack/compilers.yaml"
+sed -i "s|PATH_TO_AMD_FLANG_3_2_0|$(spack location -i 'aocc@3.2.0')/bin/flang|g" "${SPACK_INSTANCE_DIR}/etc/spack/compilers.yaml"
