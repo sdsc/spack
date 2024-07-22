@@ -125,7 +125,7 @@ FFTW_OMP_JOB_ID="$(sbatch --dependency="afterok:${GCC_JOB_ID}" 'fftw@3.3.10-omp.
   STREAM_JOB_ID="$(sbatch --dependency="afterok:${GCC_JOB_ID}" 'stream@5.10.sh' | grep -o '[[:digit:]]*')"
   STREAM_OMP_JOB_ID="$(sbatch --dependency="afterok:${GCC_JOB_ID}" 'stream@5.10-omp.sh' | grep -o '[[:digit:]]*')"
 
-d "${SLURM_SUBMIT_DIR}/specs/gcc@10.2.0/mvapich2@2.3.7"
+cd "${SLURM_SUBMIT_DIR}/specs/gcc@10.2.0/mvapich2@2.3.7"
 AMDFFTW_JOB_ID="$(sbatch --dependency="afterok:${MVAPICH2_JOB_ID}" 'amdfftw@3.1.sh' | grep -o '[[:digit:]]*')"
 AMDFFTW_OMP_JOB_ID="$(sbatch --dependency="afterok:${MVAPICH2_JOB_ID}" 'amdfftw@3.1-omp.sh' | grep -o '[[:digit:]]*')"
 AMDSCALAPACK_JOB_ID="$(sbatch --dependency="afterok:${MVAPICH2_JOB_ID}" 'amdscalapack@3.1.sh' | grep -o '[[:digit:]]*')"
