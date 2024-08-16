@@ -70,5 +70,3 @@ if [[ "${?}" -ne 0 ]]; then
 fi
 
 spack compiler add --scope site "$(spack location -i ${SPACK_PACKAGE})"
-
-sleep 30

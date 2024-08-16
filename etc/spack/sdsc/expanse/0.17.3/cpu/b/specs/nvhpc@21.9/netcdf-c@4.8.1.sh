@@ -66,9 +66,3 @@ if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
   exit 1
 fi
-
-#spack module lmod refresh --delete-tree -y
-
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'netcdf-cxx4@4.3.1.sh'
-
-sleep 30

@@ -63,3 +63,19 @@ compilers:
     modules: []
     environment: {}
     extra_rpaths: []
+- compiler:
+    spec: nvhpc@21.9
+    paths:
+      cc: /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen/gcc-8.5.0/nvhpc-21.9-xxpthf52cloih3j5abdsx65rlg4yk2kk/Linux_x86_64/21.9/compilers/bin/nvc
+      cxx: /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen/gcc-8.5.0/nvhpc-21.9-xxpthf52cloih3j5abdsx65rlg4yk2kk/Linux_x86_64/21.9/compilers/bin/nvc++
+      f77: /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen/gcc-8.5.0/nvhpc-21.9-xxpthf52cloih3j5abdsx65rlg4yk2kk/Linux_x86_64/21.9/compilers/bin/nvfortran
+      fc: /cm/shared/apps/spack/0.17.3/cpu/b/opt/spack/linux-rocky8-zen/gcc-8.5.0/nvhpc-21.9-xxpthf52cloih3j5abdsx65rlg4yk2kk/Linux_x86_64/21.9/compilers/bin/nvfortran
+    flags:
+      cflags: -fast
+      cxxflags: -fast
+      fflags: -fast
+    operating_system: rocky8
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []

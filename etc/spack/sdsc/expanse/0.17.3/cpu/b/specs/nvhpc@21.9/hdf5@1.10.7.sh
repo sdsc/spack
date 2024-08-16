@@ -42,7 +42,7 @@ module list
 declare -xr SPACK_PACKAGE='hdf5@1.10.7'
 declare -xr SPACK_COMPILER='nvhpc@21.9'
 declare -xr SPACK_VARIANTS='+cxx +fortran +hl ~ipo ~java ~mpi +shared +szip ~threadsafe +tools'
-declare -xr SPACK_DEPENDENCIES="^cmake@3.21.4/$(spack find --format '{hash:7}' hdf5@1.10.7 % gcc@8.5.0)"
+declare -xr SPACK_DEPENDENCIES="^cmake@3.21.4/$(spack find --format '{hash:7}' cmake@3.21.4 % gcc@8.5.0)"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
