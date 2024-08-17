@@ -2,7 +2,7 @@
 
 #SBATCH --job-name=fftw@3.3.10-omp
 #SBATCH --account=use300
-#SBATCH --reservation=rocky8u7_testing
+#SBATCH --reservation=root_73
 #SBATCH --partition=ind-shared
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
@@ -64,11 +64,10 @@ fi
 time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all "${SPACK_SPEC}"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
-  exit 1
 fi
 
 #spack module lmod refresh --delete-tree -y
 
-#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'hdf5@1.10.7.sh'
+sbatch --dependency="afterok:${SLURM_JOB_ID}" 'fftw@2.1.5.sh'
 
 sleep 30
