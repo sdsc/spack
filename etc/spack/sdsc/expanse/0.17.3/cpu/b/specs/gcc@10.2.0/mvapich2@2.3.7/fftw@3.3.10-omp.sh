@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=fftw@3.3.10
+#SBATCH --job-name=fftw@3.3.10-omp
 #SBATCH --account=use300
-#SBATCH --reservation=rocky8u7_testing
+#SBATCH --reservation=root_73
 #SBATCH --partition=ind-shared
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
@@ -27,7 +27,10 @@ declare -xr SPACK_INSTANCE_DIR="/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_I
 declare -xr SLURM_JOB_SCRIPT="$(scontrol show job ${SLURM_JOB_ID} | awk -F= '/Command=/{print $2}')"
 declare -xr SLURM_JOB_MD5SUM="$(md5sum ${SLURM_JOB_SCRIPT})"
 
-declare -xr SCHEDULER_MODULE='slurm'
+declare -xr SCHEDULER_MODULE='slurm/expanse/23.02.7'
+declare -xr SPACK_MODULE='cpu/0.17.3b'
+declare -xr COMPILER_MODULE='gcc/10.2.0'
+declare -xr MPI_MODULE='mvapich2/2.3.7'
 
 echo "${UNIX_TIME} ${SLURM_JOB_ID} ${SLURM_JOB_MD5SUM} ${SLURM_JOB_DEPENDENCY}" 
 echo ""
@@ -36,14 +39,18 @@ cat "${SLURM_JOB_SCRIPT}"
 
 module purge
 module load "${SCHEDULER_MODULE}"
+module load "${SPACK_MODULE}"
+module load "${COMPILER_MODULE}"
+module load "${MPI_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
 declare -xr SPACK_PACKAGE='fftw@3.3.10'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS='+mpi ~openmp ~pfft_patches'
-declare -xr SPACK_DEPENDENCIES="^openmpi@4.1.3/$(spack find --format '{hash:7}' openmpi@4.1.3 % ${SPACK_COMPILER})"
-declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
+declare -xr SPACK_FLAGS="cflags=-I${MVAPICH2HOME}/include ldflags=-L${MVAPICH2HOME}/lib"
+declare -xr SPACK_VARIANTS='+mpi +openmp ~pfft_patches'
+declare -xr SPACK_DEPENDENCIES="^mvapich2@2.3.7/$(spack find --format '{hash:7}' mvapich2@2.3.7 % ${SPACK_COMPILER})"
+declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_FLAGS} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
 
@@ -55,13 +62,13 @@ spack config get packages
 spack config get repos
 spack config get upstreams
 
-time -p spack spec --long --namespaces --types "${SPACK_SPEC}"
+time -p spack spec --long --namespaces --types fftw@3.3.10 % gcc@10.2.0 cflags=-I${MVAPICH2HOME}/include ldflags=-L${MVAPICH2HOME}/lib +mpi +openmp ~pfft_patches ^mvapich2@2.3.7/$(spack find --format '{hash:7}' mvapich2@2.3.7 % ${SPACK_COMPILER}) 
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack concretization failed.'
   exit 1
 fi
 
-time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all "${SPACK_SPEC}"
+time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all fftw@3.3.10 % gcc@10.2.0 cflags=-I${MVAPICH2HOME}/include ldflags=-L${MVAPICH2HOME}/lib +mpi +openmp ~pfft_patches ^mvapich2@2.3.7/$(spack find --format '{hash:7}' mvapich2@2.3.7 % ${SPACK_COMPILER})
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
   exit 1
@@ -69,6 +76,6 @@ fi
 
 #spack module lmod refresh --delete-tree -y
 
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'fftw@3.3.10-omp.sh'
+#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'hdf5@1.10.7.sh'
 
 sleep 30
