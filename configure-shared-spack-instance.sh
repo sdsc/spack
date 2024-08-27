@@ -3,7 +3,7 @@
 # Configure a shared Spack instance in your local ~/.spack directory.
 
 declare -xr SHARED_SPACK_VERSION='0.17.3'
-declare -xr SHARED_SPACK_INSTANCE_NAME='gpu'
+declare -xr SHARED_SPACK_INSTANCE_NAME='cpu'
 declare -xr SHARED_SPACK_INSTANCE_VERSION='b'
 declare -xr SHARED_SPACK_ROOT="/cm/shared/apps/spack/${SHARED_SPACK_VERSION}/${SHARED_SPACK_INSTANCE_NAME}/${SHARED_SPACK_INSTANCE_VERSION}"
 

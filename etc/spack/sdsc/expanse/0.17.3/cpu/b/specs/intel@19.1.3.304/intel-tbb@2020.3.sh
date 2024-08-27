@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=intel-mkl@2020.4.304
+#SBATCH --job-name=intel-tbb@2020.3
 #SBATCH --account=use300
 #SBATCH --reservation=rocky8u7_testing
 #SBATCH --partition=ind-shared
@@ -40,9 +40,9 @@ module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
 declare -xr INTEL_LICENSE_FILE='40000@elprado.sdsc.edu:40200@elprado.sdsc.edu'
-declare -xr SPACK_PACKAGE='intel-mkl@2020.4.304'
+declare -xr SPACK_PACKAGE='intel-tbb@2020.3'
 declare -xr SPACK_COMPILER='intel@19.1.3.304'
-declare -xr SPACK_VARIANTS='~ilp64 +shared threads=none'
+declare -xr SPACK_VARIANTS='~ipo +shared +tm'
 declare -xr SPACK_DEPENDENCIES=''
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS}"
 
@@ -70,8 +70,4 @@ fi
 
 #spack module lmod refresh --delete-tree -y
 
-cd "${SPACK_PACKAGE}"
-
-sbatch --dependency="afterok:${SLURM_JOB_ID}" 'intel-tbb@2020.3.sh'
-
-sleep 30
+#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'gsl@2.7.sh'
