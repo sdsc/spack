@@ -34,7 +34,7 @@ declare -xr SPACK_REVISION='3'
 declare -xr SPACK_VERSION="${SPACK_MAJOR}.${SPACK_MINOR}.${SPACK_REVISION}"
 declare -xr SPACK_INSTANCE_NAME='cpu'
 declare -xr SPACK_INSTANCE_VERSION='dev'
-declare -xr SPACK_INSTANCE_DIR='/home/mkandes/software/spack/repositories/mkandes/spack'
+declare -xr SPACK_INSTANCE_DIR='/home/mkandes/software/spack/repos/mkandes/spack'
 
 declare -xr TMPDIR="${LOCAL_SCRATCH_DIR}/spack-stage"
 declare -xr TMP="${TMPDIR}"
@@ -75,7 +75,3 @@ if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
   exit 1
 fi
-
-#sbatch --dependency="afterok:${SLURM_JOB_ID}" 'openblas@0.3.18.sh'
-
-sleep 30

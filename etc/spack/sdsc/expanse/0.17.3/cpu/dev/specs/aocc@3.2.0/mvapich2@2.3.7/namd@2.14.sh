@@ -34,7 +34,7 @@ declare -xr SPACK_REVISION='3'
 declare -xr SPACK_VERSION="${SPACK_MAJOR}.${SPACK_MINOR}.${SPACK_REVISION}"
 declare -xr SPACK_INSTANCE_NAME='cpu'
 declare -xr SPACK_INSTANCE_VERSION='dev'
-declare -xr SPACK_INSTANCE_DIR='/home/mkandes/software/spack/repositories/mkandes/spack'
+declare -xr SPACK_INSTANCE_DIR='/home/mkandes/software/spack/repos/mkandes/spack'
 
 declare -xr TMPDIR="${LOCAL_SCRATCH_DIR}/spack-stage"
 declare -xr TMP="${TMPDIR}"
@@ -50,7 +50,7 @@ module list
 declare -xr SPACK_PACKAGE='namd@2.14'
 declare -xr SPACK_COMPILER='aocc@3.2.0'
 declare -xr SPACK_VARIANTS='~cuda interface=tcl'
-declare -xr SPACK_DEPENDENCIES="^charmpp@6.10.2/$(spack find --format '{hash:7}' charmpp@6.10.2 % ${SPACK_COMPILER} ^mvapich2@2.3.7) ^fftw@3.3.10/$(spack find --format '{hash:7}' fftw@3.3.10 % ${SPACK_COMPILER} ~mpi ~openmp)"
+declare -xr SPACK_DEPENDENCIES="^charmpp@6.10.2/$(spack find --format '{hash:7}' charmpp@6.10.2 % ${SPACK_COMPILER} ^mvapich2@2.3.7) ^amdfftw@3.1/$(spack find --format '{hash:7}' amdfftw@3.1 % ${SPACK_COMPILER} ~mpi ~openmp)"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -76,7 +76,3 @@ if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
   exit 1
 fi
-
-#sbatch --dependency="afterok:${SLURM_JOB_ID}" ''
-
-sleep 30

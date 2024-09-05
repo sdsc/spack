@@ -34,7 +34,7 @@ declare -xr SPACK_REVISION='3'
 declare -xr SPACK_VERSION="${SPACK_MAJOR}.${SPACK_MINOR}.${SPACK_REVISION}"
 declare -xr SPACK_INSTANCE_NAME='cpu'
 declare -xr SPACK_INSTANCE_VERSION='dev'
-declare -xr SPACK_INSTANCE_DIR='/home/mkandes/software/spack/repositories/mkandes/spack'
+declare -xr SPACK_INSTANCE_DIR='/home/mkandes/software/spack/repos/mkandes/spack'
 
 declare -xr TMPDIR="${LOCAL_SCRATCH_DIR}/spack-stage"
 declare -xr TMP="${TMPDIR}"
@@ -49,8 +49,8 @@ module list
 
 declare -xr SPACK_PACKAGE='neuron@8.0.0'
 declare -xr SPACK_COMPILER='aocc@3.2.0'
-declare -xr SPACK_VARIANTS='~caliper +coreneuron ~cross-compile ~interviews ~legacy-unit +mpi +python +rx3d ~tests'
-declare -xr SPACK_DEPENDENCIES="^mvapich2@2.3.7/$(spack find --format '{hash:7}' mvapich2@2.3.7 % ${SPACK_COMPILER}) ^py-numpy@1.21.3/$(spack find --format '{hash:7}' py-numpy@1.21.3 % ${SPACK_COMPILER} ^openblas@0.3.18 ~ilp64 threads=none)"
+declare -xr SPACK_VARIANTS='~caliper +coreneuron ~cross-compile ~interviews ~legacy-unit +mpi ~python ~rx3d ~tests'
+declare -xr SPACK_DEPENDENCIES="^mvapich2@2.3.7/$(spack find --format '{hash:7}' mvapich2@2.3.7 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -76,7 +76,3 @@ if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
   exit 1
 fi
-
-#sbatch --dependency="afterok:${SLURM_JOB_ID}" ''
-
-sleep 30

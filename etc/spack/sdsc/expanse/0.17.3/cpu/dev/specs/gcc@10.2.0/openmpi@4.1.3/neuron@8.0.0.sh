@@ -34,7 +34,7 @@ declare -xr SPACK_REVISION='3'
 declare -xr SPACK_VERSION="${SPACK_MAJOR}.${SPACK_MINOR}.${SPACK_REVISION}"
 declare -xr SPACK_INSTANCE_NAME='cpu'
 declare -xr SPACK_INSTANCE_VERSION='dev'
-declare -xr SPACK_INSTANCE_DIR='/home/mkandes/software/spack/repositories/mkandes/spack'
+declare -xr SPACK_INSTANCE_DIR='/home/mkandes/software/spack/repos/mkandes/spack'
 
 declare -xr TMPDIR="${LOCAL_SCRATCH_DIR}/spack-stage"
 declare -xr TMP="${TMPDIR}"
