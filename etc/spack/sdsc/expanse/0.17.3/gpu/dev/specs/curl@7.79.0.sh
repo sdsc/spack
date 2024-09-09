@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=bzip2@1.0.8
+#SBATCH --job-name=curl@7.79.0
 #SBATCH --account=use300
 #SBATCH --clusters=expanse
 #SBATCH --partition=ind-gpu-shared
@@ -48,9 +48,9 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-declare -xr SPACK_PACKAGE='bzip2@1.0.8'
+declare -xr SPACK_PACKAGE='curl@7.79.0'
 declare -xr SPACK_COMPILER='gcc@8.5.0'
-declare -xr SPACK_VARIANTS='~debug +pic +shared'
+declare -xr SPACK_VARIANTS='~gssapi ~ldap ~libidn2 ~librtmp ~libssh ~libssh2 ~nghttp2 tls=openssl'
 declare -xr SPACK_DEPENDENCIES=''
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
