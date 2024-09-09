@@ -3,11 +3,12 @@
 #SBATCH --job-name=gcc@10.2.0
 #SBATCH --account=use300
 #SBATCH --clusters=expanse
-#SBATCH --partition=ind-shared
+#SBATCH --partition=ind-gpu-shared
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=16
-#SBATCH --mem=32G
+#SBATCH --cpus-per-task=10
+#SBATCH --mem=92G
+#SBATCH --gpus=1
 #SBATCH --time=01:00:00
 #SBATCH --output=%x.o%j.%N
 

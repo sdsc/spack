@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=openjdk@11.0.12_7
+#SBATCH --job-name=python@3.8.12
 #SBATCH --account=use300
 #SBATCH --clusters=expanse
 #SBATCH --partition=ind-gpu-shared
@@ -48,10 +48,10 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-declare -xr SPACK_PACKAGE='openjdk@11.0.12_7'
-declare -xr SPACK_COMPILER='gcc@8.5.0'
-declare -xr SPACK_VARIANTS=''
-declare -xr SPACK_DEPENDENCIES=''
+declare -xr SPACK_PACKAGE='python@3.8.12'
+declare -xr SPACK_COMPILER='gcc@10.2.0'
+declare -xr SPACK_VARIANTS='+bz2 +ctypes +dbm ~debug +libxml2 +lzma ~nis +optimizations +pic +pyexpat +pythoncmd +readline +shared +sqlite3 +ssl ~tix ~tkinter ~ucs4 +uuid +zlib'
+declare -xr SPACK_DEPENDENCIES="^sqlite@3.36.0/$(spack find --format '{hash:7}' sqlite@3.36.0 % gcc@8.5.0)"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv

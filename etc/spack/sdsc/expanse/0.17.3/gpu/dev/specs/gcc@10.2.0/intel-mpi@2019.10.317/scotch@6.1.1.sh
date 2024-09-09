@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=openjdk@11.0.12_7
+#SBATCH --job-name=scotch@6.1.1
 #SBATCH --account=use300
 #SBATCH --clusters=expanse
 #SBATCH --partition=ind-gpu-shared
@@ -48,10 +48,10 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-declare -xr SPACK_PACKAGE='openjdk@11.0.12_7'
-declare -xr SPACK_COMPILER='gcc@8.5.0'
-declare -xr SPACK_VARIANTS=''
-declare -xr SPACK_DEPENDENCIES=''
+declare -xr SPACK_PACKAGE='scotch@6.1.1'
+declare -xr SPACK_COMPILER='gcc@10.2.0'
+declare -xr SPACK_VARIANTS='+compression +esmumps ~int64 ~metis +mpi +shared'
+declare -xr SPACK_DEPENDENCIES="^intel-mpi@2019.10.317/$(spack find --format '{hash:7}' intel-mpi@2019.10.317 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv

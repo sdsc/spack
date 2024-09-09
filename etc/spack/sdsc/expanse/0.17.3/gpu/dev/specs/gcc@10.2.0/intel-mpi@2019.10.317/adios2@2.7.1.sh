@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=openjdk@11.0.12_7
+#SBATCH --job-name=adios2@2.7.1
 #SBATCH --account=use300
 #SBATCH --clusters=expanse
 #SBATCH --partition=ind-gpu-shared
@@ -48,10 +48,10 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-declare -xr SPACK_PACKAGE='openjdk@11.0.12_7'
-declare -xr SPACK_COMPILER='gcc@8.5.0'
-declare -xr SPACK_VARIANTS=''
-declare -xr SPACK_DEPENDENCIES=''
+declare -xr SPACK_PACKAGE='adios2@2.7.1'
+declare -xr SPACK_COMPILER='gcc@10.2.0'
+declare -xr SPACK_VARIANTS='+blosc +bzip2 ~dataman ~dataspaces ~endian_reverse +fortran +hdf5 ~ipo +mpi +pic +png +python +shared +ssc +sst +sz +zfp'
+declare -xr SPACK_DEPENDENCIES="^py-numpy@1.21.3/$(spack find --format '{hash:7}' py-numpy@1.21.3 % ${SPACK_COMPILER} ^openblas@0.3.18/$(spack find --format '{hash:7}' openblas@0.3.18 % ${SPACK_COMPILER} ~ilp64 threads=none)) ^hdf5@1.10.7/$(spack find --format '{hash:7}' hdf5@1.10.7 % ${SPACK_COMPILER} +mpi ^intel-mpi@2019.10.317) ^py-mpi4py@3.1.2/$(spack find --format '{hash:7}' py-mpi4py@3.1.2 % ${SPACK_COMPILER} ^intel-mpi@2019.10.317)"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv

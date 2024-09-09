@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=openjdk@11.0.12_7
+#SBATCH --job-name=eigen@3.4.0
 #SBATCH --account=use300
 #SBATCH --clusters=expanse
 #SBATCH --partition=ind-gpu-shared
@@ -9,7 +9,7 @@
 #SBATCH --cpus-per-task=10
 #SBATCH --mem=92G
 #SBATCH --gpus=1
-#SBATCH --time=00:30:00
+#SBATCH --time=48:00:00
 #SBATCH --output=%x.o%j.%N
 
 declare -xir UNIX_TIME="$(date +'%s')"
@@ -48,10 +48,10 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-declare -xr SPACK_PACKAGE='openjdk@11.0.12_7'
-declare -xr SPACK_COMPILER='gcc@8.5.0'
-declare -xr SPACK_VARIANTS=''
-declare -xr SPACK_DEPENDENCIES=''
+declare -xr SPACK_PACKAGE='eigen@3.4.0'
+declare -xr SPACK_COMPILER='gcc@10.2.0'
+declare -xr SPACK_VARIANTS='~ipo'
+declare -xr SPACK_DEPENDENCIES="^cmake@3.21.4/$(spack find --format '{hash:7}' cmake@3.21.4 % gcc@8.5.0)"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -64,7 +64,7 @@ spack config get packages
 spack config get repos
 spack config get upstreams
 
-time -p spack spec --long --namespaces --types --reuse "$(echo ${SPACK_SPEC})"
+time -p spack --show-cores=minimized spec --long --namespaces --types --reuse "$(echo ${SPACK_SPEC})"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack concretization failed.'
   exit 1
