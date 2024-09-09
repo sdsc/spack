@@ -37,8 +37,8 @@ declare -xr SPACK_INSTANCE_NAME='gpu'
 declare -xr SPACK_INSTANCE_VERSION='dev'
 declare -xr SPACK_INSTANCE_DIR='/home/mkandes/software/spack/repos/mkandes/spack'
 
-declare -xr TMPDIR="${LOCAL_SCRATCH_DIR}/spack-stage"
-declare -xr TMP="${TMPDIR}"
+#declare -xr TMPDIR="${LOCAL_SCRATCH_DIR}/spack-stage"
+#declare -xr TMP="${TMPDIR}"
 
 echo "${UNIX_TIME} ${LOCAL_TIME} ${SLURM_JOB_ID} ${JOB_SCRIPT_MD5} ${JOB_SCRIPT_SHA256} ${JOB_SCRIPT_NUMBER_OF_LINES} ${JOB_SCRIPT}"
 cat  "${JOB_SCRIPT}"
@@ -70,7 +70,7 @@ if [[ "${?}" -ne 0 ]]; then
   exit 1
 fi
 
-mkdir -p "${TMPDIR}"
+#mkdir -p "${TMPDIR}"
 
 time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all --reuse "$(echo ${SPACK_SPEC})"
 if [[ "${?}" -ne 0 ]]; then
