@@ -72,7 +72,6 @@ fi
 mkdir -p "${TMPDIR}"
 
 time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all --reuse quantum-espresso@7.0 % aocc@3.2.0 +cmake ~elpa ~environ +epw ~ipo hdf5=parallel +libxc +mpi ~openmp +patch +qmcpack +scalapack "${SPACK_DEPENDENCIES}"
-sleep 600
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
   exit 1
