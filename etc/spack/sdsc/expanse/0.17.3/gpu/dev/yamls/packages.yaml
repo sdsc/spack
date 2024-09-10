@@ -44,3 +44,8 @@ packages:
       - spec: 'slurm@23.02.7'
         prefix: /cm/shared/apps/slurm/current
     buildable: false
+  gdrcopy:
+    externals:
+      - spec: 'gdrcopy@2.4'
+        prefix: /usr
+    buildable: false
