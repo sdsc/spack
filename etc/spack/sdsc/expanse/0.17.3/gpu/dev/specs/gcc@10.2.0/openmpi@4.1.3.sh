@@ -3,11 +3,12 @@
 #SBATCH --job-name=openmpi@4.1.3
 #SBATCH --account=use300
 #SBATCH --clusters=expanse
-#SBATCH --partition=ind-shared
+#SBATCH --partition=ind-gpu-shared
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=16
-#SBATCH --mem=32G
+#SBATCH --cpus-per-task=10
+#SBATCH --mem=92G
+#SBATCH --gpus=1
 #SBATCH --time=00:30:00
 #SBATCH --output=%x.o%j.%N
 
@@ -63,7 +64,7 @@ spack config get packages
 spack config get repos
 spack config get upstreams
 
-time -p spack spec --long --namespaces --types --reuse openmpi@4.1.3 % gcc@10.2.0 ~atomics+cuda~cxx~cxx_exceptions~gpfs~internal-hwloc~java+legacylaunchers+lustre~memchecker+pmi+pmix+romio~rsh~singularity+static+vt+wrapper-rpath cuda_arch='70,80' fabrics='ucx' schedulers='slurm' "${SPACK_DEPENDENCIES}"
+time -p spack spec --long --namespaces --types --reuse openmpi@4.1.3 % "${SPACK_COMPILER}" ~atomics+cuda~cxx~cxx_exceptions~gpfs~internal-hwloc~java+legacylaunchers+lustre~memchecker+pmi+pmix+romio~rsh~singularity+static+vt+wrapper-rpath cuda_arch='70,80' fabrics='ucx' schedulers='slurm' "${SPACK_DEPENDENCIES}"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack concretization failed.'
   exit 1
@@ -71,7 +72,7 @@ fi
 
 mkdir -p "${TMPDIR}"
 
-time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all --reuse openmpi@4.1.3 % gcc@10.2.0 ~atomics+cuda~cxx~cxx_exceptions~gpfs~internal-hwloc~java+legacylaunchers+lustre~memchecker+pmi+pmix+romio~rsh~singularity+static+vt+wrapper-rpath cuda_arch='70,80' fabrics='ucx' schedulers='slurm' "${SPACK_DEPENDENCIES}"
+time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all --reuse openmpi@4.1.3 % "${SPACK_COMPILER}" ~atomics+cuda~cxx~cxx_exceptions~gpfs~internal-hwloc~java+legacylaunchers+lustre~memchecker+pmi+pmix+romio~rsh~singularity+static+vt+wrapper-rpath cuda_arch='70,80' fabrics='ucx' schedulers='slurm' "${SPACK_DEPENDENCIES}"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
   exit 1

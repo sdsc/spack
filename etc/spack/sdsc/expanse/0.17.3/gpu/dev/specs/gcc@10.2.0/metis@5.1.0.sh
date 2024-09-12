@@ -51,7 +51,7 @@ module list
 declare -xr SPACK_PACKAGE='metis@5.1.0'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
 declare -xr SPACK_VARIANTS='~gdb ~int64 ~real64 +shared'
-declare -xr SPACK_DEPENDENCIES="^cmake@3.21.4/$(spack find --format '{hash:7}' cmake@3.21.4 % gcc@8.5.0)"
+declare -xr SPACK_DEPENDENCIES=''
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv

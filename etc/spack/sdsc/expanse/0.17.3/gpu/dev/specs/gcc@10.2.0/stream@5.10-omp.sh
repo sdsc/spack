@@ -3,11 +3,12 @@
 #SBATCH --job-name=stream@5.10-omp
 #SBATCH --account=use300
 #SBATCH --clusters=expanse
-#SBATCH --partition=ind-shared
+#SBATCH --partition=ind-gpu-shared
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=16
-#SBATCH --mem=32G
+#SBATCH --cpus-per-task=10
+#SBATCH --mem=92G
+#SBATCH --gpus=1
 #SBATCH --time=00:30:00
 #SBATCH --output=%x.o%j.%N
 
@@ -32,7 +33,7 @@ declare -xr SPACK_MAJOR='0'
 declare -xr SPACK_MINOR='17'
 declare -xr SPACK_REVISION='3'
 declare -xr SPACK_VERSION="${SPACK_MAJOR}.${SPACK_MINOR}.${SPACK_REVISION}"
-declare -xr SPACK_INSTANCE_NAME='cpu'
+declare -xr SPACK_INSTANCE_NAME='gpu'
 declare -xr SPACK_INSTANCE_VERSION='dev'
 declare -xr SPACK_INSTANCE_DIR='/home/mkandes/software/spack/repos/mkandes/spack'
 

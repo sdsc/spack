@@ -48,10 +48,33 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
+#==> Installing ucx-1.10.1-hqmeaineuq6aq4ptuvd5kpbw7o3wb46q
+#==> No binary for ucx-1.10.1-hqmeaineuq6aq4ptuvd5kpbw7o3wb46q found: installing from source
+#==> Warning: Expected user 501506 to own /scratch/mkandes, but it is owned by 0
+#==> Using cached archive: /home/mkandes/software/spack/repos/mkandes/spack/var/spack/cache/_source-cache/archive/ae/ae9a108af6842ca135e7ec9b6131469adf9f1e50f899349fafcc69a215368bc9.tar.gz
+#==> No patches needed for ucx
+#==> ucx: Executing phase: 'autoreconf'
+#==> ucx: Executing phase: 'configure'
+#==> Error: ProcessError: Command exited with status 1:
+#    'contrib/configure-release' '--prefix=/home/mkandes/software/spack/repos/mkandes/spack/opt/spack/linux-rocky8-cascadelake/gcc-10.2.0/ucx-1.10.1-hqmeaineuq6aq4ptuvd5kpbw7o3wb46q' '--enable-mt' '--enable-cma' '--disable-params-check' '--with-avx' '--enable-optimizations' '--disable-assertions' '--disable-logging' '--with-pic' '--with-rc' '--with-ud' '--with-dc' '--with-mlx5-dv' '--with-ib-hw-tm' '--with-dm' '--with-cm' '--without-rocm' '--without-java' '--with-cuda=/home/mkandes/software/spack/repos/mkandes/spack/opt/spack/linux-rocky8-cascadelake/gcc-10.2.0/cuda-11.2.2-nymvp54yiooltc5wzqhb2unwjiwkwcmu' '--with-gdrcopy=/usr' '--with-knem=/opt/knem-1.1.4.90mlnx3' '--with-xpmem=/usr'
+#
+#1 error found in build log:
+#     411    checking for struct ibv_tm_caps.flags... yes
+#     412    checking whether ibv_exp_alloc_dm is declared... no
+#     413    checking whether ibv_alloc_dm is declared... yes
+#     414    checking whether ibv_cmd_modify_qp is declared... no
+#     415    configure: Checking OFED valgrind libs /usr/lib64/mlnx_ofed/valgrin
+#            d
+#     416    checking for ib_cm_send_req in -libcm... no
+#  >> 417    configure: error: CM requested but lib ibcm not found
+#
+#See build log for details:
+#  /scratch/mkandes/job_33766496/spack-stage/spack-stage/spack-stage-ucx-1.10.1-hqmeaineuq6aq4ptuvd5kpbw7o3wb46q/spack-build-out.txt
+
 declare -xr SPACK_PACKAGE='ucx@1.10.1'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS='~assertions ~cm +cma +cuda +dc ~debug +dm +gdrcopy +ib-hw-tm ~java ~knem ~logging +mlx5-dv +optimizations ~parameter_checking +pic +rc ~rocm +thread_multiple +ud ~xpmem cuda_arch=70,80'
-declare -xr SPACK_DEPENDENCIES="^cuda@11.2.2/$(spack find --format '{hash:7}' cuda@11.2.2 % ${SPACK_COMPILER})"
+declare -xr SPACK_VARIANTS='~assertions ~cm +cma +cuda cuda_arch=70,80 +dc ~debug +dm +gdrcopy +ib-hw-tm ~java +knem ~logging +mlx5-dv +optimizations ~parameter_checking +pic +rc ~rocm +thread_multiple +ud +xpmem'
+eclare -xr SPACK_DEPENDENCIES="^cuda@11.2.2/$(spack find --format '{hash:7}' cuda@11.2.2 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS}" #${SPACK_DEPENDENCIES}"
 
 printenv
@@ -64,7 +87,7 @@ spack config get packages
 spack config get repos
 spack config get upstreams
 
-time -p spack spec --long --namespaces --types --reuse "$(echo ${SPACK_SPEC})"
+time -p spack spec --long --namespaces --types --reuse ucx@1.10.1 % "${SPACK_COMPILER}" ~assertions ~cm +cma +cuda cuda_arch='70,80' +dc ~debug +dm +gdrcopy +ib-hw-tm ~java +knem ~logging +mlx5-dv +optimizations ~parameter_checking +pic +rc ~rocm +thread_multiple +ud +xpmem "${SPACK_DEPENDENCIES}"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack concretization failed.'
   exit 1
@@ -72,7 +95,7 @@ fi
 
 mkdir -p "${TMPDIR}"
 
-time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all --reuse "$(echo ${SPACK_SPEC})"
+time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all --reuse ucx@1.10.1 % "${SPACK_COMPILER}" ~assertions ~cm +cma +cuda cuda_arch='70,80' +dc ~debug +dm +gdrcopy +ib-hw-tm ~java +knem ~logging +mlx5-dv +optimizations ~parameter_checking +pic +rc ~rocm +thread_multiple +ud +xpmem "${SPACK_DEPENDENCIES}"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
   exit 1

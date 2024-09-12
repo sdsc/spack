@@ -51,7 +51,7 @@ module list
 declare -xr SPACK_PACKAGE='python@3.8.12'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
 declare -xr SPACK_VARIANTS='+bz2 +ctypes +dbm ~debug +libxml2 +lzma ~nis +optimizations +pic +pyexpat +pythoncmd +readline +shared +sqlite3 +ssl ~tix ~tkinter ~ucs4 +uuid +zlib'
-declare -xr SPACK_DEPENDENCIES="^sqlite@3.36.0/$(spack find --format '{hash:7}' sqlite@3.36.0 % gcc@8.5.0)"
+declare -xr SPACK_DEPENDENCIES="^sqlite@3.36.0 % ${SPACK_COMPILER} +column_metadata +fts +functions +rtree arch=linux-rocky8-cascadelake"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv

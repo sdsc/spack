@@ -64,7 +64,7 @@ spack config get packages
 spack config get repos
 spack config get upstreams
 
-time -p spack spec --long --namespaces --types --reuse elpa@2021.05.001 % "${SPACK_COMPILER}" +cuda cuda_arch=70,80 +mpi ~openmp ~rocm "${SPACK_DEPENDENCIES}"
+time -p spack spec --long --namespaces --types --reuse elpa@2021.05.001 % "${SPACK_COMPILER}" +cuda cuda_arch='70,80' +mpi ~openmp ~rocm "${SPACK_DEPENDENCIES}"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack concretization failed.'
   exit 1
@@ -72,7 +72,7 @@ fi
 
 mkdir -p "${TMPDIR}"
 
-time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all --reuse elpa@2021.05.001 % "${SPACK_COMPILER}" +cuda cuda_arch=70,80 +mpi ~openmp ~rocm "${SPACK_DEPENDENCIES}"
+time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all --reuse elpa@2021.05.001 % "${SPACK_COMPILER}" +cuda cuda_arch='70,80' +mpi ~openmp ~rocm "${SPACK_DEPENDENCIES}"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
   exit 1

@@ -9,7 +9,7 @@
 #SBATCH --cpus-per-task=10
 #SBATCH --mem=92G
 #SBATCH --gpus=1
-#SBATCH --time=48:00:00
+#SBATCH --time=00:30:00
 #SBATCH --output=%x.o%j.%N
 
 declare -xir UNIX_TIME="$(date +'%s')"
@@ -51,7 +51,7 @@ module list
 declare -xr SPACK_PACKAGE='eigen@3.4.0'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
 declare -xr SPACK_VARIANTS='~ipo'
-declare -xr SPACK_DEPENDENCIES="^cmake@3.21.4/$(spack find --format '{hash:7}' cmake@3.21.4 % gcc@8.5.0)"
+declare -xr SPACK_DEPENDENCIES="^cmake@3.21.4 % ${SPACK_COMPILER} arch=linux-rocky8-cascadelake"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv

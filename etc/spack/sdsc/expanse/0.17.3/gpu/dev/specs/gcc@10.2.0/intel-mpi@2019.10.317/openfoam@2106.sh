@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=gromacs@2022.6
+#SBATCH --job-name=openfoam@2106
 #SBATCH --account=use300
 #SBATCH --clusters=expanse
 #SBATCH --partition=ind-gpu-shared
@@ -9,7 +9,7 @@
 #SBATCH --cpus-per-task=10
 #SBATCH --mem=92G
 #SBATCH --gpus=1
-#SBATCH --time=00:30:00
+#SBATCH --time=02:00:00
 #SBATCH --output=%x.o%j.%N
 
 declare -xir UNIX_TIME="$(date +'%s')"
@@ -48,10 +48,10 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-declare -xr SPACK_PACKAGE='gromacs@2022.6'
+declare -xr SPACK_PACKAGE='openfoam@2106'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
-declare -xr SPACK_VARIANTS='+blas +cuda ~cycle_subcounters ~double +hwloc ~ipo +lapack ~mdrun_only +mpi ~nosuffix ~opencl +openmp ~plumed ~relaxed_double_precision +shared ~sycl'
-declare -xr SPACK_DEPENDENCIES="^openblas@0.3.18/$(spack find --format '{hash:7}' openblas@0.3.18 % ${SPACK_COMPILER} ~ilp64 threads=none) ^cuda@11.2.2/$(spack find --format '{hash:7}' cuda@11.2.2 % ${SPACK_COMPILER}) ^fftw@3.3.10/$(spack find --format '{hash:7}' fftw@3.3.10 % ${SPACK_COMPILER} ~mpi ~openmp) ^intel-mpi@2019.10.317/$(spack find --format '{hash:7}' intel-mpi@2019.10.317 % ${SPACK_COMPILER})" 
+declare -xr SPACK_VARIANTS='~float32 ~int64 +kahip ~knl +metis ~mgridgen ~paraview +scotch +source ~spdp ~vtk +zoltan'
+declare -xr SPACK_DEPENDENCIES="^intel-mpi@2019.10.317/$(spack find --format '{hash:7}' intel-mpi@2019.10.317 % ${SPACK_COMPILER}) ^adios2@2.7.1/$(spack find --format '{hash:7}' adios2@2.7.1 % ${SPACK_COMPILER} +mpi ^intel-mpi@2019.10.317) ^cgal@4.13/$(spack find --format '{hash:7}' cgal@4.13 % ${SPACK_COMPILER}) ^fftw@3.3.10/$(spack find --format '{hash:7}' fftw@3.3.10 % ${SPACK_COMPILER} ~mpi ~openmp) ^kahip@3.11/$(spack find --format '{hash:7}' kahip@3.11 % ${SPACK_COMPILER} ^intel-mpi@2019.10.317) ^scotch@6.1.1/$(spack find --format '{hash:7}' scotch@6.1.1 % ${SPACK_COMPILER} +mpi ^intel-mpi@2019.10.317) ^zoltan@3.83/$(spack find --format '{hash:7}' zoltan@3.83 % ${SPACK_COMPILER} +fortran +mpi +parmetis ^intel-mpi@2019.10.317)"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
