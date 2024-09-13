@@ -3,13 +3,14 @@
 #SBATCH --job-name=deploy
 #SBATCH --account=use300
 #SBATCH --clusters=expanse
+#SBATCH --qos=gpu-unlim
 #SBATCH --partition=ind-gpu-shared
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=1G
 #SBATCH --gpus=1
-#SBATCH --time=00:30:00
+#SBATCH --time=02:00:00
 #SBATCH --output=%x.o%j.%N
 
 declare -xir UNIX_TIME="$(date +'%s')"
@@ -84,6 +85,8 @@ BZIP2_JOB_ID="$(sbatch 'bzip2@1.0.8.sh' | grep -o '[[:digit:]]*')"
   OPENJDK_JOB_ID="$(sbatch --dependency="afterok:${BZIP2_JOB_ID}" 'openjdk@11.0.12_7.sh' | grep -o '[[:digit:]]*')"
   SRATOOLKIT_JOB_ID="$(sbatch --dependency="afterok:${BZIP2_JOB_ID}" 'sratoolkit@2.10.9.sh' | grep -o '[[:digit:]]*')"
 
+sleep 900
+
 cd "${SLURM_SUBMIT_DIR}/specs/gcc@10.2.0"
 CUDA_JOB_ID="$(sbatch --dependency="afterok:${GCC_JOB_ID}" 'cuda@11.2.2.sh' | grep -o '[[:digit:]]*')"
   CHARMPP_JOB_ID="$(sbatch --dependency="afterok:${CUDA_JOB_ID}" 'charmpp@6.10.2.sh' | grep -o '[[:digit:]]*')"
@@ -129,6 +132,8 @@ EIGEN_JOB_ID="$(sbatch --dependency="afterok:${GCC_JOB_ID}" 'eigen@3.4.0.sh' | g
 INTELMKL_JOB_ID="$(sbatch --dependency="afterok:${GCC_JOB_ID}" 'intel-mkl@2020.4.304.sh' | grep -o '[[:digit:]]*')"
 INTELMPI_JOB_ID="$(sbatch --dependency="afterok:${GCC_JOB_ID}" 'intel-mpi@2019.10.317.sh' | grep -o '[[:digit:]]*')"
 
+sleep 900
+
 cd "${SLURM_SUBMIT_DIR}/specs/gcc@10.2.0/intel-mpi@2019.10.317"
 BOOST_JOB_ID="$(sbatch --dependency="afterok:${INTELMPI_JOB_ID}:${NUMPY_JOB_ID}" 'boost@1.77.0.sh' | grep -o '[[:digit:]]*')"
 GROMACS_JOB_ID="$(sbatch --dependency="afterok:${CUDA_JOB_ID}:${FFTW_JOB_ID}:${INTELMPI_JOB_ID}:${OPENBLAS_JOB_ID}" 'gromacs@2022.6.sh' | grep -o '[[:digit:]]*')"
@@ -161,6 +166,8 @@ RAXML_JOB_ID="$(sbatch --dependency="afterok:${INTELMPI_JOB_ID}" 'raxml@8.2.12.s
 RAXML_NG_JOB_ID="$(sbatch --dependency="afterok:${INTELMPI_JOB_ID}" 'raxml-ng@1.0.2.sh' | grep -o '[[:digit:]]*')"
 SCOTCH_JOB_ID="$(sbatch --dependency="afterok:${INTELMPI_JOB_ID}" 'scotch@6.1.1.sh' | grep -o '[[:digit:]]*')"
   OPENFOAM_JOB_ID="$(sbatch --dependency="afterok:${ADIOS2_JOB_ID}:${SCOTCH_JOB_ID}:${ZOLTAN_JOB_ID}" 'openfoam@2106.sh' | grep -o '[[:digit:]]*')"
+
+sleep 900
 
 cd "${SLURM_SUBMIT_DIR}/specs/gcc@10.2.0/openmpi@4.1.3"
 BOOST_JOB_ID="$(sbatch --dependency="afterok:${OPENMPI_JOB_ID}" 'boost@1.77.0.sh' | grep -o '[[:digit:]]*')"
