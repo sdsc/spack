@@ -85,17 +85,17 @@ BZIP2_JOB_ID="$(sbatch 'bzip2@1.0.8.sh' | grep -o '[[:digit:]]*')"
   OPENJDK_JOB_ID="$(sbatch --dependency="afterok:${BZIP2_JOB_ID}" 'openjdk@11.0.12_7.sh' | grep -o '[[:digit:]]*')"
   SRATOOLKIT_JOB_ID="$(sbatch --dependency="afterok:${BZIP2_JOB_ID}" 'sratoolkit@2.10.9.sh' | grep -o '[[:digit:]]*')"
 
-sleep 900
+sleep 1800
 
 cd "${SLURM_SUBMIT_DIR}/specs/gcc@10.2.0"
-CUDA_JOB_ID="$(sbatch --dependency="afterok:${GCC_JOB_ID}" 'cuda@11.2.2.sh' | grep -o '[[:digit:]]*')"
+CUDA_JOB_ID="$(sbatch --dependency="afterok::${GCC_JOB_ID}:${RCLONE_JOB_ID}" 'cuda@11.2.2.sh' | grep -o '[[:digit:]]*')"
   CHARMPP_JOB_ID="$(sbatch --dependency="afterok:${CUDA_JOB_ID}" 'charmpp@6.10.2.sh' | grep -o '[[:digit:]]*')"
     NAMD2_JOB_ID="$(sbatch --dependency="afterok:${CHARMPP_JOB_ID}" 'namd@2.14.sh' | grep -o '[[:digit:]]*')"
   CUDNN_JOB_ID="$(sbatch --dependency="afterok:${CUDA_JOB_ID}" 'cudnn@8.1.1.33-11.2.sh' | grep -o '[[:digit:]]*')"
   LIBXC_JOB_ID="$(sbatch --dependency="afterok:${CUDA_JOB_ID}" 'libxc@5.1.5.sh' | grep -o '[[:digit:]]*')"
   LIBBEAGLE_JOB_ID="$(sbatch --dependency="afterok:${CUDA_JOB_ID}" 'libbeagle@3.1.2.sh' | grep -o '[[:digit:]]*')"
   NCCL_JOB_ID="$(sbatch --dependency="afterok:${CUDA_JOB_ID}" 'nccl@2.8.4-1.sh' | grep -o '[[:digit:]]*')"
-EIGEN_JOB_ID="$(sbatch --dependency="afterok:${GCC_JOB_ID}" 'eigen@3.4.0.sh' | grep -o '[[:digit:]]*')"
+EIGEN_JOB_ID="$(sbatch --dependency="afterok:${GCC_JOB_ID}:${RCLONE_JOB_ID}" 'eigen@3.4.0.sh' | grep -o '[[:digit:]]*')"
   FFTW_JOB_ID="$(sbatch --dependency="afterok:${EIGEN_JOB_ID}" 'fftw@3.3.10.sh' | grep -o '[[:digit:]]*')"
     FFTW_OMP_JOB_ID="$(sbatch --dependency="afterok:${FFTW_JOB_ID}" 'fftw@3.3.10-omp.sh' | grep -o '[[:digit:]]*')"
   GSL_JOB_ID="$(sbatch --dependency="afterok:${EIGEN_JOB_ID}" 'gsl@2.7.sh' | grep -o '[[:digit:]]*')"
@@ -132,7 +132,7 @@ EIGEN_JOB_ID="$(sbatch --dependency="afterok:${GCC_JOB_ID}" 'eigen@3.4.0.sh' | g
 INTELMKL_JOB_ID="$(sbatch --dependency="afterok:${GCC_JOB_ID}" 'intel-mkl@2020.4.304.sh' | grep -o '[[:digit:]]*')"
 INTELMPI_JOB_ID="$(sbatch --dependency="afterok:${GCC_JOB_ID}" 'intel-mpi@2019.10.317.sh' | grep -o '[[:digit:]]*')"
 
-sleep 900
+sleep 1800
 
 cd "${SLURM_SUBMIT_DIR}/specs/gcc@10.2.0/intel-mpi@2019.10.317"
 BOOST_JOB_ID="$(sbatch --dependency="afterok:${INTELMPI_JOB_ID}:${NUMPY_JOB_ID}" 'boost@1.77.0.sh' | grep -o '[[:digit:]]*')"
@@ -167,7 +167,7 @@ RAXML_NG_JOB_ID="$(sbatch --dependency="afterok:${INTELMPI_JOB_ID}" 'raxml-ng@1.
 SCOTCH_JOB_ID="$(sbatch --dependency="afterok:${INTELMPI_JOB_ID}" 'scotch@6.1.1.sh' | grep -o '[[:digit:]]*')"
   OPENFOAM_JOB_ID="$(sbatch --dependency="afterok:${ADIOS2_JOB_ID}:${SCOTCH_JOB_ID}:${ZOLTAN_JOB_ID}" 'openfoam@2106.sh' | grep -o '[[:digit:]]*')"
 
-sleep 900
+sleep 1800
 
 cd "${SLURM_SUBMIT_DIR}/specs/gcc@10.2.0/openmpi@4.1.3"
 BOOST_JOB_ID="$(sbatch --dependency="afterok:${OPENMPI_JOB_ID}" 'boost@1.77.0.sh' | grep -o '[[:digit:]]*')"
