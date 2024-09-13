@@ -3,7 +3,7 @@
 #SBATCH --job-name=deploy
 #SBATCH --account=use300
 #SBATCH --clusters=expanse
-#SBATCH --qos=gpu-unlim
+##SBATCH --qos=gpu-unlim
 #SBATCH --partition=ind-gpu-shared
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
