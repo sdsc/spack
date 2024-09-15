@@ -10,7 +10,7 @@
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=1G
 #SBATCH --gpus=1
-#SBATCH --time=02:00:00
+#SBATCH --time=00:05:00
 #SBATCH --output=%x.o%j.%N
 
 declare -xir UNIX_TIME="$(date +'%s')"
@@ -62,7 +62,7 @@ cp -p yamls/compilers.yaml "${SPACK_INSTANCE_DIR}/etc/spack/compilers.yaml"
 cp -p yamls/modules.yaml "${SPACK_INSTANCE_DIR}/etc/spack/modules.yaml"
 cp -p yamls/packages.yaml "${SPACK_INSTANCE_DIR}/etc/spack/packages.yaml"
 
-cd "${SLURM_SUBMIT_DIR}/specs"
+#cd "${SLURM_SUBMIT_DIR}/specs"
 BZIP2_JOB_ID="$(sbatch 'bzip2@1.0.8.sh' | grep -o '[[:digit:]]*')"
   CURL_JOB_ID="$(sbatch --dependency="afterok:${BZIP2_JOB_ID}" 'curl@7.79.0.sh' | grep -o '[[:digit:]]*')"
     CMAKE_JOB_ID="$(sbatch --dependency="afterok:${CURL_JOB_ID}" 'cmake@3.21.4.sh' | grep -o '[[:digit:]]*')"
@@ -85,8 +85,6 @@ BZIP2_JOB_ID="$(sbatch 'bzip2@1.0.8.sh' | grep -o '[[:digit:]]*')"
   OPENJDK_JOB_ID="$(sbatch --dependency="afterok:${BZIP2_JOB_ID}" 'openjdk@11.0.12_7.sh' | grep -o '[[:digit:]]*')"
   SRATOOLKIT_JOB_ID="$(sbatch --dependency="afterok:${BZIP2_JOB_ID}" 'sratoolkit@2.10.9.sh' | grep -o '[[:digit:]]*')"
 
-sleep 1800
-
 cd "${SLURM_SUBMIT_DIR}/specs/gcc@10.2.0"
 CUDA_JOB_ID="$(sbatch --dependency="afterok::${GCC_JOB_ID}" 'cuda@11.2.2.sh' | grep -o '[[:digit:]]*')"
   CHARMPP_JOB_ID="$(sbatch --dependency="afterok:${CUDA_JOB_ID}" 'charmpp@6.10.2.sh' | grep -o '[[:digit:]]*')"
@@ -95,7 +93,6 @@ CUDA_JOB_ID="$(sbatch --dependency="afterok::${GCC_JOB_ID}" 'cuda@11.2.2.sh' | g
   LIBXC_JOB_ID="$(sbatch --dependency="afterok:${CUDA_JOB_ID}" 'libxc@5.1.5.sh' | grep -o '[[:digit:]]*')"
   LIBBEAGLE_JOB_ID="$(sbatch --dependency="afterok:${CUDA_JOB_ID}" 'libbeagle@3.1.2.sh' | grep -o '[[:digit:]]*')"
   NCCL_JOB_ID="$(sbatch --dependency="afterok:${CUDA_JOB_ID}" 'nccl@2.8.4-1.sh' | grep -o '[[:digit:]]*')"
-sleep 900
 EIGEN_JOB_ID="$(sbatch --dependency="afterok:${GCC_JOB_ID}" 'eigen@3.4.0.sh' | grep -o '[[:digit:]]*')"
   FFTW_JOB_ID="$(sbatch --dependency="afterok:${EIGEN_JOB_ID}" 'fftw@3.3.10.sh' | grep -o '[[:digit:]]*')"
     FFTW_OMP_JOB_ID="$(sbatch --dependency="afterok:${FFTW_JOB_ID}" 'fftw@3.3.10-omp.sh' | grep -o '[[:digit:]]*')"
@@ -111,7 +108,6 @@ EIGEN_JOB_ID="$(sbatch --dependency="afterok:${GCC_JOB_ID}" 'eigen@3.4.0.sh' | g
     OPENBLAS_I64_JOB_ID="$(sbatch --dependency="afterok:${OPENBLAS_JOB_ID}" 'openblas@0.3.18-i64.sh' | grep -o '[[:digit:]]*')"
     OPENBLAS_OMP_JOB_ID="$(sbatch --dependency="afterok:${OPENBLAS_JOB_ID}" 'openblas@0.3.18-omp.sh' | grep -o '[[:digit:]]*')"
     OPENBLAS_I64_OMP_JOB_ID="$(sbatch --dependency="afterok:${OPENBLAS_JOB_ID}" 'openblas@0.3.18-i64-omp.sh' | grep -o '[[:digit:]]*')"
-sleep 900
   PYTHON_JOB_ID="$(sbatch --dependency="afterok:${EIGEN_JOB_ID}" 'python@3.8.12.sh' | grep -o '[[:digit:]]*')"
     SETUPTOOLS_JOB_ID="$(sbatch --dependency="afterok:${PYTHON_JOB_ID}" 'py-setuptools@58.2.0.sh' | grep -o '[[:digit:]]*')"
       NUMPY_JOB_ID="$(sbatch --dependency="afterok:${SETUPTOOLS_JOB_ID}:${OPENBLAS_JOB_ID}" 'py-numpy@1.21.3.sh' | grep -o '[[:digit:]]*')"
@@ -126,7 +122,6 @@ sleep 900
         NUMPY_I64_OMP_JOB_ID="$(sbatch --dependency="afterok:${OPENBLAS_I64_OMP_JOB_ID}:${NUMPY_JOB_ID}" 'py-numpy@1.21.3-i64-omp.sh' | grep -o '[[:digit:]]*')"
       PIP_JOB_ID="$(sbatch --dependency="afterok:${SETUPTOOLS_JOB_ID}" 'py-pip@21.1.2.sh' | grep -o '[[:digit:]]*')"
       VENV_JOB_ID="$(sbatch --dependency="afterok:${SETUPTOOLS_JOB_ID}" 'py-virtualenv@16.7.6.sh' | grep -o '[[:digit:]]*')"
-sleep 900
   SCOTCH_JOB_ID="$(sbatch --dependency="afterok:${EIGEN_JOB_ID}" 'scotch@6.1.1.sh' | grep -o '[[:digit:]]*')"
   STREAM_JOB_ID="$(sbatch --dependency="afterok:${EIGEN_JOB_ID}" 'stream@5.10.sh' | grep -o '[[:digit:]]*')"
     STREAM_OMP_JOB_ID="$(sbatch --dependency="afterok:${STREAM_JOB_ID}" 'stream@5.10-omp.sh' | grep -o '[[:digit:]]*')"
@@ -134,8 +129,6 @@ sleep 900
     OPENMPI_JOB_ID="$(sbatch --dependency="afterok:${UCX_JOB_ID}" 'openmpi@4.1.3.sh' | grep -o '[[:digit:]]*')"
 INTELMKL_JOB_ID="$(sbatch --dependency="afterok:${GCC_JOB_ID}" 'intel-mkl@2020.4.304.sh' | grep -o '[[:digit:]]*')"
 INTELMPI_JOB_ID="$(sbatch --dependency="afterok:${GCC_JOB_ID}" 'intel-mpi@2019.10.317.sh' | grep -o '[[:digit:]]*')"
-
-sleep 1800
 
 cd "${SLURM_SUBMIT_DIR}/specs/gcc@10.2.0/intel-mpi@2019.10.317"
 BOOST_JOB_ID="$(sbatch --dependency="afterok:${INTELMPI_JOB_ID}:${NUMPY_JOB_ID}" 'boost@1.77.0.sh' | grep -o '[[:digit:]]*')"
@@ -152,7 +145,6 @@ KAHIP_JOB_ID="$(sbatch --dependency="afterok:${INTELMPI_JOB_ID}" 'kahip@3.11.sh'
 MPI4PY_JOB_ID="$(sbatch --dependency="afterok:${INTELMPI_JOB_ID}:${PYTHON_JOB_ID}" 'py-mpi4py@3.1.2.sh' | grep -o '[[:digit:]]*')"
   ADIOS2_JOB_ID="$(sbatch --dependency="afterok:${HDF5_JOB_ID}:${MPI4PY_JOB_ID}:${NUMPY_JOB_ID}" 'adios2@2.7.1.sh' | grep -o '[[:digit:]]*')"
   NEURON_JOB_ID="$(sbatch --dependency="afterok:${MPI4PY_JOB_ID}" 'neuron@8.0.0.sh' | grep -o '[[:digit:]]*')"
-sleep 900
 NETLIB_SCALAPACK_JOB_ID="$(sbatch --dependency="afterok:${INTELMPI_JOB_ID}:${OPENBLAS_JOB_ID}" 'netlib-scalapack@2.1.0.sh' | grep -o '[[:digit:]]*')"
   ELPA_JOB_ID="$(sbatch --dependency="afterok:${CUDA_JOB_ID}:${NETLIB_SCALAPACK_JOB_ID}" 'elpa@2021.05.001.sh' | grep -o '[[:digit:]]*')"
     QUANTUM_ESPRESSO_JOB_ID="$(sbatch --dependency="afterok:${HDF5_JOB_ID}:${ELPA_JOB_ID}" 'quantum-espresso@7.0.sh' | grep -o '[[:digit:]]*')"
@@ -171,10 +163,8 @@ RAXML_NG_JOB_ID="$(sbatch --dependency="afterok:${INTELMPI_JOB_ID}" 'raxml-ng@1.
 SCOTCH_JOB_ID="$(sbatch --dependency="afterok:${INTELMPI_JOB_ID}" 'scotch@6.1.1.sh' | grep -o '[[:digit:]]*')"
   OPENFOAM_JOB_ID="$(sbatch --dependency="afterok:${ADIOS2_JOB_ID}:${SCOTCH_JOB_ID}:${ZOLTAN_JOB_ID}" 'openfoam@2106.sh' | grep -o '[[:digit:]]*')"
 
-sleep 1800
-
 cd "${SLURM_SUBMIT_DIR}/specs/gcc@10.2.0/openmpi@4.1.3"
-BOOST_JOB_ID="$(sbatch --dependency="afterok:${OPENMPI_JOB_ID}" 'boost@1.77.0.sh' | grep -o '[[:digit:]]*')"
+BOOST_JOB_ID="$(sbatch --dependency="afterok:${OPENMPI_JOB_ID}:${NUMPY_JOB_ID}" 'boost@1.77.0.sh' | grep -o '[[:digit:]]*')"
 GROMACS_JOB_ID="$(sbatch --dependency="afterok:${CUDA_JOB_ID}:${FFTW_JOB_ID}:${OPENMPI_JOB_ID}:${OPENBLAS_JOB_ID}" 'gromacs@2022.6.sh' | grep -o '[[:digit:]]*')"
 FFTW_JOB_ID="$(sbatch --dependency="afterok:${OPENMPI_JOB_ID}" 'fftw@3.3.10.sh' | grep -o '[[:digit:]]*')"
   FFTW_OMP_JOB_ID="$(sbatch --dependency="afterok:${OPENMPI_JOB_ID}" 'fftw@3.3.10-omp.sh' | grep -o '[[:digit:]]*')"
@@ -188,7 +178,6 @@ KAHIP_JOB_ID="$(sbatch --dependency="afterok:${OPENMPI_JOB_ID}" 'kahip@3.11.sh' 
 MPI4PY_JOB_ID="$(sbatch --dependency="afterok:${OPENMPI_JOB_ID}:${PYTHON_JOB_ID}" 'py-mpi4py@3.1.2.sh' | grep -o '[[:digit:]]*')"
   ADIOS2_JOB_ID="$(sbatch --dependency="afterok:${HDF5_JOB_ID}:${MPI4PY_JOB_ID}:${NUMPY_JOB_ID}" 'adios2@2.7.1.sh' | grep -o '[[:digit:]]*')"
   NEURON_JOB_ID="$(sbatch --dependency="afterok:${MPI4PY_JOB_ID}" 'neuron@8.0.0.sh' | grep -o '[[:digit:]]*')"
-sleep 900
 NETLIB_SCALAPACK_JOB_ID="$(sbatch --dependency="afterok:${OPENMPI_JOB_ID}:${OPENBLAS_JOB_ID}" 'netlib-scalapack@2.1.0.sh' | grep -o '[[:digit:]]*')"
   ELPA_JOB_ID="$(sbatch --dependency="afterok:${CUDA_JOB_ID}:${NETLIB_SCALAPACK_JOB_ID}" 'elpa@2021.05.001.sh' | grep -o '[[:digit:]]*')"
     QUANTUM_ESPRESSO_JOB_ID="$(sbatch --dependency="afterok:${HDF5_JOB_ID}:${ELPA_JOB_ID}" 'quantum-espresso@7.0.sh' | grep -o '[[:digit:]]*')"
