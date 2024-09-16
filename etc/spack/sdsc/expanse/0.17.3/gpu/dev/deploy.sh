@@ -62,7 +62,7 @@ cp -p yamls/compilers.yaml "${SPACK_INSTANCE_DIR}/etc/spack/compilers.yaml"
 cp -p yamls/modules.yaml "${SPACK_INSTANCE_DIR}/etc/spack/modules.yaml"
 cp -p yamls/packages.yaml "${SPACK_INSTANCE_DIR}/etc/spack/packages.yaml"
 
-#cd "${SLURM_SUBMIT_DIR}/specs"
+cd "${SLURM_SUBMIT_DIR}/specs"
 BZIP2_JOB_ID="$(sbatch 'bzip2@1.0.8.sh' | grep -o '[[:digit:]]*')"
   CURL_JOB_ID="$(sbatch --dependency="afterok:${BZIP2_JOB_ID}" 'curl@7.79.0.sh' | grep -o '[[:digit:]]*')"
     CMAKE_JOB_ID="$(sbatch --dependency="afterok:${CURL_JOB_ID}" 'cmake@3.21.4.sh' | grep -o '[[:digit:]]*')"
