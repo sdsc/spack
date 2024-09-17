@@ -51,7 +51,7 @@ module list
 declare -xr SPACK_PACKAGE='neuron@8.0.0'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
 declare -xr SPACK_VARIANTS='~caliper +coreneuron ~cross-compile ~interviews ~legacy-unit +mpi +python +rx3d ~tests'
-declare -xr SPACK_DEPENDENCIES="^py-numpy@1.21.3/$(spack find --format '{hash:7}' py-numpy@1.21.3 % ${SPACK_COMPILER} ^openblas@0.3.18 ~ilp64 threads=none) ^intel-mpi@2019.10.317/$(spack find --format '{hash:7}' intel-mpi@2019.10.317 % ${SPACK_COMPILER})"
+declare -xr SPACK_DEPENDENCIES="^intel-mpi@2019.10.317/$(spack find --format '{hash:7}' intel-mpi@2019.10.317 % ${SPACK_COMPILER}) ^py-numpy@1.21.3/$(spack find --format '{hash:7}' py-numpy@1.21.3 % ${SPACK_COMPILER} ^openblas@0.3.18 ~ilp64 threads=none)"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
