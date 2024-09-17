@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=beast2@2.6.4
+#SBATCH --job-name=sratoolkit@2.10.9
 #SBATCH --account=use300
 #SBATCH --clusters=expanse
 #SBATCH --partition=ind-shared
@@ -47,7 +47,7 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-declare -xr SPACK_PACKAGE='beast2@2.6.4'
+declare -xr SPACK_PACKAGE='sratoolkit@2.10.9'
 declare -xr SPACK_COMPILER='gcc@8.5.0'
 declare -xr SPACK_VARIANTS=''
 declare -xr SPACK_DEPENDENCIES=''
