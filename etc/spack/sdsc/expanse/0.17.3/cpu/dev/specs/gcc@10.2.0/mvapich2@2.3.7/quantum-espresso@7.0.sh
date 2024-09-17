@@ -63,7 +63,7 @@ spack config get packages
 spack config get repos
 spack config get upstreams
 
-time -p spack spec --long --namespaces --types --reuse quantum-espresso@7.0 % gcc@10.2.0 +cmake +elpa ~environ +epw ~ipo hdf5=parallel +libxc +mpi ~openmp +patch +qmcpack +scalapack "${SPACK_DEPENDENCIES}"
+time -p spack spec --long --namespaces --types --reuse quantum-espresso@7.0 % "${SPACK_COMPILER}" +cmake +elpa ~environ +epw ~ipo hdf5='parallel' +libxc +mpi ~openmp +patch +qmcpack +scalapack "${SPACK_DEPENDENCIES}"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack concretization failed.'
   exit 1
@@ -71,7 +71,7 @@ fi
 
 mkdir -p "${TMPDIR}"
 
-time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all --reuse quantum-espresso@7.0 % gcc@10.2.0 +cmake +elpa ~environ +epw ~ipo hdf5=parallel +libxc +mpi ~openmp +patch +qmcpack +scalapack "${SPACK_DEPENDENCIES}"
+time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all --reuse quantum-espresso@7.0 % "${SPACK_COMPILER}" +cmake +elpa ~environ +epw ~ipo hdf5='parallel' +libxc +mpi ~openmp +patch +qmcpack +scalapack "${SPACK_DEPENDENCIES}"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
   exit 1
