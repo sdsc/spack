@@ -63,7 +63,7 @@ spack config get packages
 spack config get repos
 spack config get upstreams
 
-time -p spack spec --long --namespaces --types --reuse charmpp@6.10.2 % gcc@10.2.0 backend=mpi build-target=charm++ ~cuda +omp ~papi pmi=none +production ~pthreads +shared +smp ~syncft ~tcp ~tracing "${SPACK_DEPENDENCIES}"
+time -p spack spec --long --namespaces --types --reuse charmpp@6.10.2 % "${SPACK_COMPILER}" backend='mpi' build-target='charm++' ~cuda +omp ~papi pmi='none' +production ~pthreads +shared +smp ~syncft ~tcp ~tracing "${SPACK_DEPENDENCIES}"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack concretization failed.'
   exit 1
@@ -71,7 +71,7 @@ fi
 
 mkdir -p "${TMPDIR}"
 
-time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all --reuse charmpp@6.10.2 % gcc@10.2.0 backend=mpi build-target=charm++ ~cuda +omp ~papi pmi=none +production ~pthreads +shared +smp ~syncft ~tcp ~tracing "${SPACK_DEPENDENCIES}"
+time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all --reuse charmpp@6.10.2 % "${SPACK_COMPILER}" backend='mpi' build-target='charm++' ~cuda +omp ~papi pmi=none +production ~pthreads +shared +smp ~syncft ~tcp ~tracing "${SPACK_DEPENDENCIES}"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
   exit 1
