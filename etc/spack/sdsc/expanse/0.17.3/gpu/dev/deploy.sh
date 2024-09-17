@@ -92,6 +92,7 @@ CUDA_JOB_ID="$(sbatch --dependency="afterok::${GCC_JOB_ID}" 'cuda@11.2.2.sh' | g
   CUDNN_JOB_ID="$(sbatch --dependency="afterok:${CUDA_JOB_ID}" 'cudnn@8.1.1.33-11.2.sh' | grep -o '[[:digit:]]*')"
   LIBXC_JOB_ID="$(sbatch --dependency="afterok:${CUDA_JOB_ID}" 'libxc@5.1.5.sh' | grep -o '[[:digit:]]*')"
   LIBBEAGLE_JOB_ID="$(sbatch --dependency="afterok:${CUDA_JOB_ID}" 'libbeagle@3.1.2.sh' | grep -o '[[:digit:]]*')"
+    BEAST2_JOB_ID="$(sbatch --dependency="afterok:${LIBBEAGLE_JOB_ID}" 'beast2@2.6.4.sh' | grep -o '[[:digit:]]*')"
   NCCL_JOB_ID="$(sbatch --dependency="afterok:${CUDA_JOB_ID}" 'nccl@2.8.4-1.sh' | grep -o '[[:digit:]]*')"
 EIGEN_JOB_ID="$(sbatch --dependency="afterok:${GCC_JOB_ID}" 'eigen@3.4.0.sh' | grep -o '[[:digit:]]*')"
   FFTW_JOB_ID="$(sbatch --dependency="afterok:${EIGEN_JOB_ID}" 'fftw@3.3.10.sh' | grep -o '[[:digit:]]*')"
