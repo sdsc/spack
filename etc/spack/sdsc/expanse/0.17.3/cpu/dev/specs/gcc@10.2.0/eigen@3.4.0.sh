@@ -50,7 +50,7 @@ module list
 declare -xr SPACK_PACKAGE='eigen@3.4.0'
 declare -xr SPACK_COMPILER='gcc@10.2.0'
 declare -xr SPACK_VARIANTS='~ipo'
-declare -xr SPACK_DEPENDENCIES=''
+declare -xr SPACK_DEPENDENCIES="^cmake@3.21.4 % ${SPACK_COMPILER} arch=linux-rocky8-zen2"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
