@@ -63,7 +63,7 @@ spack config get packages
 spack config get repos
 spack config get upstreams
 
-time -p spack spec --long --namespaces --types --reuse wps@4.2 % gcc@10.2.0 build_type='dmpar' "^wrf@4.2/$(spack find --format '{hash:7}' wrf@4.2 % ${SPACK_COMPILER} ^mvapich2@2.3.7)" 
+time -p spack spec --long --namespaces --types --reuse wps@4.2 % "${SPACK_COMPILER}" build_type='dmpar' "${SPACK_DEPENDENCIES}" 
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack concretization failed.'
   exit 1
@@ -71,7 +71,7 @@ fi
 
 mkdir -p "${TMPDIR}"
 
-time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all --reuse wps@4.2 % gcc@10.2.0 build_type='dmpar' "^wrf@4.2/$(spack find --format '{hash:7}' wrf@4.2 % ${SPACK_COMPILER} ^mvapich2@2.3.7)"
+time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all --reuse wps@4.2 % "${SPACK_COMPILER}" build_type='dmpar' "${SPACK_DEPENDENCIES}"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
   exit 1
