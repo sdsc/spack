@@ -63,7 +63,7 @@ spack config get packages
 spack config get repos
 spack config get upstreams
 
-time -p spack spec --long --namespaces --types --reuse wrf@4.2 % aocc@3.2.0 build_type=dm+sm compile_type=em_real nesting=basic +pnetcdf "${SPACK_DEPENDENCIES}"
+time -p spack spec --long --namespaces --types --reuse wrf@4.2 % "${SPACK_COMPILER}" build_type='dm+sm' compile_type='em_real' nesting='basic' +pnetcdf "${SPACK_DEPENDENCIES}"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack concretization failed.'
   exit 1
@@ -71,7 +71,7 @@ fi
 
 mkdir -p "${TMPDIR}"
 
-time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all --reuse wrf@4.2 % aocc@3.2.0 build_type=dm+sm compile_type=em_real nesting=basic +pnetcdf "${SPACK_DEPENDENCIES}"
+time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all --reuse wrf@4.2 % "${SPACK_COMPILER}" build_type='dm+sm' compile_type='em_real' nesting='basic' +pnetcdf "${SPACK_DEPENDENCIES}"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
   exit 1
