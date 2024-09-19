@@ -133,9 +133,11 @@ INTELMPI_JOB_ID="$(sbatch --dependency="afterok:${GCC_JOB_ID}" 'intel-mpi@2019.1
 
 cd "${SLURM_SUBMIT_DIR}/specs/gcc@10.2.0/intel-mpi@2019.10.317"
 BOOST_JOB_ID="$(sbatch --dependency="afterok:${INTELMPI_JOB_ID}:${NUMPY_JOB_ID}" 'boost@1.77.0.sh' | grep -o '[[:digit:]]*')"
-GROMACS_JOB_ID="$(sbatch --dependency="afterok:${CUDA_JOB_ID}:${FFTW_JOB_ID}:${INTELMPI_JOB_ID}:${OPENBLAS_JOB_ID}" 'gromacs@2022.6.sh' | grep -o '[[:digit:]]*')"
+#CHARMPP_JOB_ID="$(sbatch --dependency="afterok:${INTELMPI_JOB_ID}" 'charmpp@6.10.2.sh' | grep -o '[[:digit:]]*')"
+#  NAMD2_JOB_ID="$(sbatch --dependency="afterok:${CHARMPP_JOB_ID}:${FFTW_JOB_ID}" 'namd@2.14.sh' | grep -o '[[:digit:]]*')"
 FFTW_JOB_ID="$(sbatch --dependency="afterok:${INTELMPI_JOB_ID}" 'fftw@3.3.10.sh' | grep -o '[[:digit:]]*')"
   FFTW_OMP_JOB_ID="$(sbatch --dependency="afterok:${INTELMPI_JOB_ID}" 'fftw@3.3.10-omp.sh' | grep -o '[[:digit:]]*')"
+GROMACS_JOB_ID="$(sbatch --dependency="afterok:${CUDA_JOB_ID}:${FFTW_JOB_ID}:${INTELMPI_JOB_ID}:${OPENBLAS_JOB_ID}" 'gromacs@2022.6.sh' | grep -o '[[:digit:]]*')"
 HDF5_JOB_ID="$(sbatch --dependency="afterok:${INTELMPI_JOB_ID}" 'hdf5@1.10.7.sh' | grep -o '[[:digit:]]*')"
 HPL_JOB_ID="$(sbatch --dependency="afterok:${INTELMPI_JOB_ID}:${OPENBLAS_JOB_ID}" 'hpl@2.3.sh' | grep -o '[[:digit:]]*')"
   HPL_I64_JOB_ID="$(sbatch --dependency="afterok:${HPL_JOB_ID}:${OPENBLAS_I64_JOB_ID}" 'hpl@2.3-i64.sh' | grep -o '[[:digit:]]*')"
