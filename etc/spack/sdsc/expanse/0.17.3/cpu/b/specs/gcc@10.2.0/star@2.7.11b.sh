@@ -2,6 +2,7 @@
 
 #SBATCH --job-name=star@2.7.11b
 #SBATCH --account=use300
+#SBATCH --reservation=root_73
 #SBATCH --partition=ind-shared
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
