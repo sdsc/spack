@@ -14,8 +14,6 @@
 declare -xir UNIX_TIME="$(date +'%s')"
 declare -xr LOCAL_TIME="$(date +'%Y%m%dT%H%M%S%z')"
 
-declare -xr LOCAL_SCRATCH_DIR="/scratch/${USER}/job_${SLURM_JOB_ID}"
-
 declare -xr JOB_SCRIPT="$(scontrol show job ${SLURM_JOB_ID} | awk -F= '/Command=/{print $2}')"
 declare -xr JOB_SCRIPT_MD5="$(md5sum ${JOB_SCRIPT} | awk '{print $1}')"
 declare -xr JOB_SCRIPT_SHA256="$(sha256sum ${JOB_SCRIPT} | awk '{print $1}')"
@@ -35,9 +33,6 @@ declare -xr SPACK_VERSION="${SPACK_MAJOR}.${SPACK_MINOR}.${SPACK_REVISION}"
 declare -xr SPACK_INSTANCE_NAME='cpu'
 declare -xr SPACK_INSTANCE_VERSION='dev'
 declare -xr SPACK_INSTANCE_DIR='/home/mkandes/software/spack/repos/sdsc/spack'
-
-declare -xr TMPDIR="${LOCAL_SCRATCH_DIR}/spack-stage"
-declare -xr TMP="${TMPDIR}"
 
 echo "${UNIX_TIME} ${LOCAL_TIME} ${SLURM_JOB_ID} ${JOB_SCRIPT_MD5} ${JOB_SCRIPT_SHA256} ${JOB_SCRIPT_NUMBER_OF_LINES} ${JOB_SCRIPT}"
 cat  "${JOB_SCRIPT}"
@@ -60,42 +55,32 @@ cp -p yamls/compilers.yaml "${SPACK_INSTANCE_DIR}/etc/spack/compilers.yaml"
 cp -p yamls/modules.yaml "${SPACK_INSTANCE_DIR}/etc/spack/modules.yaml"
 cp -p yamls/packages.yaml "${SPACK_INSTANCE_DIR}/etc/spack/packages.yaml"
 
-spack find aocc@3.2.0 % gcc@8.5.0
-if [[ "${?}" -ne 0 ]]; then
-  echo 'ERROR: You must first manually run:'
-  echo '  spack install aocc@3.2.0 % gcc@8.5.0 +license-agreed'
-  exit 1
-fi
+cd "${SLURM_SUBMIT_DIR}/specs"
+BZIP2_JOB_ID="$(sbatch 'bzip2@1.0.8.sh' | grep -o '[[:digit:]]*')"
+  CURL_JOB_ID="$(sbatch --dependency="afterok:${BZIP2_JOB_ID}" 'curl@8.4.0.sh' | grep -o '[[:digit:]]*')"
+    AOCC_JOB_ID="$(sbatch --dependency="afterok:${CURL_JOB_ID}" 'aocc@4.2.0.sh' | grep -o '[[:digit:]]*')"
+    CMAKE_JOB_ID="$(sbatch --dependency="afterok:${CURL_JOB_ID}" 'cmake@3.27.7.sh' | grep -o '[[:digit:]]*')"
+    GCC_JOB_ID="$(sbatch --dependency="afterok:${CURL_JOB_ID}" 'gcc@13.3.0.sh' | grep -o '[[:digit:]]*')"
+      SQLITE_JOB_ID="$(sbatch --dependency="afterok:${CMAKE_JOB_ID}:${GCC_JOB_ID}" 'sqlite@3.43.2.sh' | grep -o '[[:digit:]]*')"
+        ARIA2_JOB_ID="$(sbatch --dependency="afterok:${SQLITE_JOB_ID}" 'aria2@1.37.0.sh' | grep -o '[[:digit:]]*')"
+        GDB_JOB_ID="$(sbatch --dependency="afterok:${SQLITE_JOB_ID}" 'gdb@14.2.sh' | grep -o '[[:digit:]]*')"
+          MERCURIAL_JOB_ID="$(sbatch --dependency="afterok:${GDB_JOB_ID}" 'mercurial@6.8.1.sh' | grep -o '[[:digit:]]*')"
+    PERL_JOB_ID="$(sbatch --dependency="afterok:${CURL_JOB_ID}" 'perl@5.38.2.sh' | grep -o '[[:digit:]]*')"
+      ENTREZDIRECT_JOB_ID="$(sbatch --dependency="afterok:${PERL_JOB_ID}" 'entrezdirect@22.6.20240924.sh' | grep -o '[[:digit:]]*')"
+      GIT_JOB_ID="$(sbatch --dependency="afterok:${PERL_JOB_ID}" 'git@2.45.2.sh' | grep -o '[[:digit:]]*')"
+        GO_JOB_ID="$(sbatch --dependency="afterok:${GIT_JOB_ID}" 'go@1.23.1.sh' | grep -o '[[:digit:]]*')"
+          GITLFS_JOB_ID="$(sbatch --dependency="afterok:${GO_JOB_ID}" 'git-lfs@3.5.1.sh' | grep -o '[[:digit:]]*')"
+          GH_JOB_ID="$(sbatch --dependency="afterok:${GO_JOB_ID}" 'gh@2.57.0.sh' | grep -o '[[:digit:]]*')"
+          RCLONE_JOB_ID="$(sbatch --dependency="afterok:${GO_JOB_ID}" 'rclone@1.68.1.sh' | grep -o '[[:digit:]]*')"
+      PARALLEL_JOB_ID="$(sbatch --dependency="afterok:${PERL_JOB_ID}" 'parallel@20240922.sh' | grep -o '[[:digit:]]*')"
+      SUBVERSION_JOB_ID="$(sbatch --dependency="afterok:${GDB_JOB_ID}:${PERL_JOB_ID}:${SQLITE_JOB_ID}" 'subversion@1.14.3.sh' | grep -o '[[:digit:]]*')"
+    PIGZ_JOB_ID="$(sbatch --dependency="afterok:${CURL_JOB_ID}" 'pigz@2.8.sh' | grep -o '[[:digit:]]*')"
+      TAR_JOB_ID="$(sbatch --dependency="afterok:${PIGZ_JOB_ID}" 'tar@1.34.sh' | grep -o '[[:digit:]]*')"
+  #NVHPC_JOB_ID="$(sbatch --dependency="afterok:${BZIP2_JOB_ID}" 'nvhpc@21.9.sh' | grep -o '[[:digit:]]*')"
+  OPENJDK_JOB_ID="$(sbatch --dependency="afterok:${BZIP2_JOB_ID}" 'openjdk@11.0.24_8.sh' | grep -o '[[:digit:]]*')"
+  SRATOOLKIT_JOB_ID="$(sbatch --dependency="afterok:${BZIP2_JOB_ID}" 'sratoolkit@3.1.1.sh' | grep -o '[[:digit:]]*')"
 
-#sed -i "s|PATH_TO_AMD_CLANG_3_2_0|$(spack location -i 'aocc@3.2.0')/bin/clang|g" "${SPACK_INSTANCE_DIR}/etc/spack/compilers.yaml"
-#sed -i "s|PATH_TO_AMD_CLANG++_3_2_0|$(spack location -i 'aocc@3.2.0')/bin/clang++|g" "${SPACK_INSTANCE_DIR}/etc/spack/compilers.yaml"
-#sed -i "s|PATH_TO_AMD_FLANG_3_2_0|$(spack location -i 'aocc@3.2.0')/bin/flang|g" "${SPACK_INSTANCE_DIR}/etc/spack/compilers.yaml"
-#sed -i "s|PATH_TO_AMD_FLANG_3_2_0|$(spack location -i 'aocc@3.2.0')/bin/flang|g" "${SPACK_INSTANCE_DIR}/etc/spack/compilers.yaml"
-#
-#cd "${SLURM_SUBMIT_DIR}/specs"
-#BZIP2_JOB_ID="$(sbatch 'bzip2@1.0.8.sh' | grep -o '[[:digit:]]*')"
-#  CURL_JOB_ID="$(sbatch --dependency="afterok:${BZIP2_JOB_ID}" 'curl@7.79.0.sh' | grep -o '[[:digit:]]*')"
-#    CMAKE_JOB_ID="$(sbatch --dependency="afterok:${CURL_JOB_ID}" 'cmake@3.21.4.sh' | grep -o '[[:digit:]]*')"
-#    GCC_JOB_ID="$(sbatch --dependency="afterok:${CURL_JOB_ID}" 'gcc@10.2.0.sh' | grep -o '[[:digit:]]*')"
-#      SQLITE_JOB_ID="$(sbatch --dependency="afterok:${CMAKE_JOB_ID}:${GCC_JOB_ID}" 'sqlite@3.36.0.sh' | grep -o '[[:digit:]]*')"
-#        ARIA2_JOB_ID="$(sbatch --dependency="afterok:${SQLITE_JOB_ID}" 'aria2@1.35.0.sh' | grep -o '[[:digit:]]*')"
-#        GDB_JOB_ID="$(sbatch --dependency="afterok:${SQLITE_JOB_ID}" 'gdb@11.1.sh' | grep -o '[[:digit:]]*')"
-#          MERCURIAL_JOB_ID="$(sbatch --dependency="afterok:${GDB_JOB_ID}" 'mercurial@5.8.sh' | grep -o '[[:digit:]]*')"
-#    PERL_JOB_ID="$(sbatch --dependency="afterok:${CURL_JOB_ID}" 'perl@5.32.0.sh' | grep -o '[[:digit:]]*')"
-#      ENTREZDIRECT_JOB_ID="$(sbatch --dependency="afterok:${PERL_JOB_ID}" 'entrezdirect@10.7.20190114.sh' | grep -o '[[:digit:]]*')"
-#      GIT_JOB_ID="$(sbatch --dependency="afterok:${PERL_JOB_ID}" 'git@2.31.1.sh' | grep -o '[[:digit:]]*')"
-#        GO_JOB_ID="$(sbatch --dependency="afterok:${GIT_JOB_ID}" 'go@1.17.2.sh' | grep -o '[[:digit:]]*')"
-#          GITLFS_JOB_ID="$(sbatch --dependency="afterok:${GO_JOB_ID}" 'git-lfs@2.11.0.sh' | grep -o '[[:digit:]]*')"
-#          GH_JOB_ID="$(sbatch --dependency="afterok:${GO_JOB_ID}" 'gh@2.0.0.sh' | grep -o '[[:digit:]]*')"
-#          RCLONE_JOB_ID="$(sbatch --dependency="afterok:${GO_JOB_ID}" 'rclone@1.56.2.sh' | grep -o '[[:digit:]]*')"
-#      PARALLEL_JOB_ID="$(sbatch --dependency="afterok:${PERL_JOB_ID}" 'parallel@20210922.sh' | grep -o '[[:digit:]]*')"
-#      SUBVERSION_JOB_ID="$(sbatch --dependency="afterok:${GDB_JOB_ID}:${PERL_JOB_ID}:${SQLITE_JOB_ID}" 'subversion@1.14.0.sh' | grep -o '[[:digit:]]*')"
-#    PIGZ_JOB_ID="$(sbatch --dependency="afterok:${CURL_JOB_ID}" 'pigz@2.6.sh' | grep -o '[[:digit:]]*')"
-#  #NVHPC_JOB_ID="$(sbatch --dependency="afterok:${BZIP2_JOB_ID}" 'nvhpc@21.9.sh' | grep -o '[[:digit:]]*')"
-#  OPENJDK_JOB_ID="$(sbatch --dependency="afterok:${BZIP2_JOB_ID}" 'openjdk@11.0.12_7.sh' | grep -o '[[:digit:]]*')"
-#  SRATOOLKIT_JOB_ID="$(sbatch --dependency="afterok:${BZIP2_JOB_ID}" 'sratoolkit@2.10.9.sh' | grep -o '[[:digit:]]*')"
-#
-#cd "${SLURM_SUBMIT_DIR}/specs/gcc@10.2.0"
+#cd "${SLURM_SUBMIT_DIR}/specs/gcc@13.3.0"
 #CHARMPP_JOB_ID="$(sbatch --dependency="afterok:${GCC_JOB_ID}" 'charmpp@6.10.2.sh' | grep -o '[[:digit:]]*')"
 #EIGEN_JOB_ID="$(sbatch --dependency="afterok:${GCC_JOB_ID}" 'eigen@3.4.0.sh' | grep -o '[[:digit:]]*')"
 #  AMDFFTW_JOB_ID="$(sbatch --dependency="afterok:${EIGEN_JOB_ID}" 'amdfftw@3.1.sh' | grep -o '[[:digit:]]*')"
@@ -149,7 +134,7 @@ fi
 #INTELMKL_JOB_ID="$(sbatch --dependency="afterok:${GCC_JOB_ID}" 'intel-mkl@2020.4.304.sh' | grep -o '[[:digit:]]*')"
 #INTELMPI_JOB_ID="$(sbatch --dependency="afterok:${GCC_JOB_ID}" 'intel-mpi@2019.10.317.sh' | grep -o '[[:digit:]]*')"
 #
-#cd "${SLURM_SUBMIT_DIR}/specs/gcc@10.2.0/mvapich2@2.3.7"
+#cd "${SLURM_SUBMIT_DIR}/specs/gcc@13.3.0/mvapich2@2.3.7"
 #AMDFFTW_JOB_ID="$(sbatch --dependency="afterok:${MVAPICH2_JOB_ID}" 'amdfftw@3.1.sh' | grep -o '[[:digit:]]*')"
 #  AMDFFTW_OMP_JOB_ID="$(sbatch --dependency="afterok:${AMDFFTW_JOB_ID}" 'amdfftw@3.1-omp.sh' | grep -o '[[:digit:]]*')"
 #AMDSCALAPACK_JOB_ID="$(sbatch --dependency="afterok:${AMDBLIS_JOB_ID}:${AMDLIBFLAME_JOB_ID}:${MVAPICH2_JOB_ID}" 'amdscalapack@3.1.sh' | grep -o '[[:digit:]]*')"
@@ -187,7 +172,7 @@ fi
 #SCOTCH_JOB_ID="$(sbatch --dependency="afterok:${MVAPICH2_JOB_ID}" 'scotch@6.1.1.sh' | grep -o '[[:digit:]]*')"
 #  OPENFOAM_JOB_ID="$(sbatch --dependency="afterok:${ADIOS2_JOB_ID}:${SCOTCH_JOB_ID}:${ZOLTAN_JOB_ID}" 'openfoam@2106.sh' | grep -o '[[:digit:]]*')"
 #
-#cd "${SLURM_SUBMIT_DIR}/specs/gcc@10.2.0/openmpi@4.1.3"
+#cd "${SLURM_SUBMIT_DIR}/specs/gcc@13.3.0/openmpi@4.1.3"
 #AMDFFTW_JOB_ID="$(sbatch --dependency="afterok:${OPENMPI_JOB_ID}" 'amdfftw@3.1.sh' | grep -o '[[:digit:]]*')"
 #  AMDFFTW_OMP_JOB_ID="$(sbatch --dependency="afterok:${AMDFFTW_JOB_ID}" 'amdfftw@3.1-omp.sh' | grep -o '[[:digit:]]*')"
 #AMDSCALAPACK_JOB_ID="$(sbatch --dependency="afterok:${AMDBLIS_JOB_ID}:${AMDLIBFLAME_JOB_ID}:${OPENMPI_JOB_ID}" 'amdscalapack@3.1.sh' | grep -o '[[:digit:]]*')"
@@ -226,10 +211,7 @@ fi
 #  OPENFOAM_JOB_ID="$(sbatch --dependency="afterok:${ADIOS2_JOB_ID}:${SCOTCH_JOB_ID}:${ZOLTAN_JOB_ID}" 'openfoam@2106.sh' | grep -o '[[:digit:]]*')"
 #
 #
-#cd "${SLURM_SUBMIT_DIR}/specs"
-#AOCC_JOB_ID="$(sbatch 'aocc@3.2.0.sh' | grep -o '[[:digit:]]*')"
-#
-#cd "${SLURM_SUBMIT_DIR}/specs/aocc@3.2.0"
+#cd "${SLURM_SUBMIT_DIR}/specs/aocc@4.2.0"
 #CHARMPP_JOB_ID="$(sbatch --dependency="afterok:${AOCC_JOB_ID}" 'charmpp@6.10.2.sh' | grep -o '[[:digit:]]*')"
 #EIGEN_JOB_ID="$(sbatch --dependency="afterok:${AOCC_JOB_ID}" 'eigen@3.4.0.sh' | grep -o '[[:digit:]]*')"
 #  AMDFFTW_JOB_ID="$(sbatch --dependency="afterok:${EIGEN_JOB_ID}" 'amdfftw@3.1.sh' | grep -o '[[:digit:]]*')"
@@ -281,7 +263,7 @@ fi
 #  UCX_JOB_ID="$(sbatch --dependency="afterok:${EIGEN_JOB_ID}" 'ucx@1.10.1.sh' | grep -o '[[:digit:]]*')"
 #    OPENMPI_JOB_ID="$(sbatch --dependency="afterok:${UCX_JOB_ID}" 'openmpi@4.1.3.sh' | grep -o '[[:digit:]]*')"
 #
-#cd "${SLURM_SUBMIT_DIR}/specs/aocc@3.2.0/mvapich2@2.3.7"
+#cd "${SLURM_SUBMIT_DIR}/specs/aocc@4.2.0/mvapich2@2.3.7"
 #AMDFFTW_JOB_ID="$(sbatch --dependency="afterok:${MVAPICH2_JOB_ID}" 'amdfftw@3.1.sh' | grep -o '[[:digit:]]*')"
 #  AMDFFTW_OMP_JOB_ID="$(sbatch --dependency="afterok:${AMDFFTW_JOB_ID}" 'amdfftw@3.1-omp.sh' | grep -o '[[:digit:]]*')"
 #AMDSCALAPACK_JOB_ID="$(sbatch --dependency="afterok:${AMDBLIS_JOB_ID}:${AMDLIBFLAME_JOB_ID}:${MVAPICH2_JOB_ID}" 'amdscalapack@3.1.sh' | grep -o '[[:digit:]]*')"
