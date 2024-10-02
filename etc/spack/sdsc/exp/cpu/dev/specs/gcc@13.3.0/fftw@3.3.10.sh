@@ -14,8 +14,6 @@
 declare -xir UNIX_TIME="$(date +'%s')"
 declare -xr LOCAL_TIME="$(date +'%Y%m%dT%H%M%S%z')"
 
-declare -xr LOCAL_SCRATCH_DIR="/scratch/${USER}/job_${SLURM_JOB_ID}"
-
 declare -xr JOB_SCRIPT="$(scontrol show job ${SLURM_JOB_ID} | awk -F= '/Command=/{print $2}')"
 declare -xr JOB_SCRIPT_MD5="$(md5sum ${JOB_SCRIPT} | awk '{print $1}')"
 declare -xr JOB_SCRIPT_SHA256="$(sha256sum ${JOB_SCRIPT} | awk '{print $1}')"
@@ -36,7 +34,7 @@ declare -xr SPACK_INSTANCE_NAME='cpu'
 declare -xr SPACK_INSTANCE_VERSION='dev'
 declare -xr SPACK_INSTANCE_DIR='/home/mkandes/software/spack/repos/sdsc/spack'
 
-declare -xr TMPDIR="${LOCAL_SCRATCH_DIR}/spack-stage"
+declare -xr TMPDIR="${SLURM_TMPDIR}/spack-stage"
 declare -xr TMP="${TMPDIR}"
 
 echo "${UNIX_TIME} ${LOCAL_TIME} ${SLURM_JOB_ID} ${JOB_SCRIPT_MD5} ${JOB_SCRIPT_SHA256} ${JOB_SCRIPT_NUMBER_OF_LINES} ${JOB_SCRIPT}"

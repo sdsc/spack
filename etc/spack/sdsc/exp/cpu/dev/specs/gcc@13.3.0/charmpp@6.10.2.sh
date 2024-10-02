@@ -61,7 +61,7 @@ spack config get packages
 spack config get repos
 spack config get upstreams
 
-time -p spack spec --long --namespaces --types --reuse charmpp@6.10.2 % "${SPACK_COMPILER}" backend='multicore' build-target='charm++' ~cuda ~omp ~papi pmi='none' +production ~pthreads +shared +smp ~syncft ~tcp ~tracing "${SPACK_DEPENDENCIES}"
+time -p spack spec --long --namespaces --types --reuse "$(echo ${SPACK_SPEC})"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack concretization failed.'
   exit 1
@@ -69,7 +69,7 @@ fi
 
 mkdir -p "${TMPDIR}"
 
-time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all --reuse charmpp@6.10.2 % "${SPACK_COMPILER}" backend='multicore' build-target='charm++' ~cuda ~omp ~papi pmi='none' +production ~pthreads +shared +smp ~syncft ~tcp ~tracing "${SPACK_DEPENDENCIES}"
+time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all --reuse "$(echo ${SPACK_SPEC})"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
   exit 1
