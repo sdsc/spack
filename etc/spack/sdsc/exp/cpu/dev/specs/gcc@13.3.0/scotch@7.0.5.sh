@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=iq-tree@2.3.6
+#SBATCH --job-name=scotch@7.0.5
 #SBATCH --account=use300
 #SBATCH --clusters=expanse
 #SBATCH --partition=ind-shared
@@ -45,10 +45,10 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-declare -xr SPACK_PACKAGE='iq-tree@2.3.6'
+declare -xr SPACK_PACKAGE='scotch@7.0.5'
 declare -xr SPACK_COMPILER='gcc@13.3.0'
-declare -xr SPACK_VARIANTS='~ipo +lsd2 ~mpi +openmp'
-declare -xr SPACK_DEPENDENCIES="^boost@1.86.0/$(spack find --format '{hash:7}' boost@1.86.0 % ${SPACK_COMPILER} ~mpi) ^eigen@3.4.0/$(spack find --format '{hash:7}' eigen@3.4.0 % ${SPACK_COMPILER})"
+declare -xr SPACK_VARIANTS='+compression +esmumps ~int64 ~ipo +metis ~mpi ~mpi_thread +shared +threads'
+declare -xr SPACK_DEPENDENCIES=''
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
