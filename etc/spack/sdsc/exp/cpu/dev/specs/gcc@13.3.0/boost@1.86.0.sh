@@ -47,8 +47,8 @@ module list
 
 declare -xr SPACK_PACKAGE='boost@1.86.0'
 declare -xr SPACK_COMPILER='gcc@13.3.0'
-declare -xr SPACK_VARIANTS='~atomic ~chrono ~clanglibcpp ~container ~context ~coroutine ~date_time ~debug ~exception ~fiber ~filesystem ~graph ~graph_parallel ~icu ~iostreams ~json ~locale ~log ~math ~mpi +multithreaded ~nowide ~numpy +pic ~program_options ~python ~random ~regex ~serialization +shared ~signals ~singlethreaded ~stacktrace ~system ~taggedlayout ~test ~thread ~timer ~type_erasure ~versionedlayout ~wave'
-declare -xr SPACK_DEPENDENCIES='' #"^py-numpy@2.1.2/$(spack find --format '{hash:7}' py-numpy@2.1.2 % ${SPACK_COMPILER} ^openblas@0.3.28 ~ilp64 threads=none)"
+declare -xr SPACK_VARIANTS='+atomic +chrono ~clanglibcpp +container +context +coroutine +date_time ~debug +exception +fiber +filesystem +graph +graph_parallel ~icu +iostreams +json +locale +log +math ~mpi +multithreaded ~nowide +numpy +pic +program_options +python +random +regex +serialization +shared ~signals ~singlethreaded +stacktrace +system ~taggedlayout +test +thread +timer +type_erasure ~versionedlayout +wave'
+declare -xr SPACK_DEPENDENCIES="^py-numpy@1.26.4/$(spack find --format '{hash:7}' py-numpy@1.26.4 % ${SPACK_COMPILER} ^openblas@0.3.28 ~ilp64 threads=none)"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
