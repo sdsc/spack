@@ -48,7 +48,8 @@ module list
 declare -xr SPACK_PACKAGE='amdfftw@4.2'
 declare -xr SPACK_COMPILER='gcc@13.3.0'
 declare -xr SPACK_VARIANTS='+amd-dynamic-dispatcher ~amd-fast-planner ~amd-mpi-vader-limit ~debug +mpi ~openmp +shared +static ~threads'
-declare -xr SPACK_DEPENDENCIES="^mvapich2@2.3.7-2/$(spack find --format '{hash:7}' mvapich2@2.3.7-2 % ${SPACK_COMPILER})"
+declare -xr SPACK_MPI='mvapich2@2.3.7-2'
+declare -xr SPACK_DEPENDENCIES="^${SPACK_MPI}/$(spack find --format '{hash:7}' ${SPACK_MPI} % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
