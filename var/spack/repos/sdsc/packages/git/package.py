@@ -102,7 +102,7 @@ class Git(AutotoolsPackage):
             when="@{0} +man".format(_version),
         )
 
-    variant("tcltk", default=False, description="Gitk: provide Tcl/Tk in the run environment")
+    variant("tcltk", default=True, description="Gitk: provide Tcl/Tk in the run environment")
     variant("svn", default=False, description="Provide SVN Perl dependency in run environment")
     variant("perl", default=True, description="Do not use Perl scripts or libraries at all")
     variant("nls", default=True, description="Enable native language support")
