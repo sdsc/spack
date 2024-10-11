@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=wrf@4.6.0
+#SBATCH --job-name=wps@4.6.0
 #SBATCH --account=use300
 #SBATCH --clusters=expanse
 #SBATCH --partition=ind-shared
@@ -45,11 +45,11 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-declare -xr SPACK_PACKAGE='wrf@4.6.0'
+declare -xr SPACK_PACKAGE='wps@4.6.0'
 declare -xr SPACK_COMPILER='gcc@13.3.0'
-declare -xr SPACK_VARIANTS='~adios2 build_type=dmpar compile_type=em_real nesting=basic ~netcdf_classic +pnetcdf'
+declare -xr SPACK_VARIANTS='build_type=dmpar'
 declare -xr SPACK_MPI='mvapich2@2.3.7-2'
-declare -xr SPACK_DEPENDENCIES="^hdf5@1.14.3/$(spack find --format '{hash:7}' hdf5@1.14.3 % ${SPACK_COMPILER} +mpi ^${SPACK_MPI}) ^parallel-netcdf@1.13.0/$(spack find --format '{hash:7}' parallel-netcdf@1.13.0 % ${SPACK_COMPILER} ^${SPACK_MPI}) ^netcdf-c@4.9.2/$(spack find --format '{hash:7}' netcdf-c@4.9.2 % ${SPACK_COMPILER} +mpi +parallel-netcdf ^${SPACK_MPI})"
+declare -xr SPACK_DEPENDENCIES="^wrf@4.6.0/$(spack find --format '{hash:7}' wrf@4.6.0 % ${SPACK_COMPILER} ^${SPACK_MPI})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
