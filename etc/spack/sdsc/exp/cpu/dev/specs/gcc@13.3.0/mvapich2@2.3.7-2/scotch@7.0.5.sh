@@ -47,7 +47,7 @@ module list
 
 declare -xr SPACK_PACKAGE='scotch@7.0.5'
 declare -xr SPACK_COMPILER='gcc@13.3.0'
-declare -xr SPACK_VARIANTS='+compression +esmumps ~int64 ~ipo +metis +mpi +mpi_thread +shared +threads'
+declare -xr SPACK_VARIANTS='+compression +esmumps ~int64 ~ipo ~metis +mpi +mpi_thread +shared +threads'
 declare -xr SPACK_MPI='mvapich2@2.3.7-2'
 declare -xr SPACK_DEPENDENCIES="^${SPACK_MPI}/$(spack find --format '{hash:7}' ${SPACK_MPI} % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"

@@ -49,7 +49,7 @@ declare -xr SPACK_PACKAGE='adios2@2.10.1'
 declare -xr SPACK_COMPILER='gcc@13.3.0'
 declare -xr SPACK_VARIANTS='~aws +blosc2 +bzip2 ~campaign ~cuda ~dataspaces +fortran +hdf5 ~ipo ~kokkos +libcatalyst ~libpressio +mgard +mpi +pic +png +python ~rocm +shared +sst ~sycl +sz +zfp'
 declare -xr SPACK_MPI='mvapich2@2.3.7-2'
-declare -xr SPACK_DEPENDENCIES="^py-numpy@2.1.2/$(spack find --format '{hash:7}' py-numpy@2.1.2 % ${SPACK_COMPILER} ^openblas@0.3.28/$(spack find --format '{hash:7}' openblas@0.3.28 % ${SPACK_COMPILER} ~ilp64 threads=none)) ^hdf5@1.14.3/$(spack find --format '{hash:7}' hdf5@1.14.3 % ${SPACK_COMPILER} +mpi ^${SPACK_MPI}) ^py-mpi4py@4.0.0/$(spack find --format '{hash:7}' py-mpi4py@4.0.0 % ${SPACK_COMPILER} ^${SPACK_MPI})"
+declare -xr SPACK_DEPENDENCIES="^py-numpy@1.26.4/$(spack find --format '{hash:7}' py-numpy@1.26.4 % ${SPACK_COMPILER} ^openblas@0.3.28/$(spack find --format '{hash:7}' openblas@0.3.28 % ${SPACK_COMPILER} ~ilp64 threads=none)) ^hdf5@1.14.3/$(spack find --format '{hash:7}' hdf5@1.14.3 % ${SPACK_COMPILER} +mpi ^${SPACK_MPI}) ^py-mpi4py@4.0.0/$(spack find --format '{hash:7}' py-mpi4py@4.0.0 % ${SPACK_COMPILER} ^${SPACK_MPI})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
