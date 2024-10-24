@@ -47,7 +47,7 @@ module list
 
 declare -xr SPACK_PACKAGE='charmpp@6.10.2'
 declare -xr SPACK_COMPILER='gcc@13.3.0'
-declare -xr SPACK_VARIANTS='backend=multicore build-target=charm++ ~cuda ~omp ~papi pmi=none +production ~pthreads +shared +smp ~syncft ~tcp ~tracing'
+declare -xr SPACK_VARIANTS='backend=verbs build-target=charm++ ~cuda ~omp ~papi pmi=none +production ~pthreads +shared +smp ~syncft ~tcp ~tracing'
 declare -xr SPACK_DEPENDENCIES=''
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
