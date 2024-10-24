@@ -45,6 +45,20 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
+#==> ior: Executing phase: 'autoreconf'
+#==> [2024-10-24-12:44:04.159784] './bootstrap'
+#autoreconf: Entering directory `.'
+#autoreconf: configure.ac: not using Gettext
+#autoreconf: running: aclocal --force -I config
+#autoreconf: configure.ac: tracing
+#autoreconf: configure.ac: not using Libtool
+#autoreconf: running: /home/mkandes/software/spack/repos/sdsc/spack/opt/spack/linux-rocky8-zen2/gcc-13.3.0/autoconf-2.69-v3wa4soycvim4erpsvbwodxxwrrvrpp4/bin/autoconf --force
+#configure.ac:89: error: possibly undefined macro: AC_DEFINE
+#      If this token and others are legitimate, please use m4_pattern_allow.
+#      See the Autoconf documentation.
+#configure.ac:132: error: possibly undefined macro: AC_SUBST
+#autoreconf: /home/mkandes/software/spack/repos/sdsc/spack/opt/spack/linux-rocky8-zen2/gcc-13.3.0/autoconf-2.69-v3wa4soycvim4erpsvbwodxxwrrvrpp4/bin/autoconf failed with exit status: 1
+
 declare -xr SPACK_PACKAGE='ior@4.0.0'
 declare -xr SPACK_COMPILER='gcc@13.3.0'
 declare -xr SPACK_VARIANTS='+hdf5 +lustre +ncmpi'
