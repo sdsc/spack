@@ -49,7 +49,7 @@ declare -xr SPACK_PACKAGE='netcdf-c@4.9.2'
 declare -xr SPACK_COMPILER='aocc@4.2.0'
 declare -xr SPACK_VARIANTS='~blosc ~byterange ~dap ~fsync ~hdf4 ~ipo ~jna +mpi ~nczarr_zip +optimize +parallel-netcdf +pic +shared +szip +zstd'
 declare -xr SPACK_MPI='mvapich2@2.3.7-2'
-declare -xr SPACK_DEPENDENCIES="^hdf5@1.14.3/$(spack find --format '{hash:7}' hdf5@1.14.3 % ${SPACK_COMPILER} +mpi) ^parallel-netcdf@1.13.0/$(spack find --format '{hash:7}' parallel-netcdf@1.13.0 % ${SPACK_COMPILER} ^${SPACK_MPI})"
+declare -xr SPACK_DEPENDENCIES="^hdf5@1.14.3/$(spack find --format '{hash:7}' hdf5@1.14.3 % ${SPACK_COMPILER} +mpi ^${SPACK_MPI}) ^parallel-netcdf@1.13.0/$(spack find --format '{hash:7}' parallel-netcdf@1.13.0 % ${SPACK_COMPILER} ^${SPACK_MPI})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
