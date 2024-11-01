@@ -270,7 +270,7 @@ EIGEN_JOB_ID="$(sbatch --dependency="afterok:${GCC_JOB_ID}" 'eigen@3.4.0.sh' | g
   UCX_JOB_ID="$(sbatch --dependency="afterok:${EIGEN_JOB_ID}" 'ucx@1.14.1.sh' | grep -o '[[:digit:]]*')"
     OPENMPI_JOB_ID="$(sbatch --dependency="afterok:${UCX_JOB_ID}" 'openmpi@4.1.6.sh' | grep -o '[[:digit:]]*')"
 
-cd "${SLURM_SUBMIT_DIR}/specs/aocc@4.2.0/mvapich2@2.3.7"
+cd "${SLURM_SUBMIT_DIR}/specs/aocc@4.2.0/mvapich2@2.3.7-2"
 AMDFFTW_JOB_ID="$(sbatch --dependency="afterok:${MVAPICH2_JOB_ID}" 'amdfftw@4.2.sh' | grep -o '[[:digit:]]*')"
   AMDFFTW_OMP_JOB_ID="$(sbatch --dependency="afterok:${AMDFFTW_JOB_ID}" 'amdfftw@4.2-omp.sh' | grep -o '[[:digit:]]*')"
   GROMACS_JOB_ID="$(sbatch --dependency="afterok:${AMDFFTW_JOB_ID}:${MVAPICH2_JOB_ID}:${OPENBLAS_JOB_ID}" 'gromacs@2024.3.sh' | grep -o '[[:digit:]]*')"
