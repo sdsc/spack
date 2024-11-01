@@ -45,7 +45,7 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-declare -xr SPACK_PACKAGE='ior@4.0.0'
+declare -xr SPACK_PACKAGE='ior@3.3.0'
 declare -xr SPACK_COMPILER='gcc@13.3.0'
 declare -xr SPACK_VARIANTS='+hdf5 +lustre +ncmpi'
 declare -xr SPACK_MPI='openmpi@4.1.6'
