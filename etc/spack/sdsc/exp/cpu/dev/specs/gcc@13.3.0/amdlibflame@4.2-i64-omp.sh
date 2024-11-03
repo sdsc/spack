@@ -48,7 +48,7 @@ module list
 declare -xr SPACK_PACKAGE='amdlibflame@4.2'
 declare -xr SPACK_COMPILER='gcc@13.3.0'
 declare -xr SPACK_VARIANTS='~debug +ilp64 +lapack2flame ~logging +shared +static threads=openmp ~tracing'
-declare -xr SPACK_DEPENDENCIES="^amdblis@4.2/$(spack find --format '{hash:7}' amdblis@4.2 % ${SPACK_COMPILER} +ilp64 threads=openmp)"
+declare -xr SPACK_DEPENDENCIES="^amdblis@4.2/$(spack find --format '{hash:7}' amdblis@4.2 % ${SPACK_COMPILER} +ilp64 threads=openmp) ^cmake@3.27.7/$(spack find --format '{hash:7}' cmake@3.27.7 % ${SPACK_COMPILER} arch=linux-rocky8-zen2)"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
