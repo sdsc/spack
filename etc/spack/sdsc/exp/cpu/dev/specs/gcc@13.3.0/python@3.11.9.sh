@@ -47,7 +47,7 @@ module list
 
 declare -xr SPACK_PACKAGE='python@3.11.9'
 declare -xr SPACK_COMPILER='gcc@13.3.0'
-declare -xr SPACK_VARIANTS='+bz2 +ctypes +dbm ~debug +libxml2 +lzma ~nis +optimizations +pic +pyexpat +pythoncmd +readline +shared +sqlite3 +ssl ~tkinter +uuid +zlib'
+declare -xr SPACK_VARIANTS='+bz2 +ctypes +dbm ~debug +libxml2 +lzma ~nis +optimizations +pic +pyexpat +pythoncmd +readline +shared +sqlite3 +ssl ~tkinter +uuid +zlib arch=linux-rocky8-zen2'
 declare -xr SPACK_DEPENDENCIES=''
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
