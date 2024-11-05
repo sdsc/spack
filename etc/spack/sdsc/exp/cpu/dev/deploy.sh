@@ -8,7 +8,7 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=1G
-#SBATCH --time=00:05:00
+#SBATCH --time=00:30:00
 #SBATCH --output=%x.o%j.%N
 
 declare -xir UNIX_TIME="$(date +'%s')"
@@ -273,7 +273,7 @@ EIGEN_JOB_ID="$(sbatch --dependency="afterok:${GCC_JOB_ID}" 'eigen@3.4.0.sh' | g
 cd "${SLURM_SUBMIT_DIR}/specs/aocc@4.2.0/mvapich2@2.3.7-2"
 AMDFFTW_JOB_ID="$(sbatch --dependency="afterok:${MVAPICH2_JOB_ID}" 'amdfftw@4.2.sh' | grep -o '[[:digit:]]*')"
   AMDFFTW_OMP_JOB_ID="$(sbatch --dependency="afterok:${AMDFFTW_JOB_ID}" 'amdfftw@4.2-omp.sh' | grep -o '[[:digit:]]*')"
-  GROMACS_JOB_ID="$(sbatch --dependency="afterok:${AMDFFTW_JOB_ID}:${MVAPICH2_JOB_ID}:${OPENBLAS_JOB_ID}" 'gromacs@2024.3.sh' | grep -o '[[:digit:]]*')"
+  GROMACS_JOB_ID="$(sbatch --dependency="afterok:${AMDBLIS_JOB_ID}:${AMDLIBFLAME_JOB_ID}:${AMDFFTW_JOB_ID}:${MVAPICH2_JOB_ID}" 'gromacs@2024.3.sh' | grep -o '[[:digit:]]*')"
 AMDSCALAPACK_JOB_ID="$(sbatch --dependency="afterok:${AMDBLIS_JOB_ID}:${AMDLIBFLAME_JOB_ID}:${MVAPICH2_JOB_ID}" 'amdscalapack@4.2.sh' | grep -o '[[:digit:]]*')"
   AMDSCALAPACK_OMP_JOB_ID="$(sbatch --dependency="afterok:${AMDSCALAPACK_JOB_ID}" 'amdscalapack@4.2-omp.sh' | grep -o '[[:digit:]]*')"
     ELPA_JOB_ID="$(sbatch --dependency="afterok:${AMDSCALAPACK_OMP_JOB_ID}" 'elpa@2024.03.001' | grep -o '[[:digit:]]*')"
@@ -312,7 +312,7 @@ SCOTCH_JOB_ID="$(sbatch --dependency="afterok:${MVAPICH2_JOB_ID}" 'scotch@7.0.5.
 cd "${SLURM_SUBMIT_DIR}/specs/aocc@4.2.0/openmpi@4.1.6"
 AMDFFTW_JOB_ID="$(sbatch --dependency="afterok:${OPENMPI_JOB_ID}" 'amdfftw@4.2.sh' | grep -o '[[:digit:]]*')"
   AMDFFTW_OMP_JOB_ID="$(sbatch --dependency="afterok:${AMDFFTW_JOB_ID}" 'amdfftw@4.2-omp.sh' | grep -o '[[:digit:]]*')"
-  GROMACS_JOB_ID="$(sbatch --dependency="afterok:${AMDFFTW_JOB_ID}:${OPENBLAS_JOB_ID}:${OPENMPI_JOB_ID}" 'gromacs@2024.3.sh' | grep -o '[[:digit:]]*')"
+  GROMACS_JOB_ID="$(sbatch --dependency="afterok:${AMDBLIS_JOB_ID}:${AMDLIBFLAME_JOB_ID}:${AMDFFTW_JOB_ID}:${OPENBLAS_JOB_ID}'gromacs@2024.3.sh' | grep -o '[[:digit:]]*')"
 AMDSCALAPACK_JOB_ID="$(sbatch --dependency="afterok:${AMDBLIS_JOB_ID}:${AMDLIBFLAME_JOB_ID}:${OPENMPI_JOB_ID}" 'amdscalapack@4.2.sh' | grep -o '[[:digit:]]*')"
   AMDSCALAPACK_OMP_JOB_ID="$(sbatch --dependency="afterok:${AMDSCALAPACK_JOB_ID}" 'amdscalapack@4.2-omp.sh' | grep -o '[[:digit:]]*')"
     ELPA_JOB_ID="$(sbatch --dependency="afterok:${AMDSCALAPACK_OMP_JOB_ID}" 'elpa@2024.03.001' | grep -o '[[:digit:]]*')"
