@@ -49,7 +49,7 @@ declare -xr SPACK_PACKAGE='elpa@2024.03.001'
 declare -xr SPACK_COMPILER='aocc@4.2.0'
 declare -xr SPACK_VARIANTS='~cuda +mpi ~openmp ~rocm'
 declare -xr SPACK_MPI='openmpi@4.1.6'
-declare -xr SPACK_DEPENDENCIES="^amdblis@4.2/$(spack find --format '{hash:7}' amdblis@4.2 % ${SPACK_COMPILER} ~ilp64 threads=none) ^amdlibflame@4.2/$(spack find --format '{hash:7}' amdlibflame@4.2 % ${SPACK_COMPILER} ~ilp64 ^amdblis@4.2 threads=none) ^python@3.11.9/$(spack find --format '{hash:7}' python@3.11.9 % ${SPACK_COMPILER}) ^amdscalapack@4.2/$(spack find --format '{hash:7}' amdscalapack@4.2 % ${SPACK_COMPILER} ^${SPACK_MPI})"
+declare -xr SPACK_DEPENDENCIES="^amdscalapack@4.2 ^${SPACK_MPI}/$(spack find --format '{hash:7}' ${SPACK_MPI} % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
