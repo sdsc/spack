@@ -49,7 +49,7 @@ declare -xr SPACK_PACKAGE='elpa@2024.03.001'
 declare -xr SPACK_COMPILER='aocc@4.2.0'
 declare -xr SPACK_VARIANTS='~cuda +mpi ~openmp ~rocm'
 declare -xr SPACK_MPI='mvapich2@2.3.7-2'
-declare -xr SPACK_DEPENDENCIES="^amdscalapack@4.2 ^${SPACK_MPI}/$(spack find --format '{hash:7}' ${SPACK_MPI} % ${SPACK_COMPILER})"
+declare -xr SPACK_DEPENDENCIES='^amdscalapack@4.2/s4dbhvq'
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv

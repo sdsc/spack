@@ -55,8 +55,6 @@ cp -p yamls/compilers.yaml "${SPACK_INSTANCE_DIR}/etc/spack/compilers.yaml"
 cp -p yamls/modules.yaml "${SPACK_INSTANCE_DIR}/etc/spack/modules.yaml"
 cp -p yamls/packages.yaml "${SPACK_INSTANCE_DIR}/etc/spack/packages.yaml"
 
-echo 'Hello 1'
-
 cd "${SLURM_SUBMIT_DIR}/specs"
 BZIP2_JOB_ID="$(sbatch 'bzip2@1.0.8.sh' | grep -o '[[:digit:]]*')"
   CURL_JOB_ID="$(sbatch --dependency="afterok:${BZIP2_JOB_ID}" 'curl@8.4.0.sh' | grep -o '[[:digit:]]*')"
@@ -81,8 +79,6 @@ BZIP2_JOB_ID="$(sbatch 'bzip2@1.0.8.sh' | grep -o '[[:digit:]]*')"
   #NVHPC_JOB_ID="$(sbatch --dependency="afterok:${BZIP2_JOB_ID}" 'nvhpc@21.9.sh' | grep -o '[[:digit:]]*')"
   OPENJDK_JOB_ID="$(sbatch --dependency="afterok:${BZIP2_JOB_ID}" 'openjdk@11.0.24_8.sh' | grep -o '[[:digit:]]*')"
   SRATOOLKIT_JOB_ID="$(sbatch --dependency="afterok:${BZIP2_JOB_ID}" 'sratoolkit@3.1.1.sh' | grep -o '[[:digit:]]*')"
-
-echo 'Hello 2'
 
 cd "${SLURM_SUBMIT_DIR}/specs/gcc@13.3.0"
 CHARMPP_JOB_ID="$(sbatch --dependency="afterok:${GCC_JOB_ID}" 'charmpp@6.10.2.sh' | grep -o '[[:digit:]]*')"
@@ -142,8 +138,6 @@ EIGEN_JOB_ID="$(sbatch --dependency="afterok:${GCC_JOB_ID}" 'eigen@3.4.0.sh' | g
 #INTELMKL_JOB_ID="$(sbatch --dependency="afterok:${GCC_JOB_ID}" 'intel-mkl@2020.4.304.sh' | grep -o '[[:digit:]]*')"
 #INTELMPI_JOB_ID="$(sbatch --dependency="afterok:${GCC_JOB_ID}" 'intel-mpi@2019.10.317.sh' | grep -o '[[:digit:]]*')"
 
-echo 'Hello 3'
-
 cd "${SLURM_SUBMIT_DIR}/specs/gcc@13.3.0/mvapich2@2.3.7-2"
 AMDFFTW_JOB_ID="$(sbatch --dependency="afterok:${MVAPICH2_JOB_ID}" 'amdfftw@4.2.sh' | grep -o '[[:digit:]]*')"
   AMDFFTW_OMP_JOB_ID="$(sbatch --dependency="afterok:${AMDFFTW_JOB_ID}" 'amdfftw@4.2-omp.sh' | grep -o '[[:digit:]]*')"
@@ -182,8 +176,6 @@ RAXML_NG_JOB_ID="$(sbatch --dependency="afterok:${MVAPICH2_JOB_ID}" 'raxml-ng@1.
 SCOTCH_JOB_ID="$(sbatch --dependency="afterok:${MVAPICH2_JOB_ID}" 'scotch@7.0.5.sh' | grep -o '[[:digit:]]*')"
   OPENFOAM_JOB_ID="$(sbatch --dependency="afterok:${ADIOS2_JOB_ID}:${SCOTCH_JOB_ID}:${ZOLTAN_JOB_ID}" 'openfoam@2406.sh' | grep -o '[[:digit:]]*')"
 
-echo 'Hello 4'
-
 cd "${SLURM_SUBMIT_DIR}/specs/gcc@13.3.0/openmpi@4.1.6"
 AMDFFTW_JOB_ID="$(sbatch --dependency="afterok:${OPENMPI_JOB_ID}" 'amdfftw@4.2.sh' | grep -o '[[:digit:]]*')"
   AMDFFTW_OMP_JOB_ID="$(sbatch --dependency="afterok:${AMDFFTW_JOB_ID}" 'amdfftw@4.2-omp.sh' | grep -o '[[:digit:]]*')"
@@ -221,8 +213,6 @@ RAXML_JOB_ID="$(sbatch --dependency="afterok:${OPENMPI_JOB_ID}" 'raxml@8.2.13.sh
 RAXML_NG_JOB_ID="$(sbatch --dependency="afterok:${OPENMPI_JOB_ID}" 'raxml-ng@1.2.2.sh' | grep -o '[[:digit:]]*')"
 SCOTCH_JOB_ID="$(sbatch --dependency="afterok:${OPENMPI_JOB_ID}" 'scotch@7.0.5.sh' | grep -o '[[:digit:]]*')"
   OPENFOAM_JOB_ID="$(sbatch --dependency="afterok:${ADIOS2_JOB_ID}:${SCOTCH_JOB_ID}:${ZOLTAN_JOB_ID}" 'openfoam@2406.sh' | grep -o '[[:digit:]]*')"
-
-echo 'Hello 5'
 
 cd "${SLURM_SUBMIT_DIR}/specs/aocc@4.2.0"
 CHARMPP_JOB_ID="$(sbatch --dependency="afterok:${GCC_JOB_ID}" 'charmpp@6.10.2.sh' | grep -o '[[:digit:]]*')"
@@ -280,8 +270,6 @@ EIGEN_JOB_ID="$(sbatch --dependency="afterok:${GCC_JOB_ID}" 'eigen@3.4.0.sh' | g
   UCX_JOB_ID="$(sbatch --dependency="afterok:${EIGEN_JOB_ID}" 'ucx@1.14.1.sh' | grep -o '[[:digit:]]*')"
     OPENMPI_JOB_ID="$(sbatch --dependency="afterok:${UCX_JOB_ID}" 'openmpi@4.1.6.sh' | grep -o '[[:digit:]]*')"
 
-echo 'Hello 6'
-
 cd "${SLURM_SUBMIT_DIR}/specs/aocc@4.2.0/mvapich2@2.3.7-2"
 AMDFFTW_JOB_ID="$(sbatch --dependency="afterok:${MVAPICH2_JOB_ID}" 'amdfftw@4.2.sh' | grep -o '[[:digit:]]*')"
   AMDFFTW_OMP_JOB_ID="$(sbatch --dependency="afterok:${AMDFFTW_JOB_ID}" 'amdfftw@4.2-omp.sh' | grep -o '[[:digit:]]*')"
@@ -296,7 +284,7 @@ CHARMPP_JOB_ID="$(sbatch --dependency="afterok:${MVAPICH2_JOB_ID}" 'charmpp@6.10
 FFTW_JOB_ID="$(sbatch --dependency="afterok:${MVAPICH2_JOB_ID}" 'fftw@3.3.10.sh' | grep -o '[[:digit:]]*')"
   FFTW_OMP_JOB_ID="$(sbatch --dependency="afterok:${FFTW_JOB_ID}" 'fftw@3.3.10-omp.sh' | grep -o '[[:digit:]]*')"
 HDF5_JOB_ID="$(sbatch --dependency="afterok:${MVAPICH2_JOB_ID}" 'hdf5@1.14.3.sh' | grep -o '[[:digit:]]*')"
-  QUANTUM_ESPRESSO_JOB_ID="$(sbatch --dependency="afterok:${HDF5_JOB_ID}:${ELPA_JOB_ID}" 'quantum-espresso@7.3.1.sh' | grep -o '[[:digit:]]*')"
+  QUANTUM_ESPRESSO_JOB_ID="$(sbatch --dependency="afterok:${HDF5_JOB_ID}" 'quantum-espresso@7.3.1.sh' | grep -o '[[:digit:]]*')"
 HPL_JOB_ID="$(sbatch --dependency="afterok:${AMDBLIS_I64_JOB_ID}:${MVAPICH2_JOB_ID}" 'hpl@2.3.sh' | grep -o '[[:digit:]]*')"
   HPL_I64_JOB_ID="$(sbatch --dependency="afterok:${AMDBLIS_I64_JOB_ID}:${HPL_JOB_ID}" 'hpl@2.3-i64.sh' | grep -o '[[:digit:]]*')"
   HPL_OMP_JOB_ID="$(sbatch --dependency="afterok:${AMDBLIS_OMP_JOB_ID}:${HPL_JOB_ID}" 'hpl@2.3-omp.sh' | grep -o '[[:digit:]]*')"
@@ -321,8 +309,6 @@ RAXML_NG_JOB_ID="$(sbatch --dependency="afterok:${MVAPICH2_JOB_ID}" 'raxml-ng@1.
 SCOTCH_JOB_ID="$(sbatch --dependency="afterok:${MVAPICH2_JOB_ID}" 'scotch@7.0.5.sh' | grep -o '[[:digit:]]*')"
   OPENFOAM_JOB_ID="$(sbatch --dependency="afterok:${ADIOS2_JOB_ID}:${SCOTCH_JOB_ID}:${ZOLTAN_JOB_ID}" 'openfoam@2406.sh' | grep -o '[[:digit:]]*')"
 
-echo 'Hello 7'
-
 cd "${SLURM_SUBMIT_DIR}/specs/aocc@4.2.0/openmpi@4.1.6"
 AMDFFTW_JOB_ID="$(sbatch --dependency="afterok:${OPENMPI_JOB_ID}" 'amdfftw@4.2.sh' | grep -o '[[:digit:]]*')"
   AMDFFTW_OMP_JOB_ID="$(sbatch --dependency="afterok:${AMDFFTW_JOB_ID}" 'amdfftw@4.2-omp.sh' | grep -o '[[:digit:]]*')"
@@ -337,7 +323,7 @@ CHARMPP_JOB_ID="$(sbatch --dependency="afterok:${OPENMPI_JOB_ID}" 'charmpp@6.10.
 FFTW_JOB_ID="$(sbatch --dependency="afterok:${OPENMPI_JOB_ID}" 'fftw@3.3.10.sh' | grep -o '[[:digit:]]*')"
   FFTW_OMP_JOB_ID="$(sbatch --dependency="afterok:${FFTW_JOB_ID}" 'fftw@3.3.10-omp.sh' | grep -o '[[:digit:]]*')"
 HDF5_JOB_ID="$(sbatch --dependency="afterok:${OPENMPI_JOB_ID}" 'hdf5@1.14.3.sh' | grep -o '[[:digit:]]*')"
-  QUANTUM_ESPRESSO_JOB_ID="$(sbatch --dependency="afterok:${HDF5_JOB_ID}:${ELPA_JOB_ID}" 'quantum-espresso@7.3.1.sh' | grep -o '[[:digit:]]*')"
+  QUANTUM_ESPRESSO_JOB_ID="$(sbatch --dependency="afterok:${HDF5_JOB_ID}" 'quantum-espresso@7.3.1.sh' | grep -o '[[:digit:]]*')"
 HPL_JOB_ID="$(sbatch --dependency="afterok:${AMDBLIS_I64_JOB_ID}:${OPENMPI_JOB_ID}" 'hpl@2.3.sh' | grep -o '[[:digit:]]*')"
   HPL_I64_JOB_ID="$(sbatch --dependency="afterok:${AMDBLIS_I64_JOB_ID}:${HPL_JOB_ID}" 'hpl@2.3-i64.sh' | grep -o '[[:digit:]]*')"
   HPL_OMP_JOB_ID="$(sbatch --dependency="afterok:${AMDBLIS_OMP_JOB_ID}:${HPL_JOB_ID}" 'hpl@2.3-omp.sh' | grep -o '[[:digit:]]*')"
@@ -361,5 +347,3 @@ RAXML_JOB_ID="$(sbatch --dependency="afterok:${OPENMPI_JOB_ID}" 'raxml@8.2.13.sh
 RAXML_NG_JOB_ID="$(sbatch --dependency="afterok:${OPENMPI_JOB_ID}" 'raxml-ng@1.2.2.sh' | grep -o '[[:digit:]]*')"
 SCOTCH_JOB_ID="$(sbatch --dependency="afterok:${OPENMPI_JOB_ID}" 'scotch@7.0.5.sh' | grep -o '[[:digit:]]*')"
   OPENFOAM_JOB_ID="$(sbatch --dependency="afterok:${ADIOS2_JOB_ID}:${SCOTCH_JOB_ID}:${ZOLTAN_JOB_ID}" 'openfoam@2406.sh' | grep -o '[[:digit:]]*')"
-
-echo 'Hello 8'
