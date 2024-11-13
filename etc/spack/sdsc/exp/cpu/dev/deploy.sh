@@ -32,7 +32,7 @@ declare -xr SPACK_REVISION='2'
 declare -xr SPACK_VERSION="${SPACK_MAJOR}.${SPACK_MINOR}.${SPACK_REVISION}"
 declare -xr SPACK_INSTANCE_NAME='cpu'
 declare -xr SPACK_INSTANCE_VERSION='dev'
-declare -xr SPACK_INSTANCE_DIR='/home/mkandes/software/spack/repos/sdsc/spack'
+declare -xr SPACK_INSTANCE_DIR='/home/mkandes/software/spack/repos/sdsc/cpu'
 
 echo "${UNIX_TIME} ${LOCAL_TIME} ${SLURM_JOB_ID} ${JOB_SCRIPT_MD5} ${JOB_SCRIPT_SHA256} ${JOB_SCRIPT_NUMBER_OF_LINES} ${JOB_SCRIPT}"
 cat  "${JOB_SCRIPT}"

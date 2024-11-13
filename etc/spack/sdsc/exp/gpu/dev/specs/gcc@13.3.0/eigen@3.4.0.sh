@@ -4,6 +4,7 @@
 #SBATCH --account=use300
 #SBATCH --clusters=expanse
 #SBATCH --partition=ind-gpu-shared
+#SBATCH --qos=gpu-unlim
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=10
@@ -33,7 +34,7 @@ declare -xr SPACK_REVISION='2'
 declare -xr SPACK_VERSION="${SPACK_MAJOR}.${SPACK_MINOR}.${SPACK_REVISION}"
 declare -xr SPACK_INSTANCE_NAME='gpu'
 declare -xr SPACK_INSTANCE_VERSION='dev'
-declare -xr SPACK_INSTANCE_DIR='/home/mkandes/software/spack/repos/sdsc/spack'
+declare -xr SPACK_INSTANCE_DIR='/home/mkandes/software/spack/repos/sdsc/gpu'
 
 declare -xr TMPDIR="${SLURM_TMPDIR}/spack-stage"
 declare -xr TMP="${TMPDIR}"
@@ -49,7 +50,7 @@ module list
 declare -xr SPACK_PACKAGE='eigen@3.4.0'
 declare -xr SPACK_COMPILER='gcc@13.3.0'
 declare -xr SPACK_VARIANTS=''
-declare -xr SPACK_DEPENDENCIES="^cmake@3.27.7 % ${SPACK_COMPILER} arch=linux-rocky8-zen2"
+declare -xr SPACK_DEPENDENCIES="^cmake@3.27.7 % ${SPACK_COMPILER} arch=linux-rocky8-cascadelake"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv

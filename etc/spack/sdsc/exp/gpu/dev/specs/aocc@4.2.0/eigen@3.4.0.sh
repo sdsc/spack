@@ -48,7 +48,7 @@ module list
 declare -xr SPACK_PACKAGE='eigen@3.4.0'
 declare -xr SPACK_COMPILER='aocc@4.2.0'
 declare -xr SPACK_VARIANTS=''
-declare -xr SPACK_DEPENDENCIES="^cmake@3.27.7 % ${SPACK_COMPILER} arch=linux-rocky8-zen2"
+declare -xr SPACK_DEPENDENCIES="^cmake@3.27.7 % ${SPACK_COMPILER} arch=linux-rocky8-cascadelake"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv

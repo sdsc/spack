@@ -4,6 +4,7 @@
 #SBATCH --account=use300
 #SBATCH --clusters=expanse
 #SBATCH --partition=ind-gpu-shared
+#SBATCH --qos=gpu-unlim
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=10

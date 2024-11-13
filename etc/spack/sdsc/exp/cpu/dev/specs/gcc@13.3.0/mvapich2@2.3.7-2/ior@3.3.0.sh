@@ -32,7 +32,7 @@ declare -xr SPACK_REVISION='2'
 declare -xr SPACK_VERSION="${SPACK_MAJOR}.${SPACK_MINOR}.${SPACK_REVISION}"
 declare -xr SPACK_INSTANCE_NAME='cpu'
 declare -xr SPACK_INSTANCE_VERSION='dev'
-declare -xr SPACK_INSTANCE_DIR='/home/mkandes/software/spack/repos/sdsc/spack'
+declare -xr SPACK_INSTANCE_DIR='/home/mkandes/software/spack/repos/sdsc/cpu'
 
 declare -xr TMPDIR="${SLURM_TMPDIR}/spack-stage"
 declare -xr TMP="${TMPDIR}"
@@ -52,12 +52,12 @@ module list
 #autoreconf: running: aclocal --force -I config
 #autoreconf: configure.ac: tracing
 #autoreconf: configure.ac: not using Libtool
-#autoreconf: running: /home/mkandes/software/spack/repos/sdsc/spack/opt/spack/linux-rocky8-zen2/gcc-13.3.0/autoconf-2.69-v3wa4soycvim4erpsvbwodxxwrrvrpp4/bin/autoconf --force
+#autoreconf: running: /home/mkandes/software/spack/repos/sdsc/cpu/opt/spack/linux-rocky8-zen2/gcc-13.3.0/autoconf-2.69-v3wa4soycvim4erpsvbwodxxwrrvrpp4/bin/autoconf --force
 #configure.ac:89: error: possibly undefined macro: AC_DEFINE
 #      If this token and others are legitimate, please use m4_pattern_allow.
 #      See the Autoconf documentation.
 #configure.ac:132: error: possibly undefined macro: AC_SUBST
-#autoreconf: /home/mkandes/software/spack/repos/sdsc/spack/opt/spack/linux-rocky8-zen2/gcc-13.3.0/autoconf-2.69-v3wa4soycvim4erpsvbwodxxwrrvrpp4/bin/autoconf failed with exit status: 1
+#autoreconf: /home/mkandes/software/spack/repos/sdsc/cpu/opt/spack/linux-rocky8-zen2/gcc-13.3.0/autoconf-2.69-v3wa4soycvim4erpsvbwodxxwrrvrpp4/bin/autoconf failed with exit status: 1
 
 declare -xr SPACK_PACKAGE='ior@3.3.0'
 declare -xr SPACK_COMPILER='gcc@13.3.0'

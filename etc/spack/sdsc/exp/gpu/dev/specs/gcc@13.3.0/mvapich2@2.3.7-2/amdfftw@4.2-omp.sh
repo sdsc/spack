@@ -4,6 +4,7 @@
 #SBATCH --account=use300
 #SBATCH --clusters=expanse
 #SBATCH --partition=ind-gpu-shared
+#SBATCH --qos=gpu-unlim
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=10
@@ -33,7 +34,7 @@ declare -xr SPACK_REVISION='2'
 declare -xr SPACK_VERSION="${SPACK_MAJOR}.${SPACK_MINOR}.${SPACK_REVISION}"
 declare -xr SPACK_INSTANCE_NAME='gpu'
 declare -xr SPACK_INSTANCE_VERSION='dev'
-declare -xr SPACK_INSTANCE_DIR='/home/mkandes/software/spack/repos/sdsc/spack'
+declare -xr SPACK_INSTANCE_DIR='/home/mkandes/software/spack/repos/sdsc/gpu'
 
 declare -xr TMPDIR="${SLURM_TMPDIR}/spack-stage"
 declare -xr TMP="${TMPDIR}"
