@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=gcc@13.3.0
+#SBATCH --job-name=nvhpc@24.11
 #SBATCH --account=use300
 #SBATCH --clusters=expanse
 #SBATCH --partition=ind-gpu-shared
@@ -47,9 +47,9 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-declare -xr SPACK_PACKAGE='gcc@13.3.0'
+declare -xr SPACK_PACKAGE='nvhpc@24.11'
 declare -xr SPACK_COMPILER='gcc@8.5.0'
-declare -xr SPACK_VARIANTS='~binutils +bootstrap ~graphite ~nvptx ~piclibs ~strip'
+declare -xr SPACK_VARIANTS='+blas +lapack +mpi'
 declare -xr SPACK_DEPENDENCIES=''
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
@@ -77,6 +77,12 @@ if [[ "${?}" -ne 0 ]]; then
   exit 1
 fi
 
-sed -i "s|PATH_TO_GCC_13_3_0|$(spack location -i 'gcc@13.3.0')/bin/gcc|g" "${SPACK_INSTANCE_DIR}/etc/spack/compilers.yaml"
-sed -i "s|PATH_TO_G++_13_3_0|$(spack location -i 'gcc@13.3.0')/bin/g++|g" "${SPACK_INSTANCE_DIR}/etc/spack/compilers.yaml"
-sed -i "s|PATH_TO_GFORTRAN_13_3_0|$(spack location -i 'gcc@13.3.0')/bin/gfortran|g" "${SPACK_INSTANCE_DIR}/etc/spack/compilers.yaml"
+#sed -i "s|PATH_TO_ICC_2021_10_0|$(spack location -i 'intel-oneapi-compilers@2023.2.4')/latest/linux/bin/intel64/icc|g" "${SPACK_INSTANCE_DIR}/etc/spack/compilers.yaml"
+#sed -i "s|PATH_TO_ICPC_2021_10_0|$(spack location -i 'intel-oneapi-compilers@2023.2.4')/latest/linux/bin/intel64/icpc|g" "${SPACK_INSTANCE_DIR}/etc/spack/compilers.yaml"
+#sed -i "s|PATH_TO_IFORT_2021_10_0|$(spack location -i 'intel-oneapi-compilers@2023.2.4')/latest/linux/bin/intel64/ifort|g" "${SPACK_INSTANCE_DIR}/etc/spack/compilers.yaml"
+
+#sed -i "s|PATH_TO_ICX_2023_2_4|$(spack location -i 'intel-oneapi-compilers@2023.2.4')/latest/linux/bin/icx|g" "${SPACK_INSTANCE_DIR}/etc/spack/compilers.yaml"
+#sed -i "s|PATH_TO_ICPX_2023_2_4|$(spack location -i 'intel-oneapi-compilers@2023.2.4')/latest/linux/bin/icpx|g" "${SPACK_INSTANCE_DIR}/etc/spack/compilers.yaml"
+#sed -i "s|PATH_TO_DPCPP_2023_2_4|$(spack location -i 'intel-oneapi-compilers@2023.2.4')/latest/linux/bin/dpcpp|g" "${SPACK_INSTANCE_DIR}/etc/spack/compilers.yaml"
+#sed -i "s|PATH_TO_IFX_2023_2_4|$(spack location -i 'intel-oneapi-compilers@2023.2.4')/latest/linux/bin/ifx|g" "${SPACK_INSTANCE_DIR}/etc/spack/compilers.yaml"
+
