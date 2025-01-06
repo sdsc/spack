@@ -77,12 +77,6 @@ if [[ "${?}" -ne 0 ]]; then
   exit 1
 fi
 
-#sed -i "s|PATH_TO_ICC_2021_10_0|$(spack location -i 'intel-oneapi-compilers@2023.2.4')/latest/linux/bin/intel64/icc|g" "${SPACK_INSTANCE_DIR}/etc/spack/compilers.yaml"
-#sed -i "s|PATH_TO_ICPC_2021_10_0|$(spack location -i 'intel-oneapi-compilers@2023.2.4')/latest/linux/bin/intel64/icpc|g" "${SPACK_INSTANCE_DIR}/etc/spack/compilers.yaml"
-#sed -i "s|PATH_TO_IFORT_2021_10_0|$(spack location -i 'intel-oneapi-compilers@2023.2.4')/latest/linux/bin/intel64/ifort|g" "${SPACK_INSTANCE_DIR}/etc/spack/compilers.yaml"
-
-#sed -i "s|PATH_TO_ICX_2023_2_4|$(spack location -i 'intel-oneapi-compilers@2023.2.4')/latest/linux/bin/icx|g" "${SPACK_INSTANCE_DIR}/etc/spack/compilers.yaml"
-#sed -i "s|PATH_TO_ICPX_2023_2_4|$(spack location -i 'intel-oneapi-compilers@2023.2.4')/latest/linux/bin/icpx|g" "${SPACK_INSTANCE_DIR}/etc/spack/compilers.yaml"
-#sed -i "s|PATH_TO_DPCPP_2023_2_4|$(spack location -i 'intel-oneapi-compilers@2023.2.4')/latest/linux/bin/dpcpp|g" "${SPACK_INSTANCE_DIR}/etc/spack/compilers.yaml"
-#sed -i "s|PATH_TO_IFX_2023_2_4|$(spack location -i 'intel-oneapi-compilers@2023.2.4')/latest/linux/bin/ifx|g" "${SPACK_INSTANCE_DIR}/etc/spack/compilers.yaml"
-
+sed -i "s|PATH_TO_NVC_24_11|$(spack location -i 'nvhpc@24.11')/Linux_x86_64/24.11/compilers/bin/nvc|g" "${SPACK_INSTANCE_DIR}/etc/spack/compilers.yaml"
+sed -i "s|PATH_TO_NVCPP_24_11|$(spack location -i 'nvhpc@24.11')Linux_x86_64/24.11/compilers/bin/nvc++|g" "${SPACK_INSTANCE_DIR}/etc/spack/compilers.yaml"
+sed -i "s|PATH_TO_NVFORTRAN_24_11|$(spack location -i 'nvhpc@24.11')Linux_x86_64/24.11/compilers/bin/nvfortran|g" "${SPACK_INSTANCE_DIR}/etc/spack/compilers.yaml"
