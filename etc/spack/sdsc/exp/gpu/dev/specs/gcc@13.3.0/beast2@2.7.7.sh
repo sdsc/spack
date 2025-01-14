@@ -50,7 +50,7 @@ module list
 declare -xr SPACK_PACKAGE='beast2@2.7.7'
 declare -xr SPACK_COMPILER='gcc@13.3.0'
 declare -xr SPACK_VARIANTS='+beagle'
-declare -xr SPACK_DEPENDENCIES='' #"^libbeagle@3.1.2/$(spack find --format '{hash:7}' libbeagle@3.1.2 % ${SPACK_COMPILER})"
+declare -xr SPACK_DEPENDENCIES="^libbeagle@3.1.2/$(spack find --format '{hash:7}' libbeagle@3.1.2 % ${SPACK_COMPILER} +cuda)"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
