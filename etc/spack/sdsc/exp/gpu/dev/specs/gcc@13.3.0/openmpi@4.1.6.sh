@@ -49,8 +49,8 @@ module list
 
 declare -xr SPACK_PACKAGE='openmpi@4.1.6'
 declare -xr SPACK_COMPILER='gcc@13.3.0'
-declare -xr SPACK_VARIANTS='~atomics ~cuda fabrics=ucx ~gpfs ~internal-hwloc ~internal-pmix +legacylaunchers +lustre ~memchecker ~openshmem ~orterunprefix +romio +rsh schedulers=slurm +static +vt'
-declare -xr SPACK_DEPENDENCIES="^lustre ^slurm ^rdma-core ^ucx@1.14.1/$(spack find --format '{hash:7}' ucx@1.14.1 % ${SPACK_COMPILER})"
+declare -xr SPACK_VARIANTS='~atomics +cuda cuda_arch=70,80,90 fabrics=ucx ~gpfs ~internal-hwloc ~internal-pmix +legacylaunchers +lustre ~memchecker ~openshmem ~orterunprefix +romio +rsh schedulers=slurm +static +vt'
+declare -xr SPACK_DEPENDENCIES="^lustre ^slurm ^rdma-core ^ucx@1.14.1/$(spack find --format '{hash:7}' ucx@1.14.1 % ${SPACK_COMPILER} +cuda ^cuda@12.6.3/$(spack find --format '{hash:7}' cuda@12.6.3 % ${SPACK_COMPILER}))"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
