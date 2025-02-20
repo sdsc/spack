@@ -68,7 +68,7 @@ declare -xr SPACK_PACKAGE='charmpp@6.10.2'
 declare -xr SPACK_COMPILER='gcc@13.3.0'
 declare -xr SPACK_VARIANTS='backend=mpi build-target=charm++ +cuda +omp ~papi pmi=none +production ~pthreads +shared +smp ~syncft ~tcp ~tracing'
 declare -xr SPACK_MPI='mvapich2@2.3.7-2'
-declare -xr SPACK_DEPENDENCIES="^${SPACK_MPI}/$(spack find --format '{hash:7}' ${SPACK_MPI} % ${SPACK_COMPILER})"
+declare -xr SPACK_DEPENDENCIES="^${SPACK_MPI}/$(spack find --format '{hash:7}' ${SPACK_MPI} % ${SPACK_COMPILER}) ^cuda@12.6.3/$(spack find --format '{hash:7}' cuda@12.6.3 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 export CUDATOOLKIT_HOME="${CUDA_ROOT}"
