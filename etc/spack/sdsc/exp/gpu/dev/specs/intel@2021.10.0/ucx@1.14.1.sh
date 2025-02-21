@@ -49,8 +49,8 @@ module list
 
 declare -xr SPACK_PACKAGE='ucx@1.14.1'
 declare -xr SPACK_COMPILER='intel@2021.10.0'
-declare -xr SPACK_VARIANTS='~assertions ~backtrace_detail +cma ~cuda +dc ~debug +dm ~gdrcopy ~gtest +ib_hw_tm ~java +knem ~logging +mlx5_dv +numa +openmp +optimizations ~parameter_checking +pic +rc +rdmacm ~rocm +thread_multiple ~ucg +ud +verbs ~vfs +xpmem'
-declare -xr SPACK_DEPENDENCIES=''
+declare -xr SPACK_VARIANTS='~assertions ~backtrace_detail +cma +cuda +dc ~debug +dm +gdrcopy ~gtest +ib_hw_tm ~java +knem ~logging +mlx5_dv +numa +openmp +optimizations ~parameter_checking +pic +rc +rdmacm ~rocm +thread_multiple ~ucg +ud +verbs ~vfs +xpmem cuda_arch=70,80,90'
+declare -xr SPACK_DEPENDENCIES="^cuda@12.6.3/$(spack find --format '{hash:7}' cuda@12.6.3 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
