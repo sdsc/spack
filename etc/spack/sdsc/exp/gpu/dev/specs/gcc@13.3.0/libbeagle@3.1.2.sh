@@ -49,7 +49,7 @@ module list
 
 declare -xr SPACK_PACKAGE='libbeagle@3.1.2'
 declare -xr SPACK_COMPILER='gcc@13.3.0'
-declare -xr SPACK_VARIANTS='+cuda ~opencl cuda_arch=70'
+declare -xr SPACK_VARIANTS='+cuda cuda_arch=70 ~opencl'
 declare -xr SPACK_DEPENDENCIES="^cuda@12.6.3/$(spack find --format '{hash:7}' cuda@12.6.3 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
