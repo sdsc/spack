@@ -49,8 +49,8 @@ module list
 
 declare -xr SPACK_PACKAGE='adios2@2.10.1'
 declare -xr SPACK_COMPILER='intel@2021.10.0'
-declare -xr SPACK_VARIANTS='~aws +blosc2 +bzip2 ~campaign ~cuda ~dataspaces +fortran +hdf5 ~ipo ~kokkos +libcatalyst ~libpressio ~mgard ~mpi +pic +png +python ~rocm +shared +sst ~sycl +sz +zfp'
-declare -xr SPACK_DEPENDENCIES="^py-numpy@1.26.4/$(spack find --format '{hash:7}' py-numpy@1.26.4 % ${SPACK_COMPILER} ^intel-oneapi-mkl@2023.2.0/$(spack find --format '{hash:7}' intel-oneapi-mkl@2023.2.0 % ${SPACK_COMPILER} ~cluster ~ilp64 threads=none)) ^hdf5@1.14.3/$(spack find --format '{hash:7}' hdf5@1.14.3 % ${SPACK_COMPILER} ~mpi)"
+declare -xr SPACK_VARIANTS='~aws +blosc2 +bzip2 ~campaign +cuda ~dataspaces +fortran +hdf5 ~ipo ~kokkos +libcatalyst ~libpressio +mgard ~mpi +pic +png +python ~rocm +shared +sst ~sycl +sz +zfp cuda_arch=70,80,90'
+declare -xr SPACK_DEPENDENCIES="^py-numpy@1.26.4/$(spack find --format '{hash:7}' py-numpy@1.26.4 % ${SPACK_COMPILER} ^intel-oneapi-mkl@2023.2.0/$(spack find --format '{hash:7}' intel-oneapi-mkl@2023.2.0 % ${SPACK_COMPILER} ~ilp64 threads=none)) ^hdf5@1.14.3/$(spack find --format '{hash:7}' hdf5@1.14.3 % ${SPACK_COMPILER} ~mpi) ^cuda@12.6.3/$(spack find --format '{hash:7}' cuda@12.6.3 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
