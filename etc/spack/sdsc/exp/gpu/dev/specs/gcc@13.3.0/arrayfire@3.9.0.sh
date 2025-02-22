@@ -28,6 +28,20 @@ declare -xr SCHEDULER_REVISION='7'
 declare -xr SCHEDULER_VERSION="${SCHEDULER_MAJOR}.${SCHEDULER_MINOR}.${SCHEDULER_REVISION}"
 declare -xr SCHEDULER_MODULE="${SCHEDULER_NAME}/${SLURM_CLUSTER_NAME}/${SCHEDULER_VERSION}"
 
+declare -xr COMPILER_NAME='gcc'
+declare -xr COMPILER_MAJOR='13'
+declare -xr COMPILER_MINOR='3'
+declare -xr COMPILER_REVISION='0'
+declare -xr COMPILER_VERSION="${COMPILER_MAJOR}.${COMPILER_MINOR}.${COMPILER_REVISION}"
+declare -xr COMPILER_MODULE="${COMPILER_NAME}/${COMPILER_VERSION}"
+
+declare -xr CUDA_NAME='cuda'
+declare -xr CUDA_MAJOR='12'
+declare -xr CUDA_MINOR='6'
+declare -xr CUDA_REVISION='3'
+declare -xr CUDA_VERSION="${CUDA_MAJOR}.${CUDA_MINOR}.${CUDA_REVISION}"
+declare -xr CUDA_MODULE="${CUDA_NAME}/${CUDA_VERSION}"
+
 declare -xr SPACK_MAJOR='0'
 declare -xr SPACK_MINOR='21'
 declare -xr SPACK_REVISION='2'
@@ -44,13 +58,64 @@ cat  "${JOB_SCRIPT}"
 
 module purge
 module load "${SCHEDULER_MODULE}"
-module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
+module use "${SPACK_ROOT}/share/spack/lmod/linux-rocky8-x86_64/Core"
+module load "${COMPILER_MODULE}"
+module load "${CUDA_MODULE}"
+module list
+
+# 4 errors found in build log:
+#     138    -- Found BLAS: /home/mkandes/software/spack/repos/sdsc/gpu/opt/spac
+#            k/linux-rocky8-cascadelake/gcc-13.3.0/openblas-0.3.28-mozdastvpdzuk
+#            mxujpvb3fvqitexksvx/lib/libopenblas.so
+#     139    -- Looking for cheev_
+#     140    -- Looking for cheev_ - found
+#     141    -- Found LAPACK: /home/mkandes/software/spack/repos/sdsc/gpu/opt/sp
+#            ack/linux-rocky8-cascadelake/gcc-13.3.0/openblas-0.3.28-mozdastvpdz
+#            ukmxujpvb3fvqitexksvx/lib/libopenblas.so;-lpthread;-lm;-ldl
+#     142    -- Build spdlog: 1.9.2
+#     143    -- Build type: Release
+#  >> 144    CMake Error at CMakeLists.txt:313 (add_subdirectory):
+#     145      add_subdirectory not given a binary directory but the given sourc
+#            e
+#     146      directory
+#     147      "/scratch/mkandes/job_36282250/spack-stage/spack-stage/spack-stag
+#            e-arrayfire-3.9.0-plo6ogf6tivlpl772ryfzjepqxwjvonv/spack-build-plo6
+#            ogf/extern/span-lite-src"
+#     148      is not a subdirectory of
+#     149      "/scratch/mkandes/job_36282250/spack-stage/spack-stage/spack-stag
+#            e-arrayfire-3.9.0-plo6ogf6tivlpl772ryfzjepqxwjvonv/spack-src".
+#     150      When specifying an out-of-tree source a binary directory must be 
+#            explicitly
+#     151      specified.
+#     152    
+#     153    
+#  >> 154    CMake Error at CMakeLists.txt:314 (get_property):
+#     155      get_property could not find TARGET span-lite.  Perhaps it has not
+#             yet been
+#     156      created.
+#     157    
+#     158    
+#  >> 159    CMake Error at CMakeLists.txt:317 (set_target_properties):
+#     160      set_target_properties Can not find target to add properties to: s
+#            pan-lite
+#     161    
+#     162    
+#  >> 163    CMake Error at CMakeLists.txt:319 (set_target_properties):
+#     164      set_target_properties Can not find target to add properties to: s
+#            pan-lite
+#     165    
+#     166    
+#     167    -- CUDA driver library missing. Looking for libcuda stub.
+#     168    -- CUDA driver stub FOUND: /home/mkandes/software/spack/repos/sdsc/
+#            gpu/opt/spack/linux-rocky8-cascadelake/gcc-13.3.0/cuda-12.6.3-guub3
+#            z6c6k7zgb3qv3vdngxr6zu5mhzy/lib64/stubs/libcuda.so
+#     169    -- Performing Test has_ignored_attributes_flag
 
 declare -xr SPACK_PACKAGE='arrayfire@3.9.0'
 declare -xr SPACK_COMPILER='gcc@13.3.0'
-declare -xr SPACK_VARIANTS='~cuda ~forge ~ipo ~opencl'
-declare -xr SPACK_DEPENDENCIES="^openblas@0.3.28/$(spack find --format '{hash:7}' openblas@0.3.28 % ${SPACK_COMPILER} ~ilp64 threads=none) ^fftw@3.3.10/$(spack find --format '{hash:7}' fftw@3.3.10 % ${SPACK_COMPILER} ~mpi ~openmp) ^boost@1.86.0/$(spack find --format '{hash:7}' boost@1.86.0 % ${SPACK_COMPILER} ~mpi)"
+declare -xr SPACK_VARIANTS='+cuda cuda_arch=70,80,90 ~forge ~ipo ~opencl'
+declare -xr SPACK_DEPENDENCIES="^openblas@0.3.28/$(spack find --format '{hash:7}' openblas@0.3.28 % ${SPACK_COMPILER} ~ilp64 threads=none) ^fftw@3.3.10/$(spack find --format '{hash:7}' fftw@3.3.10 % ${SPACK_COMPILER} ~mpi ~openmp) ^boost@1.86.0/$(spack find --format '{hash:7}' boost@1.86.0 % ${SPACK_COMPILER} ~mpi) ^cuda@12.6.3/$(spack find --format '{hash:7}' cuda@12.6.3 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv

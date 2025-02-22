@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=boost@1.83.0
+#SBATCH --job-name=boost@1.86.0
 #SBATCH --account=use300
 #SBATCH --clusters=expanse
 #SBATCH --partition=ind-gpu-shared
@@ -47,11 +47,11 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-declare -xr SPACK_PACKAGE='boost@1.83.0'
+declare -xr SPACK_PACKAGE='boost@1.86.0'
 declare -xr SPACK_COMPILER='intel@2021.10.0'
 declare -xr SPACK_VARIANTS='+atomic +chrono ~clanglibcpp +container +context +coroutine +date_time ~debug +exception +fiber +filesystem +graph +graph_parallel ~icu +iostreams +json +locale +log +math +mpi +multithreaded ~nowide +numpy +pic +program_options +python +random +regex +serialization +shared ~signals ~singlethreaded +stacktrace +system ~taggedlayout +test +thread +timer +type_erasure ~versionedlayout +wave'
-declare -xr SPACK_MPI='openmpi@4.1.6'
-declare -xr SPACK_DEPENDENCIES="^py-numpy@1.26.4/$(spack find --format '{hash:7}' py-numpy@1.26.4 % ${SPACK_COMPILER} ^amdblis@4.2/$(spack find --format '{hash:7}' amdblis@4.2 % ${SPACK_COMPILER} ~ilp64 threads=none) ^amdlibflame@4.2/$(spack find --format '{hash:7}' amdlibflame@4.2 % ${SPACK_COMPILER} ~ilp64 ^amdblis@4.2 threads=none)) ^${SPACK_MPI}/$(spack find --format '{hash:7}' ${SPACK_MPI} % ${SPACK_COMPILER})"
+declare -xr SPACK_MPI='intel-oneapi-mpi@2021.10.0'
+declare -xr SPACK_DEPENDENCIES="^py-numpy@1.26.4/$(spack find --format '{hash:7}' py-numpy@1.26.4 % ${SPACK_COMPILER} ^intel-oneapi-mkl@2023.2.0/$(spack find --format '{hash:7}' intel-oneapi-mkl@2023.2.0 % ${SPACK_COMPILER} ~ilp64 threads=none)) ^${SPACK_MPI}/$(spack find --format '{hash:7}' ${SPACK_MPI} % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv

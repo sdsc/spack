@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=cmake@3.27.7
+#SBATCH --job-name=nvshmem@3.0.6-4
 #SBATCH --account=use300
 #SBATCH --clusters=expanse
 #SBATCH --partition=ind-gpu-shared
@@ -28,6 +28,20 @@ declare -xr SCHEDULER_REVISION='7'
 declare -xr SCHEDULER_VERSION="${SCHEDULER_MAJOR}.${SCHEDULER_MINOR}.${SCHEDULER_REVISION}"
 declare -xr SCHEDULER_MODULE="${SCHEDULER_NAME}/${SLURM_CLUSTER_NAME}/${SCHEDULER_VERSION}"
 
+declare -xr COMPILER_NAME='gcc'
+declare -xr COMPILER_MAJOR='13'
+declare -xr COMPILER_MINOR='3'
+declare -xr COMPILER_REVISION='0'
+declare -xr COMPILER_VERSION="${COMPILER_MAJOR}.${COMPILER_MINOR}.${COMPILER_REVISION}"
+declare -xr COMPILER_MODULE="${COMPILER_NAME}/${COMPILER_VERSION}"
+
+declare -xr CUDA_NAME='cuda'
+declare -xr CUDA_MAJOR='12'
+declare -xr CUDA_MINOR='6'
+declare -xr CUDA_REVISION='3'
+declare -xr CUDA_VERSION="${CUDA_MAJOR}.${CUDA_MINOR}.${CUDA_REVISION}"
+declare -xr CUDA_MODULE="${CUDA_NAME}/${CUDA_VERSION}"
+
 declare -xr SPACK_MAJOR='0'
 declare -xr SPACK_MINOR='21'
 declare -xr SPACK_REVISION='2'
@@ -44,18 +58,23 @@ cat  "${JOB_SCRIPT}"
 
 module purge
 module load "${SCHEDULER_MODULE}"
-module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
+module use "${SPACK_ROOT}/share/spack/lmod/linux-rocky8-x86_64/Core"
+module load "${COMPILER_MODULE}"
+module load "${CUDA_MODULE}"
+module list
 
-declare -xr SPACK_PACKAGE='cmake@3.27.7'
-declare -xr SPACK_COMPILER='gcc@8.5.0'
-declare -xr SPACK_VARIANTS='~doc +ncurses +ownlibs'
-declare -xr SPACK_DEPENDENCIES=''
+declare -xr SPACK_PACKAGE='nvshmem@3.0.6-4'
+declare -xr SPACK_COMPILER='gcc@13.3.0'
+declare -xr SPACK_VARIANTS='+cuda +gdrcopy +mpi +nccl ~shmem +ucx'
+declare -xr SPACK_MPI='openmpi@4.1.6'
+declare -xr SPACK_DEPENDENCIES="^${SPACK_MPI}/$(spack find --format '{hash:7}' ${SPACK_MPI} % ${SPACK_COMPILER} +cuda)"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
+export CUDATOOLKIT_HOME="${CUDA_ROOT}"
 printenv
 
-spack config get compilers  
+spack config get compilers
 spack config get config  
 spack config get mirrors
 spack config get modules

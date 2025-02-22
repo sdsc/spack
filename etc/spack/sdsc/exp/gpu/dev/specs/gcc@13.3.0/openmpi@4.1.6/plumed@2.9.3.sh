@@ -51,7 +51,7 @@ declare -xr SPACK_PACKAGE='plumed@2.9.3'
 declare -xr SPACK_COMPILER='gcc@13.3.0'
 declare -xr SPACK_VARIANTS='arrayfire=none +gsl +mpi optional_modules=all +shared'
 declare -xr SPACK_MPI='openmpi@4.1.6'
-declare -xr SPACK_DEPENDENCIES="^openblas@0.3.28/$(spack find --format '{hash:7}' openblas@0.3.28 % ${SPACK_COMPILER} ~ilp64 threads=none) ^${SPACK_MPI}/$(spack find --format '{hash:7}' ${SPACK_MPI} % ${SPACK_COMPILER} +cuda)" 
+declare -xr SPACK_DEPENDENCIES="^openblas@0.3.28/$(spack find --format '{hash:7}' openblas@0.3.28 % ${SPACK_COMPILER} ~ilp64 threads=none) ^${SPACK_MPI}/$(spack find --format '{hash:7}' ${SPACK_MPI} % ${SPACK_COMPILER})" 
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
