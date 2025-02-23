@@ -39,12 +39,6 @@ declare -xr SPACK_INSTANCE_DIR='/home/mkandes/software/spack/repos/sdsc/gpu'
 declare -xr TMPDIR="${SLURM_TMPDIR}/spack-stage"
 declare -xr TMP="${TMPDIR}"
 
-declare -xr SPACK_PACKAGE='intel-oneapi-mkl@2023.2.0'
-declare -xr SPACK_COMPILER='intel@2021.10.0'
-declare -xr SPACK_VARIANTS='~cluster +envmods +ilp64 +shared threads=none'
-declare -xr SPACK_DEPENDENCIES=''
-declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
-
 echo "${UNIX_TIME} ${LOCAL_TIME} ${SLURM_JOB_ID} ${JOB_SCRIPT_MD5} ${JOB_SCRIPT_SHA256} ${JOB_SCRIPT_NUMBER_OF_LINES} ${JOB_SCRIPT}"
 cat  "${JOB_SCRIPT}"
 
@@ -52,6 +46,13 @@ module purge
 module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
+
+declare -xr SPACK_PACKAGE='intel-oneapi-mkl@2023.2.0'
+declare -xr SPACK_COMPILER='intel@2021.10.0'
+declare -xr SPACK_VARIANTS='~cluster +envmods +ilp64 +shared threads=none'
+declare -xr SPACK_DEPENDENCIES=''
+declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
+
 printenv
 
 spack config get ci64ilers  
