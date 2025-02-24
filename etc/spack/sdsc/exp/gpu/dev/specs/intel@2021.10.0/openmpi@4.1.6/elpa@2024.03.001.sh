@@ -10,7 +10,7 @@
 #SBATCH --cpus-per-task=10
 #SBATCH --mem=92G
 #SBATCH --gpus=1
-#SBATCH --time=00:30:00
+#SBATCH --time=01:00:00
 #SBATCH --output=%x.o%j.%N
 
 declare -xir UNIX_TIME="$(date +'%s')"
@@ -49,9 +49,9 @@ module list
 
 declare -xr SPACK_PACKAGE='elpa@2024.03.001'
 declare -xr SPACK_COMPILER='intel@2021.10.0'
-declare -xr SPACK_VARIANTS='~cuda +mpi ~openmp ~rocm'
+declare -xr SPACK_VARIANTS='+cuda cuda_arch=70,80,90 +mpi ~openmp ~rocm'
 declare -xr SPACK_MPI='openmpi@4.1.6'
-declare -xr SPACK_DEPENDENCIES="^intel-oneapi-mkl@2023.2.0/$(spack find --format '{hash:7}' intel-oneapi-mkl@2023.2.0 % ${SPACK_COMPILER} +cluster ~ilp64 mpi_family=openmpi threads=none ^${SPACK_MPI})"
+declare -xr SPACK_DEPENDENCIES="^intel-oneapi-mkl@2023.2.0/$(spack find --format '{hash:7}' intel-oneapi-mkl@2023.2.0 % ${SPACK_COMPILER} +cluster ~ilp64 mpi_family=openmpi threads=none ^${SPACK_MPI}) ^cuda@12.6.3/$(spack find --format '{hash:7}' cuda@12.6.3 % ${SPACK_COMPILER}) ^python@3.11.9/$(spack find --format '{hash:7}' python@3.11.9 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
