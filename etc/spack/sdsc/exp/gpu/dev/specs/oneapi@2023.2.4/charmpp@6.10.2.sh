@@ -51,8 +51,8 @@ module list
 
 declare -xr SPACK_PACKAGE='charmpp@6.10.2'
 declare -xr SPACK_COMPILER='oneapi@2023.2.4'
-declare -xr SPACK_VARIANTS='backend=verbs build-target=charm++ ~cuda ~omp ~papi pmi=none +production ~pthreads +shared +smp ~syncft ~tcp ~tracing'
-declare -xr SPACK_DEPENDENCIES=''
+declare -xr SPACK_VARIANTS='backend=verbs build-target=charm++ +cuda ~omp ~papi pmi=none +production ~pthreads +shared +smp ~syncft ~tcp ~tracing'
+declare -xr SPACK_DEPENDENCIES="^cuda@12.6.3/$(spack find --format '{hash:7}' cuda@12.6.3 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
