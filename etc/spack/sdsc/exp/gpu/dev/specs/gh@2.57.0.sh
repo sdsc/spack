@@ -21,6 +21,21 @@ declare -xr JOB_SCRIPT_MD5="$(md5sum ${JOB_SCRIPT} | awk '{print $1}')"
 declare -xr JOB_SCRIPT_SHA256="$(sha256sum ${JOB_SCRIPT} | awk '{print $1}')"
 declare -xr JOB_SCRIPT_NUMBER_OF_LINES="$(wc -l ${JOB_SCRIPT} | awk '{print $1}')"
 
+declare -xr SCHEDULER_NAME='slurm'
+declare -xr SCHEDULER_MAJOR='23'
+declare -xr SCHEDULER_MINOR='02'
+declare -xr SCHEDULER_REVISION='7'
+declare -xr SCHEDULER_VERSION="${SCHEDULER_MAJOR}.${SCHEDULER_MINOR}.${SCHEDULER_REVISION}"
+declare -xr SCHEDULER_MODULE="${SCHEDULER_NAME}/${SLURM_CLUSTER_NAME}/${SCHEDULER_VERSION}"
+
+declare -xr SPACK_MAJOR='0'
+declare -xr SPACK_MINOR='21'
+declare -xr SPACK_REVISION='2'
+declare -xr SPACK_VERSION="${SPACK_MAJOR}.${SPACK_MINOR}.${SPACK_REVISION}"
+declare -xr SPACK_INSTANCE_NAME='gpu'
+declare -xr SPACK_INSTANCE_VERSION='dev'
+declare -xr SPACK_INSTANCE_DIR='/home/mkandes/software/spack/repos/sdsc/gpu'
+
 declare -xr TMPDIR="${SLURM_TMPDIR}/spack-stage"
 declare -xr TMP="${TMPDIR}"
 
