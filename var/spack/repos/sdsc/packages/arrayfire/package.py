@@ -41,6 +41,9 @@ class Arrayfire(CMakePackage, CudaPackage):
 
     conflicts("cuda_arch=none", when="+cuda", msg="CUDA architecture is required")
 
+    # https://github.com/arrayfire/arrayfire/issues/3501
+    patch("ArrayFire-3.9.0-CMakeList.patch", when="@3.9.0")
+
     @property
     def libs(self):
         query_parameters = self.spec.last_query.extra_parameters
