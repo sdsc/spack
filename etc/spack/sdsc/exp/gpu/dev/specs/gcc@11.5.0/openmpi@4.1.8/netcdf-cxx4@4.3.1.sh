@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=libxc@6.2.2
+#SBATCH --job-name=netcdf-cxx4@4.3.1
 #SBATCH --account=use300
 #SBATCH --clusters=expanse
 #SBATCH --partition=ind-gpu-shared
@@ -47,11 +47,13 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-declare -xr SPACK_PACKAGE='libxc@6.2.2'
+declare -xr SPACK_PACKAGE='netcdf-cxx4@4.3.1'
 declare -xr SPACK_COMPILER='gcc@11.5.0'
-declare -xr SPACK_VARIANTS='+cuda cuda_arch=70,80 ~shared'
-declare -xr SPACK_DEPENDENCIES="^cuda@11.8.0/$(spack find --format '{hash:7}' cuda@11.8.0 % ${SPACK_COMPILER})"
+declare -xr SPACK_VARIANTS='~doc +pic +shared' 
+declare -xr SPACK_MPI='openmpi@4.1.8'
+declare -xr SPACK_DEPENDENCIES="^netcdf-c@4.9.2/$(spack find --format '{hash:7}' netcdf-c@4.9.2 % ${SPACK_COMPILER} +mpi ^${SPACK_MPI})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
+
 
 printenv
 
