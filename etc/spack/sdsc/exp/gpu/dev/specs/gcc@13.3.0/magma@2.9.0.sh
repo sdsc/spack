@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=magma@2.8.0
+#SBATCH --job-name=magma@2.9.0
 #SBATCH --account=use300
 #SBATCH --clusters=expanse
 #SBATCH --partition=ind-gpu-shared
@@ -64,7 +64,7 @@ module load "${COMPILER_MODULE}"
 module load "${CUDA_MODULE}"
 module list
 
-declare -xr SPACK_PACKAGE='magma@2.8.0'
+declare -xr SPACK_PACKAGE='magma@2.9.0'
 declare -xr SPACK_COMPILER='gcc@13.3.0'
 declare -xr SPACK_VARIANTS='+cuda +fortran ~rocm +shared cuda_arch=70,80,90'
 declare -xr SPACK_DEPENDENCIES="^cuda@12.6.3/$(spack find --format '{hash:7}' cuda@12.6.3 % ${SPACK_COMPILER}) ^openblas@0.3.28/$(spack find --format '{hash:7}' openblas@0.3.28 % ${SPACK_COMPILER} ~ilp64 threads=none)"
