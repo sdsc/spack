@@ -49,8 +49,8 @@ module list
 
 declare -xr SPACK_PACKAGE='libxc@7.0.0'
 declare -xr SPACK_COMPILER='oneapi@2023.2.4'
-declare -xr SPACK_VARIANTS='~cuda +shared'
-declare -xr SPACK_DEPENDENCIES='^perl@5.40.0 ^autoconf@2.71'
+declare -xr SPACK_VARIANTS='+cuda cuda_arch=70,80,90 ~shared'
+declare -xr SPACK_DEPENDENCIES="^cuda@12.6.3/$(spack find --format '{hash:7}' cuda@12.6.3 % ${SPACK_COMPILER}) ^perl@5.40.0 ^autoconf@2.71"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
@@ -71,8 +71,7 @@ fi
 
 mkdir -p "${TMPDIR}"
 
-#time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all --reuse "$(echo ${SPACK_SPEC})"
-time -p spack install --jobs 1 --fail-fast --yes-to-all --reuse "$(echo ${SPACK_SPEC})"
+time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all --reuse "$(echo ${SPACK_SPEC})"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
   exit 1
