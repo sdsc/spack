@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=openmpi@4.1.6
+#SBATCH --job-name=openmpi@4.1.8
 #SBATCH --account=use300
 #SBATCH --clusters=expanse
 #SBATCH --partition=ind-gpu-shared
@@ -47,7 +47,7 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-declare -xr SPACK_PACKAGE='openmpi@4.1.6'
+declare -xr SPACK_PACKAGE='openmpi@4.1.8'
 declare -xr SPACK_COMPILER='intel@2021.10.0'
 declare -xr SPACK_VARIANTS='~atomics +cuda cuda_arch=70,80,90 fabrics=ucx ~gpfs ~internal-hwloc ~internal-pmix +legacylaunchers +lustre ~memchecker ~openshmem ~orterunprefix +romio +rsh schedulers=slurm +static +vt'
 declare -xr SPACK_DEPENDENCIES="^lustre ^slurm ^rdma-core ^ucx@1.14.1/$(spack find --format '{hash:7}' ucx@1.14.1 % ${SPACK_COMPILER}) ^cuda@12.6.3/$(spack find --format '{hash:7}' cuda@12.6.3 % ${SPACK_COMPILER})"
