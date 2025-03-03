@@ -77,6 +77,6 @@ if [[ "${?}" -ne 0 ]]; then
   exit 1
 fi
 
-#sed -i "s|PATH_TO_GCC_11.5.0|$(spack location -i 'gcc@11.5.0')/bin/gcc|g" "${SPACK_INSTANCE_DIR}/etc/spack/compilers.yaml"
-#sed -i "s|PATH_TO_G++_11.5.0|$(spack location -i 'gcc@11.5.0')/bin/g++|g" "${SPACK_INSTANCE_DIR}/etc/spack/compilers.yaml"
-#sed -i "s|PATH_TO_GFORTRAN_11.5.0|$(spack location -i 'gcc@11.5.0')/bin/gfortran|g" "${SPACK_INSTANCE_DIR}/etc/spack/compilers.yaml"
+sed -i "s|PATH_TO_GCC_11.5.0|$(spack location -i 'gcc@11.5.0')/bin/gcc|g" "${SPACK_INSTANCE_DIR}/etc/spack/compilers.yaml"
+sed -i "s|PATH_TO_G++_11.5.0|$(spack location -i 'gcc@11.5.0')/bin/g++|g" "${SPACK_INSTANCE_DIR}/etc/spack/compilers.yaml"
+sed -i "s|PATH_TO_GFORTRAN_11.5.0|$(spack location -i 'gcc@11.5.0')/bin/gfortran|g" "${SPACK_INSTANCE_DIR}/etc/spack/compilers.yaml"
