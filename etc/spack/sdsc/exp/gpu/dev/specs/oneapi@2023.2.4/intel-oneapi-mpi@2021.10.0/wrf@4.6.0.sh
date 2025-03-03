@@ -50,7 +50,7 @@ module list
 declare -xr SPACK_PACKAGE='wrf@4.6.0'
 declare -xr SPACK_COMPILER='oneapi@2023.2.4'
 declare -xr SPACK_VARIANTS='~adios2 build_type=dmpar compile_type=em_real nesting=basic ~netcdf_classic +pnetcdf'
-declare -xr SPACK_MPI='openmpi@4.1.6'
+declare -xr SPACK_MPI='intel-oneapi-mpi@2021.10.0'
 declare -xr SPACK_DEPENDENCIES="^hdf5@1.14.3/$(spack find --format '{hash:7}' hdf5@1.14.3 % ${SPACK_COMPILER} +mpi ^${SPACK_MPI}) ^parallel-netcdf@1.13.0/$(spack find --format '{hash:7}' parallel-netcdf@1.13.0 % ${SPACK_COMPILER} ^${SPACK_MPI}) ^netcdf-c@4.9.2/$(spack find --format '{hash:7}' netcdf-c@4.9.2 % ${SPACK_COMPILER} +mpi +parallel-netcdf ^${SPACK_MPI})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 

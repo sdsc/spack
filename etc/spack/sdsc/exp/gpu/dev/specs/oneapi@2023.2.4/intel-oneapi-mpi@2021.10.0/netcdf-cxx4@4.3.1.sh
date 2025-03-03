@@ -50,7 +50,7 @@ module list
 declare -xr SPACK_PACKAGE='netcdf-cxx4@4.3.1'
 declare -xr SPACK_COMPILER='oneapi@2023.2.4'
 declare -xr SPACK_VARIANTS='~doc +pic +shared' 
-declare -xr SPACK_MPI='openmpi@4.1.6'
+declare -xr SPACK_MPI='intel-oneapi-mpi@2021.10.0'
 declare -xr SPACK_DEPENDENCIES="^netcdf-c@4.9.2/$(spack find --format '{hash:7}' netcdf-c@4.9.2 % ${SPACK_COMPILER} +mpi ^${SPACK_MPI})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 

@@ -50,7 +50,7 @@ module list
 declare -xr SPACK_PACKAGE='namd@2.14'
 declare -xr SPACK_COMPILER='oneapi@2023.2.4'
 declare -xr SPACK_VARIANTS='~cuda fftw=amdfftw interface=tcl'
-declare -xr SPACK_MPI='openmpi@4.1.6'
+declare -xr SPACK_MPI='intel-oneapi-mpi@2021.10.0'
 declare -xr SPACK_DEPENDENCIES="^charmpp@6.10.2/$(spack find --format '{hash:7}' charmpp@6.10.2 % ${SPACK_COMPILER} backend=mpi ^${SPACK_MPI}) ^amdfftw@4.2/$(spack find --format '{hash:7}' amdfftw@4.2 % ${SPACK_COMPILER} ~mpi ~openmp)"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 

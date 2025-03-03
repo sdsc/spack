@@ -50,7 +50,7 @@ module list
 declare -xr SPACK_PACKAGE='openfoam@2406'
 declare -xr SPACK_COMPILER='oneapi@2023.2.4'
 declare -xr SPACK_VARIANTS='~int64 +kahip ~knl +metis +mgridgen ~paraview +scotch +source ~vtk +zoltan'
-declare -xr SPACK_MPI='openmpi@4.1.6'
+declare -xr SPACK_MPI='intel-oneapi-mpi@2021.10.0'
 declare -xr SPACK_DEPENDENCIES="^adios2@2.10.1/$(spack find --format '{hash:7}' adios2@2.10.1 % ${SPACK_COMPILER} +mpi ^${SPACK_MPI}) ^cgal@5.6.1/$(spack find --format '{hash:7}' cgal@5.6.1 % ${SPACK_COMPILER}) ^amdfftw@4.2/$(spack find --format '{hash:7}' amdfftw@4.2 % ${SPACK_COMPILER} ~mpi ~openmp) ^kahip@3.16/$(spack find --format '{hash:7}' kahip@3.16 % ${SPACK_COMPILER} ^${SPACK_MPI}) ^scotch@7.0.5/$(spack find --format '{hash:7}' scotch@7.0.5 % ${SPACK_COMPILER} +mpi ^${SPACK_MPI}) ^zoltan@3.901/$(spack find --format '{hash:7}' zoltan@3.901 % ${SPACK_COMPILER} ~fortran +mpi +parmetis ^${SPACK_MPI})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 

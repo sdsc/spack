@@ -50,7 +50,7 @@ module list
 declare -xr SPACK_PACKAGE='charmpp@6.10.2'
 declare -xr SPACK_COMPILER='oneapi@2023.2.4'
 declare -xr SPACK_VARIANTS='backend=mpi build-target=charm++ ~cuda +omp ~papi pmi=none +production ~pthreads +shared +smp ~syncft ~tcp ~tracing'
-declare -xr SPACK_MPI='openmpi@4.1.6'
+declare -xr SPACK_MPI='intel-oneapi-mpi@2021.10.0'
 declare -xr SPACK_DEPENDENCIES="^${SPACK_MPI}/$(spack find --format '{hash:7}' ${SPACK_MPI} % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 

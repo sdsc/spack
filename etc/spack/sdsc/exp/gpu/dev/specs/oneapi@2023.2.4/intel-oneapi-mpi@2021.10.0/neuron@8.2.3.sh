@@ -50,7 +50,7 @@ module list
 declare -xr SPACK_PACKAGE='neuron@8.2.3'
 declare -xr SPACK_COMPILER='oneapi@2023.2.4'
 declare -xr SPACK_VARIANTS='~backtrace ~caliper +coreneuron ~interviews ~legacy-unit +mpi +python +rx3d +shared ~tests'
-declare -xr SPACK_MPI='openmpi@4.1.6'
+declare -xr SPACK_MPI='intel-oneapi-mpi@2021.10.0'
 declare -xr SPACK_DEPENDENCIES="^${SPACK_MPI}/$(spack find --format '{hash:7}' ${SPACK_MPI} % ${SPACK_COMPILER}) ^py-numpy@2.1.2/$(spack find --format '{hash:7}' py-numpy@2.1.2 % ${SPACK_COMPILER} ^amdblis@4.2/$(spack find --format '{hash:7}' amdblis@4.2 % ${SPACK_COMPILER} ~ilp64 threads=none) ^amdlibflame@4.2/$(spack find --format '{hash:7}' amdlibflame@4.2 % ${SPACK_COMPILER} ~ilp64 ^amdblis@4.2 threads=none))"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 

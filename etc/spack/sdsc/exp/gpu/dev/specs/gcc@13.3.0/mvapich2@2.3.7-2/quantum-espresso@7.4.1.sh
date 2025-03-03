@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=quantum-espresso@7.3.1
+#SBATCH --job-name=quantum-espresso@7.4.1
 #SBATCH --account=use300
 #SBATCH --clusters=expanse
 #SBATCH --partition=ind-gpu-shared
@@ -10,7 +10,7 @@
 #SBATCH --cpus-per-task=10
 #SBATCH --mem=92G
 #SBATCH --gpus=1
-#SBATCH --time=01:00:00
+#SBATCH --time=00:30:00
 #SBATCH --output=%x.o%j.%N
 
 declare -xir UNIX_TIME="$(date +'%s')"
@@ -47,12 +47,11 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-declare -xr SPACK_PACKAGE='quantum-espresso@7.3.1'
-declare -xr SPACK_COMPILER='oneapi@2023.2.4'
-declare -xr SPACK_VARIANTS='~elpa +epw +fox hdf5=parallel +libxc +mpi ~nvtx +openmp +patch +qmcpack +scalapack'
-declare -xr SPACK_MPI='openmpi@4.1.6'
-declare -xr SPACK_DEPENDENCIES='^amdfftw ^amdscalapack ^amdblis threads=openmp ^amdlibflame'
-#declare -xr SPACK_DEPENDENCIES="^cmake@3.27.7/$(spack find --format '{hash:7}' cmake@3.27.7 % ${SPACK_COMPILER}) ^amdblis@4.2/$(spack find --format '{hash:7}' amdblis@4.2 % ${SPACK_COMPILER} ~ilp64 threads=openmp) ^amdlibflame@4.2/$(spack find --format '{hash:7}' amdlibflame@4.2 % ${SPACK_COMPILER} ~ilp64 ^amdblis@4.2 threads=openmp) ^amdfftw@4.2/$(spack find --format '{hash:7}' amdfftw@4.2 % ${SPACK_COMPILER} ~mpi ~openmp) ^python@3.11.9/$(spack find --format '{hash:7}' python@3.11.9 % ${SPACK_COMPILER}) ^libxc@6.2.2/$(spack find --format '{hash:7}' libxc@6.2.2 % ${SPACK_COMPILER}) ^${SPACK_MPI}/$(spack find --format '{hash:7}' ${SPACK_MPI} % ${SPACK_COMPILER}) ^hdf5@1.14.3/$(spack find --format '{hash:7}' hdf5@1.14.3 % ${SPACK_COMPILER} +mpi ^${SPACK_MPI}) ^amdscalapack@4.2/$(spack find --format '{hash:7}' amdscalapack@4.2 % ${SPACK_COMPILER} ^${SPACK_MPI})"
+declare -xr SPACK_PACKAGE='quantum-espresso@7.4.1'
+declare -xr SPACK_COMPILER='gcc@13.3.0'
+declare -xr SPACK_VARIANTS='+elpa +epw +fox hdf5=parallel ~libxc +mpi ~nvtx ~openmp +patch +qmcpack +scalapack'
+declare -xr SPACK_MPI='mvapich2@2.3.7-2'
+declare -xr SPACK_DEPENDENCIES="^cmake@3.31.2/$(spack find --format '{hash:7}' cmake@3.31.2 % ${SPACK_COMPILER}) ^openblas@0.3.28/$(spack find --format '{hash:7}' openblas@0.3.28 % ${SPACK_COMPILER} ~ilp64 threads=none) ^fftw@3.3.10/$(spack find --format '{hash:7}' fftw@3.3.10 % ${SPACK_COMPILER} ~mpi ~openmp) ^python@3.11.9/$(spack find --format '{hash:7}' python@3.11.9 % ${SPACK_COMPILER}) ^hdf5@1.14.3/$(spack find --format '{hash:7}' hdf5@1.14.3 % ${SPACK_COMPILER} +mpi ^${SPACK_MPI}) ^netlib-scalapack@2.2.0/$(spack find --format '{hash:7}' netlib-scalapack@2.2.0 % ${SPACK_COMPILER} ^openblas@0.3.28 ^${SPACK_MPI}) ^elpa@2024.03.001/$(spack find --format '{hash:7}' elpa@2024.03.001 % ${SPACK_COMPILER} +mpi ~openmp ^${SPACK_MPI})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
