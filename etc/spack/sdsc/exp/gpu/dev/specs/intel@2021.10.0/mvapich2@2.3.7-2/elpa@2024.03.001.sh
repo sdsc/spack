@@ -51,7 +51,7 @@ declare -xr SPACK_PACKAGE='elpa@2024.03.001'
 declare -xr SPACK_COMPILER='intel@2021.10.0'
 declare -xr SPACK_VARIANTS='+cuda cuda_arch=70,80,90 +mpi ~openmp ~rocm'
 declare -xr SPACK_MPI='mvapich2@2.3.7-2'
-declare -xr SPACK_DEPENDENCIES="^intel-oneapi-mkl@2023.2.0/$(spack find --format '{hash:7}' intel-oneapi-mkl@2023.2.0 % ${SPACK_COMPILER} +cluster ~ilp64 mpi_family=mpich threads=none ^${SPACK_MPI}) ^cuda@12.6.3/$(spack find --format '{hash:7}' cuda@12.6.3 % ${SPACK_COMPILER}) ^python@3.11.9/$(spack find --format '{hash:7}' python@3.11.9 % ${SPACK_COMPILER})"
+declare -xr SPACK_DEPENDENCIES="^openblas@0.3.28/$(spack find --format '{hash:7}' openblas@0.3.28 % ${SPACK_COMPILER} ~ilp64 threads=none) ^python@3.11.9/$(spack find --format '{hash:7}' python@3.11.9 % ${SPACK_COMPILER}) ^netlib-scalapack@2.2.0/$(spack find --format '{hash:7}' netlib-scalapack@2.2.0 % ${SPACK_COMPILER} ^${SPACK_MPI}) ^cuda@12.6.3/$(spack find --format '{hash:7}' cuda@12.6.3 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
