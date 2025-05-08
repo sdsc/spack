@@ -2,6 +2,7 @@
 
 #SBATCH --job-name=deploy
 #SBATCH --account=use300
+#SBATCH --reservation=root_73
 #SBATCH --clusters=expanse
 #SBATCH --partition=ind-shared
 #SBATCH --nodes=1
@@ -32,7 +33,7 @@ declare -xr SPACK_REVISION='2'
 declare -xr SPACK_VERSION="${SPACK_MAJOR}.${SPACK_MINOR}.${SPACK_REVISION}"
 declare -xr SPACK_INSTANCE_NAME='cpu'
 declare -xr SPACK_INSTANCE_VERSION='dev'
-declare -xr SPACK_INSTANCE_DIR='/home/mkandes/software/spack/repos/sdsc/cpu'
+declare -xr SPACK_INSTANCE_DIR="/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}/${SPACK_INSTANCE_VERSION}"
 
 echo "${UNIX_TIME} ${LOCAL_TIME} ${SLURM_JOB_ID} ${JOB_SCRIPT_MD5} ${JOB_SCRIPT_SHA256} ${JOB_SCRIPT_NUMBER_OF_LINES} ${JOB_SCRIPT}"
 cat  "${JOB_SCRIPT}"
@@ -211,8 +212,8 @@ SCOTCH_JOB_ID="$(sbatch --dependency="afterok:${OPENMPI_JOB_ID}" 'scotch@7.0.5.s
   OPENFOAM_JOB_ID="$(sbatch --dependency="afterok:${ADIOS2_JOB_ID}:${CGAL5_JOB_ID}:${SCOTCH_JOB_ID}:${ZOLTAN_JOB_ID}" 'openfoam@2406.sh' | grep -o '[[:digit:]]*')"
 
 cd "${SLURM_SUBMIT_DIR}/specs/aocc@4.2.0"
-CHARMPP_JOB_ID="$(sbatch --dependency="afterok:${GCC_JOB_ID}" 'charmpp@6.10.2.sh' | grep -o '[[:digit:]]*')"
-EIGEN_JOB_ID="$(sbatch --dependency="afterok:${GCC_JOB_ID}" 'eigen@3.4.0.sh' | grep -o '[[:digit:]]*')"
+CHARMPP_JOB_ID="$(sbatch --dependency="afterok:${AOCC_JOB_ID}" 'charmpp@6.10.2.sh' | grep -o '[[:digit:]]*')"
+EIGEN_JOB_ID="$(sbatch --dependency="afterok:${AOCC_JOB_ID}" 'eigen@3.4.0.sh' | grep -o '[[:digit:]]*')"
   AMDFFTW_JOB_ID="$(sbatch --dependency="afterok:${EIGEN_JOB_ID}" 'amdfftw@4.2.sh' | grep -o '[[:digit:]]*')"
     AMDFFTW_OMP_JOB_ID="$(sbatch --dependency="afterok:${AMDFFTW_JOB_ID}" 'amdfftw@4.2-omp.sh' | grep -o '[[:digit:]]*')"
     NAMD2_JOB_ID="$(sbatch --dependency="afterok:${CHARMPP_JOB_ID}:${AMDFFTW_JOB_ID}" 'namd@2.14.sh' | grep -o '[[:digit:]]*')"
