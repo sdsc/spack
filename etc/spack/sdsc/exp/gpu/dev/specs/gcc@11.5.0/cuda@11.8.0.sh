@@ -5,7 +5,7 @@
 #SBATCH --reservation=root_73
 #SBATCH --clusters=expanse
 #SBATCH --partition=gpu-debug
-##SBATCH --qos=gpu-unlim
+#SBATCH --qos=gpu-unlim
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=10
