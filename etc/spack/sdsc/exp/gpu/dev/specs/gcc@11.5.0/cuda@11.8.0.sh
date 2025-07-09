@@ -4,7 +4,7 @@
 #SBATCH --account=use300
 #SBATCH --reservation=root_73
 #SBATCH --clusters=expanse
-#SBATCH --partition=gpu-debug
+#SBATCH --partition=ind-gpu-shared
 #SBATCH --qos=gpu-unlim
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
