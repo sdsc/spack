@@ -8,10 +8,11 @@ modules:
       hierarchy:
         - mpi
       hash_length: 0
+      exclude_implicits: true
       hide_implicits: true
-      naming_scheme: '{name}/{version}-{hash:7}'
+      naming_scheme: '{name}/{version}/{hash:7}'
       projections:
-        all: '{name}/{version}-{hash:7}'
+        all: '{name}/{version}/{hash:7}'
       all:
         autoload: 'direct'
         environment:
