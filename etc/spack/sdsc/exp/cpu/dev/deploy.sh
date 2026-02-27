@@ -32,8 +32,8 @@ declare -xr SPACK_MINOR='21'
 declare -xr SPACK_REVISION='2'
 declare -xr SPACK_VERSION="${SPACK_MAJOR}.${SPACK_MINOR}.${SPACK_REVISION}"
 declare -xr SPACK_INSTANCE_NAME='cpu'
-declare -xr SPACK_INSTANCE_VERSION='dev'
-declare -xr SPACK_INSTANCE_DIR="${HOME}/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}/${SPACK_INSTANCE_VERSION}"
+declare -xr SPACK_INSTANCE_VERSION='vde'
+declare -xr SPACK_INSTANCE_DIR="/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}/${SPACK_INSTANCE_VERSION}"
 
 echo "${UNIX_TIME} ${LOCAL_TIME} ${SLURM_JOB_ID} ${JOB_SCRIPT_MD5} ${JOB_SCRIPT_SHA256} ${JOB_SCRIPT_NUMBER_OF_LINES} ${JOB_SCRIPT}"
 cat  "${JOB_SCRIPT}"
@@ -444,9 +444,6 @@ EIGEN_JOB_ID="$(sbatch --dependency="afterok:${INTEL_ONEAPI_JOB_ID}" 'eigen@3.4.
     FFTW_OMP_JOB_ID="$(sbatch --dependency="afterok:${FFTW_JOB_ID}" 'fftw@3.3.10-omp.sh' | grep -o '[[:digit:]]*')"
   GSL_JOB_ID="$(sbatch --dependency="afterok:${EIGEN_JOB_ID}" 'gsl@2.8.sh' | grep -o '[[:digit:]]*')"
   HDF5_JOB_ID="$(sbatch --dependency="afterok:${EIGEN_JOB_ID}" 'hdf5@1.14.3.sh' | grep -o '[[:digit:]]*')"
-    NETCDF_C_JOB_ID="$(sbatch --dependency="afterok:${HDF5_JOB_ID}" 'netcdf-c@4.9.2.sh' | grep -o '[[:digit:]]*')"
-      NETCDF_CXX4_JOB_ID="$(sbatch --dependency="afterok:${NETCDF_C_JOB_ID}" 'netcdf-cxx4@4.3.1.sh' | grep -o '[[:digit:]]*')"
-      NETCDF_FORTRAN_JOB_ID="$(sbatch --dependency="afterok:${NETCDF_C_JOB_ID}" 'netcdf-fortran@4.6.1.sh' | grep -o '[[:digit:]]*')"
   INTEL_ONEAPI_MKL_JOB_ID="$(sbatch --dependency="afterok:${EIGEN_JOB_ID}" 'intel-oneapi-mkl@2023.2.0.sh' | grep -o '[[:digit:]]*')"
     INTEL_ONEAPI_MKL_I64_JOB_ID="$(sbatch --dependency="afterok:${INTEL_ONEAPI_MKL_JOB_ID}" 'intel-oneapi-mkl@2023.2.0-i64.sh' | grep -o '[[:digit:]]*')"
     INTEL_ONEAPI_MKL_OMP_JOB_ID="$(sbatch --dependency="afterok:${INTEL_ONEAPI_MKL_JOB_ID}" 'intel-oneapi-mkl@2023.2.0-omp.sh' | grep -o '[[:digit:]]*')"
@@ -464,7 +461,6 @@ EIGEN_JOB_ID="$(sbatch --dependency="afterok:${INTEL_ONEAPI_JOB_ID}" 'eigen@3.4.
           NUMPY1_OMP_JOB_ID="$(sbatch --dependency="afterok:${INTEL_ONEAPI_MKL_OMP_JOB_ID}:${NUMPY1_JOB_ID}" 'py-numpy@1.26.4-omp.sh' | grep -o '[[:digit:]]*')"
           NUMPY1_I64_OMP_JOB_ID="$(sbatch --dependency="afterok:${INTEL_ONEAPI_MKL_I64_OMP_JOB_ID}:${NUMPY1_JOB_ID}" 'py-numpy@1.26.4-i64-omp.sh' | grep -o '[[:digit:]]*')"
             ADIOS2_JOB_ID="$(sbatch --dependency="afterok:${NUMPY2_JOB_ID}" 'adios2@2.10.1.sh' | grep -o '[[:digit:]]*')"
-        VENV_JOB_ID="$(sbatch --dependency="afterok:${SETUPTOOLS_JOB_ID}" 'py-virtualenv@20.26.5.sh' | grep -o '[[:digit:]]*')"
   STREAM_JOB_ID="$(sbatch --dependency="afterok:${EIGEN_JOB_ID}" 'stream@5.10.sh' | grep -o '[[:digit:]]*')"
     STREAM_OMP_JOB_ID="$(sbatch --dependency="afterok:${STREAM_JOB_ID}" 'stream@5.10-omp.sh' | grep -o '[[:digit:]]*')"
 

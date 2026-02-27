@@ -8,7 +8,7 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=16
-#SBATCH --mem=32G
+#SBATCH --mem=64G
 #SBATCH --time=00:30:00
 #SBATCH --output=%x.o%j.%N
 
@@ -32,8 +32,8 @@ declare -xr SPACK_MINOR='21'
 declare -xr SPACK_REVISION='2'
 declare -xr SPACK_VERSION="${SPACK_MAJOR}.${SPACK_MINOR}.${SPACK_REVISION}"
 declare -xr SPACK_INSTANCE_NAME='cpu'
-declare -xr SPACK_INSTANCE_VERSION='dev'
-declare -xr SPACK_INSTANCE_DIR="${HOME}/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}/${SPACK_INSTANCE_VERSION}"
+declare -xr SPACK_INSTANCE_VERSION='vde'
+declare -xr SPACK_INSTANCE_DIR="/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}/${SPACK_INSTANCE_VERSION}"
 
 declare -xr TMPDIR="${SLURM_TMPDIR}/spack-stage"
 declare -xr TMP="${TMPDIR}"
@@ -49,7 +49,7 @@ module list
 declare -xr SPACK_PACKAGE='eigen@3.4.0'
 declare -xr SPACK_COMPILER='intel@2021.10.0'
 declare -xr SPACK_VARIANTS=''
-declare -xr SPACK_DEPENDENCIES="^cmake@3.27.7 % ${SPACK_COMPILER} arch=linux-rocky8-zen2"
+declare -xr SPACK_DEPENDENCIES="^cmake@3.31.2 % ${SPACK_COMPILER} arch=linux-rocky8-zen2"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
