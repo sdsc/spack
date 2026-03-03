@@ -76,6 +76,18 @@ if [[ "${?}" -ne 0 ]]; then
   exit 1
 fi
 
+time -p spack mirror create --dependencies --directory "${HOME}/software/spack/caches/exp/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}/dev" "$(echo ${SPACK_SPEC})"
+if [[ "${?}" -ne 0 ]]; then
+  echo 'ERROR: spack mirror create failed.'
+  exit 1
+fi
+
+time -p spack buildcache push "${HOME}/software/spack/caches/exp/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}/dev" "$(echo ${SPACK_SPEC})"
+if [[ "${?}" -ne 0 ]]; then
+  echo 'ERROR: spack buildcache push failed.'
+  exit 1
+fi
+
 sed -i "s|PATH_TO_ICC_2021_10_0|$(spack location -i 'intel-oneapi-compilers@2023.2.4')/compiler/latest/linux/bin/intel64/icc|g" "${SPACK_INSTANCE_DIR}/etc/spack/compilers.yaml"
 sed -i "s|PATH_TO_ICPC_2021_10_0|$(spack location -i 'intel-oneapi-compilers@2023.2.4')/compiler/latest/linux/bin/intel64/icpc|g" "${SPACK_INSTANCE_DIR}/etc/spack/compilers.yaml"
 sed -i "s|PATH_TO_IFORT_2021_10_0|$(spack location -i 'intel-oneapi-compilers@2023.2.4')/compiler/latest/linux/bin/intel64/ifort|g" "${SPACK_INSTANCE_DIR}/etc/spack/compilers.yaml"
@@ -84,4 +96,3 @@ sed -i "s|PATH_TO_ICX_2023_2_4|$(spack location -i 'intel-oneapi-compilers@2023.
 sed -i "s|PATH_TO_ICPX_2023_2_4|$(spack location -i 'intel-oneapi-compilers@2023.2.4')/compiler/latest/linux/bin/icpx|g" "${SPACK_INSTANCE_DIR}/etc/spack/compilers.yaml"
 sed -i "s|PATH_TO_DPCPP_2023_2_4|$(spack location -i 'intel-oneapi-compilers@2023.2.4')/compiler/latest/linux/bin/dpcpp|g" "${SPACK_INSTANCE_DIR}/etc/spack/compilers.yaml"
 sed -i "s|PATH_TO_IFX_2023_2_4|$(spack location -i 'intel-oneapi-compilers@2023.2.4')/compiler/latest/linux/bin/ifx|g" "${SPACK_INSTANCE_DIR}/etc/spack/compilers.yaml"
-

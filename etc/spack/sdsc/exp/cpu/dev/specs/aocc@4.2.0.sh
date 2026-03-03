@@ -76,6 +76,18 @@ if [[ "${?}" -ne 0 ]]; then
   exit 1
 fi
 
+time -p spack mirror create --dependencies --directory "${HOME}/software/spack/caches/exp/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}/dev" "$(echo ${SPACK_SPEC})"
+if [[ "${?}" -ne 0 ]]; then
+  echo 'ERROR: spack mirror create failed.'
+  exit 1
+fi
+
+time -p spack buildcache push "${HOME}/software/spack/caches/exp/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}/dev" "$(echo ${SPACK_SPEC})"
+if [[ "${?}" -ne 0 ]]; then
+  echo 'ERROR: spack buildcache push failed.'
+  exit 1
+fi
+
 sed -i "s|PATH_TO_AMD_CLANG_4_2_0|$(spack location -i 'aocc@4.2.0')/bin/clang|g" "${SPACK_INSTANCE_DIR}/etc/spack/compilers.yaml"
 sed -i "s|PATH_TO_AMD_CLANG++_4_2_0|$(spack location -i 'aocc@4.2.0')/bin/clang++|g" "${SPACK_INSTANCE_DIR}/etc/spack/compilers.yaml"
 sed -i "s|PATH_TO_AMD_FLANG_4_2_0|$(spack location -i 'aocc@4.2.0')/bin/flang|g" "${SPACK_INSTANCE_DIR}/etc/spack/compilers.yaml"

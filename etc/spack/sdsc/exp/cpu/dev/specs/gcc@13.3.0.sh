@@ -76,6 +76,18 @@ if [[ "${?}" -ne 0 ]]; then
   exit 1
 fi
 
+time -p spack mirror create --dependencies --directory "${HOME}/software/spack/caches/exp/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}/dev" "$(echo ${SPACK_SPEC})"
+if [[ "${?}" -ne 0 ]]; then
+  echo 'ERROR: spack mirror create failed.'
+  exit 1
+fi
+
+time -p spack buildcache push "${HOME}/software/spack/caches/exp/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}/dev" "$(echo ${SPACK_SPEC})"
+if [[ "${?}" -ne 0 ]]; then
+  echo 'ERROR: spack buildcache push failed.'
+  exit 1
+fi
+
 sed -i "s|PATH_TO_GCC_13_3_0|$(spack location -i 'gcc@13.3.0')/bin/gcc|g" "${SPACK_INSTANCE_DIR}/etc/spack/compilers.yaml"
 sed -i "s|PATH_TO_G++_13_3_0|$(spack location -i 'gcc@13.3.0')/bin/g++|g" "${SPACK_INSTANCE_DIR}/etc/spack/compilers.yaml"
 sed -i "s|PATH_TO_GFORTRAN_13_3_0|$(spack location -i 'gcc@13.3.0')/bin/gfortran|g" "${SPACK_INSTANCE_DIR}/etc/spack/compilers.yaml"
