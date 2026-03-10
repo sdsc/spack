@@ -31,6 +31,7 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
+declare -xr SPACK_SYSTEM_NAME='exp'
 declare -xr SPACK_PACKAGE='gh@2.57.0'
 declare -xr SPACK_COMPILER='gcc@8.5.0'
 declare -xr SPACK_VARIANTS=''
