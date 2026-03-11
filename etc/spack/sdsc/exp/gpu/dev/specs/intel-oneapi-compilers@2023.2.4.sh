@@ -33,6 +33,7 @@ declare -xr SPACK_MAJOR='0'
 declare -xr SPACK_MINOR='21'
 declare -xr SPACK_REVISION='2'
 declare -xr SPACK_VERSION="${SPACK_MAJOR}.${SPACK_MINOR}.${SPACK_REVISION}"
+declare -xr SPACK_SYSTEM_NAME='exp'
 declare -xr SPACK_INSTANCE_NAME='gpu'
 declare -xr SPACK_INSTANCE_VERSION='dev'
 declare -xr SPACK_INSTANCE_DIR="/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}/${SPACK_INSTANCE_VERSION}"
@@ -87,3 +88,15 @@ sed -i "s|PATH_TO_ICPX_2023_2_4|$(spack location -i 'intel-oneapi-compilers@2023
 sed -i "s|PATH_TO_DPCPP_2023_2_4|$(spack location -i 'intel-oneapi-compilers@2023.2.4')/compiler/latest/linux/bin/dpcpp|g" "${SPACK_INSTANCE_DIR}/etc/spack/compilers.yaml"
 sed -i "s|PATH_TO_IFX_2023_2_4|$(spack location -i 'intel-oneapi-compilers@2023.2.4')/compiler/latest/linux/bin/ifx|g" "${SPACK_INSTANCE_DIR}/etc/spack/compilers.yaml"
 
+
+time -p spack mirror create --dependencies --directory "${HOME}/software/spack/caches/${SPACK_VERSION}/${SPACK_SYSTEM_NAME}/${SPACK_INSTANCE_NAME}/dev" "$(echo ${SPACK_SPEC})"
+if [[ "${?}" -ne 0 ]]; then
+  echo 'ERROR: spack mirror create failed.'
+  exit 1
+fi
+
+time -p spack buildcache push "${HOME}/software/spack/caches/${SPACK_VERSION}/${SPACK_SYSTEM_NAME}/${SPACK_INSTANCE_NAME}/dev" "$(echo ${SPACK_SPEC})"
+if [[ "${?}" -ne 0 ]]; then
+  echo 'ERROR: spack buildcache push failed.'
+  exit 1
+fi

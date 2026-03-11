@@ -33,6 +33,7 @@ declare -xr COMPILER_NAME='gcc'
 declare -xr COMPILER_MAJOR='11'
 declare -xr COMPILER_MINOR='5'
 declare -xr COMPILER_REVISION='0'
+declare -xr SPACK_SYSTEM_NAME='exp'
 declare -xr COMPILER_VERSION="${COMPILER_MAJOR}.${COMPILER_MINOR}.${COMPILER_REVISION}"
 declare -xr COMPILER_MODULE="${COMPILER_NAME}/${COMPILER_VERSION}"
 
@@ -140,5 +141,17 @@ mkdir -p "${TMPDIR}"
 time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all --reuse "$(echo ${SPACK_SPEC})"
 if [[ "${?}" -ne 0 ]]; then
   echo 'ERROR: spack install failed.'
+  exit 1
+fi
+
+time -p spack mirror create --dependencies --directory "${HOME}/software/spack/caches/${SPACK_VERSION}/${SPACK_SYSTEM_NAME}/${SPACK_INSTANCE_NAME}/dev" "$(echo ${SPACK_SPEC})"
+if [[ "${?}" -ne 0 ]]; then
+  echo 'ERROR: spack mirror create failed.'
+  exit 1
+fi
+
+time -p spack buildcache push "${HOME}/software/spack/caches/${SPACK_VERSION}/${SPACK_SYSTEM_NAME}/${SPACK_INSTANCE_NAME}/dev" "$(echo ${SPACK_SPEC})"
+if [[ "${?}" -ne 0 ]]; then
+  echo 'ERROR: spack buildcache push failed.'
   exit 1
 fi

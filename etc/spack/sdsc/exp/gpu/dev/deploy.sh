@@ -33,6 +33,7 @@ declare -xr SPACK_MAJOR='0'
 declare -xr SPACK_MINOR='21'
 declare -xr SPACK_REVISION='2'
 declare -xr SPACK_VERSION="${SPACK_MAJOR}.${SPACK_MINOR}.${SPACK_REVISION}"
+declare -xr SPACK_SYSTEM_NAME='exp'
 declare -xr SPACK_INSTANCE_NAME='gpu'
 declare -xr SPACK_INSTANCE_VERSION='dev'
 declare -xr SPACK_INSTANCE_DIR="/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}/${SPACK_INSTANCE_VERSION}"
@@ -55,8 +56,13 @@ spack config get repos
 spack config get upstreams
 
 cp -p yamls/compilers.yaml "${SPACK_INSTANCE_DIR}/etc/spack/compilers.yaml"
+cp -p yamls/mirrors.yaml "${SPACK_INSTANCE_DIR}/etc/spack/mirrors.yaml"
 cp -p yamls/modules.yaml "${SPACK_INSTANCE_DIR}/etc/spack/modules.yaml"
 cp -p yamls/packages.yaml "${SPACK_INSTANCE_DIR}/etc/spack/packages.yaml"
+
+mkdir -p "${SPACK_INSTANCE_DIR}/opt/spack"
+cd "${SPACK_INSTANCE_DIR}/opt/spack"
+cp -rp "${HOME}/software/spack/keys/${SPACK_VERSION}/${SPACK_SYSTEM_NAME}/${SPACK_INSTANCE_NAME}/dev/gpg" ./
 
 cd "${SLURM_SUBMIT_DIR}/specs"
 BZIP2_JOB_ID="$(sbatch 'bzip2@1.0.8.sh' | grep -o '[[:digit:]]*')"
@@ -74,7 +80,7 @@ BZIP2_JOB_ID="$(sbatch 'bzip2@1.0.8.sh' | grep -o '[[:digit:]]*')"
       GIT_JOB_ID="$(sbatch --dependency="afterok:${PERL_JOB_ID}" 'git@2.45.2.sh' | grep -o '[[:digit:]]*')"
         GO_JOB_ID="$(sbatch --dependency="afterok:${GIT_JOB_ID}" 'go@1.23.1.sh' | grep -o '[[:digit:]]*')"
           GITLFS_JOB_ID="$(sbatch --dependency="afterok:${GO_JOB_ID}" 'git-lfs@3.5.1.sh' | grep -o '[[:digit:]]*')"
-          GH_JOB_ID="$(sbatch --dependency="afterok:${GO_JOB_ID}" 'gh@2.57.0.sh' | grep -o '[[:digit:]]*')"
+          #GH_JOB_ID="$(sbatch --dependency="afterok:${GO_JOB_ID}" 'gh@2.57.0.sh' | grep -o '[[:digit:]]*')"
           RCLONE_JOB_ID="$(sbatch --dependency="afterok:${GO_JOB_ID}" 'rclone@1.68.1.sh' | grep -o '[[:digit:]]*')"
       PARALLEL_JOB_ID="$(sbatch --dependency="afterok:${PERL_JOB_ID}" 'parallel@20240922.sh' | grep -o '[[:digit:]]*')"
       SUBVERSION_JOB_ID="$(sbatch --dependency="afterok:${GDB_JOB_ID}:${PERL_JOB_ID}:${SQLITE_JOB_ID}" 'subversion@1.14.3.sh' | grep -o '[[:digit:]]*')"
