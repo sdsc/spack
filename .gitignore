@@ -513,3 +513,16 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+
+############################
+# Additional ignores       #
+############################
+
+# Ignore all tarballs
+*.tar
+*.tar.gz
+*.tgz
+*.tar.bz2
+*.tbz2
+*.tar.xz
+*.txz

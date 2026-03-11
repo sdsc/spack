@@ -1,0 +1,41 @@
+packages:
+  lmod:
+    externals:
+      - spec: 'lmod@8.2.4'
+        prefix: /usr
+    buildable: false
+  lustre:
+    externals:
+      - spec: 'lustre@2.15.2'
+        prefix: /usr
+    buildable: false
+  openssl:
+    externals:
+      - spec: 'openssl@1.1.1k'
+        prefix: /usr
+    buildable: false
+  rdma-core:
+    externals:
+      - spec: 'rdma-core@43.0'
+        prefix: /usr
+    buildable: false
+  hcoll:
+    externals:
+      - spec: 'hcoll@4.8.3220'
+        prefix: /opt/mellanox/hcoll
+    buildable: false
+  knem:
+    externals:
+      - spec: 'knem@1.1.4'
+        prefix: /opt/knem-1.1.4.90mlnx3
+    buildable: false
+  xpmem:
+    externals:
+      - spec: 'xpmem@2.4.6'
+        prefix: /usr
+    buildable: false
+  slurm:
+    externals:
+      - spec: 'slurm@23.02.7'
+        prefix: /cm/shared/apps/slurm/current
+    buildable: false
