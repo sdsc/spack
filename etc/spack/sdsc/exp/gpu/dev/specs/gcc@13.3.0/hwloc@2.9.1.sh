@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=raxml@8.2.13
+#SBATCH --job-name=hwloc@2.9.1
 #SBATCH --account=use300
 #SBATCH --reservation=root_73
 #SBATCH --clusters=expanse
@@ -33,6 +33,7 @@ declare -xr SPACK_MAJOR='0'
 declare -xr SPACK_MINOR='21'
 declare -xr SPACK_REVISION='2'
 declare -xr SPACK_VERSION="${SPACK_MAJOR}.${SPACK_MINOR}.${SPACK_REVISION}"
+declare -xr SPACK_SYSTEM_NAME='exp'
 declare -xr SPACK_INSTANCE_NAME='gpu'
 declare -xr SPACK_INSTANCE_VERSION='dev'
 declare -xr SPACK_INSTANCE_DIR="/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}/${SPACK_INSTANCE_VERSION}"
@@ -48,16 +49,15 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-declare -xr SPACK_PACKAGE='raxml@8.2.13'
-declare -xr SPACK_COMPILER='oneapi@2023.2.4'
-declare -xr SPACK_VARIANTS='+mpi +pthreads'
-declare -xr SPACK_MPI='intel-oneapi-mpi@2021.10.0'
-declare -xr SPACK_DEPENDENCIES="^${SPACK_MPI}/$(spack find --format '{hash:7}' ${SPACK_MPI} % ${SPACK_COMPILER})"
+declare -xr SPACK_PACKAGE='hwloc@2.9.1'
+declare -xr SPACK_COMPILER='gcc@13.3.0'
+declare -xr SPACK_VARIANTS='~cairo +cuda ~gl ~libudev +libxml2 ~netloc ~nvml ~oneapi-level-zero ~opencl +pci ~rocm'
+declare -xr SPACK_DEPENDENCIES="^cuda@12.6.3/$(spack find --format '{hash:7}' cuda@12.6.3 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
 
-spack config get compilers
+spack config get compilers  
 spack config get config  
 spack config get mirrors
 spack config get modules

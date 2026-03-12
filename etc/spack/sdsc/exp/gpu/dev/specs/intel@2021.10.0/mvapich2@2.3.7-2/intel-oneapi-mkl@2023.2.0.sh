@@ -53,7 +53,7 @@ declare -xr SPACK_PACKAGE='intel-oneapi-mkl@2023.2.0'
 declare -xr SPACK_COMPILER='intel@2021.10.0'
 declare -xr SPACK_VARIANTS='+cluster +envmods ~ilp64 +shared mpi_family=mpich'
 declare -xr SPACK_MPI='mvapich2@2.3.7-2'
-declare -xr SPACK_DEPENDENCIES="^${SPACK_MPI}/$(spack find --format '{hash:7}' ${SPACK_MPI} % ${SPACK_COMPILER})"
+declare -xr SPACK_DEPENDENCIES="^hwloc@2.9.1/$(spack find --format '{hash:7}' hwloc@2.9.1 % ${SPACK_COMPILER} +cuda) ^${SPACK_MPI}/$(spack find --format '{hash:7}' ${SPACK_MPI} % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
