@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=hpl@2.3-omp
+#SBATCH --job-name=hwloc@2.9.1
 #SBATCH --account=use300
 #SBATCH --reservation=root_73
 #SBATCH --clusters=expanse
@@ -47,11 +47,10 @@ module load "${SCHEDULER_MODULE}"
 module list
 . "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
 
-declare -xr SPACK_PACKAGE='hpl@2.3'
-declare -xr SPACK_COMPILER='oneapi@2023.2.4'
-declare -xr SPACK_VARIANTS='+openmp'
-declare -xr SPACK_MPI='intel-oneapi-mpi@2021.10.0'
-declare -xr SPACK_DEPENDENCIES="^intel-oneapi-mkl@2023.2.0/$(spack find --format '{hash:7}' intel-oneapi-mkl@2023.2.0 % ${SPACK_COMPILER} ~cluster ~ilp64 threads=openmp) ^${SPACK_MPI}/$(spack find --format '{hash:7}' ${SPACK_MPI} % ${SPACK_COMPILER})"
+declare -xr SPACK_PACKAGE='hwloc@2.9.1'
+declare -xr SPACK_COMPILER='gcc@13.3.0'
+declare -xr SPACK_VARIANTS='~cairo ~cuda ~gl ~libudev +libxml2 ~netloc ~nvml ~oneapi-level-zero ~opencl +pci ~rocm'
+declare -xr SPACK_DEPENDENCIES=''
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv

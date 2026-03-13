@@ -51,7 +51,7 @@ declare -xr SPACK_PACKAGE='hpl@2.3'
 declare -xr SPACK_COMPILER='intel@2021.10.0'
 declare -xr SPACK_VARIANTS='~openmp'
 declare -xr SPACK_MPI='intel-oneapi-mpi@2021.10.0'
-declare -xr SPACK_DEPENDENCIES="^${SPACK_MPI}/$(spack find --format '{hash:7}' ${SPACK_MPI} % ${SPACK_COMPILER}) ^intel-oneapi-mkl@2023.2.0/$(spack find --format '{hash:7}' intel-oneapi-mkl@2023.2.0 % ${SPACK_COMPILER} ~cluster ~ilp64 threads=none)"
+declare -xr SPACK_DEPENDENCIES="^intel-oneapi-mkl@2023.2.0/$(spack find --format '{hash:7}' intel-oneapi-mkl@2023.2.0 % ${SPACK_COMPILER} ~cluster ~ilp64 threads=none) ^${SPACK_MPI}/$(spack find --format '{hash:7}' ${SPACK_MPI} % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 printenv
