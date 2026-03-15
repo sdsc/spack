@@ -11,7 +11,7 @@
 #SBATCH --cpus-per-task=10
 #SBATCH --mem=92G
 #SBATCH --gpus=1
-#SBATCH --time=00:30:00
+#SBATCH --time=01:00:00
 #SBATCH --output=%x.o%j.%N
 
 declare -xir UNIX_TIME="$(date +'%s')"
@@ -69,7 +69,7 @@ module list
 declare -xr SPACK_PACKAGE='magma@2.9.0'
 declare -xr SPACK_COMPILER='intel@2021.10.0'
 declare -xr SPACK_VARIANTS='+cuda +fortran ~rocm +shared cuda_arch=70,80,90'
-declare -xr SPACK_DEPENDENCIES="^cuda@12.6.3/$(spack find --format '{hash:7}' cuda@12.6.3 % ${SPACK_COMPILER}) ^openblas@0.3.28/$(spack find --format '{hash:7}' openblas@0.3.28 % ${SPACK_COMPILER} ~ilp64 threads=none)"
+declare -xr SPACK_DEPENDENCIES="^cuda@12.6.3/$(spack find --format '{hash:7}' cuda@12.6.3 % ${SPACK_COMPILER}) ^intel-oneapi-mkl@2023.2.0/$(spack find --format '{hash:7}' intel-oneapi-mkl@2023.2.0 % ${SPACK_COMPILER} ~cluster ~ilp64 threads=none)"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
 export CUDATOOLKIT_HOME="${CUDA_ROOT}"

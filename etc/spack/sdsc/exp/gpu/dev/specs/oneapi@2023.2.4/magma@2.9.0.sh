@@ -11,7 +11,7 @@
 #SBATCH --cpus-per-task=10
 #SBATCH --mem=92G
 #SBATCH --gpus=1
-#SBATCH --time=00:30:00
+#SBATCH --time=01:00:00
 #SBATCH --output=%x.o%j.%N
 
 declare -xir UNIX_TIME="$(date +'%s')"
