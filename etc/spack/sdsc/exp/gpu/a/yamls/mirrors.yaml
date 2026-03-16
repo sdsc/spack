@@ -1,0 +1,2 @@
+mirrors:
+  exp-gpu-dev: file:///home/spack_gpu/software/spack/caches/0.21.2/exp/gpu/dev
