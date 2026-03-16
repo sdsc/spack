@@ -1,0 +1,97 @@
+compilers:
+- compiler:
+    spec: gcc@8.5.0
+    paths:
+      cc: /usr/bin/gcc
+      cxx: /usr/bin/g++
+      f77: /usr/bin/gfortran
+      fc: /usr/bin/gfortran
+    flags:
+      cflags: -O2 -march=native
+      cxxflags: -O2 -march=native
+      fflags: -O2 -march=native
+    operating_system: rocky8
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+- compiler:
+    spec: gcc@13.3.0
+    paths:
+      cc: PATH_TO_GCC_13_3_0
+      cxx: PATH_TO_G++_13_3_0
+      f77: PATH_TO_GFORTRAN_13_3_0
+      fc: PATH_TO_GFORTRAN_13_3_0
+    flags:
+      cflags: -O2 -march=native
+      cxxflags: -O2 -march=native
+      fflags: -O2 -march=native
+    operating_system: rocky8
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+- compiler:
+    spec: aocc@4.2.0
+    paths:
+      cc: PATH_TO_AMD_CLANG_4_2_0
+      cxx: PATH_TO_AMD_CLANG++_4_2_0
+      f77: PATH_TO_AMD_FLANG_4_2_0
+      fc: PATH_TO_AMD_FLANG_4_2_0
+    flags:
+      cflags: -O2 -march=native
+      cxxflags: -O2 -march=native
+      fflags: -O2 -march=native
+    operating_system: rocky8
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+- compiler:
+    spec: intel@2021.10.0
+    paths:
+      cc: PATH_TO_ICC_2021_10_0
+      cxx: PATH_TO_ICPC_2021_10_0
+      f77: PATH_TO_IFORT_2021_10_0
+      fc: PATH_TO_IFORT_2021_10_0
+    flags:
+      cflags: -O2 -march=native
+      cxxflags: -O2 -march=native
+      fflags: -O2 -march=native
+    operating_system: rocky8
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+- compiler:
+    spec: dpcpp@2023.2.4
+    paths:
+      cc: PATH_TO_ICX_2023_2_4
+      cxx: PATH_TO_DPCPP_2023_2_4
+      f77: PATH_TO_IFX_2023_2_4
+      fc: PATH_TO_IFX_2023_2_4
+    flags:
+      cflags: -O2 -march=native
+      cxxflags: -O2 -march=native
+      fflags: -O2 -march=native
+    operating_system: rocky8
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+- compiler:
+    spec: oneapi@2023.2.4
+    paths:
+      cc: PATH_TO_ICX_2023_2_4
+      cxx: PATH_TO_ICPX_2023_2_4
+      f77: PATH_TO_IFX_2023_2_4
+      fc: PATH_TO_IFX_2023_2_4
+    flags:
+      cflags: -O2 -march=native
+      cxxflags: -O2 -march=native
+      fflags: -O2 -march=native
+    operating_system: rocky8
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
