@@ -1,0 +1,866 @@
+1776122680 20260413T162440-0700 48046698 ac47d678e7fc9d0d271903267870fafa 8bbc42a13996c5d279df896caf60c656e6e340331c65b58d962826d58406a9c1 93 /cm/shared/apps/spack/0.21.2/gpu/a/etc/spack/sdsc/exp/gpu/a/specs/gcc@13.3.0/mvapich2@2.3.7-2/netcdf-c@4.9.2.sh
+#!/usr/bin/env bash
+
+#SBATCH --job-name=netcdf-c@4.9.2
+#SBATCH --account=use300
+#SBATCH --reservation=root_73
+#SBATCH --clusters=expanse
+#SBATCH --partition=ind-gpu-shared
+#SBATCH --qos=gpu-unlim
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=1
+#SBATCH --cpus-per-task=10
+#SBATCH --mem=92G
+#SBATCH --gpus=1
+#SBATCH --time=00:30:00
+#SBATCH --output=%x.o%j.%N
+
+declare -xir UNIX_TIME="$(date +'%s')"
+declare -xr LOCAL_TIME="$(date +'%Y%m%dT%H%M%S%z')"
+
+declare -xr JOB_SCRIPT="$(scontrol show job ${SLURM_JOB_ID} | awk -F= '/Command=/{print $2}')"
+declare -xr JOB_SCRIPT_MD5="$(md5sum ${JOB_SCRIPT} | awk '{print $1}')"
+declare -xr JOB_SCRIPT_SHA256="$(sha256sum ${JOB_SCRIPT} | awk '{print $1}')"
+declare -xr JOB_SCRIPT_NUMBER_OF_LINES="$(wc -l ${JOB_SCRIPT} | awk '{print $1}')"
+
+declare -xr SCHEDULER_NAME='slurm'
+declare -xr SCHEDULER_MAJOR='23'
+declare -xr SCHEDULER_MINOR='02'
+declare -xr SCHEDULER_REVISION='7'
+declare -xr SCHEDULER_VERSION="${SCHEDULER_MAJOR}.${SCHEDULER_MINOR}.${SCHEDULER_REVISION}"
+declare -xr SCHEDULER_MODULE="${SCHEDULER_NAME}/${SLURM_CLUSTER_NAME}/${SCHEDULER_VERSION}"
+
+declare -xr SPACK_MAJOR='0'
+declare -xr SPACK_MINOR='21'
+declare -xr SPACK_REVISION='2'
+declare -xr SPACK_VERSION="${SPACK_MAJOR}.${SPACK_MINOR}.${SPACK_REVISION}"
+declare -xr SPACK_SYSTEM_NAME='exp'
+declare -xr SPACK_INSTANCE_NAME='gpu'
+declare -xr SPACK_INSTANCE_VERSION='a'
+declare -xr SPACK_INSTANCE_DIR="/cm/shared/apps/spack/${SPACK_VERSION}/${SPACK_INSTANCE_NAME}/${SPACK_INSTANCE_VERSION}"
+
+declare -xr TMPDIR="${SLURM_TMPDIR}/spack-stage"
+declare -xr TMP="${TMPDIR}"
+
+echo "${UNIX_TIME} ${LOCAL_TIME} ${SLURM_JOB_ID} ${JOB_SCRIPT_MD5} ${JOB_SCRIPT_SHA256} ${JOB_SCRIPT_NUMBER_OF_LINES} ${JOB_SCRIPT}"
+cat  "${JOB_SCRIPT}"
+
+module purge
+module load "${SCHEDULER_MODULE}"
+module list
+. "${SPACK_INSTANCE_DIR}/share/spack/setup-env.sh"
+
+declare -xr SPACK_PACKAGE='netcdf-c@4.9.2'
+declare -xr SPACK_COMPILER='gcc@13.3.0'
+declare -xr SPACK_VARIANTS='~blosc ~byterange ~dap ~fsync ~hdf4 ~ipo ~jna +mpi ~nczarr_zip +optimize +parallel-netcdf +pic +shared +szip +zstd'
+declare -xr SPACK_MPI='mvapich2@2.3.7-2'
+declare -xr SPACK_DEPENDENCIES="^hdf5@1.14.3/$(spack find --format '{hash:7}' hdf5@1.14.3 % ${SPACK_COMPILER} +mpi ^${SPACK_MPI}) ^parallel-netcdf@1.13.0/$(spack find --format '{hash:7}' parallel-netcdf@1.13.0 % ${SPACK_COMPILER} ^${SPACK_MPI})"
+declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
+
+printenv
+
+spack config get compilers  
+spack config get config  
+spack config get mirrors
+spack config get modules
+spack config get packages
+spack config get repos
+spack config get upstreams
+
+time -p spack spec --long --namespaces --types --reuse "$(echo ${SPACK_SPEC})"
+if [[ "${?}" -ne 0 ]]; then
+  echo 'ERROR: spack concretization failed.'
+  exit 1
+fi
+
+mkdir -p "${TMPDIR}"
+
+time -p spack install --jobs "${SLURM_CPUS_PER_TASK}" --fail-fast --yes-to-all --reuse "$(echo ${SPACK_SPEC})"
+if [[ "${?}" -ne 0 ]]; then
+  echo 'ERROR: spack install failed.'
+  exit 1
+fi
+
+time -p spack mirror create --dependencies --directory "${HOME}/software/spack/caches/${SPACK_VERSION}/${SPACK_SYSTEM_NAME}/${SPACK_INSTANCE_NAME}/dev" "$(echo ${SPACK_SPEC})"
+if [[ "${?}" -ne 0 ]]; then
+  echo 'ERROR: spack mirror create failed.'
+  exit 1
+fi
+
+time -p spack buildcache push "${HOME}/software/spack/caches/${SPACK_VERSION}/${SPACK_SYSTEM_NAME}/${SPACK_INSTANCE_NAME}/dev" "$(echo ${SPACK_SPEC})"
+if [[ "${?}" -ne 0 ]]; then
+  echo 'ERROR: spack buildcache push failed.'
+  exit 1
+fi
+
+Currently Loaded Modules:
+  1) slurm/expanse/23.02.7
+
+ 
+
+SLURM_JOB_GROUP=spack
+LD_LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:/cm/shared/apps/slurm/current/lib64
+LS_COLORS=rs=0:di=38;5;33:ln=38;5;51:mh=00:pi=40;38;5;11:so=38;5;13:do=38;5;5:bd=48;5;232;38;5;11:cd=48;5;232;38;5;3:or=48;5;232;38;5;9:mi=01;05;37;41:su=48;5;196;38;5;15:sg=48;5;11;38;5;16:ca=48;5;196;38;5;226:tw=48;5;10;38;5;16:ow=48;5;10;38;5;21:st=48;5;21;38;5;15:ex=38;5;40:*.tar=38;5;9:*.tgz=38;5;9:*.arc=38;5;9:*.arj=38;5;9:*.taz=38;5;9:*.lha=38;5;9:*.lz4=38;5;9:*.lzh=38;5;9:*.lzma=38;5;9:*.tlz=38;5;9:*.txz=38;5;9:*.tzo=38;5;9:*.t7z=38;5;9:*.zip=38;5;9:*.z=38;5;9:*.dz=38;5;9:*.gz=38;5;9:*.lrz=38;5;9:*.lz=38;5;9:*.lzo=38;5;9:*.xz=38;5;9:*.zst=38;5;9:*.tzst=38;5;9:*.bz2=38;5;9:*.bz=38;5;9:*.tbz=38;5;9:*.tbz2=38;5;9:*.tz=38;5;9:*.deb=38;5;9:*.rpm=38;5;9:*.jar=38;5;9:*.war=38;5;9:*.ear=38;5;9:*.sar=38;5;9:*.rar=38;5;9:*.alz=38;5;9:*.ace=38;5;9:*.zoo=38;5;9:*.cpio=38;5;9:*.7z=38;5;9:*.rz=38;5;9:*.cab=38;5;9:*.wim=38;5;9:*.swm=38;5;9:*.dwm=38;5;9:*.esd=38;5;9:*.jpg=38;5;13:*.jpeg=38;5;13:*.mjpg=38;5;13:*.mjpeg=38;5;13:*.gif=38;5;13:*.bmp=38;5;13:*.pbm=38;5;13:*.pgm=38;5;13:*.ppm=38;5;13:*.tga=38;5;13:*.xbm=38;5;13:*.xpm=38;5;13:*.tif=38;5;13:*.tiff=38;5;13:*.png=38;5;13:*.svg=38;5;13:*.svgz=38;5;13:*.mng=38;5;13:*.pcx=38;5;13:*.mov=38;5;13:*.mpg=38;5;13:*.mpeg=38;5;13:*.m2v=38;5;13:*.mkv=38;5;13:*.webm=38;5;13:*.ogm=38;5;13:*.mp4=38;5;13:*.m4v=38;5;13:*.mp4v=38;5;13:*.vob=38;5;13:*.qt=38;5;13:*.nuv=38;5;13:*.wmv=38;5;13:*.asf=38;5;13:*.rm=38;5;13:*.rmvb=38;5;13:*.flc=38;5;13:*.avi=38;5;13:*.fli=38;5;13:*.flv=38;5;13:*.gl=38;5;13:*.dl=38;5;13:*.xcf=38;5;13:*.xwd=38;5;13:*.yuv=38;5;13:*.cgm=38;5;13:*.emf=38;5;13:*.ogv=38;5;13:*.ogx=38;5;13:*.aac=38;5;45:*.au=38;5;45:*.flac=38;5;45:*.m4a=38;5;45:*.mid=38;5;45:*.midi=38;5;45:*.mka=38;5;45:*.mp3=38;5;45:*.mpc=38;5;45:*.ogg=38;5;45:*.ra=38;5;45:*.wav=38;5;45:*.oga=38;5;45:*.opus=38;5;45:*.spx=38;5;45:*.xspf=38;5;45:
+SRUN_DEBUG=3
+SLURM_STEP_ID=0
+SLURM_STEP_GPUS=0
+SLURM_NODEID=0
+SLURM_TASK_PID=552886
+__LMOD_REF_COUNT_PATH=/cm/shared/apps/slurm/current/sbin:1;/cm/shared/apps/slurm/current/bin:1;/cm/shared/apps/spack/0.21.2/gpu/a/bin:1;/home/spack_gpu/.local/bin:2;/home/spack_gpu/bin:2;/usr/local/bin:1;/usr/bin:1;/usr/local/sbin:1;/usr/sbin:1
+_ModuleTable002_=L2V0Yy9tb2R1bGVmaWxlcyIsIi91c3Ivc2hhcmUvbW9kdWxlZmlsZXMiLCIvdXNyL3NoYXJlL01vZHVsZXMvbW9kdWxlZmlsZXMiLCIvY20vc2hhcmVkL21vZHVsZWZpbGVzIix9LFsic3lzdGVtQmFzZU1QQVRIIl09Ii9jbS9sb2NhbC9tb2R1bGVmaWxlczovY20vc2hhcmVkL2FwcHMvYWNjZXNzL21vZHVsZWZpbGVzOi9jbS9zaGFyZWQvbW9kdWxlZmlsZXM6L2V0Yy9tb2R1bGVmaWxlczovdXNyL3NoYXJlL21vZHVsZWZpbGVzOi91c3Ivc2hhcmUvTW9kdWxlcy9tb2R1bGVmaWxlcyIsfQ==
+SSH_CONNECTION=198.202.100.14 51958 198.202.100.14 22
+SPACK_PYTHON=/usr/bin/python3
+SPACK_MAJOR=0
+SLURM_PRIO_PROCESS=0
+SLURM_CPU_BIND_VERBOSE=quiet
+LANG=en_US.UTF-8
+SLURM_SUBMIT_DIR=/cm/shared/apps/spack/0.21.2/gpu/a/etc/spack/sdsc/exp/gpu/a/specs/gcc@13.3.0/mvapich2@2.3.7-2
+HISTCONTROL=ignoredups
+SCHEDULER_NAME=slurm
+HOSTNAME=exp-15-57
+LMOD_SYSTEM_DEFAULT_MODULES=DefaultModules
+OLDPWD=/cm/shared/apps/spack/0.21.2/gpu/a/etc/spack/sdsc/exp/gpu/a/specs/gcc@13.3.0
+__LMOD_REF_COUNT__LMFILES_=/cm/shared/modulefiles/slurm/expanse/23.02.7:1
+SLURM_CPUS_PER_TASK=10
+SLURM_STEPID=0
+SLURM_SRUN_COMM_HOST=10.21.0.20
+SPACK_DEPENDENCIES=^hdf5@1.14.3/uyibllb ^parallel-netcdf@1.13.0/5j6em5x
+SCHEDULER_MINOR=02
+SLURM_DISTRIBUTION=cyclic
+ENVIRONMENT=BATCH
+SPACK_VERSION=0.21.2
+SPACK_MINOR=21
+SLURM_PROCID=0
+SPACK_INSTANCE_VERSION=a
+SLURM_JOB_GID=11491
+SPACK_VARIANTS=~blosc ~byterange ~dap ~fsync ~hdf4 ~ipo ~jna +mpi ~nczarr_zip +optimize +parallel-netcdf +pic +shared +szip +zstd
+SCHEDULER_REVISION=7
+SPACK_INSTANCE_DIR=/cm/shared/apps/spack/0.21.2/gpu/a
+__LMOD_REF_COUNT_LD_LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:1;/cm/shared/apps/slurm/current/lib64:1
+SLURM_CPU_BIND=quiet,mask_cpu:0x0000000001
+SCHEDULER_VERSION=23.02.7
+SLURMD_NODENAME=exp-15-57
+SLURM_JOB_END_TIME=1776124480
+JOB_SCRIPT_MD5=ac47d678e7fc9d0d271903267870fafa
+SLURM_TASKS_PER_NODE=1
+S_COLORS=auto
+which_declare=declare -f
+SPACK_COMPILER=gcc@13.3.0
+SLURM_JOB_RESERVATION=root_73
+XDG_SESSION_ID=352409
+USER=spack_gpu
+SLURM_NNODES=1
+SLURM_LAUNCH_NODE_IPADDR=10.21.0.20
+SLURM_PMIX_TMPDIR=/scratch/spack_gpu/job_48046698
+SLURM_TMPDIR=/scratch/spack_gpu/job_48046698
+SLURM_STEP_TASKS_PER_NODE=1
+JOB_SCRIPT_NUMBER_OF_LINES=93
+SLURM_JOB_START_TIME=1776122680
+SLURM_NTASKS_PER_NODE=1
+__LMOD_REF_COUNT_MODULEPATH=/cm/local/modulefiles:1;/cm/shared/apps/access/modulefiles:1;/etc/modulefiles:1;/usr/share/modulefiles:1;/usr/share/Modules/modulefiles:1;/cm/shared/modulefiles:1
+__LMOD_REF_COUNT_LOADEDMODULES=slurm/expanse/23.02.7:1
+SCHEDULER_MAJOR=23
+SLURM_GPUS=1
+PWD=/cm/shared/apps/spack/0.21.2/gpu/a/etc/spack/sdsc/exp/gpu/a/specs/gcc@13.3.0/mvapich2@2.3.7-2
+ENABLE_LMOD=1
+SLURM_JOB_NODELIST=exp-15-57
+HOME=/home/spack_gpu
+SLURM_CLUSTER_NAME=expanse
+TMP=/scratch/spack_gpu/job_48046698/spack-stage
+LMOD_COLORIZE=yes
+LOCAL_TIME=20260413T162440-0700
+LMOD_SYSHOST=expanse
+SLURM_NODELIST=exp-15-57
+SLURM_GPUS_ON_NODE=1
+SSH_CLIENT=198.202.100.14 51958 22
+LMOD_VERSION=8.2.4
+CPATH=/cm/shared/apps/slurm/current/include
+SLURM_NTASKS=1
+LMOD_SETTARG_CMD=:
+SLURM_JOB_CPUS_PER_NODE=10
+BASH_ENV=/usr/share/lmod/lmod/init/bash
+SLURM_TOPOLOGY_ADDR=exp-15-57
+SLURMD_DEBUG=2
+SLURM_WORKING_CLUSTER=expanse:mgr1:6817:9984:109
+SPACK_MPI=mvapich2@2.3.7-2
+JOB_SCRIPT_SHA256=8bbc42a13996c5d279df896caf60c656e6e340331c65b58d962826d58406a9c1
+SPACK_PACKAGE=netcdf-c@4.9.2
+__LMOD_REF_COUNT_LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:1;/cm/shared/apps/slurm/current/lib64:1
+SLURM_STEP_NODELIST=exp-15-57
+SLURM_JOB_NAME=netcdf-c@4.9.2
+SLURM_SRUN_COMM_PORT=39803
+TMPDIR=/scratch/spack_gpu/job_48046698/spack-stage
+LIBRARY_PATH=/cm/shared/apps/slurm/current/lib64/slurm:/cm/shared/apps/slurm/current/lib64
+SLURM_JOB_GPUS=2
+LMOD_sys=Linux
+SLURM_JOBID=48046698
+_ModuleTable001_=X01vZHVsZVRhYmxlXz17WyJNVHZlcnNpb24iXT0zLFsiY19yZWJ1aWxkVGltZSJdPWZhbHNlLFsiY19zaG9ydFRpbWUiXT1mYWxzZSxkZXB0aFQ9e30sZmFtaWx5PXt9LG1UPXtbInNsdXJtL2V4cGFuc2UiXT17WyJmbiJdPSIvY20vc2hhcmVkL21vZHVsZWZpbGVzL3NsdXJtL2V4cGFuc2UvMjMuMDIuNyIsWyJmdWxsTmFtZSJdPSJzbHVybS9leHBhbnNlLzIzLjAyLjciLFsibG9hZE9yZGVyIl09MSxwcm9wVD17fSxbInN0YWNrRGVwdGgiXT0wLFsic3RhdHVzIl09ImFjdGl2ZSIsWyJ1c2VyTmFtZSJdPSJzbHVybS9leHBhbnNlLzIzLjAyLjciLH0sfSxtcGF0aEE9eyIvY20vbG9jYWwvbW9kdWxlZmlsZXMiLCIvY20vc2hhcmVkL2FwcHMvYWNjZXNzL21vZHVsZWZpbGVzIiwi
+SLURM_CONF=/cm/shared/apps/slurm/var/etc/expanse/slurm.conf
+LOADEDMODULES=slurm/expanse/23.02.7
+__LMOD_REF_COUNT_MANPATH=/cm/shared/apps/slurm/current/man:3;/usr/share/lmod/lmod/share/man:1;/usr/local/share/man:2;/usr/share/man:2;/cm/local/apps/environment-modules/current/share/man:2
+_ModuleTable003_=TmFtZSJdPSJzaGFyZWQiLH0sc2x1cm09e1siZm4iXT0iL2NtL2xvY2FsL21vZHVsZWZpbGVzL3NsdXJtL2V4cGFuc2UvMjMuMDIuNyIsWyJmdWxsTmFtZSJdPSJzbHVybS9leHBhbnNlLzIzLjAyLjciLFsibG9hZE9yZGVyIl09Myxwcm9wVD17fSxbInN0YWNrRGVwdGgiXT0yLFsic3RhdHVzIl09ImFjdGl2ZSIsWyJ1c2VyTmFtZSJdPSJzbHVybSIsfSx9LG1wYXRoQT17Ii9jbS9zaGFyZWQvYXBwcy9zcGFjay8wLjE3LjMvY3B1L2Ivc2hhcmUvc3BhY2svbG1vZC9saW51eC1yb2NreTgteDg2XzY0L0NvcmUiLCIvY20vbG9jYWwvbW9kdWxlZmlsZXMiLCIvY20vc2hhcmVkL2FwcHMvYWNjZXNzL21vZHVsZWZpbGVzIiwiL2V0Yy9tb2R1bGVmaWxlcyIsIi91c3Ivc2hhcmUvbW9k
+SLURM_NODE_ALIASES=(null)
+LMOD_ROOT=/usr/share/lmod
+SLURM_JOB_QOS=gpu-unlim
+SLURM_TOPOLOGY_ADDR_PATTERN=node
+SSH_TTY=/dev/pts/418
+MAIL=/var/spool/mail/spack_gpu
+SLURM_CPUS_ON_NODE=10
+LMOD_arch=x86_64
+SLURM_JOB_NUM_NODES=1
+__Init_Default_Modules=1
+CMD_WLM_CLUSTER_NAME=expanse
+SLURM_MEM_PER_NODE=94208
+SPACK_ROOT=/cm/shared/apps/spack/0.21.2/gpu/a
+TERM=xterm-256color
+SHELL=/bin/bash
+_ModuleTable_Sz_=2
+SLURM_JOB_UID=527835
+__LMOD_REF_COUNT_CPATH=/cm/shared/apps/slurm/current/include:1
+SLURM_JOB_PARTITION=ind-gpu-shared
+SLURM_SCRIPT_CONTEXT=prolog_task
+SLURM_PTY_WIN_ROW=43
+SLURM_CPU_BIND_LIST=0x0000000001
+SPACK_INSTANCE_NAME=gpu
+SLURM_JOB_USER=spack_gpu
+CUDA_VISIBLE_DEVICES=0
+JOB_SCRIPT=/cm/shared/apps/spack/0.21.2/gpu/a/etc/spack/sdsc/exp/gpu/a/specs/gcc@13.3.0/mvapich2@2.3.7-2/netcdf-c@4.9.2.sh
+SLURM_PTY_WIN_COL=132
+SLURM_NPROCS=1
+SHLVL=3
+SLURM_SUBMIT_HOST=exp-15-57
+UNIX_TIME=1776122680
+SLURM_JOB_ACCOUNT=use300
+MANPATH=/cm/shared/apps/slurm/current/man:/usr/share/lmod/lmod/share/man:/usr/local/share/man:/usr/share/man:/cm/local/apps/environment-modules/current/share/man
+LMOD_PREPEND_BLOCK=normal
+SLURM_STEP_LAUNCHER_PORT=39803
+MODULEPATH=/cm/local/modulefiles:/cm/shared/apps/access/modulefiles:/etc/modulefiles:/usr/share/modulefiles:/usr/share/Modules/modulefiles:/cm/shared/modulefiles
+SLURM_PTY_PORT=33091
+SLURM_GTIDS=0
+LOGNAME=spack_gpu
+DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/527835/bus
+XDG_RUNTIME_DIR=/run/user/527835
+MODULEPATH_ROOT=/usr/share/modulefiles
+LMOD_PACKAGE_PATH=/usr/share/lmod/etc/site/lmod
+PATH=/cm/shared/apps/spack/0.21.2/gpu/a/bin:/cm/shared/apps/slurm/current/sbin:/cm/shared/apps/slurm/current/bin:/cm/shared/apps/spack/0.21.2/gpu/a/bin:/home/spack_gpu/.local/bin:/home/spack_gpu/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin
+SLURM_JOB_ID=48046698
+_LMFILES_=/cm/shared/modulefiles/slurm/expanse/23.02.7
+SLURM_CPU_BIND_TYPE=mask_cpu:
+SPACK_REVISION=2
+DEBUGINFOD_URLS=https://debuginfod.centos.org/ 
+SLURM_STEP_NUM_TASKS=1
+SCHEDULER_MODULE=slurm/expanse/23.02.7
+MODULESHOME=/usr/share/lmod/lmod
+LMOD_SETTARG_FULL_SUPPORT=no
+HISTSIZE=-1
+LMOD_PKG=/usr/share/lmod/lmod
+SLURM_STEP_NUM_NODES=1
+SPACK_SPEC=netcdf-c@4.9.2 % gcc@13.3.0 ~blosc ~byterange ~dap ~fsync ~hdf4 ~ipo ~jna +mpi ~nczarr_zip +optimize +parallel-netcdf +pic +shared +szip +zstd ^hdf5@1.14.3/uyibllb ^parallel-netcdf@1.13.0/5j6em5x
+LMOD_CMD=/usr/share/lmod/lmod/libexec/lmod
+SPACK_SYSTEM_NAME=exp
+SLURM_LOCALID=0
+LESSOPEN=||/usr/bin/lesspipe.sh %s
+LMOD_FULL_SETTARG_SUPPORT=no
+LMOD_DIR=/usr/share/lmod/lmod/libexec
+BASH_FUNC_which%%=() {  ( alias;
+ eval ${which_declare} ) | /usr/bin/which --tty-only --read-alias --read-functions --show-tilde --show-dot $@
+}
+BASH_FUNC_module%%=() {  eval $($LMOD_CMD bash "$@") && eval $(${LMOD_SETTARG_CMD:-:} -s sh)
+}
+BASH_FUNC_spack%%=() {  : this is a shell function from: /cm/shared/apps/spack/0.21.2/gpu/a/share/spack/setup-env.sh;
+ : the real spack script is here: /cm/shared/apps/spack/0.21.2/gpu/a/bin/spack;
+ _spack_shell_wrapper "$@";
+ return $?
+}
+BASH_FUNC__spack_shell_wrapper%%=() {  for var in DYLD_LIBRARY_PATH DYLD_FALLBACK_LIBRARY_PATH;
+ do
+ eval "if [ -n \"\${${var}-}\" ]; then export SPACK_$var=\${${var}}; fi";
+ done;
+ if [ -n "${ZSH_VERSION:-}" ]; then
+ emulate -L sh;
+ fi;
+ _sp_flags="";
+ while [ ! -z ${1+x} ] && [ "${1#-}" != "${1}" ]; do
+ _sp_flags="$_sp_flags $1";
+ shift;
+ done;
+ if [ -n "$_sp_flags" ] && [ "${_sp_flags#*h}" != "${_sp_flags}" ] || [ "${_sp_flags#*V}" != "${_sp_flags}" ]; then
+ command spack $_sp_flags "$@";
+ return;
+ fi;
+ _sp_subcommand="";
+ if [ ! -z ${1+x} ]; then
+ _sp_subcommand="$1";
+ shift;
+ fi;
+ case $_sp_subcommand in 
+ "cd")
+ _sp_arg="";
+ if [ -n "$1" ]; then
+ _sp_arg="$1";
+ shift;
+ fi;
+ if [ "$_sp_arg" = "-h" ] || [ "$_sp_arg" = "--help" ]; then
+ command spack cd -h;
+ else
+ LOC="$(SPACK_COLOR="${SPACK_COLOR:-always}" spack location $_sp_arg "$@")";
+ if [ -d "$LOC" ]; then
+ cd "$LOC";
+ else
+ return 1;
+ fi;
+ fi;
+ return
+ ;;
+ "env")
+ _sp_arg="";
+ if [ -n "$1" ]; then
+ _sp_arg="$1";
+ shift;
+ fi;
+ if [ "$_sp_arg" = "-h" ] || [ "$_sp_arg" = "--help" ]; then
+ command spack env -h;
+ else
+ case $_sp_arg in 
+ activate)
+ _a=" $@";
+ if [ "${_a#* --sh}" != "$_a" ] || [ "${_a#* --csh}" != "$_a" ] || [ "${_a#* -h}" != "$_a" ] || [ "${_a#* --help}" != "$_a" ]; then
+ command spack env activate "$@";
+ else
+ stdout="$(SPACK_COLOR="${SPACK_COLOR:-always}" command spack $_sp_flags env activate --sh "$@")" || return;
+ eval "$stdout";
+ fi
+ ;;
+ deactivate)
+ _a=" $@";
+ if [ "${_a#* --sh}" != "$_a" ] || [ "${_a#* --csh}" != "$_a" ]; then
+ command spack env deactivate "$@";
+ else
+ if [ -n "$*" ]; then
+ command spack env deactivate -h;
+ else
+ stdout="$(SPACK_COLOR="${SPACK_COLOR:-always}" command spack $_sp_flags env deactivate --sh)" || return;
+ eval "$stdout";
+ fi;
+ fi
+ ;;
+ *)
+ command spack env $_sp_arg "$@"
+ ;;
+ esac;
+ fi;
+ return
+ ;;
+ "load" | "unload")
+ _a=" $@";
+ if [ "${_a#* --sh}" != "$_a" ] || [ "${_a#* --csh}" != "$_a" ] || [ "${_a#* -h}" != "$_a" ] || [ "${_a#* --list}" != "$_a" ] || [ "${_a#* --help}" != "$_a" ]; then
+ command spack $_sp_flags $_sp_subcommand "$@";
+ else
+ stdout="$(SPACK_COLOR="${SPACK_COLOR:-always}" command spack $_sp_flags $_sp_subcommand --sh "$@")" || return;
+ eval "$stdout";
+ fi
+ ;;
+ *)
+ command spack $_sp_flags $_sp_subcommand "$@"
+ ;;
+ esac
+}
+BASH_FUNC_ml%%=() {  eval $($LMOD_DIR/ml_cmd "$@")
+}
+_=/usr/bin/printenv
+compilers:
+- compiler:
+    spec: gcc@8.5.0
+    paths:
+      cc: /usr/bin/gcc
+      cxx: /usr/bin/g++
+      f77: /usr/bin/gfortran
+      fc: /usr/bin/gfortran
+    flags:
+      cflags: -O2 -march=native
+      cxxflags: -O2 -march=native
+      fflags: -O2 -march=native
+    operating_system: rocky8
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+- compiler:
+    spec: gcc@11.5.0
+    paths:
+      cc: /cm/shared/apps/spack/0.21.2/gpu/a/opt/spack/linux-rocky8-skylake_avx512/gcc-8.5.0/gcc-11.5.0-7orsjuvhgffakcju45ebnvmxflj235hb/bin/gcc
+      cxx: /cm/shared/apps/spack/0.21.2/gpu/a/opt/spack/linux-rocky8-skylake_avx512/gcc-8.5.0/gcc-11.5.0-7orsjuvhgffakcju45ebnvmxflj235hb/bin/g++
+      f77: /cm/shared/apps/spack/0.21.2/gpu/a/opt/spack/linux-rocky8-skylake_avx512/gcc-8.5.0/gcc-11.5.0-7orsjuvhgffakcju45ebnvmxflj235hb/bin/gfortran
+      fc: /cm/shared/apps/spack/0.21.2/gpu/a/opt/spack/linux-rocky8-skylake_avx512/gcc-8.5.0/gcc-11.5.0-7orsjuvhgffakcju45ebnvmxflj235hb/bin/gfortran
+    flags:
+      cflags: -O2 -march=native
+      cxxflags: -O2 -march=native
+      fflags: -O2 -march=native
+    operating_system: rocky8
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+- compiler:
+    spec: gcc@13.3.0
+    paths:
+      cc: /cm/shared/apps/spack/0.21.2/gpu/a/opt/spack/linux-rocky8-skylake_avx512/gcc-8.5.0/gcc-13.3.0-ot32neovzvypcfvs6axkk4vndxj3lqe6/bin/gcc
+      cxx: /cm/shared/apps/spack/0.21.2/gpu/a/opt/spack/linux-rocky8-skylake_avx512/gcc-8.5.0/gcc-13.3.0-ot32neovzvypcfvs6axkk4vndxj3lqe6/bin/g++
+      f77: /cm/shared/apps/spack/0.21.2/gpu/a/opt/spack/linux-rocky8-skylake_avx512/gcc-8.5.0/gcc-13.3.0-ot32neovzvypcfvs6axkk4vndxj3lqe6/bin/gfortran
+      fc: /cm/shared/apps/spack/0.21.2/gpu/a/opt/spack/linux-rocky8-skylake_avx512/gcc-8.5.0/gcc-13.3.0-ot32neovzvypcfvs6axkk4vndxj3lqe6/bin/gfortran
+    flags:
+      cflags: -O2 -march=native
+      cxxflags: -O2 -march=native
+      fflags: -O2 -march=native
+    operating_system: rocky8
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+- compiler:
+    spec: intel@2021.10.0
+    paths:
+      cc: /cm/shared/apps/spack/0.21.2/gpu/a/opt/spack/linux-rocky8-skylake_avx512/gcc-8.5.0/intel-oneapi-compilers-2023.2.4-zf5rsmmip3d2cnpb2wmwd4smgo4qdnvr/compiler/latest/linux/bin/intel64/icc
+      cxx: /cm/shared/apps/spack/0.21.2/gpu/a/opt/spack/linux-rocky8-skylake_avx512/gcc-8.5.0/intel-oneapi-compilers-2023.2.4-zf5rsmmip3d2cnpb2wmwd4smgo4qdnvr/compiler/latest/linux/bin/intel64/icpc
+      f77: /cm/shared/apps/spack/0.21.2/gpu/a/opt/spack/linux-rocky8-skylake_avx512/gcc-8.5.0/intel-oneapi-compilers-2023.2.4-zf5rsmmip3d2cnpb2wmwd4smgo4qdnvr/compiler/latest/linux/bin/intel64/ifort
+      fc: /cm/shared/apps/spack/0.21.2/gpu/a/opt/spack/linux-rocky8-skylake_avx512/gcc-8.5.0/intel-oneapi-compilers-2023.2.4-zf5rsmmip3d2cnpb2wmwd4smgo4qdnvr/compiler/latest/linux/bin/intel64/ifort
+    flags:
+      cflags: -O2 -march=native
+      cxxflags: -O2 -march=native
+      fflags: -O2 -march=native
+    operating_system: rocky8
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+- compiler:
+    spec: dpcpp@2023.2.4
+    paths:
+      cc: /cm/shared/apps/spack/0.21.2/gpu/a/opt/spack/linux-rocky8-skylake_avx512/gcc-8.5.0/intel-oneapi-compilers-2023.2.4-zf5rsmmip3d2cnpb2wmwd4smgo4qdnvr/compiler/latest/linux/bin/icx
+      cxx: /cm/shared/apps/spack/0.21.2/gpu/a/opt/spack/linux-rocky8-skylake_avx512/gcc-8.5.0/intel-oneapi-compilers-2023.2.4-zf5rsmmip3d2cnpb2wmwd4smgo4qdnvr/compiler/latest/linux/bin/dpcpp
+      f77: /cm/shared/apps/spack/0.21.2/gpu/a/opt/spack/linux-rocky8-skylake_avx512/gcc-8.5.0/intel-oneapi-compilers-2023.2.4-zf5rsmmip3d2cnpb2wmwd4smgo4qdnvr/compiler/latest/linux/bin/ifx
+      fc: /cm/shared/apps/spack/0.21.2/gpu/a/opt/spack/linux-rocky8-skylake_avx512/gcc-8.5.0/intel-oneapi-compilers-2023.2.4-zf5rsmmip3d2cnpb2wmwd4smgo4qdnvr/compiler/latest/linux/bin/ifx
+    flags:
+      cflags: -O2 -march=native
+      cxxflags: -O2 -march=native
+      fflags: -O2 -march=native
+    operating_system: rocky8
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+- compiler:
+    spec: oneapi@2023.2.4
+    paths:
+      cc: /cm/shared/apps/spack/0.21.2/gpu/a/opt/spack/linux-rocky8-skylake_avx512/gcc-8.5.0/intel-oneapi-compilers-2023.2.4-zf5rsmmip3d2cnpb2wmwd4smgo4qdnvr/compiler/latest/linux/bin/icx
+      cxx: /cm/shared/apps/spack/0.21.2/gpu/a/opt/spack/linux-rocky8-skylake_avx512/gcc-8.5.0/intel-oneapi-compilers-2023.2.4-zf5rsmmip3d2cnpb2wmwd4smgo4qdnvr/compiler/latest/linux/bin/icpx
+      f77: /cm/shared/apps/spack/0.21.2/gpu/a/opt/spack/linux-rocky8-skylake_avx512/gcc-8.5.0/intel-oneapi-compilers-2023.2.4-zf5rsmmip3d2cnpb2wmwd4smgo4qdnvr/compiler/latest/linux/bin/ifx
+      fc: /cm/shared/apps/spack/0.21.2/gpu/a/opt/spack/linux-rocky8-skylake_avx512/gcc-8.5.0/intel-oneapi-compilers-2023.2.4-zf5rsmmip3d2cnpb2wmwd4smgo4qdnvr/compiler/latest/linux/bin/ifx
+    flags:
+      cflags: -O2 -march=native
+      cxxflags: -O2 -march=native
+      fflags: -O2 -march=native
+    operating_system: rocky8
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+- compiler:
+    spec: nvhpc@24.11
+    paths:
+      cc: /cm/shared/apps/spack/0.21.2/gpu/a/opt/spack/linux-rocky8-skylake_avx512/gcc-8.5.0/nvhpc-24.11-2utxz5zvsn5ub3jpvbh3sa2hk54xx4rw/Linux_x86_64/24.11/compilers/bin/nvc
+      cxx: /cm/shared/apps/spack/0.21.2/gpu/a/opt/spack/linux-rocky8-skylake_avx512/gcc-8.5.0/nvhpc-24.11-2utxz5zvsn5ub3jpvbh3sa2hk54xx4rwLinux_x86_64/24.11/compilers/bin/nvc++
+      f77: /cm/shared/apps/spack/0.21.2/gpu/a/opt/spack/linux-rocky8-skylake_avx512/gcc-8.5.0/nvhpc-24.11-2utxz5zvsn5ub3jpvbh3sa2hk54xx4rwLinux_x86_64/24.11/compilers/bin/nvfortran
+      fc: /cm/shared/apps/spack/0.21.2/gpu/a/opt/spack/linux-rocky8-skylake_avx512/gcc-8.5.0/nvhpc-24.11-2utxz5zvsn5ub3jpvbh3sa2hk54xx4rwLinux_x86_64/24.11/compilers/bin/nvfortran
+    flags:
+      cflags: -fast
+      cxxflags: -fast
+      fflags: -fast
+    operating_system: rocky8
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+config:
+  install_tree:
+    root: $spack/opt/spack
+    projections:
+      all: '{architecture}/{compiler.name}-{compiler.version}/{name}-{version}-{hash}'
+    # install_tree can include an optional padded length (int or boolean)
+    # default is False (do not pad)
+    # if padded_length is True, Spack will pad as close to the system max path
+    # length as possible
+    # if padded_length is an integer, Spack will pad to that many characters,
+    # assuming it is higher than the length of the install_tree root.
+    # padded_length: 128
+
+
+  # Locations where templates should be found
+  template_dirs:
+  - $spack/share/spack/templates
+
+  # Directory where licenses should be located
+  license_dir: $spack/etc/spack/licenses
+  build_stage:
+  - $tempdir/$user/spack-stage
+  - $user_cache_path/stage
+  test_stage: $user_cache_path/test
+  source_cache: $spack/var/spack/cache
+  misc_cache: $user_cache_path/cache
+  connect_timeout: 10
+  verify_ssl: true
+  suppress_gpg_warnings: false
+  install_missing_compilers: false
+  checksum: true
+  deprecated: false
+  dirty: false
+  build_language: C
+  locks: true
+  url_fetch_method: urllib
+  ccache: false
+  concretizer: clingo
+  db_lock_timeout: 60
+  package_lock_timeout: null
+  shared_linking:
+    # Spack automatically embeds runtime search paths in ELF binaries for their
+    # dependencies. Their type can either be "rpath" or "runpath". For glibc, rpath is
+    # inherited and has precedence over LD_LIBRARY_PATH; runpath is not inherited
+    # and of lower precedence. DO NOT MIX these within the same install tree.
+    type: rpath
+
+
+    # (Experimental) Embed absolute paths of dependent libraries directly in ELF
+    # binaries to avoid runtime search. This can improve startup time of
+    # executables with many dependencies, in particular on slow filesystems.
+    bind: false
+
+
+  # Set to 'false' to allow installation on filesystems that doesn't allow setgid bit
+  # manipulation by unprivileged user (e.g. AFS)
+  allow_sgid: true
+  install_status: true
+  binary_index_ttl: 600
+  flags:
+    # Whether to keep -Werror flags active in package builds.
+    keep_werror: none
+
+  # A mapping of aliases that can be used to define new commands. For instance,
+  # `sp: spec -I` will define a new command `sp` that will execute `spec` with
+  # the `-I` argument. Aliases cannot override existing commands.
+  aliases:
+    concretise: concretize
+    containerise: containerize
+    rm: remove
+  debug: false
+  build_jobs: 10
+mirrors:
+  exp-gpu-dev: file:///home/spack_gpu/software/spack/caches/0.21.2/exp/gpu/dev
+  spack-public:
+    binary: false
+    url: https://mirror.spack.io
+modules:
+  default:
+    # Where to install modules
+    'enable:':
+    - lmod
+    lmod:
+      core_compilers:
+      - gcc@8.5.0
+      hierarchy:
+      - mpi
+      hash_length: 0
+      exclude_implicits: true
+      hide_implicits: true
+      naming_scheme: '{name}/{version}/{hash:7}'
+      projections:
+        all: '{name}/{version}/{hash:7}'
+      all:
+        autoload: direct
+        environment:
+          set:
+            '{name}_ROOT': '{prefix}'
+        suffixes:
+          +complex: cmplx
+          +openmp: omp
+          threads=openmp: omp
+          +ilp64: i64
+      cuda:
+        environment:
+          prepend_path:
+            PATH: /cm/local/apps/cuda/libs/current/bin
+            LD_LIBRARY_PATH: /cm/local/apps/cuda/libs/current/lib64
+          set:
+            CUDA_DRIVER_ROOT: /cm/local/apps/cuda
+      intel:
+        environment:
+          set:
+            INTEL_LICENSE_FILE: 40000@elprado.sdsc.edu:40200@elprado.sdsc.edu
+    roots:
+      tcl: $spack/share/spack/modules
+      lmod: $spack/share/spack/lmod
+    # What type of modules to use ("tcl" and/or "lmod")
+
+    tcl:
+      all:
+        autoload: direct
+
+    # Default configurations if lmod is enabled
+  prefix_inspections:
+    ./bin:
+    - PATH
+    ./man:
+    - MANPATH
+    ./share/man:
+    - MANPATH
+    ./share/aclocal:
+    - ACLOCAL_PATH
+    ./lib/pkgconfig:
+    - PKG_CONFIG_PATH
+    ./lib64/pkgconfig:
+    - PKG_CONFIG_PATH
+    ./share/pkgconfig:
+    - PKG_CONFIG_PATH
+    ./:
+    - CMAKE_PREFIX_PATH
+
+  # These are configurations for the module set named "default"
+packages:
+  lmod:
+    externals:
+    - spec: lmod@8.2.4
+      prefix: /usr
+    buildable: false
+  lustre:
+    externals:
+    - spec: lustre@2.15.2
+      prefix: /usr
+    buildable: false
+  openssl:
+    externals:
+    - spec: openssl@1.1.1k
+      prefix: /usr
+    buildable: false
+  rdma-core:
+    externals:
+    - spec: rdma-core@43.0
+      prefix: /usr
+    buildable: false
+  hcoll:
+    externals:
+    - spec: hcoll@4.8.3220
+      prefix: /opt/mellanox/hcoll
+    buildable: false
+  knem:
+    externals:
+    - spec: knem@1.1.4
+      prefix: /opt/knem-1.1.4.90mlnx3
+    buildable: false
+  xpmem:
+    externals:
+    - spec: xpmem@2.4.6
+      prefix: /usr
+    buildable: false
+  slurm:
+    externals:
+    - spec: slurm@23.02.7
+      prefix: /cm/shared/apps/slurm/current
+    buildable: false
+  gdrcopy:
+    externals:
+    - spec: gdrcopy@2.4
+      prefix: /usr
+    buildable: false
+  all:
+    compiler: [gcc, intel, pgi, clang, xl, nag, fj, aocc]
+    providers:
+      awk: [gawk]
+      blas: [openblas, amdblis]
+      D: [ldc]
+      daal: [intel-oneapi-daal]
+      elf: [elfutils]
+      fftw-api: [fftw, amdfftw]
+      flame: [libflame, amdlibflame]
+      fuse: [libfuse]
+      gl: [glx, osmesa]
+      glu: [mesa-glu, openglu]
+      golang: [go, gcc]
+      go-or-gccgo-bootstrap: [go-bootstrap, gcc]
+      iconv: [libiconv]
+      ipp: [intel-oneapi-ipp]
+      java: [openjdk, jdk, ibm-java]
+      jpeg: [libjpeg-turbo, libjpeg]
+      lapack: [openblas, amdlibflame]
+      libglx: [mesa+glx, mesa18+glx]
+      libllvm: [llvm]
+      libosmesa: [mesa+osmesa, mesa18+osmesa]
+      lua-lang: [lua, lua-luajit-openresty, lua-luajit]
+      luajit: [lua-luajit-openresty, lua-luajit]
+      mariadb-client: [mariadb-c-client, mariadb]
+      mkl: [intel-oneapi-mkl]
+      mpe: [mpe2]
+      mpi: [openmpi, mpich]
+      mysql-client: [mysql, mariadb-c-client]
+      opencl: [pocl]
+      onedal: [intel-oneapi-dal]
+      pbs: [openpbs, torque]
+      pil: [py-pillow]
+      pkgconfig: [pkgconf, pkg-config]
+      qmake: [qt-base, qt]
+      rpc: [libtirpc]
+      scalapack: [netlib-scalapack, amdscalapack]
+      sycl: [hipsycl]
+      szip: [libaec, libszip]
+      tbb: [intel-tbb]
+      unwind: [libunwind]
+      uuid: [util-linux-uuid, libuuid]
+      xxd: [xxd-standalone, vim]
+      yacc: [bison, byacc]
+      ziglang: [zig]
+      zlib-api: [zlib-ng+compat, zlib]
+    permissions:
+      read: world
+      write: user
+repos:
+- $spack/var/spack/repos/sdsc
+- $spack/var/spack/repos/builtin
+upstreams: {}
+Input spec
+--------------------------------
+ -   [    ]  .netcdf-c@4.9.2%gcc@13.3.0~blosc~byterange~dap~fsync~hdf4~ipo~jna+mpi~nczarr_zip+optimize+parallel-netcdf+pic+shared+szip+zstd
+ -   [    ]      ^.hdf5@1.14.3/uyibllb
+ -   [    ]      ^.parallel-netcdf@1.13.0/5j6em5x
+
+Concretized
+--------------------------------
+ -   7oip2la  [    ]  builtin.netcdf-c@4.9.2%gcc@13.3.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~blosc~byterange~dap~fsync~hdf4~ipo~jna+mpi~nczarr_zip+optimize+parallel-netcdf+pic+shared+szip+zstd build_system=cmake build_type=Release generator=make patches=0161eb8 arch=linux-rocky8-cascadelake
+[+]  5isi7j4  [blr ]      ^builtin.bzip2@1.0.8%gcc@13.3.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~debug~pic+shared build_system=generic arch=linux-rocky8-cascadelake
+[+]  2tc2tda  [b   ]          ^builtin.diffutils@3.9%gcc@13.3.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  build_system=autotools arch=linux-rocky8-cascadelake
+[+]  tmbf5xo  [bl  ]              ^builtin.libiconv@1.17%gcc@13.3.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  build_system=autotools libs=shared,static arch=linux-rocky8-cascadelake
+[+]  mzmpq6o  [b   ]      ^sdsc.cmake@3.31.2%gcc@13.3.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~doc+ncurses+ownlibs build_system=generic build_type=Release arch=linux-rocky8-cascadelake
+[+]  2ee3y2o  [bl  ]          ^builtin.curl@8.4.0%gcc@13.3.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~gssapi~ldap~libidn2~librtmp~libssh~libssh2+nghttp2 build_system=autotools libs=shared,static tls=openssl arch=linux-rocky8-cascadelake
+[+]  fklbcrd  [bl  ]              ^builtin.nghttp2@1.57.0%gcc@13.3.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  build_system=autotools arch=linux-rocky8-cascadelake
+[e]  uo4vlvg  [bl  ]              ^builtin.openssl@1.1.1k%gcc@8.5.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~docs+shared build_system=generic certs=mozilla arch=linux-rocky8-skylake_avx512
+[+]  oawn4o6  [bl  ]          ^builtin.ncurses@6.4%gcc@13.3.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~symlinks+termlib abi=none build_system=autotools arch=linux-rocky8-cascadelake
+[+]  fxl2qjx  [b   ]      ^builtin.gmake@4.4.1%gcc@13.3.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~guile build_system=generic arch=linux-rocky8-cascadelake
+[+]  uyibllb  [bl  ]      ^builtin.hdf5@1.14.3%gcc@13.3.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +cxx+fortran+hl~ipo~java~map+mpi+shared+szip~threadsafe+tools api=default build_system=cmake build_type=Release generator=make arch=linux-rocky8-cascadelake
+[+]  bo4fz77  [b r ]          ^sdsc.pkgconf@2.3.0%gcc@13.3.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  build_system=autotools arch=linux-rocky8-cascadelake
+[+]  2jzahiq  [bl  ]      ^builtin.libaec@1.0.6%gcc@13.3.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~ipo+shared build_system=cmake build_type=Release generator=make arch=linux-rocky8-cascadelake
+[+]  6vqnyhs  [b r ]      ^builtin.m4@1.4.19%gcc@13.3.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +sigsegv build_system=autotools patches=9dc5fbd,bfdffa7 arch=linux-rocky8-cascadelake
+[+]  plmywyn  [bl  ]          ^builtin.libsigsegv@2.14%gcc@13.3.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  build_system=autotools arch=linux-rocky8-cascadelake
+[+]  lwrzi2z  [bl  ]      ^sdsc.mvapich2@2.3.7-2%gcc@13.3.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~alloca~cuda~debug~hwloc_graphics+hwlocv2+regcache+wrapperrpath build_system=autotools ch3_rank_bits=32 fabrics=mrail file_systems=lustre patches=d98d8e7 process_managers=slurm threads=multiple arch=linux-rocky8-cascadelake
+[+]  rojkqcn  [b   ]          ^builtin.automake@1.15.1%gcc@13.3.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  build_system=autotools arch=linux-rocky8-cascadelake
+[+]  3xzam2l  [b   ]              ^sdsc.autoconf@2.72%gcc@13.3.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  build_system=autotools arch=linux-rocky8-cascadelake
+[+]  klc2keg  [b   ]          ^builtin.bison@3.8.2%gcc@13.3.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  build_system=autotools arch=linux-rocky8-cascadelake
+[+]  hrcpzuo  [bl  ]              ^builtin.gettext@0.22.3%gcc@13.3.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +bzip2+curses+git~libunistring+libxml2+pic+shared+tar+xz build_system=autotools arch=linux-rocky8-cascadelake
+[+]  fmr7b5a  [bl  ]                  ^sdsc.tar@1.34%gcc@13.3.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  build_system=autotools zip=pigz arch=linux-rocky8-cascadelake
+[+]  eymxjzm  [  r ]                      ^sdsc.pigz@2.8%gcc@13.3.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  build_system=makefile arch=linux-rocky8-cascadelake
+[+]  3rm2fty  [b   ]          ^builtin.findutils@4.9.0%gcc@13.3.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  build_system=autotools patches=440b954 arch=linux-rocky8-cascadelake
+[+]  orxdiyr  [bl  ]          ^builtin.libpciaccess@0.17%gcc@13.3.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  build_system=autotools arch=linux-rocky8-cascadelake
+[+]  bgbwgi5  [b   ]              ^builtin.libtool@2.4.7%gcc@13.3.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  build_system=autotools arch=linux-rocky8-cascadelake
+[+]  cc4rw45  [b   ]              ^builtin.util-macros@1.19.3%gcc@13.3.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  build_system=autotools arch=linux-rocky8-cascadelake
+[+]  xm2y2pr  [bl  ]          ^builtin.libxml2@2.10.3%gcc@13.3.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +pic~python+shared build_system=autotools arch=linux-rocky8-cascadelake
+[+]  swd6o52  [blr ]              ^builtin.xz@5.4.1%gcc@13.3.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~pic build_system=autotools libs=shared,static arch=linux-rocky8-cascadelake
+[e]  bmrv6wp  [bl  ]          ^builtin.rdma-core@43.0%gcc@13.3.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +static build_system=cmake build_type=Release generator=make arch=linux-rocky8-cascadelake
+[e]  wso2jiw  [bl  ]          ^builtin.slurm@23.02.7%gcc@13.3.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~cgroup~gtk~hdf5~hwloc~mariadb~nvml~pam~pmix+readline~restd~rsmi build_system=autotools sysconfdir=PREFIX/etc arch=linux-rocky8-cascadelake
+[+]  5j6em5x  [bl  ]      ^sdsc.parallel-netcdf@1.13.0%gcc@13.3.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" ~burstbuffer+cxx+fortran+pic+shared build_system=autotools arch=linux-rocky8-cascadelake
+[+]  fvjdv2e  [b r ]          ^sdsc.perl@5.40.0%gcc@13.3.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +cpanm+opcode+open+shared+threads build_system=generic arch=linux-rocky8-cascadelake
+[+]  ajfbb7c  [bl  ]              ^builtin.berkeley-db@18.1.40%gcc@13.3.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +cxx~docs+stl build_system=autotools patches=26090f4,b231fcc arch=linux-rocky8-cascadelake
+[+]  krbcu4g  [bl  ]              ^builtin.gdbm@1.23%gcc@13.3.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  build_system=autotools arch=linux-rocky8-cascadelake
+[+]  v5c55yq  [bl  ]                  ^builtin.readline@8.2%gcc@13.3.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native"  build_system=autotools patches=bbf97f1 arch=linux-rocky8-cascadelake
+[+]  hfj3adw  [bl  ]      ^builtin.zlib-ng@2.1.4%gcc@13.3.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +compat+opt build_system=autotools arch=linux-rocky8-cascadelake
+[+]  nqsiys2  [blr ]      ^builtin.zstd@1.5.5%gcc@13.3.0 cflags="-O2 -march=native" cxxflags="-O2 -march=native" fflags="-O2 -march=native" +programs build_system=makefile compression=none libs=shared,static arch=linux-rocky8-cascadelake
+
+real 19.16
+user 18.17
+sys 0.69
+==> Warning: Expected user 527835 to own /scratch/spack_gpu, but it is owned by 0
+[+] /cm/shared/apps/spack/0.21.2/gpu/a/opt/spack/linux-rocky8-cascadelake/gcc-13.3.0/bzip2-1.0.8-5isi7j4cvhilpvksxo7fzytvtvrvyx7o
+[+] /cm/shared/apps/spack/0.21.2/gpu/a/opt/spack/linux-rocky8-cascadelake/gcc-13.3.0/nghttp2-1.57.0-fklbcrd3wnnuaam3jkzqwlkiiqeoiskg
+[+] /usr (external openssl-1.1.1k-uo4vlvgmpso5fkguhd6popwmxj6tqamu)
+[+] /cm/shared/apps/spack/0.21.2/gpu/a/opt/spack/linux-rocky8-cascadelake/gcc-13.3.0/zlib-ng-2.1.4-hfj3adwit6ayp2zweo2rxahpgfhusok7
+[+] /cm/shared/apps/spack/0.21.2/gpu/a/opt/spack/linux-rocky8-cascadelake/gcc-13.3.0/ncurses-6.4-oawn4o62y6cbil7zgxbos3lpylkg3xsd
+[+] /cm/shared/apps/spack/0.21.2/gpu/a/opt/spack/linux-rocky8-cascadelake/gcc-13.3.0/gmake-4.4.1-fxl2qjxf43x5hrl5zrx7zj35jt5tasse
+[+] /usr (external rdma-core-43.0-bmrv6wpmgvsbpg23rtual4eedj3t52bc)
+[+] /cm/shared/apps/slurm/current (external slurm-23.02.7-wso2jiwmc4pbt3r2nenrtkyp7jvqtppm)
+[+] /cm/shared/apps/spack/0.21.2/gpu/a/opt/spack/linux-rocky8-cascadelake/gcc-13.3.0/zstd-1.5.5-nqsiys2k6rmlr4tt3fy32wapf37khsru
+[+] /cm/shared/apps/spack/0.21.2/gpu/a/opt/spack/linux-rocky8-cascadelake/gcc-13.3.0/libiconv-1.17-tmbf5xo42hamen4ocg65mi5k2wclspxu
+[+] /cm/shared/apps/spack/0.21.2/gpu/a/opt/spack/linux-rocky8-cascadelake/gcc-13.3.0/libpciaccess-0.17-orxdiyrcldod7f6ikmw34ru243nvvfhs
+[+] /cm/shared/apps/spack/0.21.2/gpu/a/opt/spack/linux-rocky8-cascadelake/gcc-13.3.0/libaec-1.0.6-2jzahiqnszz5otglg5u4zu3aurgfal7w
+[+] /cm/shared/apps/spack/0.21.2/gpu/a/opt/spack/linux-rocky8-cascadelake/gcc-13.3.0/curl-8.4.0-2ee3y2o7z3jk3n3vcts6xappigajcxsb
+[+] /cm/shared/apps/spack/0.21.2/gpu/a/opt/spack/linux-rocky8-cascadelake/gcc-13.3.0/xz-5.4.1-swd6o52sgkja25jh4exa6hmodyy3wtre
+[+] /cm/shared/apps/spack/0.21.2/gpu/a/opt/spack/linux-rocky8-cascadelake/gcc-13.3.0/libsigsegv-2.14-plmywynnnkgfnp4ye4dm5mmhyd6fz46r
+[+] /cm/shared/apps/spack/0.21.2/gpu/a/opt/spack/linux-rocky8-cascadelake/gcc-13.3.0/pkgconf-2.3.0-bo4fz776yxsvd7azbwccuu7v4zso5flq
+[+] /cm/shared/apps/spack/0.21.2/gpu/a/opt/spack/linux-rocky8-cascadelake/gcc-13.3.0/cmake-3.31.2-mzmpq6ort5qr7d33zw4pdgcdprfk5l27
+[+] /cm/shared/apps/spack/0.21.2/gpu/a/opt/spack/linux-rocky8-cascadelake/gcc-13.3.0/m4-1.4.19-6vqnyhsgcb2r4zoodsb4ec3hcuwoffp7
+[+] /cm/shared/apps/spack/0.21.2/gpu/a/opt/spack/linux-rocky8-cascadelake/gcc-13.3.0/libxml2-2.10.3-xm2y2prctmykhbvb5lopy3v5rxh24bd4
+[+] /cm/shared/apps/spack/0.21.2/gpu/a/opt/spack/linux-rocky8-cascadelake/gcc-13.3.0/mvapich2-2.3.7-2-lwrzi2zo2ksbrkk5rqq7dzfvdw3fe3ed
+[+] /cm/shared/apps/spack/0.21.2/gpu/a/opt/spack/linux-rocky8-cascadelake/gcc-13.3.0/hdf5-1.14.3-uyibllbq3j4t5bjxt6u4ztyek7itvy6b
+[+] /cm/shared/apps/spack/0.21.2/gpu/a/opt/spack/linux-rocky8-cascadelake/gcc-13.3.0/parallel-netcdf-1.13.0-5j6em5xv2ffrsmktoenbexfr7qvypzhi
+==> Installing netcdf-c-4.9.2-7oip2laet6m6cobutcrb5pbfwrvhyxkp [23/23]
+==> No binary for netcdf-c-4.9.2-7oip2laet6m6cobutcrb5pbfwrvhyxkp found: installing from source
+==> Fetching file:///home/spack_gpu/software/spack/caches/0.21.2/exp/gpu/dev/_source-cache/archive/bc/bc104d101278c68b303359b3dc4192f81592ae8640f1aee486921138f7f88cb7.tar.gz
+==> Fetching file:///home/spack_gpu/software/spack/caches/0.21.2/exp/gpu/dev/_source-cache/archive/01/0161eb870fdfaf61be9d70132c9447a537320342366362e76b8460c823bf95ca
+==> Applied patch https://github.com/Unidata/netcdf-c/commit/f8904d5a1d89420dde0f9d2c0e051ba08d08e086.patch?full_index=1
+==> netcdf-c: Executing phase: 'cmake'
+==> netcdf-c: Executing phase: 'build'
+==> netcdf-c: Executing phase: 'install'
+==> netcdf-c: Successfully installed netcdf-c-4.9.2-7oip2laet6m6cobutcrb5pbfwrvhyxkp
+  Stage: 0.64s.  Cmake: 16.20s.  Build: 21.75s.  Install: 2.60s.  Post-install: 0.34s.  Total: 42.00s
+[+] /cm/shared/apps/spack/0.21.2/gpu/a/opt/spack/linux-rocky8-cascadelake/gcc-13.3.0/netcdf-c-4.9.2-7oip2laet6m6cobutcrb5pbfwrvhyxkp
+real 61.79
+user 169.79
+sys 86.74
+==> Concretizing input specs
+==> Skipping rdma-core@43.0%gcc@13.3.0+static build_system=cmake build_type=Release generator=make arch=linux-rocky8-cascadelake/bmrv6wp as it is an external spec.
+==> Skipping slurm@23.02.7%gcc@13.3.0~cgroup~gtk~hdf5~hwloc~mariadb~nvml~pam~pmix+readline~restd~rsmi build_system=autotools sysconfdir=PREFIX/etc arch=linux-rocky8-cascadelake/wso2jiw as it is an external spec.
+==> Skipping openssl@1.1.1k%gcc@8.5.0~docs+shared build_system=generic certs=mozilla arch=linux-rocky8-skylake_avx512/uo4vlvg as it is an external spec.
+==> Adding package autoconf@2.72 to mirror
+==> Adding package automake@1.15.1 to mirror
+==> Adding package berkeley-db@18.1.40 to mirror
+==> Adding package bison@3.8.2 to mirror
+==> Adding package bzip2@1.0.8 to mirror
+==> Adding package cmake@3.31.2 to mirror
+==> Adding package curl@8.4.0 to mirror
+==> Adding package diffutils@3.9 to mirror
+==> Adding package findutils@4.9.0 to mirror
+==> Adding package gdbm@1.23 to mirror
+==> Adding package gettext@0.22.3 to mirror
+==> Adding package gmake@4.4.1 to mirror
+==> Adding package hdf5@1.14.3 to mirror
+==> Adding package libaec@1.0.6 to mirror
+==> Adding package libiconv@1.17 to mirror
+==> Adding package libpciaccess@0.17 to mirror
+==> Adding package libsigsegv@2.14 to mirror
+==> Adding package libtool@2.4.7 to mirror
+==> Adding package libxml2@2.10.3 to mirror
+==> Adding package m4@1.4.19 to mirror
+==> Adding package mvapich2@2.3.7-2 to mirror
+==> Adding package ncurses@6.4 to mirror
+==> Adding package netcdf-c@4.9.2 to mirror
+==> Adding package nghttp2@1.57.0 to mirror
+==> Adding package parallel-netcdf@1.13.0 to mirror
+==> Adding package perl@5.40.0 to mirror
+==> Adding package pigz@2.8 to mirror
+==> Adding package pkgconf@2.3.0 to mirror
+==> Adding package readline@8.2 to mirror
+==> Adding package tar@1.34 to mirror
+==> Adding package util-macros@1.19.3 to mirror
+==> Adding package xz@5.4.1 to mirror
+==> Adding package zlib-ng@2.1.4 to mirror
+==> Adding package zstd@1.5.5 to mirror
+==> Summary for mirror in /home/spack_gpu/software/spack/caches/0.21.2/exp/gpu/dev
+==> Archive stats:
+    34   already present
+    0    added
+    0    failed to fetch.
+real 18.89
+user 18.18
+sys 0.51
+==> Selected 34 specs to push to file:///home/spack_gpu/software/spack/caches/0.21.2/exp/gpu/dev
+==> [ 1/34] Pushed netcdf-c@4.9.2/7oip2la
+==> The following 33 specs were skipped as they already exist in the buildcache:
+    bzip2@1.0.8/5isi7j4, cmake@3.31.2/mzmpq6o, gmake@4.4.1/fxl2qjx, hdf5@1.14.3/uyibllb, ..., pigz@2.8/eymxjzm
+    Use --force to overwrite them.
+real 1.91
+user 1.28
+sys 0.25

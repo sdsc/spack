@@ -68,7 +68,7 @@ module list
 
 declare -xr SPACK_PACKAGE='mvapich2@2.3.7-2'
 declare -xr SPACK_COMPILER='gcc@11.5.0'
-declare -xr SPACK_VARIANTS='~alloca ch3_rank_bits=32 ~cuda ~debug fabrics=mrail file_systems=lustre ~hwloc_graphics ~hwlocv2 process_managers=slurm +regcache threads=multiple +wrapperrpath'
+declare -xr SPACK_VARIANTS='~alloca ch3_rank_bits=32 ~cuda ~debug fabrics=mrail file_systems=lustre ~hwloc_graphics +hwlocv2 process_managers=slurm +regcache threads=multiple +wrapperrpath'
 declare -xr SPACK_DEPENDENCIES="^slurm ^rdma-core" #^cuda@11.8.0/$(spack find --format '{hash:7}' cuda@11.8.0 % ${SPACK_COMPILER})"
 declare -xr SPACK_SPEC="${SPACK_PACKAGE} % ${SPACK_COMPILER} ${SPACK_VARIANTS} ${SPACK_DEPENDENCIES}"
 
